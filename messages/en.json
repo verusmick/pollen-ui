@@ -1,5 +1,9 @@
 {
   "HomePage": {
     "title": "Hello world 2"
+  },
+  "forecastPage": {
+    "title": "Forecast Map",
+    "description": "Interactive pollen forecast map"
   }
 }
