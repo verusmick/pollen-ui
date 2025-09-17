@@ -1,10 +1,7 @@
 "use client";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import {
-  getForecastByCoords,
-  getForecastWithIntervals,
-} from "@/lib/api/forecast";
+import { getForecastByCoords } from "@/lib/api/forecast";
 
 export default function ForecastPage() {
   const t = useTranslations("forecastPage");
