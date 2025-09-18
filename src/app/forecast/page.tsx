@@ -2,11 +2,6 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { getForecastByCoords } from "@/lib/api/forecast";
-import dynamic from 'next/dynamic';
-
-const ForecastMap = dynamic(() => import('@/components/ForecastMap'), {
-  ssr: false
-});
 
 export default function ForecastPage() {
   const t = useTranslations("forecastPage");
@@ -47,7 +42,7 @@ export default function ForecastPage() {
       </pre> */}
 
       <div className="mt-6 h-[500px] w-full rounded-lg bg-gray-200 flex items-center justify-center">
-        <ForecastMap />
+        <span className="text-gray-500">[Map goes here]</span>
       </div>
     </main>
   );
