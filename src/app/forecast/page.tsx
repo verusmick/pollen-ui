@@ -1,7 +1,13 @@
 "use client";
-import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { getForecastByCoords } from "@/lib/api/forecast";
+
+const ForecastMap = dynamic(() => import("@/components/ForecastMap"), {
+  ssr: false,
+  loading: () => <p>Loading...</p>,
+});
 
 export default function ForecastPage() {
   const t = useTranslations("forecastPage");
@@ -34,7 +40,7 @@ export default function ForecastPage() {
       <p className="text-gray-600">{t("description")}</p>
 
       <p className="text-1xl pt-3">Testing API</p>
-      <pre className="bg-gray-900 p-4 rounded-lg mt-4 overflow-x-auto">
+      <pre className="h-[120px] bg-gray-900 p-4 rounded-lg mt-4 overflow-x-auto">
         {data ? JSON.stringify(data, null, 2) : "Loading..."}
       </pre>
       {/* <pre className="bg-gray-900 p-4 rounded-lg mt-4 overflow-x-auto max-h-[200px]">
@@ -42,7 +48,7 @@ export default function ForecastPage() {
       </pre> */}
 
       <div className="mt-6 h-[500px] w-full rounded-lg bg-gray-200 flex items-center justify-center">
-        <span className="text-gray-500">[Map goes here]</span>
+        <ForecastMap />
       </div>
     </main>
   );
