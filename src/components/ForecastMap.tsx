@@ -35,31 +35,47 @@ export default function ForecastMap() {
 
   return (
     <MapContainer
-      center={[48.5, 11.5]}
-      zoom={7}
-      style={{ height: "600px", width: "100%" }}
+      center={[49, 11.6]}
+      style={{
+        height: "100vh",
+        width: "100vw",
+        top: 0,
+      }}
+      maxBoundsViscosity={1.0}
+      zoom={8.5}
+      zoomControl={false}
+      // scrollWheelZoom={false}
+      // dragging={false}
+      minZoom={6}
+      touchZoom={false}
+      doubleClickZoom={false}
+      boxZoom={false}
+      keyboard={false}
+      maxBounds={[
+        [47, 5.8663], // Southwest (lat, lon)
+        [55.0581, 15.941], // Northeast (lat, lon)
+      ]}
     >
+      {/* Dark option */}
       <TileLayer
-        attribution="&copy; OpenStreetMap contributors"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
       />
-
-      {/* Show Bavaria border */}
-      <GeoJSON
-        data={bavariaGeo as any}
-        style={() => ({
-          fillColor: "transparent",
-          color: "blue",
-          weight: 2,
-        })}
-      />
+      {/* Light option */}
+      {/* <TileLayer
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      /> */}
 
       {/* Gray everything outside Bavaria */}
       <GeoJSON
         data={mask as any}
         style={() => ({
-          fillColor: "rgba(200,200,200,0.7)",
-          color: "none",
+          fillColor: "#212121",
+          // color: "#212121",
+          color: "#A0BCE8",
+          fillOpacity: 0.8,
+          weight: 2,
         })}
       />
     </MapContainer>
