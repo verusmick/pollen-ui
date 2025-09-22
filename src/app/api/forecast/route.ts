@@ -1,16 +1,19 @@
-import {NextResponse} from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-const BASE_URL = 'http://forecast.enjambre.com.bo/api/forecast';
+const BASE_URL = 'http://forecast.enjambre.com.bo/api';
 
-export async function GET(req: Request) {
-  const {searchParams} = new URL(req.url);
+export async function GET(req: NextRequest) {
+  const urlObj = new URL(req.url);
 
-  // server-side fetch: HTTP is allowed here
-  const url = `${BASE_URL}?${searchParams.toString()}`;
-  const res = await fetch(url);
+  // Forward request to external API
+  const forwardUrl = `${BASE_URL}/forecast?${urlObj.searchParams.toString()}`;
+  const res = await fetch(forwardUrl);
 
   if (!res.ok) {
-    return NextResponse.json({error: 'Failed to fetch forecast'}, {status: res.status});
+    return NextResponse.json(
+      { error: `Failed to fetch forecast: ${res.statusText}` },
+      { status: res.status }
+    );
   }
 
   const data = await res.json();
