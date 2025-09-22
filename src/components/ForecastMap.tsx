@@ -6,7 +6,8 @@ import "leaflet-defaulticon-compatibility";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
 
-export default function ForecastMap() {
+export default function ForecastMap({ pollenData }: { pollenData: any }) {
+  console.log("heat pollen data", JSON.stringify(pollenData));
   // Extract Bavaria's multipolygon coordinates
   const bavariaCoords =
     bavariaGeo.features[0].geometry.type === "MultiPolygon"
