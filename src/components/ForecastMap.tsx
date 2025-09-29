@@ -5,14 +5,25 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
+import germanyGeo from "@/data/germany.geo.json";
+import HeatmapLayer from "./HeatmapLayer";
+import filterPointsInBavaria from "../utils/filterPointsInBavaria";
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
-  console.log("heat pollen data", JSON.stringify(pollenData));
+  // Convert pollenData into [lat, lon, intensity] for heatmap
+  const heatPoints: [number, number, number?][] = pollenData.map(
+    (point: any) => [point.lat, point.long, point.value ? point.value:  0.5]
+    // (point: any) => [point.lat, point.long, 10]
+  );
+                            
+  const filteredHeatPoints = filterPointsInBavaria(heatPoints);
+  console.log('-====>', filteredHeatPoints)
+
   // Extract Bavaria's multipolygon coordinates
   const bavariaCoords =
-    bavariaGeo.features[0].geometry.type === "MultiPolygon"
-      ? bavariaGeo.features[0].geometry.coordinates
-      : [bavariaGeo.features[0].geometry.coordinates];
+    germanyGeo.features[0].geometry.type === "MultiPolygon"
+      ? germanyGeo.features[0].geometry.coordinates
+      : [germanyGeo.features[0].geometry.coordinates];
 
   // Build mask polygon with world outline + Bavaria holes
   const mask = {
@@ -36,46 +47,54 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
   return (
     <MapContainer
-      center={[49, 11.6]}
+      center={[51, 10.5]}
       style={{
         height: "100vh",
         width: "100vw",
         top: 0,
       }}
       maxBoundsViscosity={1.0}
-      zoom={8.5}
+      zoom={6.5}
       zoomControl={false}
       // scrollWheelZoom={false}
       // dragging={false}
-      minZoom={6}
+      minZoom={5}
       touchZoom={false}
       doubleClickZoom={false}
       boxZoom={false}
       keyboard={false}
       maxBounds={[
-        [47, 5.8663], // Southwest (lat, lon)
-        [55.0581, 15.941], // Northeast (lat, lon)
+        [34, -10], // Southwest (lat, lon)
+        [72, 32], // Northeast (lat, lon)
       ]}
     >
-      {/* Dark option */}
       <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png"
+        attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {/* Light option */}
-      {/* <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-      /> */}
 
-      {/* Gray everything outside Bavaria */}
+      {/* Pollen Heatmap */}
+      <HeatmapLayer
+        points={filteredHeatPoints}
+        options={{ radius: 25, blur: 15, maxZoom: 17 }}
+      />
+
+      {/* Boundary of Bavaria */}
+      <GeoJSON
+        data={bavariaGeo as any}
+        style={() => ({
+          fillColor: "transparent",
+          color: "#4e4d4d",
+          weight: 1.5,
+        })}
+      />
+      {/* Gray everything outside of Gemany */}
       <GeoJSON
         data={mask as any}
         style={() => ({
           fillColor: "#212121",
-          // color: "#212121",
           color: "#A0BCE8",
-          fillOpacity: 0.8,
+          fillOpacity: 0.5,
           weight: 2,
         })}
       />
