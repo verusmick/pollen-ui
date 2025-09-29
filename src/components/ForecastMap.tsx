@@ -12,11 +12,12 @@ import filterPointsInBavaria from "../utils/filterPointsInBavaria";
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
   // Convert pollenData into [lat, lon, intensity] for heatmap
   const heatPoints: [number, number, number?][] = pollenData.map(
-    // (point: any) => [point.lat, point.long, point.value ? point.value:  0.5]
-    (point: any) => [point.lat, point.long, 0.5]
+    (point: any) => [point.lat, point.long, point.value ? point.value:  0.5]
+    // (point: any) => [point.lat, point.long, 10]
   );
-
+                            
   const filteredHeatPoints = filterPointsInBavaria(heatPoints);
+  console.log('-====>', filteredHeatPoints)
 
   // Extract Bavaria's multipolygon coordinates
   const bavariaCoords =
@@ -75,16 +76,15 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       {/* Pollen Heatmap */}
       <HeatmapLayer
         points={filteredHeatPoints}
-        // points={heatPoints}
         options={{ radius: 25, blur: 15, maxZoom: 17 }}
       />
 
+      {/* Boundary of Bavaria */}
       <GeoJSON
         data={bavariaGeo as any}
         style={() => ({
           fillColor: "transparent",
           color: "#4e4d4d",
-          // fillOpacity: 0.5,
           weight: 1.5,
         })}
       />
@@ -93,7 +93,6 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
         data={mask as any}
         style={() => ({
           fillColor: "#212121",
-          // color: "#212121",
           color: "#A0BCE8",
           fillOpacity: 0.5,
           weight: 2,
