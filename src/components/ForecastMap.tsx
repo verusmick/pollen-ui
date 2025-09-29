@@ -5,22 +5,24 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
+import germanyGeo from "@/data/germany.geo.json";
 import HeatmapLayer from "./HeatmapLayer";
+import filterPointsInBavaria from "../utils/filterPointsInBavaria";
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
-  // console.log("heat pollen data", JSON.stringify(pollenData));
-
   // Convert pollenData into [lat, lon, intensity] for heatmap
   const heatPoints: [number, number, number?][] = pollenData.map(
-    (point: any) => [point.lat, point.long, point.value ? point.value:  0.5]
+    // (point: any) => [point.lat, point.long, point.value ? point.value:  0.5]
+    (point: any) => [point.lat, point.long, 0.5]
   );
 
-  console.log('==>', heatPoints)
+  const filteredHeatPoints = filterPointsInBavaria(heatPoints);
+
   // Extract Bavaria's multipolygon coordinates
   const bavariaCoords =
-    bavariaGeo.features[0].geometry.type === "MultiPolygon"
-      ? bavariaGeo.features[0].geometry.coordinates
-      : [bavariaGeo.features[0].geometry.coordinates];
+    germanyGeo.features[0].geometry.type === "MultiPolygon"
+      ? germanyGeo.features[0].geometry.coordinates
+      : [germanyGeo.features[0].geometry.coordinates];
 
   // Build mask polygon with world outline + Bavaria holes
   const mask = {
@@ -44,25 +46,25 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
   return (
     <MapContainer
-      center={[49, 11.6]}
+      center={[51, 10.5]}
       style={{
         height: "100vh",
         width: "100vw",
         top: 0,
       }}
       maxBoundsViscosity={1.0}
-      zoom={8.5}
+      zoom={6.5}
       zoomControl={false}
       // scrollWheelZoom={false}
       // dragging={false}
-      minZoom={6}
+      minZoom={5}
       touchZoom={false}
       doubleClickZoom={false}
       boxZoom={false}
       keyboard={false}
       maxBounds={[
-        [47, 5.8663], // Southwest (lat, lon)
-        [55.0581, 15.941], // Northeast (lat, lon)
+        [34, -10], // Southwest (lat, lon)
+        [72, 32], // Northeast (lat, lon)
       ]}
     >
       <TileLayer
@@ -72,11 +74,21 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
       {/* Pollen Heatmap */}
       <HeatmapLayer
-        points={heatPoints}
+        points={filteredHeatPoints}
+        // points={heatPoints}
         options={{ radius: 25, blur: 15, maxZoom: 17 }}
       />
 
-      {/* Gray everything outside Bavaria */}
+      <GeoJSON
+        data={bavariaGeo as any}
+        style={() => ({
+          fillColor: "transparent",
+          color: "#4e4d4d",
+          // fillOpacity: 0.5,
+          weight: 1.5,
+        })}
+      />
+      {/* Gray everything outside of Gemany */}
       <GeoJSON
         data={mask as any}
         style={() => ({
