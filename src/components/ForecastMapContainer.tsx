@@ -80,7 +80,7 @@ export const ForecastMapContainer = () => {
     console.log("Added data for hour " + hour);
   }
 
-  function loadAllData(longs, lats) {
+  function loadAllData(longs: number[], lats: number[]) {
     const hours = Array.from({ length: 48 }, (_, i) => i + 1);
 
     return hours
@@ -136,7 +136,7 @@ export const ForecastMapContainer = () => {
       });
   }
 
-  const handleSliderChange = (e) => {
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hour = parseInt(e.target.value);
     setPlaying(false); // Stop autoplay if user interacts
     setSelectedHour(hour);

@@ -1,27 +1,28 @@
-import * as turf from "@turf/turf";
+import { feature, point, polygon, bbox, booleanPointInPolygon } from "@turf/turf";
+import type { Feature, Polygon, GeoJsonProperties } from "geojson";
 import bavariaGeo from '@/data/bavaria.geo.json';
 
 export default function filterPointsInBavaria(points: [number, number, number?][]) {
   const bavariaFeature = bavariaGeo.features[0];
-  const polygons: turf.Feature<turf.Polygon>[] = [];
+  const polygons: Feature<Polygon, GeoJsonProperties>[] = [];
 
   if (bavariaFeature.geometry.type === "MultiPolygon") {
     bavariaFeature.geometry.coordinates.forEach((coords) => {
-      polygons.push(turf.polygon(coords));
+      polygons.push(polygon(coords));
     });
   } else {
-    polygons.push(turf.polygon(bavariaFeature.geometry.coordinates));
+polygons.push(polygon(bavariaFeature.geometry.coordinates[0]));
   }
 
-  const bboxes = polygons.map((poly) => turf.bbox(poly));
+  const bboxes = polygons.map((poly) => bbox(poly));
 
   return points.filter(([lat, lng]) => {
-    const point = turf.point([lng, lat]);
+    const p = point([lng, lat]);
 
     for (let i = 0; i < polygons.length; i++) {
       const [minX, minY, maxX, maxY] = bboxes[i];
       if (lng >= minX && lng <= maxX && lat >= minY && lat <= maxY) {
-        if (turf.booleanPointInPolygon(point, polygons[i])) {
+        if (booleanPointInPolygon(p, polygons[i])) {
           return true;
         }
       }

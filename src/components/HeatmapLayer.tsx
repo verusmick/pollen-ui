@@ -1,11 +1,25 @@
 "use client";
-import { createLayerComponent } from "@react-leaflet/core";
+import { createLayerComponent, LayerProps } from "@react-leaflet/core";
 import L from "leaflet";
 import "leaflet.heat";
 
-interface HeatmapProps {
+declare module "leaflet" {
+interface HeatLayerOptions extends L.LayerOptions {
+    minOpacity?: number;
+    maxZoom?: number;
+    radius?: number;
+    blur?: number;
+    max?: number;
+    gradient?: { [key: number]: string };
+  }
+  interface HeatLayer extends L.Layer {
+    setLatLngs(latlngs: [number, number, number?][]): this;
+    setOptions(options: L.HeatLayerOptions): this;
+  }
+}
+interface HeatmapProps extends LayerProps {
   points: [number, number, number?][]; // [lat, lng, intensity?]
-  options?: L.HeatMapOption;
+  options?: L.HeatLayerOptions;
 }
 
 const HeatmapLayer = createLayerComponent<L.HeatLayer, HeatmapProps>(
@@ -17,7 +31,7 @@ const HeatmapLayer = createLayerComponent<L.HeatLayer, HeatmapProps>(
     if (props.points !== prevProps.points) {
       layer.setLatLngs(props.points);
     }
-    if (props.options !== prevProps.options) {
+    if (props.options && props.options !== prevProps.options) {
       layer.setOptions(props.options);
     }
   }
