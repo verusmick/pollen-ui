@@ -104,7 +104,6 @@ export const ForecastMapContainer = () => {
   }
 
   function loadInitialData() {
-    // console.log("Initial Data");
     // setLoading(true);
     let longs: number[] = [];
     let lats: number[] = [];
@@ -118,17 +117,15 @@ export const ForecastMapContainer = () => {
         return getForecastByCoords({ from, to, pollen: pollenType });
       })
       .then((res) => {
-        // console.log("getForecastByCoords", res);
+     
         addData(res, longs, lats, 0);
         setLongitudes(longs);
         setLatitudes(lats);
         setData(allData[0]);
-        // console.log("initial data loaded", allData[0]);
         return loadAllData(longs, lats);
       })
       .then((res) => {
         setLoading(false);
-        console.log("all data loaded", allData);
       })
       .catch((err) => {
         console.error("Failed to load data:", err);
@@ -160,7 +157,7 @@ export const ForecastMapContainer = () => {
 
     return () => clearInterval(interval);
   }, [playing, allData1]);
-  console.log("data", data);
+
   return (
     <div className="relative h-screen w-screen">
       {/* Fullscreen Map */}
