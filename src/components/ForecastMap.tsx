@@ -6,8 +6,10 @@ import { useMemo, useState } from "react";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
 import germanyGeo from "@/data/germany.geo.json";
+import type { FeatureCollection } from "geojson";
 import filterPointsInBavaria from "../utils/filterPointsInBavaria";
 import { BitmapLayer } from "@deck.gl/layers";
+import type { Feature } from "geojson";
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -55,8 +57,9 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   const maskLayer = useMemo(() => {
     const bavariaCoords = germanyGeo.features[0].geometry.coordinates;
 
-    const maskPolygon = {
+    const maskPolygon: Feature = {
       type: "Feature",
+      properties: {},
       geometry: {
         type: "Polygon",
         coordinates: [
@@ -76,7 +79,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
     return new GeoJsonLayer({
       id: "mask-layer",
-      data: maskPolygon,
+      data: [maskPolygon],
       filled: true,
       stroked: false,
       getFillColor: [33, 33, 33, 180], // Dark gray
@@ -92,16 +95,18 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       maxZoom: 19,
       tileSize: 256,
       renderSubLayers: (props) => {
-        const {
-          bbox: { west, south, east, north },
-          data,
-          id,
-        } = props.tile;
+        const { bbox, data, id } = props.tile;
+
+        // Handle different types of bounding boxes
+        const bounds: [number, number, number, number] =
+          "west" in bbox
+            ? [bbox.west, bbox.south, bbox.east, bbox.north]
+            : [bbox.left, bbox.bottom, bbox.right, bbox.top];
 
         return new BitmapLayer({
           id: `${id}-bitmap`,
           image: data,
-          bounds: [west, south, east, north],
+          bounds,
         });
       },
     }),
@@ -158,7 +163,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     // Bavaria boundary
     new GeoJsonLayer({
       id: "bavaria-boundary",
-      data: bavariaGeo,
+      data: bavariaGeo as FeatureCollection,
       filled: false,
       stroked: true,
       getLineColor: [78, 77, 77],
@@ -219,10 +224,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
           minZoom: 5,
           maxZoom: 12,
         }}
-        controller={{
-          maxZoom: 12,
-          minZoom: 5,
-        }}
+        controller={true}
         layers={layers}
         style={{ width: "100vw", height: "100vh" }}
         // getTooltip={({ object }) => {
