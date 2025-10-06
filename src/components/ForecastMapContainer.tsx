@@ -1,16 +1,11 @@
 "use client";
-import dynamic from "next/dynamic";
 import {
   getForecastByCoords,
   getLatitudes,
   getLongitudes,
 } from "@/lib/api/forecast";
 import { useEffect, useState } from "react";
-
-const ForecastMap = dynamic(() => import("@/components/ForecastMap"), {
-  ssr: false,
-  loading: () => <p>Loading...</p>,
-});
+import ForecastMap from "@/components/ForecastMap";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
@@ -25,9 +20,10 @@ export const ForecastMapContainer = () => {
   const [allData1, setAllData1] = useState<
     { long: number; lat: number; value: number }[][]
   >([]);
+
   const pollenType = "POLLEN_BIRCH";
-  const from = 1649894400; // April 1, 2022 00:00:0ƒ0
-  const to = from + 59 * 60 + 59; // April 1, 2022 00:59:59
+  const from = 1649894400;
+  const to = from + 59 * 60 + 59;
 
   let allData: { long: number; lat: number; value: number }[][] = [];
 
@@ -54,30 +50,24 @@ export const ForecastMapContainer = () => {
         let value = forecasts[i];
         if (value > 0) {
           if (value >= 1 && value <= 30) {
-            value = 2;
+            value = 0.2;
           } else if (value >= 31 && value <= 100) {
-            value = 4;
+            value = 0.4;
           } else if (value >= 101 && value <= 200) {
-            value = 6;
+            value = 0.6;
           } else if (value >= 201 && value <= 400) {
-            value = 8;
+            value = 0.8;
           } else {
-            value = 9;
+            value = 0.9;
           }
           values.push({ long: lon, lat: lat, value: value });
         }
-
-        // let value = Math.floor(Math.random() * 10) + 1;
-        // if (values.length < 50000 && value < 7) {
-        //     values.push({ long: lon, lat: lat, value: value });
-        // }
-
         i++;
       }
     }
     allData.push(values);
     setAllData1(allData);
-    console.log("Added data for hour " + hour);
+    // console.log("Added data for hour " + hour);
   }
 
   function loadAllData(longs: number[], lats: number[]) {
@@ -104,8 +94,6 @@ export const ForecastMapContainer = () => {
   }
 
   function loadInitialData() {
-    // console.log("Initial Data");
-    // setLoading(true);
     let longs: number[] = [];
     let lats: number[] = [];
     getLongitudes()
@@ -118,7 +106,6 @@ export const ForecastMapContainer = () => {
         return getForecastByCoords({ from, to, pollen: pollenType });
       })
       .then((res) => {
-        // console.log("getForecastByCoords", res);
         addData(res, longs, lats, 0);
         setLongitudes(longs);
         setLatitudes(lats);
@@ -128,17 +115,17 @@ export const ForecastMapContainer = () => {
       })
       .then((res) => {
         setLoading(false);
-        console.log("all data loaded", allData);
+        // console.log("all data loaded", allData);
       })
       .catch((err) => {
-        console.error("Failed to load data:", err);
+        // console.error("Failed to load data:", err);
         setLoading(false);
       });
   }
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hour = parseInt(e.target.value);
-    setPlaying(false); // Stop autoplay if user interacts
+    setPlaying(false);
     setSelectedHour(hour);
     setData(allData1[hour] || []);
   };
@@ -152,7 +139,7 @@ export const ForecastMapContainer = () => {
 
     const interval = setInterval(() => {
       setSelectedHour((prev) => {
-        const nextHour = (prev + 1) % 49; // Loop from 0–48
+        const nextHour = (prev + 1) % 49;
         setData(allData1[nextHour] || []);
         return nextHour;
       });
@@ -160,13 +147,11 @@ export const ForecastMapContainer = () => {
 
     return () => clearInterval(interval);
   }, [playing, allData1]);
-  console.log("data", data);
+
   return (
     <div className="relative h-screen w-screen">
-      {/* Fullscreen Map */}
       <ForecastMap pollenData={data} />
 
-      {/* Floating Control Panel */}
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2
                     bg-white/90 shadow-lg rounded-lg p-4
@@ -190,7 +175,10 @@ export const ForecastMapContainer = () => {
         </div>
 
         <div className="w-full">
-          <label htmlFor="hourSlider" className="block mb-2 text-center">
+          <label
+            htmlFor="hourSlider"
+            className="block mb-2 text-center bg-gray-800"
+          >
             Hour selected: {selectedHour} hour(s)
           </label>
           <input

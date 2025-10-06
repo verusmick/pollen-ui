@@ -1,107 +1,254 @@
 "use client";
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
-import "leaflet-defaulticon-compatibility";
+import { DeckGL } from "@deck.gl/react";
+import { TileLayer } from "@deck.gl/geo-layers";
+import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
+import { useMemo, useState } from "react";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
 import germanyGeo from "@/data/germany.geo.json";
-import HeatmapLayer from "./HeatmapLayer";
+import type { FeatureCollection } from "geojson";
 import filterPointsInBavaria from "../utils/filterPointsInBavaria";
+import { BitmapLayer } from "@deck.gl/layers";
+import type { Feature } from "geojson";
+
+// Define the grid cell size in degrees
+const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
-  // Convert pollenData into [lat, lon, intensity] for heatmap
-  const heatPoints: [number, number, number?][] = pollenData.map(
-    (point: any) => [point.lat, point.long, point.value ? point.value:  0.5]
-    // (point: any) => [point.lat, point.long, 10]
-  );
-                            
-  const filteredHeatPoints = filterPointsInBavaria(heatPoints);
-  console.log('-====>', filteredHeatPoints)
+  const [hoverInfo, setHoverInfo] = useState<{
+    object: any;
+    x: number;
+    y: number;
+  } | null>(null);
+  // Convert your API data to grid cells
+  const gridCells = useMemo(() => {
+    if (!pollenData || pollenData.length === 0) return [];
 
-  // Extract Bavaria's multipolygon coordinates
-  const bavariaCoords =
-    germanyGeo.features[0].geometry.type === "MultiPolygon"
-      ? germanyGeo.features[0].geometry.coordinates
-      : [germanyGeo.features[0].geometry.coordinates];
+    // Convert to the format your filter expects
+    const heatPoints: [number, number, number?][] = pollenData.map(
+      (point: any) => [point.lat, point.long, point.value || 0.5]
+    );
 
-  // Build mask polygon with world outline + Bavaria holes
-  const mask = {
-    type: "Feature",
-    geometry: {
-      type: "Polygon",
-      coordinates: [
-        // World rectangle (outer ring)
-        [
-          [-180, -90],
-          [-180, 90],
-          [180, 90],
-          [180, -90],
-          [-180, -90],
+    // const filteredPoints = filterPointsInBavaria(heatPoints);
+    const filteredPoints = filterPointsInBavaria(heatPoints);
+
+    // Create grid cells from filtered points
+    return filteredPoints.map(([lat, lon, intensity = 0.5]) => {
+      // Create a square quadrant around each point
+      const halfCell = GRID_RESOLUTION / 2;
+
+      const quadrant = [
+        [lon - halfCell, lat - halfCell], // bottom-left
+        [lon + halfCell, lat - halfCell], // bottom-right
+        [lon + halfCell, lat + halfCell], // top-right
+        [lon - halfCell, lat + halfCell], // top-left
+        [lon - halfCell, lat - halfCell], // close polygon
+      ];
+
+      return {
+        polygon: quadrant,
+        intensity: intensity,
+        position: [lon, lat],
+      };
+    });
+  }, [pollenData]);
+
+  // Create mask for area outside Germany
+  const maskLayer = useMemo(() => {
+    const bavariaCoords = germanyGeo.features[0].geometry.coordinates;
+
+    const maskPolygon: Feature = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          // World bounds
+          [
+            [-180, -90],
+            [-180, 90],
+            [180, 90],
+            [180, -90],
+            [-180, -90],
+          ],
+          // Bavaria hole
+          ...bavariaCoords.flat(),
         ],
-        // Flatten each polygon ring in MultiPolygon
-        ...bavariaCoords.map((polygon) => polygon[0]),
-      ],
-    },
-  };
+      },
+    };
+
+    return new GeoJsonLayer({
+      id: "mask-layer",
+      data: [maskPolygon],
+      filled: true,
+      stroked: false,
+      getFillColor: [33, 33, 33, 180], // Dark gray
+    });
+  }, []);
+
+  const layers = [
+    // Free OpenStreetMap base layer
+    new TileLayer({
+      id: "base-map",
+      data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      minZoom: 0,
+      maxZoom: 19,
+      tileSize: 256,
+      renderSubLayers: (props) => {
+        const { bbox, data, id } = props.tile;
+
+        // Handle different types of bounding boxes
+        const bounds: [number, number, number, number] =
+          "west" in bbox
+            ? [bbox.west, bbox.south, bbox.east, bbox.north]
+            : [bbox.left, bbox.bottom, bbox.right, bbox.top];
+
+        return new BitmapLayer({
+          id: `${id}-bitmap`,
+          image: data,
+          bounds,
+        });
+      },
+    }),
+
+    // Pollen grid cells layer
+    new PolygonLayer({
+      id: "pollen-grid",
+      data: gridCells,
+      getPolygon: (d: any) => d.polygon,
+      getFillColor: (d: any) => {
+        const intensity = d.intensity;
+        // Your color scale based on pollen intensity
+        if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
+        else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
+        else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
+        else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
+        else return [255, 0, 0, 60]; // Red - high
+      },
+      getLineColor: [0, 0, 0, 10],
+      // lineWidthMinPixels: 0.5,
+      filled: true,
+      stroked: true,
+      extruded: false,
+      // 🔥 HOVER CONFIGURATION
+      pickable: true,
+      autoHighlight: true,
+      highlightColor: [255, 255, 255, 100], // White highlight border
+      onHover: (info: any) => {
+        // Show tooltip on hover
+        if (info.object) {
+          setHoverInfo({
+            object: info.object,
+            x: info.x,
+            y: info.y,
+          });
+        } else {
+          setHoverInfo(null); // Hide tooltip when not hovering
+        }
+      },
+      onClick: (info: any) => {
+        // // Show tooltip on hover
+        // if (info.object) {
+        //   setHoverInfo({
+        //     object: info.object,
+        //     x: info.x,
+        //     y: info.y,
+        //   });
+        // } else {
+        //   setHoverInfo(null); // Hide tooltip when not hovering
+        // }
+      },
+    }),
+
+    // Bavaria boundary
+    new GeoJsonLayer({
+      id: "bavaria-boundary",
+      data: bavariaGeo as FeatureCollection,
+      filled: false,
+      stroked: true,
+      getLineColor: [78, 77, 77],
+      lineWidthMinPixels: 1.5,
+      getLineWidth: 1,
+    }),
+
+    // Mask outside area
+    maskLayer,
+  ];
+
+  function renderTooltip() {
+    if (!hoverInfo || !hoverInfo.object) return null;
+
+    const { object, x, y } = hoverInfo;
+    const intensity = object.intensity;
+
+    // Convert intensity to pollen level text
+    const pollenLevel =
+      intensity <= 0.2
+        ? "Very Low"
+        : intensity <= 0.4
+        ? "Low"
+        : intensity <= 0.6
+        ? "Medium"
+        : intensity <= 0.8
+        ? "High"
+        : "Very High";
+
+    return (
+      <div
+        className="absolute pointer-events-none z-50"
+        style={{ left: x, top: y, transform: "translate(-50%, -100%)" }}
+      >
+        <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg max-w-xs">
+          <div className="font-semibold">Pollen Information</div>
+          {/* <div>Intensity: {(intensity * 10).toFixed(1)}</div> */}
+          <div>Level: {pollenLevel}</div>
+          <div>Lat: {object.position[1].toFixed(4)}</div>
+          <div>Lon: {object.position[0].toFixed(4)}</div>
+        </div>
+        {/* Tooltip arrow */}
+        <div
+          className="absolute top-full left-1/2 transform -translate-x-1/2 
+                        border-8 border-transparent border-t-gray-800"
+        />
+      </div>
+    );
+  }
 
   return (
-    <MapContainer
-      center={[51, 10.5]}
-      style={{
-        height: "100vh",
-        width: "100vw",
-        top: 0,
-      }}
-      maxBoundsViscosity={1.0}
-      zoom={6.5}
-      zoomControl={false}
-      // scrollWheelZoom={false}
-      // dragging={false}
-      minZoom={5}
-      touchZoom={false}
-      doubleClickZoom={false}
-      boxZoom={false}
-      keyboard={false}
-      maxBounds={[
-        [34, -10], // Southwest (lat, lon)
-        [72, 32], // Northeast (lat, lon)
-      ]}
-    >
-      {/* <TileLayer
-        url="https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png"
-        attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      /> */}
-      <TileLayer
-        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    <>
+      <DeckGL
+        initialViewState={{
+          longitude: 10.5,
+          latitude: 51,
+          zoom: 6.5,
+          minZoom: 5,
+          maxZoom: 12,
+        }}
+        controller={true}
+        layers={layers}
+        style={{ width: "100vw", height: "100vh" }}
+        // getTooltip={({ object }) => {
+        //     // Alternative tooltip approach (simpler)
+        //     if (object) {
+        //       return {
+        //         html: `
+        //           <div class="p-2 bg-gray-800 text-white rounded">
+        //             <strong>Intensity:</strong> ${getPollenLabel(object.intensity)}<br/>
+        //             <strong>Position:</strong> ${object.position[1].toFixed(4)}, ${object.position[0].toFixed(4)}
+        //           </div>
+        //         `,
+        //         style: {
+        //           backgroundColor: '#1f2937',
+        //           color: 'white',
+        //           borderRadius: '8px',
+        //           padding: '8px'
+        //         }
+        //       };
+        //     }
+        //     return null;
+        //   }}
       />
-
-      {/* Pollen Heatmap */}
-      <HeatmapLayer
-        points={filteredHeatPoints}
-        options={{ radius: 25, blur: 15, maxZoom: 17 }}
-      />
-
-      {/* Boundary of Bavaria */}
-      <GeoJSON
-        data={bavariaGeo as any}
-        style={() => ({
-          fillColor: "transparent",
-          color: "#4e4d4d",
-          weight: 1.5,
-        })}
-      />
-      {/* Gray everything outside of Gemany */}
-      <GeoJSON
-        data={mask as any}
-        style={() => ({
-          fillColor: "#212121",
-          color: "#A0BCE8",
-          fillOpacity: 0.5,
-          weight: 2,
-        })}
-      />
-    </MapContainer>
+      {renderTooltip()}
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import { feature, point, polygon, bbox, booleanPointInPolygon } from "@turf/turf";
 import type { Feature, Polygon, GeoJsonProperties } from "geojson";
 import bavariaGeo from '@/data/bavaria.geo.json';
+// import bavariaGeo from '@/data/germany.geo.json';
 
 export default function filterPointsInBavaria(points: [number, number, number?][]) {
   const bavariaFeature = bavariaGeo.features[0];
@@ -11,7 +12,7 @@ export default function filterPointsInBavaria(points: [number, number, number?][
       polygons.push(polygon(coords));
     });
   } else {
-polygons.push(polygon(bavariaFeature.geometry.coordinates[0]));
+    polygons.push(polygon(bavariaFeature.geometry.coordinates[0]));
   }
 
   const bboxes = polygons.map((poly) => bbox(poly));
