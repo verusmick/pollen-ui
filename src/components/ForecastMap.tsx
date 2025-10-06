@@ -2,7 +2,7 @@
 import { DeckGL } from "@deck.gl/react";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
 import germanyGeo from "@/data/germany.geo.json";
@@ -13,6 +13,11 @@ import { BitmapLayer } from "@deck.gl/layers";
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
+  const [hoverInfo, setHoverInfo] = useState<{
+    object: any;
+    x: number;
+    y: number;
+  } | null>(null);
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
@@ -120,6 +125,34 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       filled: true,
       stroked: true,
       extruded: false,
+      // 🔥 HOVER CONFIGURATION
+      pickable: true,
+      autoHighlight: true,
+      highlightColor: [255, 255, 255, 100], // White highlight border
+      onHover: (info: any) => {
+        // Show tooltip on hover
+        if (info.object) {
+          setHoverInfo({
+            object: info.object,
+            x: info.x,
+            y: info.y,
+          });
+        } else {
+          setHoverInfo(null); // Hide tooltip when not hovering
+        }
+      },
+      onClick: (info: any) => {
+        // // Show tooltip on hover
+        // if (info.object) {
+        //   setHoverInfo({
+        //     object: info.object,
+        //     x: info.x,
+        //     y: info.y,
+        //   });
+        // } else {
+        //   setHoverInfo(null); // Hide tooltip when not hovering
+        // }
+      },
     }),
 
     // Bavaria boundary
@@ -137,21 +170,83 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     maskLayer,
   ];
 
+  function renderTooltip() {
+    if (!hoverInfo || !hoverInfo.object) return null;
+
+    const { object, x, y } = hoverInfo;
+    const intensity = object.intensity;
+
+    // Convert intensity to pollen level text
+    const pollenLevel =
+      intensity <= 0.2
+        ? "Very Low"
+        : intensity <= 0.4
+        ? "Low"
+        : intensity <= 0.6
+        ? "Medium"
+        : intensity <= 0.8
+        ? "High"
+        : "Very High";
+
+    return (
+      <div
+        className="absolute pointer-events-none z-50"
+        style={{ left: x, top: y, transform: "translate(-50%, -100%)" }}
+      >
+        <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg max-w-xs">
+          <div className="font-semibold">Pollen Information</div>
+          {/* <div>Intensity: {(intensity * 10).toFixed(1)}</div> */}
+          <div>Level: {pollenLevel}</div>
+          <div>Lat: {object.position[1].toFixed(4)}</div>
+          <div>Lon: {object.position[0].toFixed(4)}</div>
+        </div>
+        {/* Tooltip arrow */}
+        <div
+          className="absolute top-full left-1/2 transform -translate-x-1/2 
+                        border-8 border-transparent border-t-gray-800"
+        />
+      </div>
+    );
+  }
+
   return (
-    <DeckGL
-      initialViewState={{
-        longitude: 10.5,
-        latitude: 51,
-        zoom: 6.5,
-        minZoom: 5,
-        maxZoom: 12,
-      }}
-      controller={{
-        maxZoom: 12,
-        minZoom: 5,
-      }}
-      layers={layers}
-      style={{ width: "100vw", height: "100vh" }}
-    />
+    <>
+      <DeckGL
+        initialViewState={{
+          longitude: 10.5,
+          latitude: 51,
+          zoom: 6.5,
+          minZoom: 5,
+          maxZoom: 12,
+        }}
+        controller={{
+          maxZoom: 12,
+          minZoom: 5,
+        }}
+        layers={layers}
+        style={{ width: "100vw", height: "100vh" }}
+        // getTooltip={({ object }) => {
+        //     // Alternative tooltip approach (simpler)
+        //     if (object) {
+        //       return {
+        //         html: `
+        //           <div class="p-2 bg-gray-800 text-white rounded">
+        //             <strong>Intensity:</strong> ${getPollenLabel(object.intensity)}<br/>
+        //             <strong>Position:</strong> ${object.position[1].toFixed(4)}, ${object.position[0].toFixed(4)}
+        //           </div>
+        //         `,
+        //         style: {
+        //           backgroundColor: '#1f2937',
+        //           color: 'white',
+        //           borderRadius: '8px',
+        //           padding: '8px'
+        //         }
+        //       };
+        //     }
+        //     return null;
+        //   }}
+      />
+      {renderTooltip()}
+    </>
   );
 }
