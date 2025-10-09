@@ -111,7 +111,7 @@ export const ForecastMapContainer = () => {
         setLatitudes(lats);
         setData(allData[0]);
         // console.log("initial data loaded", allData[0]);
-        return loadAllData(longs, lats);
+        // return loadAllData(longs, lats);
       })
       .then((res) => {
         setLoading(false);

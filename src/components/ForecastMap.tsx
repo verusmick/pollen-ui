@@ -14,6 +14,179 @@ import type { Feature } from "geojson";
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
+const Mockdata  = [
+  {
+    "cell_id": "11.0_48.0",
+    "grid_lat": 48.05,
+    "grid_lon": 11.05,
+    "avg_value": 0.65,
+    "max_value": 0.89,
+    "min_value": 0.42,
+    "point_count": 156,
+    "bounds": [11.0, 48.0, 11.1, 48.1],
+    "polygon": [
+      [11.0, 48.0],
+      [11.1, 48.0],
+      [11.1, 48.1],
+      [11.0, 48.1],
+      [11.0, 48.0]
+    ]
+  },
+  {
+    "cell_id": "11.1_48.0", 
+    "grid_lat": 48.05,
+    "grid_lon": 11.15,
+    "avg_value": 0.35,
+    "max_value": 0.52,
+    "min_value": 0.18,
+    "point_count": 142,
+    "bounds": [11.1, 48.0, 11.2, 48.1],
+    "polygon": [
+      [11.1, 48.0],
+      [11.2, 48.0],
+      [11.2, 48.1],
+      [11.1, 48.1],
+      [11.1, 48.0]
+    ]
+  },
+  {
+    "cell_id": "11.0_48.1",
+    "grid_lat": 48.15,
+    "grid_lon": 11.05,
+    "avg_value": 0.78,
+    "max_value": 0.95,
+    "min_value": 0.61,
+    "point_count": 168,
+    "bounds": [11.0, 48.1, 11.1, 48.2],
+    "polygon": [
+      [11.0, 48.1],
+      [11.1, 48.1],
+      [11.1, 48.2],
+      [11.0, 48.2],
+      [11.0, 48.1]
+    ]
+  },
+  {
+    "cell_id": "11.1_48.1",
+    "grid_lat": 48.15,
+    "grid_lon": 11.15,
+    "avg_value": 0.52,
+    "max_value": 0.68,
+    "min_value": 0.35,
+    "point_count": 151,
+    "bounds": [11.1, 48.1, 11.2, 48.2],
+    "polygon": [
+      [11.1, 48.1],
+      [11.2, 48.1],
+      [11.2, 48.2],
+      [11.1, 48.2],
+      [11.1, 48.1]
+    ]
+  },
+  {
+    "cell_id": "11.2_48.0",
+    "grid_lat": 48.05,
+    "grid_lon": 11.25,
+    "avg_value": 0.22,
+    "max_value": 0.35,
+    "min_value": 0.12,
+    "point_count": 138,
+    "bounds": [11.2, 48.0, 11.3, 48.1],
+    "polygon": [
+      [11.2, 48.0],
+      [11.3, 48.0],
+      [11.3, 48.1],
+      [11.2, 48.1],
+      [11.2, 48.0]
+    ]
+  },
+  {
+    "cell_id": "11.2_48.1",
+    "grid_lat": 48.15,
+    "grid_lon": 11.25,
+    "avg_value": 0.45,
+    "max_value": 0.62,
+    "min_value": 0.28,
+    "point_count": 145,
+    "bounds": [11.2, 48.1, 11.3, 48.2],
+    "polygon": [
+      [11.2, 48.1],
+      [11.3, 48.1],
+      [11.3, 48.2],
+      [11.2, 48.2],
+      [11.2, 48.1]
+    ]
+  },
+  {
+    "cell_id": "11.0_48.2",
+    "grid_lat": 48.25,
+    "grid_lon": 11.05,
+    "avg_value": 0.91,
+    "max_value": 0.98,
+    "min_value": 0.85,
+    "point_count": 162,
+    "bounds": [11.0, 48.2, 11.1, 48.3],
+    "polygon": [
+      [11.0, 48.2],
+      [11.1, 48.2],
+      [11.1, 48.3],
+      [11.0, 48.3],
+      [11.0, 48.2]
+    ]
+  },
+  {
+    "cell_id": "11.1_48.2",
+    "grid_lat": 48.25,
+    "grid_lon": 11.15,
+    "avg_value": 0.68,
+    "max_value": 0.82,
+    "min_value": 0.55,
+    "point_count": 155,
+    "bounds": [11.1, 48.2, 11.2, 48.3],
+    "polygon": [
+      [11.1, 48.2],
+      [11.2, 48.2],
+      [11.2, 48.3],
+      [11.1, 48.3],
+      [11.1, 48.2]
+    ]
+  },
+  {
+    "cell_id": "11.2_48.2",
+    "grid_lat": 48.25,
+    "grid_lon": 11.25,
+    "avg_value": 0.38,
+    "max_value": 0.52,
+    "min_value": 0.25,
+    "point_count": 148,
+    "bounds": [11.2, 48.2, 11.3, 48.3],
+    "polygon": [
+      [11.2, 48.2],
+      [11.3, 48.2],
+      [11.3, 48.3],
+      [11.2, 48.3],
+      [11.2, 48.2]
+    ]
+  },
+  {
+    "cell_id": "11.3_48.1",
+    "grid_lat": 48.15,
+    "grid_lon": 11.35,
+    "avg_value": 0.15,
+    "max_value": 0.28,
+    "min_value": 0.08,
+    "point_count": 132,
+    "bounds": [11.3, 48.1, 11.4, 48.2],
+    "polygon": [
+      [11.3, 48.1],
+      [11.4, 48.1],
+      [11.4, 48.2],
+      [11.3, 48.2],
+      [11.3, 48.1]
+    ]
+  }
+];
+
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
   const [hoverInfo, setHoverInfo] = useState<{
     object: any;
@@ -22,36 +195,20 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   } | null>(null);
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
-    if (!pollenData || pollenData.length === 0) return [];
+    if (!Mockdata || Mockdata.length === 0) return [];
 
-    // Convert to the format your filter expects
-    const heatPoints: [number, number, number?][] = pollenData.map(
-      (point: any) => [point.lat, point.long, point.value || 0.5]
-    );
-
-    // const filteredPoints = filterPointsInBavaria(heatPoints);
-    const filteredPoints = filterPointsInBavaria(heatPoints);
-
-    // Create grid cells from filtered points
-    return filteredPoints.map(([lat, lon, intensity = 0.5]) => {
-      // Create a square quadrant around each point
-      const halfCell = GRID_RESOLUTION / 2;
-
-      const quadrant = [
-        [lon - halfCell, lat - halfCell], // bottom-left
-        [lon + halfCell, lat - halfCell], // bottom-right
-        [lon + halfCell, lat + halfCell], // top-right
-        [lon - halfCell, lat + halfCell], // top-left
-        [lon - halfCell, lat - halfCell], // close polygon
-      ];
-
-      return {
-        polygon: quadrant,
-        intensity: intensity,
-        position: [lon, lat],
-      };
-    });
-  }, [pollenData]);
+    return Mockdata.map((cell: any) => ({
+      polygon: cell.polygon,  // Already formatted correctly!
+      intensity: cell.avg_value,
+      position: [cell.grid_lon, cell.grid_lat],
+      statistics: {
+        avg: cell.avg_value,
+        max: cell.max_value, 
+        min: cell.min_value,
+        count: cell.point_count
+      }
+    }));
+  }, [Mockdata]);
 
   // Create mask for area outside Germany
   const maskLayer = useMemo(() => {
@@ -85,6 +242,8 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       getFillColor: [33, 33, 33, 180], // Dark gray
     });
   }, []);
+
+  console.log("===>", gridCells);
 
   const layers = [
     // Free OpenStreetMap base layer
@@ -130,7 +289,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       filled: true,
       stroked: true,
       extruded: false,
-      // 🔥 HOVER CONFIGURATION
+      // Hover conf
       pickable: true,
       autoHighlight: true,
       highlightColor: [255, 255, 255, 100], // White highlight border
