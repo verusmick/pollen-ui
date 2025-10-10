@@ -7,6 +7,7 @@ import {
 import { useEffect, useState } from "react";
 import ForecastMap from "@/components/ForecastMap";
 import { ForecastHeader } from "./ui/ForecastHeader";
+import { PollenSelector } from "./ui/PollenSelector";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
@@ -21,7 +22,7 @@ export const ForecastMapContainer = () => {
   const [allData1, setAllData1] = useState<
     { long: number; lat: number; value: number }[][]
   >([]);
-
+  const pollenOptions = ["Birch", "Grass", "Abies"];
   const pollenType = "POLLEN_BIRCH";
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
@@ -154,6 +155,10 @@ export const ForecastMapContainer = () => {
       <ForecastMap pollenData={data} />
       {/*Card Title*/}
       <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
+      {/*pollen select*/}
+      <span className="absolute top-20 left-6 w-[160px] z-50">
+        <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
+      </span>
 
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2
