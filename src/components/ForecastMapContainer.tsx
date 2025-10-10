@@ -7,7 +7,7 @@ import {
 import { useEffect, useState } from "react";
 import ForecastMap from "@/components/ForecastMap";
 import { ForecastHeader } from "./ui/ForecastHeader";
-import { ForecastSelector } from "./ui/ForecastSelector";
+import { PollenSelector } from "./ui/PollenSelector";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
@@ -157,7 +157,7 @@ export const ForecastMapContainer = () => {
       <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
       {/*pollen select*/}
       <span className="absolute top-20 left-6 w-[160px] z-50">
-        <ForecastSelector options={pollenOptions} selected={pollenOptions[0]} />
+        <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
       </span>
 
       <div

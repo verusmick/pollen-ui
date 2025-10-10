@@ -9,7 +9,7 @@ interface ForecastSelectorProps {
   onChange?: (value: string) => void;
 }
 
-export const ForecastSelector = ({
+export const PollenSelector = ({
   options,
   selected,
   onChange,
