@@ -10,6 +10,7 @@ import { ForecastHeader } from "./ui/ForecastHeader";
 import { PollenSelector } from "./ui/PollenSelector";
 import { SearchCardToggle } from "./ui/SearchCardToggle";
 import { BiSearch } from "react-icons/bi";
+import { LocationButton } from "./ui/LocationButton";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
@@ -155,7 +156,7 @@ export const ForecastMapContainer = () => {
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap pollenData={data} />
-      <span className="absolute top-6 right-6 z-50 flex items-start gap-2">
+      <span className="absolute top-6 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title="Search">
           <div className="relative w-full">
             <input
@@ -169,6 +170,7 @@ export const ForecastMapContainer = () => {
             />
           </div>
         </SearchCardToggle>
+        <LocationButton />
       </span>
 
       {/*Card Title*/}
