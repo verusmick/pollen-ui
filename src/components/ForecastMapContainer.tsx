@@ -7,7 +7,8 @@ import {
 import { useEffect, useState } from "react";
 import ForecastMap from "@/components/ForecastMap";
 import { ForecastHeader } from "./ui/ForecastHeader";
-
+import { SearchCardToggle } from "./ui/SearchCardToggle";
+import { Search } from "lucide-react";
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
   const [data, setData] = useState<
@@ -152,9 +153,21 @@ export const ForecastMapContainer = () => {
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap pollenData={data} />
+      <SearchCardToggle title="Search">
+        <div className="relative w-full">
+          <input
+            type="text"
+            placeholder="Search Location..."
+            className="w-full pr-10 px-4 py-1 rounded-2xl focus:outline-none bg-gray-950/70 text-md text-white"
+          />
+          <Search
+            size={18}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
+        </div>
+      </SearchCardToggle>
       {/*Card Title*/}
       <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
-
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2
                     bg-white/90 shadow-lg rounded-lg p-4
