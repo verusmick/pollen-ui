@@ -28,7 +28,11 @@ const hours = [
   "02:00",
 ];
 
-export default function PollenTimeline() {
+interface Props {
+  setPlaying?: (arg:boolean) => void;
+}
+
+export default function PollenTimeline({ setPlaying: play }: Props) {
   const [active, setActive] = useState(10); // default to 16:00
   const [playing, setPlaying] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
@@ -60,7 +64,10 @@ export default function PollenTimeline() {
       <div className="flex items-center gap-2">
         {/* Left Controls */}
         <button
-          onClick={() => setPlaying(!playing)}
+          onClick={() => {
+            play?.(true);
+            setPlaying(!playing);
+          }}
           className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition"
         >
           {playing ? <FaPause size={14} /> : <FaPlay size={14} />}
@@ -116,3 +123,48 @@ export default function PollenTimeline() {
     </div>
   );
 }
+
+
+
+      {/* <div
+        className="absolute bottom-6 left-1/2 -translate-x-1/2
+                    bg-white/90 shadow-lg rounded-lg p-4
+                    flex flex-col items-center w-[340px] z-1000"
+      >
+        <div className="mb-3">
+          <button
+            onClick={() => setPlaying((p) => !p)}
+            disabled={loading}
+            className={`px-4 py-2 rounded font-semibold text-white transition-colors duration-200
+            ${
+              playing
+                ? "bg-red-600 hover:bg-red-700 focus:ring-2 focus:ring-red-400"
+                : "bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-400"
+            }
+            ${loading ? "opacity-50 cursor-not-allowed" : ""}
+          `}
+          >
+            {playing ? "Stop" : "Play"}
+          </button>
+        </div>
+
+        <div className="w-full">
+          <label
+            htmlFor="hourSlider"
+            className="block mb-2 text-center bg-gray-800"
+          >
+            Hour selected: {selectedHour} hour(s)
+          </label>
+          <input
+            disabled={loading}
+            id="hourSlider"
+            type="range"
+            min="0"
+            max="48"
+            value={selectedHour}
+            onChange={handleSliderChange}
+            className="w-full"
+          />
+          {loading && <span>LOADING ...{loadingHour}</span>}
+        </div>
+      </div> */}
