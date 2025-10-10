@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { BiChevronDown } from "react-icons/bi";
+
 interface ForecastSelectorProps {
   options: string[];
   selected?: string;
@@ -37,10 +38,7 @@ export const ForecastSelector = ({
   }, []);
 
   return (
-    <div
-      ref={dropdownRef}
-      className="absolute top-20 left-6 w-[160px] z-50 text-xs"
-    >
+    <div ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full bg-card text-white px-2 py-2 flex justify-between items-center shadow-md transition text-xs ${
@@ -48,7 +46,7 @@ export const ForecastSelector = ({
         }`}
       >
         {selectedOption}
-        <ChevronDown
+        <BiChevronDown
           className={`w-4 h-4 text-white transform transition-transform ${
             isOpen ? "rotate-180" : "rotate-0"
           }`}

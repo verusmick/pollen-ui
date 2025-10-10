@@ -156,7 +156,10 @@ export const ForecastMapContainer = () => {
       {/*Card Title*/}
       <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
       {/*pollen select*/}
-      <ForecastSelector options={pollenOptions} selected={pollenOptions[0]} />
+      <span className="absolute top-20 left-6 w-[160px] z-50">
+        <ForecastSelector options={pollenOptions} selected={pollenOptions[0]} />
+      </span>
+
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2
                     bg-white/90 shadow-lg rounded-lg p-4
