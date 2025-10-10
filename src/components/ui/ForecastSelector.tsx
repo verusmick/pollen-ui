@@ -61,9 +61,9 @@ export const ForecastSelector = ({
             <li
               key={opt}
               onClick={() => handleOptionClick(opt)}
-              className={`cursor-pointer px-2 py-2 hover:bg-gray-800/70 hover:text-white transition ${
+              className={`cursor-pointer px-2 py-2 hover:bg-neutral-700/40 hover:text-white transition ${
                 opt === selectedOption
-                  ? "font-bold bg-gray-950/70"
+                  ? "font-bold bg-neutral-700"
                   : "text-white"
               }`}
             >
