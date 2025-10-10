@@ -7,8 +7,10 @@ import {
 import { useEffect, useState } from "react";
 import ForecastMap from "@/components/ForecastMap";
 import { ForecastHeader } from "./ui/ForecastHeader";
+import { PollenSelector } from "./ui/PollenSelector";
 import { SearchCardToggle } from "./ui/SearchCardToggle";
-import { Search } from "lucide-react";
+import { BiSearch } from "react-icons/bi";
+
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
   const [data, setData] = useState<
@@ -22,7 +24,7 @@ export const ForecastMapContainer = () => {
   const [allData1, setAllData1] = useState<
     { long: number; lat: number; value: number }[][]
   >([]);
-
+  const pollenOptions = ["Birch", "Grass", "Abies"];
   const pollenType = "POLLEN_BIRCH";
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
@@ -153,21 +155,29 @@ export const ForecastMapContainer = () => {
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap pollenData={data} />
-      <SearchCardToggle title="Search">
-        <div className="relative w-full">
-          <input
-            type="text"
-            placeholder="Search Location..."
-            className="w-full pr-10 px-4 py-1 rounded-2xl focus:outline-none bg-gray-950/70 text-md text-white"
-          />
-          <Search
-            size={18}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-        </div>
-      </SearchCardToggle>
+      <span className="absolute top-6 right-6 z-50 flex items-start gap-2">
+        <SearchCardToggle title="Search">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search Location..."
+              className="w-full pr-10 px-4 py-1 rounded-2xl focus:outline-none bg-neutral-900 text-md text-white"
+            />
+            <BiSearch
+              size={18}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+          </div>
+        </SearchCardToggle>
+      </span>
+
       {/*Card Title*/}
       <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
+      {/*pollen select*/}
+      <span className="absolute top-20 left-6 w-[160px] z-50">
+        <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
+      </span>
+
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2
                     bg-white/90 shadow-lg rounded-lg p-4

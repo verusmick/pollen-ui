@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Search, X } from "lucide-react";
+import { BiSearch, BiX } from "react-icons/bi";
+import { Tooltip } from "./Tooltip";
 
 interface SearchCardToggleProps {
   title?: string;
@@ -15,20 +16,27 @@ export const SearchCardToggle = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="absolute top-6 right-6 z-50 flex items-start gap-2">
+    <div className="relative">
+      {/* Card */}
       {open && (
-        <div className="bg-card shadow-lg rounded-lg w-[300px] p-4 flex flex-col gap-2 mr-2">
+        <div
+          className="absolute top-0 right-12 bg-card shadow-lg rounded-lg w-[300px]
+                     p-4 flex flex-col gap-2 z-50"
+        >
           <h3 className="font-semibold text-white">{title}</h3>
-          {children || <p className="text-white text-sm">contenido</p>}
+          {children}
         </div>
       )}
 
-      <button
-        onClick={() => setOpen(!open)}
-        className="bg-card hover:bg-gray-900 text-white p-2 rounded-full shadow-lg focus:outline-none"
-      >
-        {open ? <X size={20} /> : <Search size={20} />}
-      </button>
+      <Tooltip text={title} position="left" visible={!open}>
+        <button
+          onClick={() => setOpen(!open)}
+          className="bg-card hover:bg-neutral-800 text-white
+                     p-2 rounded-full shadow-lg focus:outline-none"
+        >
+          {open ? <BiX size={20} /> : <BiSearch size={20} />}
+        </button>
+      </Tooltip>
     </div>
   );
 };
