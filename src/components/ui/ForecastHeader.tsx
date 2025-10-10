@@ -20,8 +20,8 @@ export const ForecastHeader = ({
         <Image
           src={iconSrc}
           alt="Forecast icon"
-          width={28}
-          height={24}
+          width={32}
+          height={28}
           className="rounded-sm"
         />
         <h3 className="text-sm text-white">{title}</h3>
