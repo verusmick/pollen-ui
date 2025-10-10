@@ -10,6 +10,7 @@ import { ForecastHeader } from "./ui/ForecastHeader";
 import { PollenSelector } from "./ui/PollenSelector";
 import { SearchCardToggle } from "./ui/SearchCardToggle";
 import { BiSearch } from "react-icons/bi";
+import PollenTimeline from "./ui/PollenTimeline";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
@@ -178,7 +179,7 @@ export const ForecastMapContainer = () => {
         <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
       </span>
 
-      <div
+      {/* <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2
                     bg-white/90 shadow-lg rounded-lg p-4
                     flex flex-col items-center w-[340px] z-1000"
@@ -219,7 +220,10 @@ export const ForecastMapContainer = () => {
           />
           {loading && <span>LOADING ...{loadingHour}</span>}
         </div>
-      </div>
+      </div> */}
+      <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
+        <PollenTimeline />
+      </span>
     </div>
   );
 };
