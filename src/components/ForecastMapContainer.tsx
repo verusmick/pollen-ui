@@ -6,6 +6,7 @@ import {
 } from "@/lib/api/forecast";
 import { useEffect, useState } from "react";
 import ForecastMap from "@/components/ForecastMap";
+import { ForecastHeader } from "./ui/ForecastHeader";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
@@ -111,7 +112,7 @@ export const ForecastMapContainer = () => {
         setLatitudes(lats);
         setData(allData[0]);
         // console.log("initial data loaded", allData[0]);
-        return loadAllData(longs, lats);
+        // return loadAllData(longs, lats);
       })
       .then((res) => {
         setLoading(false);
@@ -151,6 +152,8 @@ export const ForecastMapContainer = () => {
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap pollenData={data} />
+      {/*Card Title*/}
+      <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
 
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2
