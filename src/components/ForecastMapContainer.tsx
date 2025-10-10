@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import ForecastMap from "@/components/ForecastMap";
 import { ForecastHeader } from "./ui/ForecastHeader";
 import { PollenSelector } from "./ui/PollenSelector";
+import { SearchCardToggle } from "./ui/SearchCardToggle";
+import { BiSearch } from "react-icons/bi";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
@@ -153,6 +155,22 @@ export const ForecastMapContainer = () => {
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap pollenData={data} />
+      <span className="absolute top-6 right-6 z-50 flex items-start gap-2">
+        <SearchCardToggle title="Search">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search Location..."
+              className="w-full pr-10 px-4 py-1 rounded-2xl focus:outline-none bg-neutral-900 text-md text-white"
+            />
+            <BiSearch
+              size={18}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+          </div>
+        </SearchCardToggle>
+      </span>
+
       {/*Card Title*/}
       <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
       {/*pollen select*/}
