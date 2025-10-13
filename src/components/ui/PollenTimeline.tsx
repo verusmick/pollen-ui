@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { FaPlay, FaPause } from "react-icons/fa";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
@@ -29,56 +29,49 @@ const hours = [
 ];
 
 interface Props {
-  setPlaying?: (arg:boolean) => void;
+  setPlaying: (playing: boolean | ((p: boolean) => boolean)) => void;
+  playing: boolean;
+  activeHour: number;
+  onHourChange: (hour: number) => void;
 }
 
-export default function PollenTimeline({ setPlaying: play }: Props) {
-  const [active, setActive] = useState(10); // default to 16:00
-  const [playing, setPlaying] = useState(false);
+export default function PollenTimeline({
+  setPlaying,
+  activeHour,
+  onHourChange,
+  playing,
+}: Props) {
   const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!playing) return;
-    const id = setInterval(() => {
-      setActive((prev) => (prev + 1) % hours.length);
-    }, 1000);
-    return () => clearInterval(id);
-  }, [playing]);
-
-  useEffect(() => {
     if (barRef.current) {
-      const activeEl = barRef.current.children[active] as HTMLElement;
+      const activeEl = barRef.current.children[activeHour] as HTMLElement;
       activeEl?.scrollIntoView({ behavior: "smooth", inline: "center" });
     }
-  }, [active]);
+  }, [activeHour]);
 
   return (
     <div className="bg-card text-white rounded-lg shadow-md p-3 w-200 backdrop-blur-sm">
-      {/* Top Floating Label */}
-      {/* <div className="relative mb-2 text-center">
-        <div className="inline-block bg-blue-600 text-white text-sm px-3 py-1 rounded">
-          Forecast: Thursday, {hours[active]}
-        </div>
-      </div> */}
-
       <div className="flex items-center gap-2">
-        {/* Left Controls */}
+        {/* Play / Pause */}
         <button
-          onClick={() => {
-            play?.(true);
-            setPlaying(!playing);
-          }}
+          onClick={() => setPlaying((p) => !p)}
           className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition"
         >
           {playing ? <FaPause size={14} /> : <FaPlay size={14} />}
         </button>
+
+        {/* Step backward */}
         <button
-          onClick={() => setActive((i) => (i === 0 ? hours.length - 1 : i - 1))}
+          onClick={() =>
+            onHourChange(activeHour === 0 ? hours.length - 1 : activeHour - 1)
+          }
           className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition"
         >
           <MdChevronLeft size={18} />
         </button>
 
+        {/* Timeline */}
         <div
           ref={barRef}
           className="relative flex overflow-x-auto gap-[2px] scrollbar-hide flex-1 border-t border-gray-700 pt-2"
@@ -90,26 +83,29 @@ export default function PollenTimeline({ setPlaying: play }: Props) {
             >
               <div
                 className={`h-2 w-full rounded-sm ${
-                  i <= active ? "bg-blue-500" : "bg-slate-700"
+                  i <= activeHour ? "bg-blue-500" : "bg-slate-700"
                 }`}
               />
-
               <span
                 className={`text-[11px] mt-1 ${
-                  i === active ? "text-white" : "text-gray-400"
+                  i === activeHour ? "text-white" : "text-gray-400"
                 }`}
               >
                 {h}
               </span>
-
               <div className="absolute top-0 left-full h-4 w-[1px] bg-gray-700"></div>
+              {/* Clickable overlay */}
+              <button
+                className="absolute inset-0 w-full h-full opacity-0"
+                onClick={() => onHourChange(i)}
+              />
             </div>
           ))}
         </div>
 
-        {/* Right Controls */}
+        {/* Step forward */}
         <button
-          onClick={() => setActive((i) => (i + 1) % hours.length)}
+          onClick={() => onHourChange((activeHour + 1) % hours.length)}
           className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition"
         >
           <MdChevronRight size={18} />
@@ -123,48 +119,3 @@ export default function PollenTimeline({ setPlaying: play }: Props) {
     </div>
   );
 }
-
-
-
-      {/* <div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2
-                    bg-white/90 shadow-lg rounded-lg p-4
-                    flex flex-col items-center w-[340px] z-1000"
-      >
-        <div className="mb-3">
-          <button
-            onClick={() => setPlaying((p) => !p)}
-            disabled={loading}
-            className={`px-4 py-2 rounded font-semibold text-white transition-colors duration-200
-            ${
-              playing
-                ? "bg-red-600 hover:bg-red-700 focus:ring-2 focus:ring-red-400"
-                : "bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-400"
-            }
-            ${loading ? "opacity-50 cursor-not-allowed" : ""}
-          `}
-          >
-            {playing ? "Stop" : "Play"}
-          </button>
-        </div>
-
-        <div className="w-full">
-          <label
-            htmlFor="hourSlider"
-            className="block mb-2 text-center bg-gray-800"
-          >
-            Hour selected: {selectedHour} hour(s)
-          </label>
-          <input
-            disabled={loading}
-            id="hourSlider"
-            type="range"
-            min="0"
-            max="48"
-            value={selectedHour}
-            onChange={handleSliderChange}
-            className="w-full"
-          />
-          {loading && <span>LOADING ...{loadingHour}</span>}
-        </div>
-      </div> */}
