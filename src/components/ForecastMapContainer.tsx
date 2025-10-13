@@ -124,7 +124,7 @@ export const ForecastMapContainer = () => {
       setSelectedHour(nextHour);
       await loadHour(nextHour);
       setData(allDataRef.current[nextHour] || []);
-    }, 500);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [playing, selectedHour]);
