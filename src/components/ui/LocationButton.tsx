@@ -1,0 +1,103 @@
+"use client";
+
+import { useState } from "react";
+import { BiMap, BiX } from "react-icons/bi";
+import { Tooltip } from "./Tooltip";
+import { TbLocationFilled } from "react-icons/tb";
+
+interface LocationButtonProps {
+  tooltipText?: string;
+  onLocationFound?: (position: { lat: number; lng: number }) => void;
+}
+
+export const LocationButton = ({
+  tooltipText = "Show your location",
+  onLocationFound,
+}: LocationButtonProps) => {
+  const [open, setOpen] = useState(false);
+  const [permissionStatus, setPermissionStatus] = useState<
+    "idle" | "granted" | "denied" | "prompt"
+  >("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRequestPermission = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setPermissionStatus("granted");
+        setError(null);
+        onLocationFound?.(coords);
+        setOpen(false);
+      },
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setPermissionStatus("denied");
+        } else {
+          setError(err.message);
+        }
+      }
+    );
+  };
+
+  return (
+    <>
+      <Tooltip text={tooltipText} position="left" visible={!open}>
+        <button
+          onClick={() => setOpen(true)}
+          className="bg-card hover:bg-neutral-800 text-white p-2 rounded-full shadow-lg focus:outline-none"
+        >
+          <TbLocationFilled size={20} />
+        </button>
+      </Tooltip>
+
+      {open && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+          <div className="bg-card rounded-xl shadow-xl w-[360px] p-6 flex flex-col gap-4 text-white relative">
+            <button
+              onClick={() => setOpen(false)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-white"
+            >
+              <BiX size={22} />
+            </button>
+
+            <h2 className="text-xl font-semibold text-center">Zuam</h2>
+
+            <p className="text-sm text-gray-300 text-center">
+              Click below to request permission to access your location.
+            </p>
+
+            <button
+              onClick={handleRequestPermission}
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-all"
+            >
+              <BiMap size={20} />
+              Request permission
+            </button>
+
+            {permissionStatus === "granted" && (
+              <p className="text-center text-sm text-green-400">
+                ✅ Permission granted! You can now access location data.
+              </p>
+            )}
+            {permissionStatus === "denied" && (
+              <p className="text-center text-sm text-red-400">
+                ⚠️ Permission denied. Please enable it in browser settings.
+              </p>
+            )}
+            {error && (
+              <p className="text-center text-sm text-red-400">⚠️ {error}</p>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+};

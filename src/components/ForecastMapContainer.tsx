@@ -11,6 +11,7 @@ import { PollenSelector } from "./ui/PollenSelector";
 import { SearchCardToggle } from "./ui/SearchCardToggle";
 import { BiSearch } from "react-icons/bi";
 import PollenTimeline from "./ui/PollenTimeline";
+import { LocationButton } from "./ui/LocationButton";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
@@ -25,6 +26,10 @@ export const ForecastMapContainer = () => {
   const [allData1, setAllData1] = useState<
     { long: number; lat: number; value: number }[][]
   >([]);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const pollenOptions = ["Birch", "Grass", "Abies"];
   const pollenType = "POLLEN_BIRCH";
   const from = 1649894400;
@@ -156,7 +161,7 @@ export const ForecastMapContainer = () => {
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap pollenData={data} />
-      <span className="absolute top-6 right-6 z-50 flex items-start gap-2">
+      <span className="absolute top-6 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title="Search">
           <div className="relative w-full">
             <input
@@ -170,6 +175,7 @@ export const ForecastMapContainer = () => {
             />
           </div>
         </SearchCardToggle>
+        <LocationButton onLocationFound={(pos) => setUserLocation(pos)} />
       </span>
 
       {/*Card Title*/}
