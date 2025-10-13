@@ -112,10 +112,10 @@ export default function PollenTimeline({
         </button>
       </div>
 
-      <div className="text-xs text-gray-500 mt-2 flex justify-between">
+      {/* <div className="text-xs text-gray-500 mt-2 flex justify-between">
         <span>Updated on 11.09.2025, 15:14</span>
         <span>Friday, 12.09.2025</span>
-      </div>
+      </div> */}
     </div>
   );
 }
