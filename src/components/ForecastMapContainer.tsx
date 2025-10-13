@@ -160,7 +160,7 @@ export const ForecastMapContainer = () => {
 
   return (
     <div className="relative h-screen w-screen">
-      <ForecastMap pollenData={data} userLocation={userLocation} />
+      <ForecastMap pollenData={data} />
       <span className="absolute top-6 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title="Search">
           <div className="relative w-full">

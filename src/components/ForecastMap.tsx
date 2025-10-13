@@ -1,7 +1,7 @@
 "use client";
 import { DeckGL } from "@deck.gl/react";
 import { TileLayer } from "@deck.gl/geo-layers";
-import { GeoJsonLayer, PolygonLayer, ScatterplotLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
 import { useMemo, useState } from "react";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
@@ -14,33 +14,42 @@ import type { Feature } from "geojson";
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
-export default function ForecastMap({
-  pollenData,
-  userLocation,
-}: {
-  pollenData: any;
-  userLocation?: { lat: number; lng: number } | null;
-}) {
-  const [hoverInfo, setHoverInfo] = useState<any>(null);
+export default function ForecastMap({ pollenData }: { pollenData: any }) {
+  const [hoverInfo, setHoverInfo] = useState<{
+    object: any;
+    x: number;
+    y: number;
+  } | null>(null);
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
-    if (!pollenData?.length) return [];
-    const heatPoints = pollenData.map((p: any) => [
-      p.lat,
-      p.long,
-      p.value || 0.5,
-    ]);
+    if (!pollenData || pollenData.length === 0) return [];
+
+    // Convert to the format your filter expects
+    const heatPoints: [number, number, number?][] = pollenData.map(
+      (point: any) => [point.lat, point.long, point.value || 0.5]
+    );
+
+    // const filteredPoints = filterPointsInBavaria(heatPoints);
     const filteredPoints = filterPointsInBavaria(heatPoints);
+
+    // Create grid cells from filtered points
     return filteredPoints.map(([lat, lon, intensity = 0.5]) => {
-      const halfCell = 0.02 / 2;
+      // Create a square quadrant around each point
+      const halfCell = GRID_RESOLUTION / 2;
+
       const quadrant = [
-        [lon - halfCell, lat - halfCell],
-        [lon + halfCell, lat - halfCell],
-        [lon + halfCell, lat + halfCell],
-        [lon - halfCell, lat + halfCell],
-        [lon - halfCell, lat - halfCell],
+        [lon - halfCell, lat - halfCell], // bottom-left
+        [lon + halfCell, lat - halfCell], // bottom-right
+        [lon + halfCell, lat + halfCell], // top-right
+        [lon - halfCell, lat + halfCell], // top-left
+        [lon - halfCell, lat - halfCell], // close polygon
       ];
-      return { polygon: quadrant, intensity, position: [lon, lat] };
+
+      return {
+        polygon: quadrant,
+        intensity: intensity,
+        position: [lon, lat],
+      };
     });
   }, [pollenData]);
 
@@ -78,7 +87,7 @@ export default function ForecastMap({
   }, []);
 
   const layers = [
-   
+    // Free OpenStreetMap base layer
     new TileLayer({
       id: "base-map",
       data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -87,10 +96,13 @@ export default function ForecastMap({
       tileSize: 256,
       renderSubLayers: (props) => {
         const { bbox, data, id } = props.tile;
-        const bounds =
+
+        // Handle different types of bounding boxes
+        const bounds: [number, number, number, number] =
           "west" in bbox
             ? [bbox.west, bbox.south, bbox.east, bbox.north]
             : [bbox.left, bbox.bottom, bbox.right, bbox.top];
+
         return new BitmapLayer({
           id: `${id}-bitmap`,
           image: data,
@@ -99,42 +111,68 @@ export default function ForecastMap({
       },
     }),
 
-   
-    maskLayer,
-
-    
-    userLocation &&
-      new ScatterplotLayer({
-        id: "user-location",
-        data: [userLocation],
-        getPosition: (d: any) => [d.lng, d.lat],
-        getRadius: 500,
-        getFillColor: [66, 133, 244, 255], 
-        radiusMinPixels: 6,
-        radiusMaxPixels: 10,
-      }),
-
-    
+    // Pollen grid cells layer
     new PolygonLayer({
       id: "pollen-grid",
       data: gridCells,
       getPolygon: (d: any) => d.polygon,
       getFillColor: (d: any) => {
-        const i = d.intensity;
-        if (i <= 0.2) return [0, 100, 0, 60];
-        else if (i <= 0.4) return [154, 205, 50, 60];
-        else if (i <= 0.6) return [255, 255, 0, 60];
-        else if (i <= 0.8) return [255, 165, 0, 60];
-        return [255, 0, 0, 60];
+        const intensity = d.intensity;
+        // Your color scale based on pollen intensity
+        if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
+        else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
+        else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
+        else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
+        else return [255, 0, 0, 60]; // Red - high
       },
+      getLineColor: [0, 0, 0, 10],
+      // lineWidthMinPixels: 0.5,
       filled: true,
       stroked: true,
+      extruded: false,
+      // 🔥 HOVER CONFIGURATION
       pickable: true,
-      onHover: (info) =>
-        setHoverInfo(
-          info.object ? { object: info.object, x: info.x, y: info.y } : null
-        ),
+      autoHighlight: true,
+      highlightColor: [255, 255, 255, 100], // White highlight border
+      onHover: (info: any) => {
+        // Show tooltip on hover
+        if (info.object) {
+          setHoverInfo({
+            object: info.object,
+            x: info.x,
+            y: info.y,
+          });
+        } else {
+          setHoverInfo(null); // Hide tooltip when not hovering
+        }
+      },
+      onClick: (info: any) => {
+        // // Show tooltip on hover
+        // if (info.object) {
+        //   setHoverInfo({
+        //     object: info.object,
+        //     x: info.x,
+        //     y: info.y,
+        //   });
+        // } else {
+        //   setHoverInfo(null); // Hide tooltip when not hovering
+        // }
+      },
     }),
+
+    // Bavaria boundary
+    new GeoJsonLayer({
+      id: "bavaria-boundary",
+      data: bavariaGeo as FeatureCollection,
+      filled: false,
+      stroked: true,
+      getLineColor: [78, 77, 77],
+      lineWidthMinPixels: 1.5,
+      getLineWidth: 1,
+    }),
+
+    // Mask outside area
+    maskLayer,
   ];
 
   function renderTooltip() {
@@ -180,16 +218,37 @@ export default function ForecastMap({
     <>
       <DeckGL
         initialViewState={{
-          longitude: userLocation?.lng || 10.5,
-          latitude: userLocation?.lat || 51,
-          zoom: userLocation ? 12 : 6.5,
+          longitude: 10.5,
+          latitude: 51,
+          zoom: 6.5,
           minZoom: 5,
-          maxZoom: 14,
+          maxZoom: 12,
         }}
         controller={true}
-        layers={layers.filter(Boolean)}
+        layers={layers}
         style={{ width: "100vw", height: "100vh" }}
+        // getTooltip={({ object }) => {
+        //     // Alternative tooltip approach (simpler)
+        //     if (object) {
+        //       return {
+        //         html: `
+        //           <div class="p-2 bg-gray-800 text-white rounded">
+        //             <strong>Intensity:</strong> ${getPollenLabel(object.intensity)}<br/>
+        //             <strong>Position:</strong> ${object.position[1].toFixed(4)}, ${object.position[0].toFixed(4)}
+        //           </div>
+        //         `,
+        //         style: {
+        //           backgroundColor: '#1f2937',
+        //           color: 'white',
+        //           borderRadius: '8px',
+        //           padding: '8px'
+        //         }
+        //       };
+        //     }
+        //     return null;
+        //   }}
       />
+      {renderTooltip()}
     </>
   );
 }
