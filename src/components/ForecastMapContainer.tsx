@@ -121,7 +121,7 @@ export const ForecastMapContainer = () => {
         setLatitudes(lats);
         setData(allData[0]);
         // console.log("initial data loaded", allData[0]);
-        // return loadAllData(longs, lats);
+        return loadAllData(longs, lats);
       })
       .then((res) => {
         setLoading(false);
@@ -184,9 +184,52 @@ export const ForecastMapContainer = () => {
       <span className="absolute top-20 left-6 w-[160px] z-50">
         <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
       </span>
-      <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
+      {/* <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
         <PollenTimeline setPlaying={setPlaying} />
-      </span>
+      </span> */}
+
+      <div
+        className="absolute bottom-6 left-1/2 -translate-x-1/2
+                    bg-white/90 shadow-lg rounded-lg p-4
+                    flex flex-col items-center w-[340px] z-1000"
+      >
+        <div className="mb-3">
+          <button
+            onClick={() => setPlaying((p) => !p)}
+            disabled={loading}
+            className={`px-4 py-2 rounded font-semibold text-white transition-colors duration-200
+            ${
+              playing
+                ? "bg-red-600 hover:bg-red-700 focus:ring-2 focus:ring-red-400"
+                : "bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-400"
+            }
+            ${loading ? "opacity-50 cursor-not-allowed" : ""}
+          `}
+          >
+            {playing ? "Stop" : "Play"}
+          </button>
+        </div>
+
+        <div className="w-full">
+          <label
+            htmlFor="hourSlider"
+            className="block mb-2 text-center bg-gray-800"
+          >
+            Hour selected: {selectedHour} hour(s)
+          </label>
+          <input
+            disabled={loading}
+            id="hourSlider"
+            type="range"
+            min="0"
+            max="48"
+            value={selectedHour}
+            onChange={handleSliderChange}
+            className="w-full"
+          />
+          {loading && <span>LOADING ...{loadingHour}</span>}
+        </div>
+      </div>
     </div>
   );
 };
