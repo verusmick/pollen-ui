@@ -2,9 +2,9 @@ const isServer = typeof window === 'undefined';
 
 // Use internal proxy in production (browser-safe)
 // Use external API directly in local dev (since no HTTPS restriction)
-const BASE_URL = !isServer && process.env.NODE_ENV === 'development'
-  ? 'http://forecast.enjambre.com.bo/api'
-  : '/api';
+const BASE_URL = isServer
+  ? process.env.FORECAST_API
+  : process.env.NEXT_PUBLIC_FORECAST_API || '/api';
 
 export async function getForecastByCoords(params: {
   from: number;
