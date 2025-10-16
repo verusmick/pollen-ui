@@ -28,7 +28,7 @@ export const ForecastMapContainer = () => {
     lng: number;
   } | null>(null);
 
-  const pollenOptions = ["Birch", "Grass", "Abies"];
+  const pollenOptions = ["Birch", "Grass", "Alder"];
   const pollenType = "POLLEN_BIRCH";
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
