@@ -15,8 +15,8 @@ import { LocationSearch } from "./ui/LocationSearch";
 
 export const ForecastMapContainer = () => {
   const [loadingHour, setLoadingHour] = useState(0);
-  const [data, setData] = useState<
-    Array<{ long: number; lat: number; value: number }>
+  const [pollenData, setPollenData] = useState<
+    Array<[long: number, lat: number, value: number]>
   >([]);
   const [longitudes, setLongitudes] = useState<number[]>([]);
   const [latitudes, setLatitudes] = useState<number[]>([]);
@@ -29,28 +29,26 @@ export const ForecastMapContainer = () => {
   } | null>(null);
 
   const pollenOptions = ["Birch", "Grass", "Alder"];
-  const pollenType = "POLLEN_BIRCH";
+  const POLLEN_TYPE = "POLLEN_BIRCH";
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
 
-  const allDataRef = useRef<{ long: number; lat: number; value: number }[][]>(
-    []
-  );
+  const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
 
-  function addData(
+  const addNewPollenData = (
     forecasts: number[],
     longs: number[],
     lats: number[],
     hour: number
-  ) {
-    let values: Array<{ long: number; lat: number; value: number }> = [];
+  ) => {
+    let values: Array<[long: number, lat: number, value: number]> = [];
     if (!forecasts.length || forecasts.length !== longs.length * lats.length) {
       allDataRef.current[hour] = values;
       return;
     }
 
     let i = 0;
-    for (let lon of longs) {
+    for (let long of longs) {
       for (let lat of lats) {
         let value = forecasts[i];
         if (value > 0) {
@@ -59,17 +57,18 @@ export const ForecastMapContainer = () => {
           else if (value <= 200) value = 0.6;
           else if (value <= 400) value = 0.8;
           else value = 0.9;
-          values.push({ long: lon, lat: lat, value });
+          // values.push({ long: lon, lat: lat, value });
+          values.push([lat, long, value]);
         }
         i++;
       }
     }
 
     allDataRef.current[hour] = values;
-    if (hour === selectedHour) setData(values);
-  }
+    if (hour === selectedHour) setPollenData(values);
+  };
 
-  async function loadHour(hour: number) {
+  const loadHour = async (hour: number) => {
     if (!longitudes.length || !latitudes.length) return;
     if (allDataRef.current[hour]) return;
 
@@ -81,29 +80,29 @@ export const ForecastMapContainer = () => {
       const res = await getForecastByCoords({
         from: start,
         to: end,
-        pollen: pollenType,
+        pollen: POLLEN_TYPE,
       });
-      addData(res, longitudes, latitudes, hour);
+      addNewPollenData(res, longitudes, latitudes, hour);
     } catch (err) {
       console.error("Failed to load hour", hour, err);
     }
-  }
+  };
 
-  async function loadInitialData() {
+  const loadInitialData = async () => {
     try {
       const longs = await getLongitudes();
       const lats = await getLatitudes();
       setLongitudes(longs);
       setLatitudes(lats);
 
-      const res = await getForecastByCoords({ from, to, pollen: pollenType });
-      addData(res, longs, lats, 0);
+      const res = await getForecastByCoords({ from, to, pollen: POLLEN_TYPE });
+      addNewPollenData(res, longs, lats, 0);
     } catch (err) {
       console.error("Failed to load initial data", err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   // Slider
 
@@ -111,7 +110,7 @@ export const ForecastMapContainer = () => {
     setPlaying(false);
     setSelectedHour(hour);
     await loadHour(hour);
-    setData(allDataRef.current[hour] || []);
+    setPollenData(allDataRef.current[hour] || []);
   };
 
   // Play (Timeline)
@@ -123,7 +122,7 @@ export const ForecastMapContainer = () => {
       const nextHour = (selectedHour + 1) % 49;
       setSelectedHour(nextHour);
       await loadHour(nextHour);
-      setData(allDataRef.current[nextHour] || []);
+      setPollenData(allDataRef.current[nextHour] || []);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -135,7 +134,7 @@ export const ForecastMapContainer = () => {
 
   return (
     <div className="relative h-screen w-screen">
-      <ForecastMap pollenData={data} />
+      <ForecastMap pollenData={pollenData} />
 
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title="Search">
