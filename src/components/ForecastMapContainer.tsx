@@ -137,7 +137,7 @@ export const ForecastMapContainer = () => {
     <div className="relative h-screen w-screen">
       <ForecastMap pollenData={data} />
 
-      <span className="absolute top-6 right-6 z-50 flex flex-col items-start gap-2">
+      <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title="Search">
           <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
         </SearchCardToggle>
@@ -146,7 +146,7 @@ export const ForecastMapContainer = () => {
 
       <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
 
-      <span className="absolute top-20 left-6 w-[160px] z-50">
+      <span className="absolute top-18 z-50">
         <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
       </span>
 

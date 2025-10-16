@@ -51,12 +51,12 @@ export default function PollenTimeline({
   }, [activeHour]);
 
   return (
-    <div className="bg-card text-white rounded-lg shadow-md p-3 w-200 backdrop-blur-sm">
+    <div className="bg-card text-white rounded-lg shadow-md p-3 w-full max-w-5xl mx-auto backdrop-blur-sm">
       <div className="flex items-center gap-2">
         {/* Play / Pause */}
         <button
           onClick={() => setPlaying((p) => !p)}
-          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition"
+          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition flex-shrink-0"
         >
           {playing ? <FaPause size={14} /> : <FaPlay size={14} />}
         </button>
@@ -66,7 +66,7 @@ export default function PollenTimeline({
           onClick={() =>
             onHourChange(activeHour === 0 ? hours.length - 1 : activeHour - 1)
           }
-          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition"
+          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition flex-shrink-0"
         >
           <MdChevronLeft size={18} />
         </button>
@@ -74,12 +74,12 @@ export default function PollenTimeline({
         {/* Timeline */}
         <div
           ref={barRef}
-          className="relative flex overflow-x-auto gap-[2px] scrollbar-hide flex-1 border-t border-gray-700 pt-2"
+          className="relative flex overflow-x-auto gap-[2px] scrollbar-hide flex-1 border-t border-gray-700 pt-2 px-1 sm:px-2 md:px-4"
         >
           {hours.map((h, i) => (
             <div
               key={h}
-              className="flex flex-col items-center relative min-w-[40px]"
+              className="flex flex-col items-center relative min-w-[32px] sm:min-w-[40px] md:min-w-[48px] lg:min-w-[60px]"
             >
               <div
                 className={`h-2 w-full rounded-sm ${
@@ -87,14 +87,17 @@ export default function PollenTimeline({
                 }`}
               />
               <span
-                className={`text-[11px] mt-1 ${
-                  i === activeHour ? "text-white" : "text-gray-400"
+                className={`text-[10px] sm:text-[11px] md:text-[12px] mt-1 ${
+                  i === activeHour
+                    ? "text-white font-semibold"
+                    : "text-gray-400"
                 }`}
               >
                 {h}
               </span>
+              {/* Línea divisoria */}
               <div className="absolute top-0 left-full h-4 w-[1px] bg-gray-700"></div>
-              {/* Clickable overlay */}
+              {/* Overlay clicable */}
               <button
                 className="absolute inset-0 w-full h-full opacity-0"
                 onClick={() => onHourChange(i)}
@@ -106,16 +109,11 @@ export default function PollenTimeline({
         {/* Step forward */}
         <button
           onClick={() => onHourChange((activeHour + 1) % hours.length)}
-          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition"
+          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition flex-shrink-0"
         >
           <MdChevronRight size={18} />
         </button>
       </div>
-
-      {/* <div className="text-xs text-gray-500 mt-2 flex justify-between">
-        <span>Updated on 11.09.2025, 15:14</span>
-        <span>Friday, 12.09.2025</span>
-      </div> */}
     </div>
   );
 }
