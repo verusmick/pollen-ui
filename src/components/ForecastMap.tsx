@@ -23,15 +23,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
-
-    // Convert to the format your filter expects
-    const heatPoints: [number, number, number?][] = pollenData.map(
-      (point: any) => [point.lat, point.long, point.value || 0.5]
-    );
-
-    // const filteredPoints = filterPointsInBavaria(heatPoints);
-    const filteredPoints = filterPointsInBavaria(heatPoints);
-
+    const filteredPoints = filterPointsInBavaria(pollenData);
     // Create grid cells from filtered points
     return filteredPoints.map(([lat, lon, intensity = 0.5]) => {
       // Create a square quadrant around each point
@@ -227,26 +219,6 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
         controller={true}
         layers={layers}
         style={{ width: "100vw", height: "100vh" }}
-        // getTooltip={({ object }) => {
-        //     // Alternative tooltip approach (simpler)
-        //     if (object) {
-        //       return {
-        //         html: `
-        //           <div class="p-2 bg-gray-800 text-white rounded">
-        //             <strong>Intensity:</strong> ${getPollenLabel(object.intensity)}<br/>
-        //             <strong>Position:</strong> ${object.position[1].toFixed(4)}, ${object.position[0].toFixed(4)}
-        //           </div>
-        //         `,
-        //         style: {
-        //           backgroundColor: '#1f2937',
-        //           color: 'white',
-        //           borderRadius: '8px',
-        //           padding: '8px'
-        //         }
-        //       };
-        //     }
-        //     return null;
-        //   }}
       />
       {renderTooltip()}
     </>
