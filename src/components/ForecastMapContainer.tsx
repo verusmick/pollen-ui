@@ -151,7 +151,7 @@ export const ForecastMapContainer = () => {
             />
           </div>
         </SearchCardToggle>
-        <LocationButton onLocationFound={(pos) => setUserLocation(pos)} />
+        <LocationButton />
       </span>
 
       <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />

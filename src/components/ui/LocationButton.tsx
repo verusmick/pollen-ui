@@ -2,23 +2,24 @@
 
 import { useState } from "react";
 import { BiMap, BiX } from "react-icons/bi";
-import { Tooltip } from "./Tooltip";
 import { TbLocationFilled } from "react-icons/tb";
+import { Tooltip } from "./Tooltip";
+import { useLocationStore } from "@/store/locationStore";
 
 interface LocationButtonProps {
   tooltipText?: string;
-  onLocationFound?: (position: { lat: number; lng: number }) => void;
 }
 
 export const LocationButton = ({
   tooltipText = "Show your location",
-  onLocationFound,
 }: LocationButtonProps) => {
   const [open, setOpen] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<
     "idle" | "granted" | "denied" | "prompt"
   >("idle");
   const [error, setError] = useState<string | null>(null);
+
+  const setLocation = useLocationStore((state) => state.setLocation);
 
   const handleRequestPermission = () => {
     if (!navigator.geolocation) {
@@ -34,7 +35,7 @@ export const LocationButton = ({
         };
         setPermissionStatus("granted");
         setError(null);
-        onLocationFound?.(coords);
+        setLocation(coords);
         setOpen(false);
       },
       (err) => {
