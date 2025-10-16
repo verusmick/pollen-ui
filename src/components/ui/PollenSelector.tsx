@@ -57,7 +57,7 @@ export const PollenSelector = ({
         onClick={() => setIsOpen(!isOpen)}
         className={`
           w-full bg-card text-white px-2 py-2 flex justify-between items-center
-          rounded-lg shadow-md text-xs sm:text-sm md:text-base lg:text-sm xl:text-lg 2xl:text-lg
+          rounded-lg shadow-md text-[16px]
           transition
         `}
       >
@@ -70,7 +70,7 @@ export const PollenSelector = ({
       </button>
 
       {isOpen && (
-        <ul className="w-full bg-card rounded-b-lg shadow-lg max-h-60 overflow-auto border border-card text-xs sm:text-sm md:text-base lg:text-sm xl:text-lg 2xl:text-lg">
+        <ul className="w-full bg-card rounded-b-lg shadow-lg max-h-60 overflow-auto border border-card text-[16px]">
           {options.map((opt) => (
             <li
               key={opt}

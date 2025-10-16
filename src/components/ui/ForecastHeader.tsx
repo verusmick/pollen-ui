@@ -29,8 +29,8 @@ export const ForecastHeader = ({
       <Image
         src={iconSrc}
         alt="Forecast icon"
-        width={30}
-        height={30}
+        width={24}
+        height={24}
         className="
           rounded-sm
           w-[8vw] sm:w-[6vw] md:w-[4vw] lg:w-[3vw] xl:w-[2.5vw] 2xl:w-[2vw]
@@ -39,10 +39,7 @@ export const ForecastHeader = ({
       />
       <h3
         className="
-          text-white truncate
-          text-xs sm:text-sm md:text-sm lg:text-md xl:text-lg 2xl:text-xl
-          max-w-[60%]
-      "
+          text-white truncate text-[16px] max-w-[60%]"
       >
         {title}
       </h3>
