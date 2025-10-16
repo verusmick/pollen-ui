@@ -35,7 +35,7 @@ export const LocationButton = ({
         };
         setPermissionStatus("granted");
         setError(null);
-        setLocation(coords); // <-- guarda en Zustand
+        setLocation(coords);
         setOpen(false);
       },
       (err) => {
@@ -85,7 +85,7 @@ export const LocationButton = ({
 
             {permissionStatus === "granted" && (
               <p className="text-center text-sm text-green-400">
-                ✅ Permission granted! Coordinates saved.
+                ✅ Permission granted! You can now access location data.
               </p>
             )}
             {permissionStatus === "denied" && (
