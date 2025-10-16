@@ -12,8 +12,11 @@ import { SearchCardToggle } from "./ui/SearchCardToggle";
 import PollenTimeline from "./ui/PollenTimeline";
 import { LocationButton } from "./ui/LocationButton";
 import { LocationSearch } from "./ui/LocationSearch";
+import { LoadingOverlay } from "./ui/LoadingOverlay";
+import { useLoadingStore } from "@/store/loadingStore";
 
 export const ForecastMapContainer = () => {
+  const { loading, setLoading } = useLoadingStore();
   const [loadingHour, setLoadingHour] = useState(0);
   const [data, setData] = useState<
     Array<{ long: number; lat: number; value: number }>
@@ -22,7 +25,6 @@ export const ForecastMapContainer = () => {
   const [latitudes, setLatitudes] = useState<number[]>([]);
   const [selectedHour, setSelectedHour] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
@@ -90,6 +92,7 @@ export const ForecastMapContainer = () => {
   }
 
   async function loadInitialData() {
+    setLoading(true, "Loading initial pollen data...");
     try {
       const longs = await getLongitudes();
       const lats = await getLatitudes();
@@ -135,29 +138,36 @@ export const ForecastMapContainer = () => {
 
   return (
     <div className="relative h-screen w-screen">
-      <ForecastMap pollenData={data} />
-
-      <span className="absolute top-6 right-6 z-50 flex flex-col items-start gap-2">
-        <SearchCardToggle title="Search">
-          <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
-        </SearchCardToggle>
-        <LocationButton />
-      </span>
-
-      <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
-
-      <span className="absolute top-20 left-6 w-[160px] z-50">
-        <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
-      </span>
-
-      <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
-        <PollenTimeline
-          setPlaying={setPlaying}
-          playing={playing}
-          activeHour={selectedHour}
-          onHourChange={handleSliderChange}
-        />
-      </span>
+      {loading ? (
+        <>
+          <LoadingOverlay message="Pollen Forecast Map" />
+        </>
+      ) : (
+        <>
+          <ForecastMap pollenData={data} />
+          <span className="absolute top-6 right-6 z-50 flex flex-col items-start gap-2">
+            <SearchCardToggle title="Search">
+              <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
+            </SearchCardToggle>
+            <LocationButton />
+          </span>
+          <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
+          <span className="absolute top-20 left-6 w-[160px] z-50">
+            <PollenSelector
+              options={pollenOptions}
+              selected={pollenOptions[0]}
+            />
+          </span>
+          <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
+            <PollenTimeline
+              setPlaying={setPlaying}
+              playing={playing}
+              activeHour={selectedHour}
+              onHourChange={handleSliderChange}
+            />
+          </span>
+        </>
+      )}
     </div>
   );
 };
