@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
 import { Tooltip } from "./Tooltip";
 
@@ -14,13 +13,34 @@ export const SearchCardToggle = ({
   children,
 }: SearchCardToggleProps) => {
   const [open, setOpen] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Detect click outside the card
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
 
   return (
     <div className="relative">
       {/* Card */}
       {open && (
         <div
-          className="absolute top-0 right-12 bg-card shadow-lg rounded-lg w-[300px]
+          ref={cardRef}
+          className="absolute top-0 right-12 bg-card/80 shadow-lg rounded-lg w-[400px]
                      p-4 flex flex-col gap-2 z-50"
         >
           <h3 className="font-semibold text-white">{title}</h3>
