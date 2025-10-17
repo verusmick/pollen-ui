@@ -67,7 +67,7 @@ export const LocationSearch = ({
 
       {/* Suggestions */}
       {suggestions.length > 0 && (
-        <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto">
+        <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto search-scroll">
           {suggestions.map((item) => {
             const display = item.display_name;
             const regex = new RegExp(`(${query})`, "gi");
@@ -88,7 +88,10 @@ export const LocationSearch = ({
               >
                 {parts.map((part: string, i: number) =>
                   part.toLowerCase() === query.toLowerCase() ? (
-                    <span key={i} className="underline font-bold">
+                    <span
+                      key={i}
+                      className="underline font-bold text-indigo-400"
+                    >
                       {part}
                     </span>
                   ) : (
