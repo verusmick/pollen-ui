@@ -16,6 +16,13 @@ import filterPointsInRegion from "../utils/filterPointsInRegion";
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
+  const [viewState, setViewState] = useState({
+    longitude: 10.5,
+    latitude: 51,
+    zoom: 6.5,
+    minZoom: 5,
+    maxZoom: 12,
+  });
   const [hoverInfo, setHoverInfo] = useState<{
     object: any;
     x: number;
@@ -210,18 +217,51 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   return (
     <>
       <DeckGL
-        initialViewState={{
-          longitude: 10.5,
-          latitude: 51,
-          zoom: 6.5,
-          minZoom: 5,
-          maxZoom: 12,
-        }}
+        initialViewState={viewState}
         controller={true}
         layers={layers}
         style={{ width: "100vw", height: "100vh" }}
+        viewState={viewState}
+        onViewStateChange={(e) =>
+          setViewState({
+            ...(e.viewState as {
+              longitude: number;
+              latitude: number;
+              zoom: number;
+              minZoom: number;
+              maxZoom: number;
+            }),
+          })
+        }
       />
       {renderTooltip()}
+      {/*  zoom buttons*/}
+      <div className="absolute bottom-10 right-8 z-50">
+        <div className="bg-card backdrop-blur-md rounded-xl shadow-lg flex flex-col">
+          <button
+            onClick={() =>
+              setViewState((prev) => ({
+                ...prev,
+                zoom: Math.min(prev.zoom + 1, prev.maxZoom),
+              }))
+            }
+            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-t-xl"
+          >
+            +
+          </button>
+          <button
+            onClick={() =>
+              setViewState((prev) => ({
+                ...prev,
+                zoom: Math.max(prev.zoom - 1, prev.minZoom),
+              }))
+            }
+            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-b-xl"
+          >
+            -
+          </button>
+        </div>
+      </div>
     </>
   );
 }
