@@ -75,6 +75,11 @@ export const LocationSearch = ({
       {/* Loading */}
       {loading && <div className="text-white text-base">{t("loading")}</div>}
 
+      {/* No results */}
+      {!loading && query && suggestions.length === 0 && (
+        <div className="text-white text-base opacity-80">{t("no_results")}</div>
+      )}
+
       {/* Suggestions */}
       {suggestions.length > 0 && (
         <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto search-scroll">
