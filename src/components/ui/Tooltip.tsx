@@ -18,7 +18,7 @@ export const Tooltip = ({
   visible = true,
 }: TooltipProps) => {
   const baseClasses = `
-    whitespace-nowrap bg-card text-white text-sm font-semibold px-3 py-2 
+    whitespace-nowrap bg-card text-white text-base font-semibold px-3 py-2 
     rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 
     pointer-events-none shadow-md z-50
     after:content-[''] after:absolute after:border-6 after:border-transparent

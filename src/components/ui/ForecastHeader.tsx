@@ -39,7 +39,7 @@ export const ForecastHeader = ({
       />
       <h3
         className="
-          text-white truncate text-[16px] max-w-[60%]"
+          text-white truncate text-base max-w-[60%]"
       >
         {title}
       </h3>

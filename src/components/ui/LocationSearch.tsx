@@ -63,7 +63,7 @@ export const LocationSearch = ({
       </div>
 
       {/* Loading */}
-      {loading && <div className="text-white">Loading...</div>}
+      {loading && <div className="text-white text-base">Loading...</div>}
 
       {/* Suggestions */}
       {suggestions.length > 0 && (

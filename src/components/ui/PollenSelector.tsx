@@ -34,8 +34,7 @@ export const PollenSelector = ({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -70,13 +69,15 @@ export const PollenSelector = ({
       </button>
 
       {isOpen && (
-        <ul className="w-full bg-card rounded-b-lg shadow-lg max-h-60 overflow-auto border border-card text-[16px]">
+        <ul className="w-full bg-card rounded-b-lg shadow-lg max-h-60 overflow-auto border border-card text-base">
           {options.map((opt) => (
             <li
               key={opt}
               onClick={() => handleOptionClick(opt)}
               className={`cursor-pointer px-2 py-2 hover:bg-neutral-700/40 hover:text-white transition ${
-                opt === selectedOption ? "font-bold bg-neutral-700" : "text-white"
+                opt === selectedOption
+                  ? "font-bold bg-neutral-700"
+                  : "text-white"
               }`}
             >
               {opt}

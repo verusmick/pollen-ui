@@ -47,7 +47,7 @@ export const SearchCardToggle = ({
         >
           <h3
             className="
-              font-semibold text-white text-[16px]
+              font-semibold text-white text-base
               border-b border-white/10 pb-2 mb-2
             "
           >
