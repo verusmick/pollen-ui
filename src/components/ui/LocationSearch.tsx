@@ -63,7 +63,7 @@ export const LocationSearch = ({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search Location, Zip Code (Germany)"
+          placeholder="Search Location, Zip Code"
           className="w-full pl-8 pr-8 py-1 rounded-md bg-neutral-900/70 text-white focus:outline-none"
         />
       </div>
