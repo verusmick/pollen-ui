@@ -30,7 +30,6 @@ export const LocationSearch = ({
               countrycodes: "de", // Germany
             })
         );
-
         const data = await res.json();
         setSuggestions(data);
       } catch (err) {
@@ -69,7 +68,7 @@ export const LocationSearch = ({
       </div>
 
       {/* Loading */}
-      {loading && <div className="text-white text-sm">Loading...</div>}
+      {loading && <div className="text-white text-base">Loading...</div>}
 
       {/* Suggestions */}
       {suggestions.length > 0 && (
@@ -82,7 +81,7 @@ export const LocationSearch = ({
             return (
               <li
                 key={item.place_id}
-                className="px-3 py-2 bg-neutral-800 rounded-lg hover:bg-neutral-700 cursor-pointer shadow-sm text-sm"
+                className="px-3 py-2 bg-neutral-800 rounded-lg hover:bg-neutral-700 cursor-pointer shadow-sm"
                 onClick={() => {
                   onSelect({
                     lat: parseFloat(item.lat),
@@ -94,7 +93,10 @@ export const LocationSearch = ({
               >
                 {parts.map((part: string, i: number) =>
                   part.toLowerCase() === query.toLowerCase() ? (
-                    <span key={i} className="underline font-bold">
+                    <span
+                      key={i}
+                      className="underline font-bold text-indigo-400"
+                    >
                       {part}
                     </span>
                   ) : (
