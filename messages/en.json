@@ -3,7 +3,17 @@
     "title": "Hello world 2"
   },
   "forecastPage": {
+    "name_company": "Zaum",
     "title": "Forecast Map",
-    "description": "Interactive pollen forecast map"
+    "description": "Interactive pollen forecast map",
+    "message_loading": "Pollen Forecast Map",
+    "title_tooltip_search": "Search",
+    "title_tooltip_location": "Show your location",
+    "loading": "Loading",
+    "placeholder_input_search": "Search Location, Zip Code",
+    "title_button_location": "Request permission",
+    "description_card_location": "Click below to request permission to access your location.",
+    "description_permission_granted": "Permission granted! You can now access location data.",
+    "description_permission_denied":"Permission denied. Please enable it in browser settings."
   }
 }
