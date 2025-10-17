@@ -15,7 +15,7 @@ export const SearchCardToggle = ({
   const [open, setOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Cerrar al hacer clic fuera
+ // Close on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
@@ -57,7 +57,7 @@ export const SearchCardToggle = ({
         </div>
       )}
 
-      {/* Botón flotante */}
+      {/* Floating button */}
       <Tooltip text={title} position="left" visible={!open}>
         <button
           onClick={() => setOpen(!open)}

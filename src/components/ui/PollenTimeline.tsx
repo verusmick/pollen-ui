@@ -95,7 +95,7 @@ export default function PollenTimeline({
               >
                 {h}
               </span>
-              {/* Línea divisoria */}
+              {/* Dividing line */}
               <div className="absolute top-0 left-full h-4 w-[1px] bg-gray-700"></div>
               {/* Overlay clicable */}
               <button
