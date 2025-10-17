@@ -5,14 +5,14 @@ import { BiMap, BiX } from "react-icons/bi";
 import { TbLocationFilled } from "react-icons/tb";
 import { Tooltip } from "./Tooltip";
 import { useLocationStore } from "@/store/locationStore";
+import { useTranslations } from "next-intl";
 
 interface LocationButtonProps {
-  tooltipText?: string;
+  tooltipText: string;
 }
 
-export const LocationButton = ({
-  tooltipText = "Show your location",
-}: LocationButtonProps) => {
+export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
+  const t = useTranslations("forecastPage.show_your_location");
   const [open, setOpen] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<
     "idle" | "granted" | "denied" | "prompt"
@@ -73,10 +73,12 @@ export const LocationButton = ({
               <BiX size={22} />
             </button>
 
-            <h2 className="text-xl font-semibold text-center">Zuam</h2>
+            <h2 className="text-xl font-semibold text-center">
+              {t("name_company")}
+            </h2>
 
             <p className="text-sm text-gray-300 text-center">
-              Click below to request permission to access your location.
+              {t("description_card_location")}
             </p>
 
             <button
@@ -84,17 +86,17 @@ export const LocationButton = ({
               className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-all"
             >
               <BiMap size={20} />
-              Request permission
+              {t("title_button_location")}
             </button>
 
             {permissionStatus === "granted" && (
               <p className="text-center text-sm text-green-400">
-                ✅ Permission granted! You can now access location data.
+                ✅ {t("description_permission_granted")}
               </p>
             )}
             {permissionStatus === "denied" && (
               <p className="text-center text-sm text-red-400">
-                ⚠️ Permission denied. Please enable it in browser settings.
+                ⚠️ {t("description_permission_denied")}
               </p>
             )}
             {error && (

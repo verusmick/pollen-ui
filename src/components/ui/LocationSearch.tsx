@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
 
@@ -7,6 +8,7 @@ export const LocationSearch = ({
 }: {
   onSelect: (pos: { lat: number; lng: number }) => void;
 }) => {
+  const t = useTranslations("forecastPage.search");
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -62,13 +64,13 @@ export const LocationSearch = ({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search Location, Zip Code"
+          placeholder={t("placeholder_input_search")}
           className="w-full pl-8 pr-8 py-1 rounded-md bg-neutral-900/70 text-white focus:outline-none"
         />
       </div>
 
       {/* Loading */}
-      {loading && <div className="text-white text-base">Loading...</div>}
+      {loading && <div className="text-white text-base">{t("loading")}</div>}
 
       {/* Suggestions */}
       {suggestions.length > 0 && (

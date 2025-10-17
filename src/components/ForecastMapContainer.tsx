@@ -14,8 +14,12 @@ import { LocationButton } from "./ui/LocationButton";
 import { LocationSearch } from "./ui/LocationSearch";
 import { LoadingOverlay } from "./ui/LoadingOverlay";
 import { useLoadingStore } from "@/store/loadingStore";
+import { useTranslations } from "next-intl";
 
 export const ForecastMapContainer = () => {
+  const t = useTranslations("forecastPage");
+  const tSearch = useTranslations("forecastPage.search");
+  const tLocation = useTranslations("forecastPage.show_your_location");
   const { loading, setLoading } = useLoadingStore();
   const [loadingHour, setLoadingHour] = useState(0);
   const [pollenData, setPollenData] = useState<
@@ -139,18 +143,18 @@ export const ForecastMapContainer = () => {
     <div className="relative h-screen w-screen">
       {loading ? (
         <>
-          <LoadingOverlay message="Pollen Forecast Map" />
+          <LoadingOverlay message={t("message_loading")} />
         </>
       ) : (
         <>
           <ForecastMap pollenData={pollenData} />
           <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-            <SearchCardToggle title="Search">
+            <SearchCardToggle title={tSearch("title_tooltip_search")}>
               <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
             </SearchCardToggle>
-            <LocationButton />
+            <LocationButton tooltipText={tLocation("title_tooltip_location")} />
           </span>
-          <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
+          <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
           <span className="absolute top-18 z-50">
             <PollenSelector
               options={pollenOptions}
