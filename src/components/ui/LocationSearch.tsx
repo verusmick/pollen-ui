@@ -21,10 +21,16 @@ export const LocationSearch = ({
       setLoading(true);
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-            query
-          )}&format=json&limit=5`
+          `https://nominatim.openstreetmap.org/search?` +
+            new URLSearchParams({
+              q: query,
+              format: "json",
+              addressdetails: "1",
+              limit: "8",
+              countrycodes: "de", // Germany
+            })
         );
+
         const data = await res.json();
         setSuggestions(data);
       } catch (err) {
@@ -32,7 +38,7 @@ export const LocationSearch = ({
       } finally {
         setLoading(false);
       }
-    }, 300);
+    }, 400);
 
     return () => clearTimeout(timeout);
   }, [query]);
@@ -57,17 +63,17 @@ export const LocationSearch = ({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search Location, Zip Code"
+          placeholder="Search Location, Zip Code (Germany)"
           className="w-full pl-8 pr-8 py-1 rounded-md bg-neutral-900/70 text-white focus:outline-none"
         />
       </div>
 
       {/* Loading */}
-      {loading && <div className="text-white">Loading...</div>}
+      {loading && <div className="text-white text-sm">Loading...</div>}
 
       {/* Suggestions */}
       {suggestions.length > 0 && (
-        <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto">
+        <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto search-scroll">
           {suggestions.map((item) => {
             const display = item.display_name;
             const regex = new RegExp(`(${query})`, "gi");
@@ -76,7 +82,7 @@ export const LocationSearch = ({
             return (
               <li
                 key={item.place_id}
-                className="px-3 py-2 bg-neutral-800 rounded-lg hover:bg-neutral-700 cursor-pointer shadow-sm"
+                className="px-3 py-2 bg-neutral-800 rounded-lg hover:bg-neutral-700 cursor-pointer shadow-sm text-sm"
                 onClick={() => {
                   onSelect({
                     lat: parseFloat(item.lat),
