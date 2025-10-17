@@ -21,9 +21,14 @@ export const LocationSearch = ({
       setLoading(true);
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-            query
-          )}&format=json&limit=5`
+          `https://nominatim.openstreetmap.org/search?` +
+            new URLSearchParams({
+              q: query,
+              format: "json",
+              addressdetails: "1",
+              limit: "8",
+              countrycodes: "de", // Germany
+            })
         );
         const data = await res.json();
         setSuggestions(data);
@@ -32,7 +37,7 @@ export const LocationSearch = ({
       } finally {
         setLoading(false);
       }
-    }, 300);
+    }, 400);
 
     return () => clearTimeout(timeout);
   }, [query]);
