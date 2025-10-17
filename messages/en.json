@@ -9,7 +9,8 @@
     "search": {
       "title_tooltip_search": "Search",
       "loading": "Loading",
-      "placeholder_input_search": "Search Location, Zip Code"
+      "placeholder_input_search": "Search Location, Zip Code",
+      "no_results": "No results found"
     },
     "show_your_location": {
       "title_tooltip_location": "Show your location",
