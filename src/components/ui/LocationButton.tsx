@@ -12,7 +12,7 @@ interface LocationButtonProps {
 }
 
 export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
-  const t = useTranslations();
+  const t = useTranslations("forecastPage.show_your_location");
   const [open, setOpen] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<
     "idle" | "granted" | "denied" | "prompt"
@@ -70,11 +70,11 @@ export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
             </button>
 
             <h2 className="text-xl font-semibold text-center">
-              {t("forecastPage.name_company")}
+              {t("name_company")}
             </h2>
 
             <p className="text-sm text-gray-300 text-center">
-              {t("forecastPage.description_card_location")}
+              {t("description_card_location")}
             </p>
 
             <button
@@ -82,17 +82,17 @@ export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
               className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-all"
             >
               <BiMap size={20} />
-              {t("forecastPage.title_button_location")}
+              {t("title_button_location")}
             </button>
 
             {permissionStatus === "granted" && (
               <p className="text-center text-sm text-green-400">
-                ✅ {t("forecastPage.description_permission_granted")}
+                ✅ {t("description_permission_granted")}
               </p>
             )}
             {permissionStatus === "denied" && (
               <p className="text-center text-sm text-red-400">
-                ⚠️ {t("forecastPage.description_permission_denied")}
+                ⚠️ {t("description_permission_denied")}
               </p>
             )}
             {error && (
