@@ -53,7 +53,11 @@ export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
       <Tooltip text={tooltipText} position="left" visible={!open}>
         <button
           onClick={() => setOpen(true)}
-          className="bg-card hover:bg-neutral-800 text-white p-2 rounded-full shadow-lg focus:outline-none"
+          className="
+            bg-card backdrop-blur-sm hover:bg-neutral-800 text-white
+            p-3 rounded-full shadow-lg focus:outline-none transition
+            border border-white/10
+          "
         >
           <TbLocationFilled size={20} />
         </button>

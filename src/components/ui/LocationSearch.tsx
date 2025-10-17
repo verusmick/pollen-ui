@@ -23,9 +23,14 @@ export const LocationSearch = ({
       setLoading(true);
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-            query
-          )}&format=json&limit=5`
+          `https://nominatim.openstreetmap.org/search?` +
+            new URLSearchParams({
+              q: query,
+              format: "json",
+              addressdetails: "1",
+              limit: "8",
+              countrycodes: "de", // Germany
+            })
         );
         const data = await res.json();
         setSuggestions(data);
@@ -34,7 +39,7 @@ export const LocationSearch = ({
       } finally {
         setLoading(false);
       }
-    }, 300);
+    }, 400);
 
     return () => clearTimeout(timeout);
   }, [query]);
@@ -65,11 +70,11 @@ export const LocationSearch = ({
       </div>
 
       {/* Loading */}
-      {loading && <div className="text-white">{t("loading")}</div>}
+      {loading && <div className="text-white text-base">{t("loading")}</div>}
 
       {/* Suggestions */}
       {suggestions.length > 0 && (
-        <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto">
+        <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto search-scroll">
           {suggestions.map((item) => {
             const display = item.display_name;
             const regex = new RegExp(`(${query})`, "gi");
@@ -90,7 +95,10 @@ export const LocationSearch = ({
               >
                 {parts.map((part: string, i: number) =>
                   part.toLowerCase() === query.toLowerCase() ? (
-                    <span key={i} className="underline font-bold">
+                    <span
+                      key={i}
+                      className="underline font-bold text-indigo-400"
+                    >
                       {part}
                     </span>
                   ) : (
