@@ -1,4 +1,5 @@
 "use client";
+import { useSearchLocationStore } from "@/store/searchLocationStore";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
@@ -12,6 +13,8 @@ export const LocationSearch = ({
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const setLocation = useSearchLocationStore((state) => state.setLocation);
 
   useEffect(() => {
     if (!query) {
@@ -90,10 +93,13 @@ export const LocationSearch = ({
                 key={item.place_id}
                 className="px-3 py-2 bg-neutral-800 rounded-lg hover:bg-neutral-700 cursor-pointer shadow-sm"
                 onClick={() => {
-                  onSelect({
+                  const selected = {
                     lat: parseFloat(item.lat),
                     lng: parseFloat(item.lon),
-                  });
+                    name: item.display_name,
+                  };
+                  setLocation(selected);
+                  onSelect(selected);
                   setQuery(item.display_name);
                   setSuggestions([]);
                 }}
