@@ -2,20 +2,23 @@
 import { DeckGL } from "@deck.gl/react";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
 import germanyGeo from "@/data/germany.geo.json";
 import type { FeatureCollection } from "geojson";
 
-import { BitmapLayer } from "@deck.gl/layers";
+import { BitmapLayer, IconLayer } from "@deck.gl/layers";
 import type { Feature } from "geojson";
 import filterPointsInRegion from "../utils/filterPointsInRegion";
+import { useSearchLocationStore } from "@/store/searchLocationStore";
+import { FlyToInterpolator } from "@deck.gl/core";
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
+  const { lat, lng, name, boundingbox } = useSearchLocationStore();
   const [viewState, setViewState] = useState({
     longitude: 10.5,
     latitude: 51,
@@ -173,6 +176,34 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
     // Mask outside area
     maskLayer,
+    (lat && lng) ? new IconLayer({
+        id: "search-marker",
+        data: [{ position: [lng, lat], name }],
+        getIcon: () => "marker",
+        getColor: (d) => [33, 33, 33],
+        getPosition: (d) => d.position,
+        getSize: () => 41,
+        iconAtlas: "/map_icon.png",
+        iconMapping: {
+          marker: {
+            x: 0,
+            y: 0,
+            width: 128,
+            height: 128,
+            anchorY: 128,
+            mask: true,
+          },
+          "marker-warning": {
+            x: 128,
+            y: 0,
+            width: 128,
+            height: 128,
+            anchorY: 128,
+            mask: false,
+          },
+        },
+        pickable: true,
+      }) : null,
   ];
 
   function renderTooltip() {
@@ -213,6 +244,19 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       </div>
     );
   }
+
+  useEffect(() => {
+    if (lat && lng) {
+      setViewState((prev) => ({
+        ...prev,
+        longitude: lng,
+        latitude: lat,
+        zoom: 10,
+        transitionDuration: 1000,
+        transitionInterpolator: new FlyToInterpolator(),
+      }));
+    }
+  }, [lat, lng]);
 
   return (
     <>
