@@ -4,6 +4,21 @@
   },
   "forecastPage": {
     "title": "Forecast Map",
-    "description": "Interactive pollen forecast map"
+    "description": "Interactive pollen forecast map",
+    "message_loading": "Pollen Forecast Map",
+    "search": {
+      "title_tooltip_search": "Search",
+      "loading": "Loading",
+      "placeholder_input_search": "Search Location, Zip Code",
+      "no_results": "No results found"
+    },
+    "show_your_location": {
+      "title_tooltip_location": "Show your location",
+      "name_company": "Zaum",
+      "description_card_location": "Click below to request permission to access your location.",
+      "description_permission_granted": "Permission granted! You can now access location data.",
+      "description_permission_denied": "Permission denied. Please enable it in browser settings.",
+      "title_button_location": "Request permission"
+    }
   }
 }

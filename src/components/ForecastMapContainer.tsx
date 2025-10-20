@@ -9,48 +9,52 @@ import ForecastMap from "@/components/ForecastMap";
 import { ForecastHeader } from "./ui/ForecastHeader";
 import { PollenSelector } from "./ui/PollenSelector";
 import { SearchCardToggle } from "./ui/SearchCardToggle";
-import { BiSearch } from "react-icons/bi";
 import PollenTimeline from "./ui/PollenTimeline";
 import { LocationButton } from "./ui/LocationButton";
+import { LocationSearch } from "./ui/LocationSearch";
+import { LoadingOverlay } from "./ui/LoadingOverlay";
+import { useLoadingStore } from "@/store/loadingStore";
+import { useTranslations } from "next-intl";
 
 export const ForecastMapContainer = () => {
+  const t = useTranslations("forecastPage");
+  const tSearch = useTranslations("forecastPage.search");
+  const tLocation = useTranslations("forecastPage.show_your_location");
+  const { loading, setLoading } = useLoadingStore();
   const [loadingHour, setLoadingHour] = useState(0);
-  const [data, setData] = useState<
-    Array<{ long: number; lat: number; value: number }>
+  const [pollenData, setPollenData] = useState<
+    Array<[long: number, lat: number, value: number]>
   >([]);
   const [longitudes, setLongitudes] = useState<number[]>([]);
   const [latitudes, setLatitudes] = useState<number[]>([]);
   const [selectedHour, setSelectedHour] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
 
   const pollenOptions = ["Birch", "Grass", "Alder"];
-  const pollenType = "POLLEN_BIRCH";
+  const POLLEN_TYPE = "POLLEN_BIRCH";
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
 
-  const allDataRef = useRef<{ long: number; lat: number; value: number }[][]>(
-    []
-  );
+  const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
 
-  function addData(
+  const addNewPollenData = (
     forecasts: number[],
     longs: number[],
     lats: number[],
     hour: number
-  ) {
-    let values: Array<{ long: number; lat: number; value: number }> = [];
+  ) => {
+    let values: Array<[long: number, lat: number, value: number]> = [];
     if (!forecasts.length || forecasts.length !== longs.length * lats.length) {
       allDataRef.current[hour] = values;
       return;
     }
 
     let i = 0;
-    for (let lon of longs) {
+    for (let long of longs) {
       for (let lat of lats) {
         let value = forecasts[i];
         if (value > 0) {
@@ -59,17 +63,18 @@ export const ForecastMapContainer = () => {
           else if (value <= 200) value = 0.6;
           else if (value <= 400) value = 0.8;
           else value = 0.9;
-          values.push({ long: lon, lat: lat, value });
+          // values.push({ long: lon, lat: lat, value });
+          values.push([lat, long, value]);
         }
         i++;
       }
     }
 
     allDataRef.current[hour] = values;
-    if (hour === selectedHour) setData(values);
-  }
+    if (hour === selectedHour) setPollenData(values);
+  };
 
-  async function loadHour(hour: number) {
+  const loadHour = async (hour: number) => {
     if (!longitudes.length || !latitudes.length) return;
     if (allDataRef.current[hour]) return;
 
@@ -81,29 +86,30 @@ export const ForecastMapContainer = () => {
       const res = await getForecastByCoords({
         from: start,
         to: end,
-        pollen: pollenType,
+        pollen: POLLEN_TYPE,
       });
-      addData(res, longitudes, latitudes, hour);
+      addNewPollenData(res, longitudes, latitudes, hour);
     } catch (err) {
       console.error("Failed to load hour", hour, err);
     }
-  }
+  };
 
-  async function loadInitialData() {
+  const loadInitialData = async () => {
+    setLoading(true, "Loading initial pollen data...");
     try {
       const longs = await getLongitudes();
       const lats = await getLatitudes();
       setLongitudes(longs);
       setLatitudes(lats);
 
-      const res = await getForecastByCoords({ from, to, pollen: pollenType });
-      addData(res, longs, lats, 0);
+      const res = await getForecastByCoords({ from, to, pollen: POLLEN_TYPE });
+      addNewPollenData(res, longs, lats, 0);
     } catch (err) {
       console.error("Failed to load initial data", err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   // Slider
 
@@ -111,7 +117,7 @@ export const ForecastMapContainer = () => {
     setPlaying(false);
     setSelectedHour(hour);
     await loadHour(hour);
-    setData(allDataRef.current[hour] || []);
+    setPollenData(allDataRef.current[hour] || []);
   };
 
   // Play (Timeline)
@@ -123,7 +129,7 @@ export const ForecastMapContainer = () => {
       const nextHour = (selectedHour + 1) % 49;
       setSelectedHour(nextHour);
       await loadHour(nextHour);
-      setData(allDataRef.current[nextHour] || []);
+      setPollenData(allDataRef.current[nextHour] || []);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -135,31 +141,18 @@ export const ForecastMapContainer = () => {
 
   return (
     <div className="relative h-screen w-screen">
-      <ForecastMap pollenData={data} />
-
-      <span className="absolute top-6 right-6 z-50 flex flex-col items-start gap-2">
-        <SearchCardToggle title="Search">
-          <div className="relative w-full">
-            <input
-              type="text"
-              placeholder="Search Location..."
-              className="w-full pr-10 px-4 py-1 rounded-2xl focus:outline-none bg-neutral-900 text-md text-white"
-            />
-            <BiSearch
-              size={18}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-            />
-          </div>
+      {/* Main content */}
+      <ForecastMap pollenData={pollenData} />
+      <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
+        <SearchCardToggle title={tSearch("title_tooltip_search")}>
+          <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
         </SearchCardToggle>
-        <LocationButton onLocationFound={(pos) => setUserLocation(pos)} />
+        <LocationButton tooltipText={tLocation("title_tooltip_location")} />
       </span>
-
-      <ForecastHeader title="Forecast Map" iconSrc="/zaum.png" />
-
-      <span className="absolute top-20 left-6 w-[160px] z-50">
+      <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
+      <span className="absolute top-18 z-50">
         <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
       </span>
-
       <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
         <PollenTimeline
           setPlaying={setPlaying}
@@ -168,6 +161,9 @@ export const ForecastMapContainer = () => {
           onHourChange={handleSliderChange}
         />
       </span>
+
+      {/* LoadingOverlay */}
+      {loading && <LoadingOverlay message={t("message_loading")} />}
     </div>
   );
 };

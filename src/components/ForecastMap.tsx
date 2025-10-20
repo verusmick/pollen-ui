@@ -2,19 +2,30 @@
 import { DeckGL } from "@deck.gl/react";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
 import germanyGeo from "@/data/germany.geo.json";
 import type { FeatureCollection } from "geojson";
-import filterPointsInBavaria from "../utils/filterPointsInBavaria";
-import { BitmapLayer } from "@deck.gl/layers";
+
+import { BitmapLayer, IconLayer } from "@deck.gl/layers";
 import type { Feature } from "geojson";
+import filterPointsInRegion from "../utils/filterPointsInRegion";
+import { useSearchLocationStore } from "@/store/searchLocationStore";
+import { FlyToInterpolator } from "@deck.gl/core";
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
+  const { lat, lng, name, boundingbox } = useSearchLocationStore();
+  const [viewState, setViewState] = useState({
+    longitude: 10.5,
+    latitude: 51,
+    zoom: 6.5,
+    minZoom: 5,
+    maxZoom: 12,
+  });
   const [hoverInfo, setHoverInfo] = useState<{
     object: any;
     x: number;
@@ -23,15 +34,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
-
-    // Convert to the format your filter expects
-    const heatPoints: [number, number, number?][] = pollenData.map(
-      (point: any) => [point.lat, point.long, point.value || 0.5]
-    );
-
-    // const filteredPoints = filterPointsInBavaria(heatPoints);
-    const filteredPoints = filterPointsInBavaria(heatPoints);
-
+    const filteredPoints = filterPointsInRegion(pollenData, bavariaGeo);
     // Create grid cells from filtered points
     return filteredPoints.map(([lat, lon, intensity = 0.5]) => {
       // Create a square quadrant around each point
@@ -173,6 +176,34 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
     // Mask outside area
     maskLayer,
+    (lat && lng) ? new IconLayer({
+        id: "search-marker",
+        data: [{ position: [lng, lat], name }],
+        getIcon: () => "marker",
+        getColor: (d) => [33, 33, 33],
+        getPosition: (d) => d.position,
+        getSize: () => 41,
+        iconAtlas: "/map_icon.png",
+        iconMapping: {
+          marker: {
+            x: 0,
+            y: 0,
+            width: 128,
+            height: 128,
+            anchorY: 128,
+            mask: true,
+          },
+          "marker-warning": {
+            x: 128,
+            y: 0,
+            width: 128,
+            height: 128,
+            anchorY: 128,
+            mask: false,
+          },
+        },
+        pickable: true,
+      }) : null,
   ];
 
   function renderTooltip() {
@@ -214,41 +245,67 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     );
   }
 
+  useEffect(() => {
+    if (lat && lng) {
+      setViewState((prev) => ({
+        ...prev,
+        longitude: lng,
+        latitude: lat,
+        zoom: 10,
+        transitionDuration: 1000,
+        transitionInterpolator: new FlyToInterpolator(),
+      }));
+    }
+  }, [lat, lng]);
+
   return (
     <>
       <DeckGL
-        initialViewState={{
-          longitude: 10.5,
-          latitude: 51,
-          zoom: 6.5,
-          minZoom: 5,
-          maxZoom: 12,
-        }}
+        initialViewState={viewState}
         controller={true}
         layers={layers}
         style={{ width: "100vw", height: "100vh" }}
-        // getTooltip={({ object }) => {
-        //     // Alternative tooltip approach (simpler)
-        //     if (object) {
-        //       return {
-        //         html: `
-        //           <div class="p-2 bg-gray-800 text-white rounded">
-        //             <strong>Intensity:</strong> ${getPollenLabel(object.intensity)}<br/>
-        //             <strong>Position:</strong> ${object.position[1].toFixed(4)}, ${object.position[0].toFixed(4)}
-        //           </div>
-        //         `,
-        //         style: {
-        //           backgroundColor: '#1f2937',
-        //           color: 'white',
-        //           borderRadius: '8px',
-        //           padding: '8px'
-        //         }
-        //       };
-        //     }
-        //     return null;
-        //   }}
+        viewState={viewState}
+        onViewStateChange={(e) =>
+          setViewState({
+            ...(e.viewState as {
+              longitude: number;
+              latitude: number;
+              zoom: number;
+              minZoom: number;
+              maxZoom: number;
+            }),
+          })
+        }
       />
       {renderTooltip()}
+      {/*  zoom buttons*/}
+      <div className="absolute bottom-10 right-8 z-50">
+        <div className="bg-card backdrop-blur-md rounded-xl shadow-lg flex flex-col">
+          <button
+            onClick={() =>
+              setViewState((prev) => ({
+                ...prev,
+                zoom: Math.min(prev.zoom + 1, prev.maxZoom),
+              }))
+            }
+            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-t-xl"
+          >
+            +
+          </button>
+          <button
+            onClick={() =>
+              setViewState((prev) => ({
+                ...prev,
+                zoom: Math.max(prev.zoom - 1, prev.minZoom),
+              }))
+            }
+            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-b-xl"
+          >
+            -
+          </button>
+        </div>
+      </div>
     </>
   );
 }

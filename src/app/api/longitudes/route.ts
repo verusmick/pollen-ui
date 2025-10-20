@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BASE_URL = 'http://forecast.enjambre.com.bo/api';
+const BASE_URL = process.env.NEXT_PUBLIC_FORECAST_API;
 
 export async function GET() {
   const res = await fetch(`${BASE_URL}/longitudes`);
