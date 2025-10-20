@@ -141,36 +141,29 @@ export const ForecastMapContainer = () => {
 
   return (
     <div className="relative h-screen w-screen">
-      {loading ? (
-        <>
-          <LoadingOverlay message={t("message_loading")} />
-        </>
-      ) : (
-        <>
-          <ForecastMap pollenData={pollenData} />
-          <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-            <SearchCardToggle title={tSearch("title_tooltip_search")}>
-              <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
-            </SearchCardToggle>
-            <LocationButton tooltipText={tLocation("title_tooltip_location")} />
-          </span>
-          <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
-          <span className="absolute top-18 z-50">
-            <PollenSelector
-              options={pollenOptions}
-              selected={pollenOptions[0]}
-            />
-          </span>
-          <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
-            <PollenTimeline
-              setPlaying={setPlaying}
-              playing={playing}
-              activeHour={selectedHour}
-              onHourChange={handleSliderChange}
-            />
-          </span>
-        </>
-      )}
+      {/* Main content */}
+      <ForecastMap pollenData={pollenData} />
+      <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
+        <SearchCardToggle title={tSearch("title_tooltip_search")}>
+          <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
+        </SearchCardToggle>
+        <LocationButton tooltipText={tLocation("title_tooltip_location")} />
+      </span>
+      <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
+      <span className="absolute top-18 z-50">
+        <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
+      </span>
+      <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
+        <PollenTimeline
+          setPlaying={setPlaying}
+          playing={playing}
+          activeHour={selectedHour}
+          onHourChange={handleSliderChange}
+        />
+      </span>
+
+      {/* LoadingOverlay */}
+      {loading && <LoadingOverlay message={t("message_loading")} />}
     </div>
   );
 };
