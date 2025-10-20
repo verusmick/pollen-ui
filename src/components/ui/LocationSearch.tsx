@@ -32,7 +32,9 @@ export const LocationSearch = ({
               format: "json",
               addressdetails: "1",
               limit: "8",
-              countrycodes: "de", // Germany
+              countrycodes: "de",
+              viewbox: "9.5000,47.2700,13.8000,50.5667",
+              bounded: "1",
             })
         );
         const data = await res.json();
