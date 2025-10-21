@@ -1,15 +1,18 @@
 "use client";
 import { useSearchLocationStore } from "@/store/searchLocationStore";
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
 
 export const LocationSearch = ({
   onSelect,
+  open,
 }: {
   onSelect: (pos: { lat: number; lng: number }) => void;
+  open: boolean;
 }) => {
   const t = useTranslations("forecastPage.search");
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,7 +51,11 @@ export const LocationSearch = ({
 
     return () => clearTimeout(timeout);
   }, [query]);
-
+  useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [open]);
   return (
     <div className="relative w-full flex flex-col gap-2">
       {/* Input with icons */}
@@ -66,6 +73,7 @@ export const LocationSearch = ({
         )}
 
         <input
+          ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -84,7 +92,7 @@ export const LocationSearch = ({
 
       {/* Suggestions */}
       {suggestions.length > 0 && (
-        <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto search-scroll">
+        <ul className="list-none flex flex-col gap-2 max-h-[50vh] overflow-auto search-scroll">
           {suggestions.map((item) => {
             const display = item.display_name;
             const regex = new RegExp(`(${query})`, "gi");

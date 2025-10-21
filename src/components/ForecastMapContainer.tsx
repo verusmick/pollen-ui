@@ -145,7 +145,12 @@ export const ForecastMapContainer = () => {
       <ForecastMap pollenData={pollenData} />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch("title_tooltip_search")}>
-          <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
+          {(open) => (
+            <LocationSearch
+              open={open}
+              onSelect={(pos) => setUserLocation(pos)}
+            />
+          )}
         </SearchCardToggle>
         <LocationButton tooltipText={tLocation("title_tooltip_location")} />
       </span>

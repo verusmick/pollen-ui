@@ -1,11 +1,11 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
 import { Tooltip } from "./Tooltip";
 
 interface SearchCardToggleProps {
   title?: string;
-  children?: React.ReactNode;
+  children?: React.ReactNode | ((open: boolean) => React.ReactNode);
 }
 
 export const SearchCardToggle = ({
@@ -15,7 +15,7 @@ export const SearchCardToggle = ({
   const [open, setOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
- // Close on click outside
+  // Close on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
@@ -53,7 +53,9 @@ export const SearchCardToggle = ({
           >
             {title}
           </h3>
-          <div className="text-white">{children}</div>
+          <div className="text-white">
+            {typeof children === "function" ? children(open) : children}
+          </div>
         </div>
       )}
 
