@@ -28,11 +28,6 @@ export const PollenSelector = ({
     onToggle?.(isOpen);
   }, [isOpen, onToggle]);
 
-  // Notify parent after isOpen changes
-  useEffect(() => {
-    onToggle?.(isOpen);
-  }, [isOpen, onToggle]);
-
   const handleOptionClick = (option: string) => {
     setSelectedOption(option);
     onChange?.(option);
