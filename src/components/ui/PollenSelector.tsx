@@ -1,5 +1,6 @@
 "use client";
 
+import { usePollenStore } from "@/store/pollenStore";
 import { useState, useRef, useEffect } from "react";
 import { BiChevronDown } from "react-icons/bi";
 
@@ -16,9 +17,11 @@ export const PollenSelector = ({
   onChange,
   onToggle,
 }: ForecastSelectorProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(selected || options[0]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const selectedOption = usePollenStore((state) => state.selectedPollen);
+  const setSelectedOption = usePollenStore((state) => state.setSelectedPollen);
 
   // Notify parent after isOpen changes
   useEffect(() => {
@@ -70,7 +73,7 @@ export const PollenSelector = ({
           transition
         "
       >
-        {selectedOption}
+        {selectedOption || options[0]}
         <BiChevronDown
           className={`w-4 h-4 text-white transform transition-transform ${
             isOpen ? "rotate-180" : "rotate-0"
