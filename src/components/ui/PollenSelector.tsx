@@ -7,12 +7,14 @@ interface ForecastSelectorProps {
   options: string[];
   selected?: string;
   onChange?: (value: string) => void;
+  onToggle?: (open: boolean) => void;
 }
 
 export const PollenSelector = ({
   options,
   selected,
   onChange,
+  onToggle,
 }: ForecastSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(selected || options[0]);
@@ -22,6 +24,15 @@ export const PollenSelector = ({
     setSelectedOption(option);
     onChange?.(option);
     setIsOpen(false);
+    onToggle?.(false);
+  };
+
+  const handleToggle = () => {
+    setIsOpen((prev) => {
+      const next = !prev;
+      onToggle?.(next);
+      return next;
+    });
   };
 
   useEffect(() => {
@@ -31,6 +42,7 @@ export const PollenSelector = ({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
+        onToggle?.(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -54,7 +66,7 @@ export const PollenSelector = ({
   "
     >
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="
       w-full bg-card text-white px-2 py-1 flex justify-between items-center
       rounded-md shadow-md text-base

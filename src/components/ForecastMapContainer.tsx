@@ -15,6 +15,7 @@ import { LocationSearch } from "./ui/LocationSearch";
 import { LoadingOverlay } from "./ui/LoadingOverlay";
 import { useLoadingStore } from "@/store/loadingStore";
 import { useTranslations } from "next-intl";
+import { PollenChart } from "./ui/PollenChart";
 
 export const ForecastMapContainer = () => {
   const t = useTranslations("forecastPage");
@@ -33,7 +34,7 @@ export const ForecastMapContainer = () => {
     lat: number;
     lng: number;
   } | null>(null);
-
+  const [selectorOpen, setSelectorOpen] = useState(false);
   const pollenOptions = ["Birch", "Grass", "Alder"];
   const POLLEN_TYPE = "POLLEN_BIRCH";
   const from = 1649894400;
@@ -159,8 +160,10 @@ export const ForecastMapContainer = () => {
             <PollenSelector
               options={pollenOptions}
               selected={pollenOptions[0]}
+              onToggle={setSelectorOpen}
             />
           </span>
+          {!selectorOpen && <PollenChart />}
           <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
             <PollenTimeline
               setPlaying={setPlaying}
