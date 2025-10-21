@@ -58,7 +58,7 @@ export const PollenSelector = ({
         className="
       w-full bg-card text-white px-2 py-1 flex justify-between items-center
       rounded-md shadow-md text-base
-      transition
+      transition cursor-pointer
     "
       >
         {selectedOption}
