@@ -99,6 +99,7 @@ export const LocationSearch = ({
                     lat: parseFloat(item.lat),
                     lng: parseFloat(item.lon),
                     name: item.display_name,
+                    boundingbox: item.boundingbox,
                   };
                   setLocation(selected);
                   onSelect(selected);

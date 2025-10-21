@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BASE_URL = process.env.NEXT_PUBLIC_FORECAST_API;
+const BASE_URL = 'http://forecast.enjambre.com.bo/api';
 
 export async function GET(req: NextRequest) {
   const urlObj = new URL(req.url);

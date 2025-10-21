@@ -1,24 +1,25 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 interface SearchLocationState {
+  boundingbox: Array<number>;
   lat: number | null;
   lng: number | null;
   name: string | null;
-  setLocation: (loc: { lat: number; lng: number; name: string }) => void;
+  setLocation: (loc: { boundingbox: Array<number>; lat: number; lng: number; name: string }) => void;
   clearLocation: () => void;
 }
-export const useSearchLocationStore = create<SearchLocationState>()(
-  persist(
-    (set) => ({
-      lat: null,
-      lng: null,
-      name: null,
-      setLocation: (loc) => set({ lat: loc.lat, lng: loc.lng, name: loc.name }),
-      clearLocation: () => set({ lat: null, lng: null, name: null }),
+
+export const useSearchLocationStore = create<SearchLocationState>((set) => ({
+  boundingbox: [],
+  lat: null,
+  lng: null,
+  name: null,
+  setLocation: (loc) =>
+    set({
+      boundingbox: loc.boundingbox,
+      lat: loc.lat,
+      lng: loc.lng,
+      name: loc.name,
     }),
-    {
-      name: "search-location", // key en localStorage
-    }
-  )
-);
+  clearLocation: () => set({ boundingbox: [], lat: null, lng: null, name: null }),
+}));
