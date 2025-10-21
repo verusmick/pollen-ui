@@ -15,8 +15,15 @@ import { LocationSearch } from "./ui/LocationSearch";
 import { LoadingOverlay } from "./ui/LoadingOverlay";
 import { useLoadingStore } from "@/store/loadingStore";
 import { useTranslations } from "next-intl";
-import { PollenChart } from "./ui/PollenChart";
 
+import dynamic from "next/dynamic";
+
+const PollenChart = dynamic(
+  () => import("./ui/PollenChart").then((mod) => mod.PollenChart),
+  {
+    ssr: false,
+  }
+);
 export const ForecastMapContainer = () => {
   const t = useTranslations("forecastPage");
   const tSearch = useTranslations("forecastPage.search");
