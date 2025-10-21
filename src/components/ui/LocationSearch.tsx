@@ -59,14 +59,14 @@ export const LocationSearch = ({
   return (
     <div className="relative w-full flex flex-col gap-2">
       {/* Input with icons */}
-      <div className="relative">
+      <div className="relative ">
         <BiSearch
           className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"
           size={18}
         />
         {query && (
           <BiX
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
             size={18}
             onClick={() => setQuery("")}
           />
@@ -78,7 +78,7 @@ export const LocationSearch = ({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("placeholder_input_search")}
-          className="w-full pl-8 pr-8 py-1 rounded-md bg-neutral-900/70 text-white focus:outline-none"
+          className="w-full pl-8 pr-8 py-1 rounded-md bg-neutral-900/70 text-white focus:outline-none cursor-pointer"
         />
       </div>
 

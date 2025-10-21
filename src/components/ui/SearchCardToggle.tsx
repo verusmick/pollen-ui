@@ -49,6 +49,7 @@ export const SearchCardToggle = ({
             className="
               font-semibold text-white text-base
               border-b border-white/10 pb-2 mb-2
+              cursor-pointer
             "
           >
             {title}
@@ -66,7 +67,7 @@ export const SearchCardToggle = ({
           className="
             bg-card backdrop-blur-sm hover:bg-neutral-800 text-white
             p-3 rounded-full shadow-lg focus:outline-none transition
-            border border-white/10
+            border border-white/10 cursor-pointer
           "
         >
           {open ? <BiX size={20} /> : <BiSearch size={20} />}
