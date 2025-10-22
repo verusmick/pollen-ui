@@ -9,8 +9,10 @@ import { FlyToInterpolator } from "@deck.gl/core";
 import bavariaGeo from "@/data/bavaria.geo.json";
 import germanyGeo from "@/data/germany.geo.json";
 
-import filterPointsInRegion from "../utils/filterPointsInRegion";
 import MapZoomControls from "./MapZoomControls";
+import MapTooltip from "./MapTooltip";
+
+import filterPointsInRegion from "../utils/filterPointsInRegion";
 import { useSearchLocationStore } from "@/store/searchLocationStore";
 
 import type { Feature } from "geojson";
@@ -29,7 +31,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   });
   const { lat, lng, name, boundingbox } = useSearchLocationStore();
 
-  const [hoverInfo, setHoverInfo] = useState<{
+  const [tooltipInfo, settTooltipInfo] = useState<{
     object: any;
     x: number;
     y: number;
@@ -109,13 +111,13 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     onHover: (info: any) => {
       // Show tooltip on hover
       if (info.object) {
-        setHoverInfo({
+        settTooltipInfo({
           object: info.object,
           x: info.x,
           y: info.y,
         });
       } else {
-        setHoverInfo(null); // Hide tooltip when not hovering
+        settTooltipInfo(null); // Hide tooltip when not hovering
       }
     },
     onClick: (info: any) => {
@@ -208,45 +210,6 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
         })
       : null;
 
-  function renderTooltip() {
-    if (!hoverInfo || !hoverInfo.object) return null;
-
-    const { object, x, y } = hoverInfo;
-    const intensity = object.intensity;
-
-    // Convert intensity to pollen level text
-    const pollenLevel =
-      intensity <= 0.2
-        ? "Very Low"
-        : intensity <= 0.4
-        ? "Low"
-        : intensity <= 0.6
-        ? "Medium"
-        : intensity <= 0.8
-        ? "High"
-        : "Very High";
-
-    return (
-      <div
-        className="absolute pointer-events-none z-50"
-        style={{ left: x, top: y, transform: "translate(-50%, -100%)" }}
-      >
-        <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg max-w-xs">
-          <div className="font-semibold">Pollen Information</div>
-          {/* <div>Intensity: {(intensity * 10).toFixed(1)}</div> */}
-          <div>Level: {pollenLevel}</div>
-          <div>Lat: {object.position[1].toFixed(4)}</div>
-          <div>Lon: {object.position[0].toFixed(4)}</div>
-        </div>
-        {/* Tooltip arrow */}
-        <div
-          className="absolute top-full left-1/2 transform -translate-x-1/2 
-                        border-8 border-transparent border-t-gray-800"
-        />
-      </div>
-    );
-  }
-
   // watcher to check the properties of the map
   useEffect(() => {
     if (lat && lng) {
@@ -287,7 +250,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
           })
         }
       />
-      {renderTooltip()}
+      <MapTooltip hoverInfo={tooltipInfo}/>
       <MapZoomControls
         zoom={viewMapState.zoom}
         minZoom={viewMapState.minZoom}
