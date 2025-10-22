@@ -39,7 +39,7 @@ export const SearchCardToggle = ({
           className="
             absolute top-0 right-12
             bg-card/80 backdrop-blur-sm shadow-lg rounded-lg
-            w-[60vw] sm:w-[40vw] md:w-[30vw] lg:w-[25vw] xl:w-[25vw] 2xl:w-[20vw]
+            w-[60vw] sm:w-[40vw] md:w-[30vw] lg:w-[25vw] xl:w-[30vw] 2xl:w-[30vw]
             p-4 flex flex-col gap-3
             border border-white/10
             z-50 transition-all duration-200

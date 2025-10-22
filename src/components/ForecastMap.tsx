@@ -176,34 +176,36 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
     // Mask outside area
     maskLayer,
-    (lat && lng) ? new IconLayer({
-        id: "search-marker",
-        data: [{ position: [lng, lat], name }],
-        getIcon: () => "marker",
-        getColor: (d) => [33, 33, 33],
-        getPosition: (d) => d.position,
-        getSize: () => 41,
-        iconAtlas: "/map_icon.png",
-        iconMapping: {
-          marker: {
-            x: 0,
-            y: 0,
-            width: 128,
-            height: 128,
-            anchorY: 128,
-            mask: true,
+    lat && lng
+      ? new IconLayer({
+          id: "search-marker",
+          data: [{ position: [lng, lat], name }],
+          getIcon: () => "marker",
+          getColor: (d) => [33, 33, 33],
+          getPosition: (d) => d.position,
+          getSize: () => 41,
+          iconAtlas: "/map_icon.png",
+          iconMapping: {
+            marker: {
+              x: 0,
+              y: 0,
+              width: 128,
+              height: 128,
+              anchorY: 128,
+              mask: true,
+            },
+            "marker-warning": {
+              x: 128,
+              y: 0,
+              width: 128,
+              height: 128,
+              anchorY: 128,
+              mask: false,
+            },
           },
-          "marker-warning": {
-            x: 128,
-            y: 0,
-            width: 128,
-            height: 128,
-            anchorY: 128,
-            mask: false,
-          },
-        },
-        pickable: true,
-      }) : null,
+          pickable: true,
+        })
+      : null,
   ];
 
   function renderTooltip() {
@@ -289,7 +291,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
                 zoom: Math.min(prev.zoom + 1, prev.maxZoom),
               }))
             }
-            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-t-xl"
+            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-t-xl cursor-pointer"
           >
             +
           </button>
@@ -300,7 +302,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
                 zoom: Math.max(prev.zoom - 1, prev.minZoom),
               }))
             }
-            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-b-xl"
+            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-b-xl cursor-pointer"
           >
             -
           </button>
