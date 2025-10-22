@@ -268,9 +268,9 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
         controller={true}
         layers={[
           baseMapLayer,
-          pollenGridCellsLayer,
           bavariaGeoJsonLayer,
           germanyGeoJsonLayer,
+          pollenGridCellsLayer,
           pinIconLayer,
         ]}
         style={{ width: "100vw", height: "100vh" }}
