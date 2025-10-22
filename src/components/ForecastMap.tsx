@@ -31,7 +31,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   });
   const { lat, lng, name, boundingbox } = useSearchLocationStore();
 
-  const [tooltipInfo, settTooltipInfo] = useState<{
+  const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
     y: number;
@@ -111,13 +111,13 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     onHover: (info: any) => {
       // Show tooltip on hover
       if (info.object) {
-        settTooltipInfo({
+        setTooltipInfo({
           object: info.object,
           x: info.x,
           y: info.y,
         });
       } else {
-        settTooltipInfo(null); // Hide tooltip when not hovering
+        setTooltipInfo(null); // Hide tooltip when not hovering
       }
     },
     onClick: (info: any) => {
@@ -210,6 +210,17 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
         })
       : null;
 
+  const handleViewStateChange = (e: any) =>
+    setViewMapState({
+      ...(e.viewState as {
+        longitude: number;
+        latitude: number;
+        zoom: number;
+        minZoom: number;
+        maxZoom: number;
+      }),
+    });
+
   // watcher to check the properties of the map
   useEffect(() => {
     if (lat && lng) {
@@ -238,19 +249,10 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
         ]}
         style={{ width: "100vw", height: "100vh" }}
         viewState={viewMapState}
-        onViewStateChange={(e) =>
-          setViewMapState({
-            ...(e.viewState as {
-              longitude: number;
-              latitude: number;
-              zoom: number;
-              minZoom: number;
-              maxZoom: number;
-            }),
-          })
-        }
+        // This is triggered when the hand move the map
+        onViewStateChange={handleViewStateChange}
       />
-      <MapTooltip hoverInfo={tooltipInfo}/>
+      <MapTooltip hoverInfo={tooltipInfo} />
       <MapZoomControls
         zoom={viewMapState.zoom}
         minZoom={viewMapState.minZoom}
