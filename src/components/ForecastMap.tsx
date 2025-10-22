@@ -13,13 +13,14 @@ import type { Feature } from "geojson";
 import filterPointsInRegion from "../utils/filterPointsInRegion";
 import { useSearchLocationStore } from "@/store/searchLocationStore";
 import { FlyToInterpolator } from "@deck.gl/core";
+import MapZoomControls from "./MapZoomControls";
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
   const { lat, lng, name, boundingbox } = useSearchLocationStore();
-  const [viewState, setViewState] = useState({
+  const [viewMapState, setViewMapState] = useState({
     longitude: 10.5,
     latitude: 51,
     zoom: 6.5,
@@ -249,7 +250,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
   useEffect(() => {
     if (lat && lng) {
-      setViewState((prev) => ({
+      setViewMapState((prev) => ({
         ...prev,
         longitude: lng,
         latitude: lat,
@@ -263,13 +264,13 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   return (
     <>
       <DeckGL
-        initialViewState={viewState}
+        initialViewState={viewMapState}
         controller={true}
         layers={layers}
         style={{ width: "100vw", height: "100vh" }}
-        viewState={viewState}
+        viewState={viewMapState}
         onViewStateChange={(e) =>
-          setViewState({
+          setViewMapState({
             ...(e.viewState as {
               longitude: number;
               latitude: number;
@@ -281,33 +282,14 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
         }
       />
       {renderTooltip()}
-      {/*  zoom buttons*/}
-      <div className="absolute bottom-10 right-8 z-50">
-        <div className="bg-card backdrop-blur-md rounded-xl shadow-lg flex flex-col">
-          <button
-            onClick={() =>
-              setViewState((prev) => ({
-                ...prev,
-                zoom: Math.min(prev.zoom + 1, prev.maxZoom),
-              }))
-            }
-            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-t-xl cursor-pointer"
-          >
-            +
-          </button>
-          <button
-            onClick={() =>
-              setViewState((prev) => ({
-                ...prev,
-                zoom: Math.max(prev.zoom - 1, prev.minZoom),
-              }))
-            }
-            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-b-xl cursor-pointer"
-          >
-            -
-          </button>
-        </div>
-      </div>
+      <MapZoomControls
+        zoom={viewMapState.zoom}
+        minZoom={viewMapState.minZoom}
+        maxZoom={viewMapState.maxZoom}
+        onZoomChange={(newZoom) =>
+          setViewMapState((prev) => ({ ...prev, zoom: newZoom }))
+        }
+      />
     </>
   );
 }
