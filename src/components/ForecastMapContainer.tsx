@@ -16,6 +16,14 @@ import { LoadingOverlay } from "./ui/LoadingOverlay";
 import { useLoadingStore } from "@/store/loadingStore";
 import { useTranslations } from "next-intl";
 
+import dynamic from "next/dynamic";
+
+const PollenChart = dynamic(
+  () => import("./ui/PollenChart").then((mod) => mod.PollenChart),
+  {
+    ssr: false,
+  }
+);
 export const ForecastMapContainer = () => {
   const t = useTranslations("forecastPage");
   const tSearch = useTranslations("forecastPage.search");
@@ -33,6 +41,8 @@ export const ForecastMapContainer = () => {
     lat: number;
     lng: number;
   } | null>(null);
+  const [selectorOpen, setSelectorOpen] = useState(false);
+  const [showChart, setShowChart] = useState(true);
 
   const pollenOptions = ["Birch", "Grass", "Alder"];
   const POLLEN_TYPE = "POLLEN_BIRCH";
@@ -156,8 +166,15 @@ export const ForecastMapContainer = () => {
       </span>
       <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
       <span className="absolute top-18 z-50">
-        <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
+        <PollenSelector
+          options={pollenOptions}
+          selected={pollenOptions[0]}
+          onToggle={setSelectorOpen}
+        />
       </span>
+      {!selectorOpen && showChart && (
+        <PollenChart onClose={() => setShowChart(false)} />
+      )}
       <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
         <PollenTimeline
           setPlaying={setPlaying}

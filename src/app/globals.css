@@ -49,3 +49,8 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #555 transparent;
 }
+.recharts-surface:focus,
+.recharts-wrapper:focus,
+.recharts-surface:focus-visible {
+  outline: none !important;
+}
