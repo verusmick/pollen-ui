@@ -70,7 +70,7 @@ export const PollenChart = ({ onClose }: PollenChartProps) => {
               stroke="#A0BCE8"
               strokeWidth={2}
               dot={false}
-              strokeDasharray="5 15"
+              strokeDasharray="10 5"
               activeDot={{
                 r: 6,
                 stroke: "#ffae42",

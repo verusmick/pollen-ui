@@ -1,15 +1,18 @@
 "use client";
 import { useSearchLocationStore } from "@/store/searchLocationStore";
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
 
 export const LocationSearch = ({
   onSelect,
+  open,
 }: {
   onSelect: (pos: { lat: number; lng: number }) => void;
+  open: boolean;
 }) => {
   const t = useTranslations("forecastPage.search");
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,29 +51,34 @@ export const LocationSearch = ({
 
     return () => clearTimeout(timeout);
   }, [query]);
-
+  useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [open]);
   return (
     <div className="relative w-full flex flex-col gap-2">
       {/* Input with icons */}
-      <div className="relative">
+      <div className="relative ">
         <BiSearch
           className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"
           size={18}
         />
         {query && (
           <BiX
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
             size={18}
             onClick={() => setQuery("")}
           />
         )}
 
         <input
+          ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("placeholder_input_search")}
-          className="w-full pl-8 pr-8 py-1 rounded-md bg-neutral-900/70 text-white focus:outline-none"
+          className="w-full pl-8 pr-8 py-1 rounded-md bg-neutral-900/70 text-white focus:outline-none cursor-pointer"
         />
       </div>
 
@@ -84,7 +92,7 @@ export const LocationSearch = ({
 
       {/* Suggestions */}
       {suggestions.length > 0 && (
-        <ul className="list-none flex flex-col gap-2 max-h-64 overflow-auto search-scroll">
+        <ul className="list-none flex flex-col gap-2 max-h-[50vh] overflow-auto search-scroll">
           {suggestions.map((item) => {
             const display = item.display_name;
             const regex = new RegExp(`(${query})`, "gi");

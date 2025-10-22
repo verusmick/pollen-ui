@@ -56,7 +56,7 @@ export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
           className="
             bg-card backdrop-blur-sm hover:bg-neutral-800 text-white
             p-3 rounded-full shadow-lg focus:outline-none transition
-            border border-white/10
+            border border-white/10 cursor-pointer
           "
         >
           <TbLocationFilled size={20} />
