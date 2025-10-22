@@ -68,10 +68,10 @@ export const PollenSelector = ({
       <button
         onClick={handleToggle}
         className="
-          w-full bg-card text-white px-2 py-1 flex justify-between items-center
-          rounded-md shadow-md text-base
-          transition
-        "
+      w-full bg-card text-white px-2 py-1 flex justify-between items-center
+      rounded-md shadow-md text-base
+      transition cursor-pointer
+    "
       >
         {selectedOption || options[0]}
         <BiChevronDown
