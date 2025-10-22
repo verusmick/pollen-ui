@@ -30,7 +30,6 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     maxZoom: 12,
   });
   const { lat, lng, name, boundingbox } = useSearchLocationStore();
-
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
@@ -61,30 +60,6 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       };
     });
   }, [pollenData]);
-
-  // Free OpenStreetMap base layer
-  const baseMapLayer = new TileLayer({
-    id: "base-map",
-    data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    minZoom: 0,
-    maxZoom: 19,
-    tileSize: 256,
-    renderSubLayers: (props) => {
-      const { bbox, data, id } = props.tile;
-
-      // Handle different types of bounding boxes
-      const bounds: [number, number, number, number] =
-        "west" in bbox
-          ? [bbox.west, bbox.south, bbox.east, bbox.north]
-          : [bbox.left, bbox.bottom, bbox.right, bbox.top];
-
-      return new BitmapLayer({
-        id: `${id}-bitmap`,
-        image: data,
-        bounds,
-      });
-    },
-  });
 
   const pollenGridCellsLayer = new PolygonLayer({
     id: "pollen-grid",
@@ -134,6 +109,62 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     },
   });
 
+  const pinIconLayer =
+    lat && lng
+      ? new IconLayer({
+          id: "search-marker",
+          data: [{ position: [lng, lat], name }],
+          getIcon: () => "marker",
+          getColor: (d) => [33, 33, 33],
+          getPosition: (d) => d.position,
+          getSize: () => 41,
+          iconAtlas: "/map_icon.png",
+          iconMapping: {
+            marker: {
+              x: 0,
+              y: 0,
+              width: 128,
+              height: 128,
+              anchorY: 128,
+              mask: true,
+            },
+            "marker-warning": {
+              x: 128,
+              y: 0,
+              width: 128,
+              height: 128,
+              anchorY: 128,
+              mask: false,
+            },
+          },
+          pickable: true,
+        })
+      : null;
+
+  // Free OpenStreetMap base layer
+  const baseMapLayer = new TileLayer({
+    id: "base-map",
+    data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    minZoom: 0,
+    maxZoom: 19,
+    tileSize: 256,
+    renderSubLayers: (props) => {
+      const { bbox, data, id } = props.tile;
+
+      // Handle different types of bounding boxes
+      const bounds: [number, number, number, number] =
+        "west" in bbox
+          ? [bbox.west, bbox.south, bbox.east, bbox.north]
+          : [bbox.left, bbox.bottom, bbox.right, bbox.top];
+
+      return new BitmapLayer({
+        id: `${id}-bitmap`,
+        image: data,
+        bounds,
+      });
+    },
+  });
+
   // Bavaria boundary
   const bavariaGeoJsonLayer = new GeoJsonLayer({
     id: "bavaria-boundary",
@@ -177,38 +208,6 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       getFillColor: [33, 33, 33, 180], // Dark gray
     });
   }, []);
-
-  const pinIconLayer =
-    lat && lng
-      ? new IconLayer({
-          id: "search-marker",
-          data: [{ position: [lng, lat], name }],
-          getIcon: () => "marker",
-          getColor: (d) => [33, 33, 33],
-          getPosition: (d) => d.position,
-          getSize: () => 41,
-          iconAtlas: "/map_icon.png",
-          iconMapping: {
-            marker: {
-              x: 0,
-              y: 0,
-              width: 128,
-              height: 128,
-              anchorY: 128,
-              mask: true,
-            },
-            "marker-warning": {
-              x: 128,
-              y: 0,
-              width: 128,
-              height: 128,
-              anchorY: 128,
-              mask: false,
-            },
-          },
-          pickable: true,
-        })
-      : null;
 
   const handleViewStateChange = (e: any) =>
     setViewMapState({
