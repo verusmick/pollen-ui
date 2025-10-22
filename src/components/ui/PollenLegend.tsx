@@ -8,11 +8,11 @@ interface PollenLegendProps {
 }
 
 const gradient = `linear-gradient(to right,
-  rgba(0,100,0,0.6) 0%,      
-  rgba(154,205,50,0.6) 25%,   
-  rgba(255,255,0,0.6) 50%,    
-  rgba(255,165,0,0.6) 75%,   
-  rgba(255,0,0,0.6) 100%     
+  rgba(0,100,0,0.9) 0%,
+  rgba(154,205,50,0.9) 25%,
+  rgba(255,255,0,0.9) 50%,
+  rgba(255,165,0,0.9) 75%,
+  rgba(255,0,0,0.9) 100%
 )`;
 
 export const PollenLegend = ({ width, height }: PollenLegendProps) => {
@@ -35,7 +35,11 @@ export const PollenLegend = ({ width, height }: PollenLegendProps) => {
         {labels.map((label, idx) => (
           <span
             key={idx}
-            className="text-xs font-bold text-white drop-shadow-sm"
+            className="text-xs font-bold text-white"
+            style={{
+              textShadow:
+                "1px 1px 2px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)",
+            }}
           >
             {label}
           </span>
