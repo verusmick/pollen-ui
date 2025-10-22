@@ -17,6 +17,7 @@ import { useLoadingStore } from "@/store/loadingStore";
 import { useTranslations } from "next-intl";
 
 import dynamic from "next/dynamic";
+import { PollenLegend } from "./ui/PollenLegend";
 
 const PollenChart = dynamic(
   () => import("./ui/PollenChart").then((mod) => mod.PollenChart),
@@ -175,14 +176,25 @@ export const ForecastMapContainer = () => {
       {!selectorOpen && showChart && (
         <PollenChart onClose={() => setShowChart(false)} />
       )}
-      <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
+
+      <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
           setPlaying={setPlaying}
           playing={playing}
           activeHour={selectedHour}
           onHourChange={handleSliderChange}
         />
-      </span>
+      </div>
+
+      {/* Legend centered below the timeline on small/medium screens */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 2xl:hidden">
+        <PollenLegend width={350} height={25} />
+      </div>
+
+      {/* Legend in the lower left corner for large screens */}
+      <div className="hidden 2xl:block absolute bottom-10 left-10 z-50">
+        <PollenLegend width={350} height={25} />
+      </div>
 
       {/* LoadingOverlay */}
       {loading && <LoadingOverlay message={t("message_loading")} />}
