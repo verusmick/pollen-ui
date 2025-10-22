@@ -177,7 +177,7 @@ export const ForecastMapContainer = () => {
         <PollenChart onClose={() => setShowChart(false)} />
       )}
 
-      <div className="absolute 2xl:bottom-10 xl:bottom-13 left-1/2 -translate-x-1/2 z-50">
+      <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
           setPlaying={setPlaying}
           playing={playing}
