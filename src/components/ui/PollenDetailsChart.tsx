@@ -15,7 +15,7 @@ interface PollenChartProps {
   onClose?: () => void;
 }
 
-export const PollenChart = ({ onClose }: PollenChartProps) => {
+export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
   const [data, setData] = useState<Array<{ hour: number; value: number }>>([]);
 
   useEffect(() => {

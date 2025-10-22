@@ -14,27 +14,32 @@ import MapTooltip from "./MapTooltip";
 
 import filterPointsInRegion from "../utils/filterPointsInRegion";
 import { useSearchLocationStore } from "@/store/searchLocationStore";
+import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
 
 import type { Feature } from "geojson";
 import type { FeatureCollection } from "geojson";
 
-// Define the grid cell size in degrees
+ // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
+const viewMapInitialState = {
+  longitude: 10.5,
+  latitude: 51,
+  zoom: 6.5,
+  minZoom: 5,
+  maxZoom: 12,
+};
+
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
-  const [viewMapState, setViewMapState] = useState({
-    longitude: 10.5,
-    latitude: 51,
-    zoom: 6.5,
-    minZoom: 5,
-    maxZoom: 12,
-  });
+  const [viewMapState, setViewMapState] = useState(viewMapInitialState);
   const { lat, lng, name, boundingbox } = useSearchLocationStore();
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
     y: number;
   } | null>(null);
+
+  const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
 
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
@@ -85,26 +90,27 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     highlightColor: [255, 255, 255, 100], // White highlight border
     onHover: (info: any) => {
       // Show tooltip on hover
-      if (info.object) {
-        setTooltipInfo({
-          object: info.object,
-          x: info.x,
-          y: info.y,
-        });
-      } else {
-        setTooltipInfo(null); // Hide tooltip when not hovering
-      }
-    },
-    onClick: (info: any) => {
-      // // Show tooltip on hover
       // if (info.object) {
-      //   setHoverInfo({
+      //   setTooltipInfo({
       //     object: info.object,
       //     x: info.x,
       //     y: info.y,
       //   });
       // } else {
-      //   setHoverInfo(null); // Hide tooltip when not hovering
+      //   setTooltipInfo(null); // Hide tooltip when not hovering
+      // }
+    },
+    onClick: (info: any) => {
+      setShowPollenDetailsChart(true);
+      // Show tooltip on hover
+      // if (info.object) {
+      //   setTooltipInfo({
+      //     object: info.object,
+      //     x: info.x,
+      //     y: info.y,
+      //   });
+      // } else {
+      //   setTooltipInfo(null); // Hide tooltip when not hovering
       // }
     },
   });
@@ -220,6 +226,12 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       }),
     });
 
+  const handleCursor = ({ isDragging, isHovering }: any) => {
+    if (isDragging) return "grabbing";
+    if (isHovering) return "pointer";
+    return "grab";
+  };
+
   // watcher to check the properties of the map
   useEffect(() => {
     if (lat && lng) {
@@ -246,10 +258,11 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
           pollenGridCellsLayer,
           pinIconLayer,
         ]}
-        style={{ width: "100vw", height: "100vh" }}
+        style={{ width: "100vw", height: "100vh", cursor: "pointer" }}
         viewState={viewMapState}
         // This is triggered when the hand move the map
         onViewStateChange={handleViewStateChange}
+        getCursor={handleCursor}
       />
       <MapTooltip hoverInfo={tooltipInfo} />
       <MapZoomControls

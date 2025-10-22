@@ -18,9 +18,10 @@ import { useTranslations } from "next-intl";
 
 import dynamic from "next/dynamic";
 import { PollenLegend } from "./ui/PollenLegend";
+import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
 
-const PollenChart = dynamic(
-  () => import("./ui/PollenChart").then((mod) => mod.PollenChart),
+const PollenDetailsChart = dynamic(
+  () => import("./ui/PollenDetailsChart").then((mod) => mod.PollenDetailsChart),
   {
     ssr: false,
   }
@@ -43,7 +44,8 @@ export const ForecastMapContainer = () => {
     lng: number;
   } | null>(null);
   const [selectorOpen, setSelectorOpen] = useState(false);
-  const [showChart, setShowChart] = useState(true);
+  const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
+    usePollenDetailsChartStore();
 
   const pollenOptions = ["Birch", "Grass", "Alder"];
   const POLLEN_TYPE = "POLLEN_BIRCH";
@@ -173,8 +175,8 @@ export const ForecastMapContainer = () => {
           onToggle={setSelectorOpen}
         />
       </span>
-      {!selectorOpen && showChart && (
-        <PollenChart onClose={() => setShowChart(false)} />
+      {!selectorOpen && showPollenDetailsChart && (
+        <PollenDetailsChart onClose={() => setShowPollenDetailsChart(false)} />
       )}
 
       <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
