@@ -19,7 +19,7 @@ import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
 import type { Feature } from "geojson";
 import type { FeatureCollection } from "geojson";
 
- // Define the grid cell size in degrees
+// Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 const viewMapInitialState = {
@@ -32,14 +32,26 @@ const viewMapInitialState = {
 
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
   const [viewMapState, setViewMapState] = useState(viewMapInitialState);
-  const { lat, lng, name, boundingbox } = useSearchLocationStore();
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
     y: number;
   } | null>(null);
 
+  const [pinIconMap, setPinIconMap] = useState<{
+    lat: null | number;
+    long: null | number;
+  }>({ lat: null, long: null });
+
+  const {
+    lat: searchLat,
+    lng: searchlong,
+    name,
+    boundingbox,
+  } = useSearchLocationStore();
   const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
+
+  // console.log("===>", lat, lng);
 
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
@@ -101,25 +113,26 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       // }
     },
     onClick: (info: any) => {
-      setShowPollenDetailsChart(true);
       // Show tooltip on hover
-      // if (info.object) {
-      //   setTooltipInfo({
-      //     object: info.object,
-      //     x: info.x,
-      //     y: info.y,
-      //   });
-      // } else {
-      //   setTooltipInfo(null); // Hide tooltip when not hovering
-      // }
+      if (info.object) {
+        setPinIconMap({ lat: info.coordinate[1], long: info.coordinate[0] });
+        setShowPollenDetailsChart(true);
+        // setTooltipInfo({
+        //   object: info.object,
+        //   x: info.x,
+        //   y: info.y,
+        // });
+      } else {
+        // setTooltipInfo(null); // Hide tooltip when not hovering
+      }
     },
   });
 
   const pinIconLayer =
-    lat && lng
+    pinIconMap.lat && pinIconMap.long
       ? new IconLayer({
           id: "search-marker",
-          data: [{ position: [lng, lat], name }],
+          data: [{ position: [pinIconMap.long, pinIconMap.lat], name }],
           getIcon: () => "marker",
           getColor: (d) => [33, 33, 33],
           getPosition: (d) => d.position,
@@ -234,17 +247,19 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
   // watcher to check the properties of the map
   useEffect(() => {
-    if (lat && lng) {
+    if (searchLat && searchlong) {
+      setPinIconMap({ lat: searchLat, long: searchlong });
       setViewMapState((prev) => ({
         ...prev,
-        longitude: lng,
-        latitude: lat,
+        longitude: searchlong,
+        latitude: searchLat,
         zoom: 10,
         transitionDuration: 1000,
         transitionInterpolator: new FlyToInterpolator(),
       }));
+      setShowPollenDetailsChart(true);
     }
-  }, [lat, lng]);
+  }, [searchLat, searchlong]);
 
   return (
     <>
