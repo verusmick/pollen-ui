@@ -43,6 +43,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     lat: null | number;
     long: null | number;
   }>({ lat: null, long: null });
+  const flyToInterpolator = useMemo(() => new FlyToInterpolator(), []);
 
   const {
     lat: searchLat,
@@ -253,36 +254,39 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
   // watcher to check the properties of the map
   useEffect(() => {
-    if (searchLat && searchlong) {
-      clearCurrentLocation();
-      setPinIconMap({ lat: searchLat, long: searchlong });
-      setViewMapState((prev) => ({
-        ...prev,
-        longitude: searchlong,
-        latitude: searchLat,
-        zoom: 10,
-        transitionDuration: 1000,
-        transitionInterpolator: new FlyToInterpolator(),
-      }));
-      setShowPollenDetailsChart(true);
-    }
-  }, [searchLat, searchlong]);
+    const hasSearch = searchLat != null && searchlong != null;
+    const hasCurrent =
+      currentLocationLat != null && currentLocationLong != null;
 
-  useEffect(() => {
-    if (currentLocationLat && currentLocationLong) {
-      clearCurrentLocation();
-      setPinIconMap({ lat: currentLocationLat, long: currentLocationLong });
-      setViewMapState((prev) => ({
-        ...prev,
-        longitude: currentLocationLong,
-        latitude: currentLocationLat,
-        zoom: 10,
-        transitionDuration: 1000,
-        transitionInterpolator: new FlyToInterpolator(),
-      }));
-      setShowPollenDetailsChart(true);
-    }
-  }, [currentLocationLat, currentLocationLong]);
+    if (!hasSearch && !hasCurrent) return;
+
+    // prioritize search coordinates when present
+    const lat = hasSearch ? searchLat! : currentLocationLat!;
+    const lng = hasSearch ? searchlong! : currentLocationLong!;
+
+    // keep previous behaviour: clear stored current location before centering
+    clearCurrentLocation();
+    setPinIconMap({ lat, long: lng });
+    setViewMapState((prev) => ({
+      ...prev,
+      longitude: lng,
+      latitude: lat,
+      zoom: 10,
+      transitionDuration: 1000,
+      transitionInterpolator: flyToInterpolator,
+    }));
+    setShowPollenDetailsChart(true);
+  }, [
+    searchLat,
+    searchlong,
+    currentLocationLat,
+    currentLocationLong,
+    clearCurrentLocation,
+    setPinIconMap,
+    setViewMapState,
+    setShowPollenDetailsChart,
+    flyToInterpolator,
+  ]);
 
   return (
     <>
