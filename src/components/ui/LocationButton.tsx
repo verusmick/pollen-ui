@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BiMap, BiX } from "react-icons/bi";
 import { TbLocationFilled } from "react-icons/tb";
 import { Tooltip } from "./Tooltip";
-import { useLocationStore } from "@/store/locationStore";
+import { useCurrentLocationStore } from "@/store/currentLocationStore";
 import { useTranslations } from "next-intl";
 
 interface LocationButtonProps {
@@ -19,7 +19,7 @@ export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
   >("idle");
   const [error, setError] = useState<string | null>(null);
 
-  const setLocation = useLocationStore((state) => state.setLocation);
+  const setLocation = useCurrentLocationStore((state) => state.setLocation);
 
   const handleRequestPermission = () => {
     if (!navigator.geolocation) {

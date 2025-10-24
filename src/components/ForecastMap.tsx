@@ -18,6 +18,7 @@ import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
 
 import type { Feature } from "geojson";
 import type { FeatureCollection } from "geojson";
+import { useCurrentLocationStore } from "@/store/currentLocationStore";
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -49,9 +50,13 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     name,
     boundingbox,
   } = useSearchLocationStore();
+  const {
+    lat: currentLocationLat,
+    lng: currentLocationLong,
+    clearLocation: clearCurrentLocation,
+    setLocation: setCurrentLocation,
+  } = useCurrentLocationStore((state) => state);
   const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
-
-  // console.log("===>", lat, lng);
 
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
@@ -115,6 +120,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     onClick: (info: any) => {
       // Show tooltip on hover
       if (info.object) {
+        clearCurrentLocation();
         setPinIconMap({ lat: info.coordinate[1], long: info.coordinate[0] });
         setShowPollenDetailsChart(true);
         // setTooltipInfo({
@@ -248,6 +254,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   // watcher to check the properties of the map
   useEffect(() => {
     if (searchLat && searchlong) {
+      clearCurrentLocation();
       setPinIconMap({ lat: searchLat, long: searchlong });
       setViewMapState((prev) => ({
         ...prev,
@@ -260,6 +267,22 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
       setShowPollenDetailsChart(true);
     }
   }, [searchLat, searchlong]);
+
+  useEffect(() => {
+    if (currentLocationLat && currentLocationLong) {
+      clearCurrentLocation();
+      setPinIconMap({ lat: currentLocationLat, long: currentLocationLong });
+      setViewMapState((prev) => ({
+        ...prev,
+        longitude: currentLocationLong,
+        latitude: currentLocationLat,
+        zoom: 10,
+        transitionDuration: 1000,
+        transitionInterpolator: new FlyToInterpolator(),
+      }));
+      setShowPollenDetailsChart(true);
+    }
+  }, [currentLocationLat, currentLocationLong]);
 
   return (
     <>
