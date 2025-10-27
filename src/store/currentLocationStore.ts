@@ -14,7 +14,7 @@ export const useCurrentLocationStore = create<CurrentLocationState>()(
       lat: null,
       lng: null,
       setLocation: (coords) => set({ lat: coords.lat, lng: coords.lng }),
-      clearLocation: () => {console.log('asd');set({ lat: null, lng: null })},
+      clearLocation: () => set({ lat: null, lng: null }),
     }),
     {
       name: "current-location",
