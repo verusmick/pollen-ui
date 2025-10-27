@@ -16,6 +16,7 @@ export const LocationSearch = ({
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState<number>(-1);
 
   const setLocation = useSearchLocationStore((state) => state.setLocation);
 
@@ -42,6 +43,7 @@ export const LocationSearch = ({
         );
         const data = await res.json();
         setSuggestions(data);
+        setHighlightIndex(data.length > 0 ? 0 : -1);
       } catch (err) {
         console.error(err);
       } finally {
@@ -51,24 +53,63 @@ export const LocationSearch = ({
 
     return () => clearTimeout(timeout);
   }, [query]);
+
+  // Focus when opened
   useEffect(() => {
     if (open && inputRef.current) {
       inputRef.current.focus();
     }
   }, [open]);
+
+ // Function to select a suggestion
+  const handleSelect = (item: any) => {
+    const selected = {
+      lat: parseFloat(item.lat),
+      lng: parseFloat(item.lon),
+      name: item.display_name,
+      boundingbox: item.boundingbox,
+    };
+    setLocation(selected);
+    onSelect(selected);
+    setQuery(item.display_name);
+    setSuggestions([]);
+  };
+
+  // Keyboard handler
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightIndex((prev) => (prev + 1) % suggestions.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightIndex((prev) =>
+        prev <= 0 ? suggestions.length - 1 : prev - 1
+      );
+    } else if (e.key === "Enter" && highlightIndex >= 0) {
+      e.preventDefault();
+      handleSelect(suggestions[highlightIndex]);
+    }
+  };
+
   return (
     <div className="relative w-full flex flex-col gap-2">
-      {/* Input with icons */}
-      <div className="relative ">
+      {/* Input */}
+      <div className="relative">
         <BiSearch
           className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"
           size={18}
         />
         {query && (
           <BiX
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
             size={18}
-            onClick={() => setQuery("")}
+            onClick={() => {
+              setQuery("");
+              setSuggestions([]);
+              setHighlightIndex(-1);
+            }}
           />
         )}
 
@@ -77,6 +118,7 @@ export const LocationSearch = ({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder={t("placeholder_input_search")}
           className="w-full pl-8 pr-8 py-1 rounded-md bg-neutral-900/70 text-white focus:outline-none cursor-pointer"
         />
@@ -92,35 +134,28 @@ export const LocationSearch = ({
 
       {/* Suggestions */}
       {suggestions.length > 0 && (
-        <ul className="list-none flex flex-col gap-2 max-h-[50vh] overflow-auto search-scroll">
-          {suggestions.map((item) => {
+        <ul className="list-none flex flex-col gap-1 max-h-[50vh] overflow-auto search-scroll">
+          {suggestions.map((item, index) => {
             const display = item.display_name;
             const regex = new RegExp(`(${query})`, "gi");
             const parts = display.split(regex);
 
+            const isHighlighted = index === highlightIndex;
+
             return (
               <li
                 key={item.place_id}
-                className="px-3 py-2 bg-neutral-800 rounded-lg hover:bg-neutral-700 cursor-pointer shadow-sm"
-                onClick={() => {
-                  const selected = {
-                    lat: parseFloat(item.lat),
-                    lng: parseFloat(item.lon),
-                    name: item.display_name,
-                    boundingbox: item.boundingbox,
-                  };
-                  setLocation(selected);
-                  onSelect(selected);
-                  setQuery(item.display_name);
-                  setSuggestions([]);
-                }}
+                className={`px-3 py-2 rounded-lg cursor-pointer transition ${
+                  isHighlighted
+                    ? "bg-neutral-600 text-white"
+                    : "bg-neutral-800 hover:bg-neutral-700 text-gray-200"
+                }`}
+                onClick={() => handleSelect(item)}
+                onMouseEnter={() => setHighlightIndex(index)}
               >
                 {parts.map((part: string, i: number) =>
                   part.toLowerCase() === query.toLowerCase() ? (
-                    <span
-                      key={i}
-                      className="underline font-bold text-indigo-400"
-                    >
+                    <span key={i} className="underline font-bold text-indigo-400">
                       {part}
                     </span>
                   ) : (

@@ -5,7 +5,7 @@ import { Tooltip } from "./Tooltip";
 
 interface SearchCardToggleProps {
   title?: string;
-  children?: React.ReactNode | ((open: boolean) => React.ReactNode);
+  children?: (open: boolean, setOpen: (value: boolean) => void) => React.ReactNode;
 }
 
 export const SearchCardToggle = ({
@@ -55,7 +55,7 @@ export const SearchCardToggle = ({
             {title}
           </h3>
           <div className="text-white">
-            {typeof children === "function" ? children(open) : children}
+            {typeof children === "function" ? children(open, setOpen) : children}
           </div>
         </div>
       )}
