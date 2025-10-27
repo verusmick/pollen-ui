@@ -1,36 +1,63 @@
 "use client";
+import { useMemo, useState, useEffect } from "react";
 import { DeckGL } from "@deck.gl/react";
 import { TileLayer } from "@deck.gl/geo-layers";
 import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-import { useMemo, useState, useEffect } from "react";
+import { BitmapLayer, IconLayer } from "@deck.gl/layers";
+import { FlyToInterpolator } from "@deck.gl/core";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
 import germanyGeo from "@/data/germany.geo.json";
-import type { FeatureCollection } from "geojson";
 
-import { BitmapLayer, IconLayer } from "@deck.gl/layers";
-import type { Feature } from "geojson";
+import MapZoomControls from "./MapZoomControls";
+import MapTooltip from "./MapTooltip";
+
 import filterPointsInRegion from "../utils/filterPointsInRegion";
 import { useSearchLocationStore } from "@/store/searchLocationStore";
-import { FlyToInterpolator } from "@deck.gl/core";
+import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
+
+import type { Feature } from "geojson";
+import type { FeatureCollection } from "geojson";
+import { useCurrentLocationStore } from "@/store/currentLocationStore";
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
+const viewMapInitialState = {
+  longitude:11.5,
+  latitude: 48.8,
+  zoom: 7,
+  minZoom: 5,
+  maxZoom: 12,
+};
+
 export default function ForecastMap({ pollenData }: { pollenData: any }) {
-  const { lat, lng, name, boundingbox } = useSearchLocationStore();
-  const [viewState, setViewState] = useState({
-    longitude: 10.5,
-    latitude: 51,
-    zoom: 6.5,
-    minZoom: 5,
-    maxZoom: 12,
-  });
-  const [hoverInfo, setHoverInfo] = useState<{
+  const [viewMapState, setViewMapState] = useState(viewMapInitialState);
+  const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
     y: number;
   } | null>(null);
+
+  const [pinIconMap, setPinIconMap] = useState<{
+    lat: null | number;
+    long: null | number;
+  }>({ lat: null, long: null });
+
+  const {
+    lat: searchLat,
+    lng: searchlong,
+    name,
+    boundingbox,
+  } = useSearchLocationStore();
+  const {
+    lat: currentLocationLat,
+    lng: currentLocationLong,
+    clearLocation: clearCurrentLocation,
+    setLocation: setCurrentLocation,
+  } = useCurrentLocationStore((state) => state);
+  const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
+
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
@@ -56,8 +83,126 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     });
   }, [pollenData]);
 
+  const pollenGridCellsLayer = new PolygonLayer({
+    id: "pollen-grid",
+    data: gridCells,
+    getPolygon: (d: any) => d.polygon,
+    getFillColor: (d: any) => {
+      const intensity = d.intensity;
+      // Your color scale based on pollen intensity
+      if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
+      else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
+      else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
+      else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
+      else return [255, 0, 0, 60]; // Red - high
+    },
+    getLineColor: [0, 0, 0, 10],
+    // lineWidthMinPixels: 0.5,
+    filled: true,
+    stroked: true,
+    extruded: false,
+    // 🔥 HOVER CONFIGURATION
+    pickable: true,
+    autoHighlight: true,
+    highlightColor: [255, 255, 255, 100], // White highlight border
+    onHover: (info: any) => {
+      // Show tooltip on hover
+      // if (info.object) {
+      //   setTooltipInfo({
+      //     object: info.object,
+      //     x: info.x,
+      //     y: info.y,
+      //   });
+      // } else {
+      //   setTooltipInfo(null); // Hide tooltip when not hovering
+      // }
+    },
+    onClick: (info: any) => {
+      // Show tooltip on hover
+      if (info.object) {
+        clearCurrentLocation();
+        setPinIconMap({ lat: info.coordinate[1], long: info.coordinate[0] });
+        setShowPollenDetailsChart(true);
+        // setTooltipInfo({
+        //   object: info.object,
+        //   x: info.x,
+        //   y: info.y,
+        // });
+      } else {
+        // setTooltipInfo(null); // Hide tooltip when not hovering
+      }
+    },
+  });
+
+  const pinIconLayer =
+    pinIconMap.lat && pinIconMap.long
+      ? new IconLayer({
+          id: "search-marker",
+          data: [{ position: [pinIconMap.long, pinIconMap.lat], name }],
+          getIcon: () => "marker",
+          getColor: (d) => [33, 33, 33],
+          getPosition: (d) => d.position,
+          getSize: () => 41,
+          iconAtlas: "/map_icon.png",
+          iconMapping: {
+            marker: {
+              x: 0,
+              y: 0,
+              width: 128,
+              height: 128,
+              anchorY: 128,
+              mask: true,
+            },
+            "marker-warning": {
+              x: 128,
+              y: 0,
+              width: 128,
+              height: 128,
+              anchorY: 128,
+              mask: false,
+            },
+          },
+          pickable: true,
+        })
+      : null;
+
+  // Free OpenStreetMap base layer
+  const baseMapLayer = new TileLayer({
+    id: "base-map",
+    data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    minZoom: 0,
+    maxZoom: 19,
+    tileSize: 256,
+    renderSubLayers: (props) => {
+      const { bbox, data, id } = props.tile;
+
+      // Handle different types of bounding boxes
+      const bounds: [number, number, number, number] =
+        "west" in bbox
+          ? [bbox.west, bbox.south, bbox.east, bbox.north]
+          : [bbox.left, bbox.bottom, bbox.right, bbox.top];
+
+      return new BitmapLayer({
+        id: `${id}-bitmap`,
+        image: data,
+        bounds,
+      });
+    },
+  });
+
+  // Bavaria boundary
+  const bavariaGeoJsonLayer = new GeoJsonLayer({
+    id: "bavaria-boundary",
+    data: bavariaGeo as FeatureCollection,
+    filled: false,
+    stroked: true,
+    getLineColor: [78, 77, 77],
+    lineWidthMinPixels: 1.5,
+    getLineWidth: 1,
+  });
+
   // Create mask for area outside Germany
-  const maskLayer = useMemo(() => {
+  const germanyGeoJsonLayer = useMemo(() => {
     const bavariaCoords = germanyGeo.features[0].geometry.coordinates;
 
     const maskPolygon: Feature = {
@@ -89,223 +234,83 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     });
   }, []);
 
-  const layers = [
-    // Free OpenStreetMap base layer
-    new TileLayer({
-      id: "base-map",
-      data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      minZoom: 0,
-      maxZoom: 19,
-      tileSize: 256,
-      renderSubLayers: (props) => {
-        const { bbox, data, id } = props.tile;
+  const handleViewStateChange = (e: any) =>
+    setViewMapState({
+      ...(e.viewState as {
+        longitude: number;
+        latitude: number;
+        zoom: number;
+        minZoom: number;
+        maxZoom: number;
+      }),
+    });
 
-        // Handle different types of bounding boxes
-        const bounds: [number, number, number, number] =
-          "west" in bbox
-            ? [bbox.west, bbox.south, bbox.east, bbox.north]
-            : [bbox.left, bbox.bottom, bbox.right, bbox.top];
+  const handleCursor = ({ isDragging, isHovering }: any) => {
+    if (isDragging) return "grabbing";
+    if (isHovering) return "pointer";
+    return "grab";
+  };
 
-        return new BitmapLayer({
-          id: `${id}-bitmap`,
-          image: data,
-          bounds,
-        });
-      },
-    }),
-
-    // Pollen grid cells layer
-    new PolygonLayer({
-      id: "pollen-grid",
-      data: gridCells,
-      getPolygon: (d: any) => d.polygon,
-      getFillColor: (d: any) => {
-        const intensity = d.intensity;
-        // Your color scale based on pollen intensity
-        if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
-        else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
-        else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
-        else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
-        else return [255, 0, 0, 60]; // Red - high
-      },
-      getLineColor: [0, 0, 0, 10],
-      // lineWidthMinPixels: 0.5,
-      filled: true,
-      stroked: true,
-      extruded: false,
-      // 🔥 HOVER CONFIGURATION
-      pickable: true,
-      autoHighlight: true,
-      highlightColor: [255, 255, 255, 100], // White highlight border
-      onHover: (info: any) => {
-        // Show tooltip on hover
-        if (info.object) {
-          setHoverInfo({
-            object: info.object,
-            x: info.x,
-            y: info.y,
-          });
-        } else {
-          setHoverInfo(null); // Hide tooltip when not hovering
-        }
-      },
-      onClick: (info: any) => {
-        // // Show tooltip on hover
-        // if (info.object) {
-        //   setHoverInfo({
-        //     object: info.object,
-        //     x: info.x,
-        //     y: info.y,
-        //   });
-        // } else {
-        //   setHoverInfo(null); // Hide tooltip when not hovering
-        // }
-      },
-    }),
-
-    // Bavaria boundary
-    new GeoJsonLayer({
-      id: "bavaria-boundary",
-      data: bavariaGeo as FeatureCollection,
-      filled: false,
-      stroked: true,
-      getLineColor: [78, 77, 77],
-      lineWidthMinPixels: 1.5,
-      getLineWidth: 1,
-    }),
-
-    // Mask outside area
-    maskLayer,
-    (lat && lng) ? new IconLayer({
-        id: "search-marker",
-        data: [{ position: [lng, lat], name }],
-        getIcon: () => "marker",
-        getColor: (d) => [33, 33, 33],
-        getPosition: (d) => d.position,
-        getSize: () => 41,
-        iconAtlas: "/map_icon.png",
-        iconMapping: {
-          marker: {
-            x: 0,
-            y: 0,
-            width: 128,
-            height: 128,
-            anchorY: 128,
-            mask: true,
-          },
-          "marker-warning": {
-            x: 128,
-            y: 0,
-            width: 128,
-            height: 128,
-            anchorY: 128,
-            mask: false,
-          },
-        },
-        pickable: true,
-      }) : null,
-  ];
-
-  function renderTooltip() {
-    if (!hoverInfo || !hoverInfo.object) return null;
-
-    const { object, x, y } = hoverInfo;
-    const intensity = object.intensity;
-
-    // Convert intensity to pollen level text
-    const pollenLevel =
-      intensity <= 0.2
-        ? "Very Low"
-        : intensity <= 0.4
-        ? "Low"
-        : intensity <= 0.6
-        ? "Medium"
-        : intensity <= 0.8
-        ? "High"
-        : "Very High";
-
-    return (
-      <div
-        className="absolute pointer-events-none z-50"
-        style={{ left: x, top: y, transform: "translate(-50%, -100%)" }}
-      >
-        <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg max-w-xs">
-          <div className="font-semibold">Pollen Information</div>
-          {/* <div>Intensity: {(intensity * 10).toFixed(1)}</div> */}
-          <div>Level: {pollenLevel}</div>
-          <div>Lat: {object.position[1].toFixed(4)}</div>
-          <div>Lon: {object.position[0].toFixed(4)}</div>
-        </div>
-        {/* Tooltip arrow */}
-        <div
-          className="absolute top-full left-1/2 transform -translate-x-1/2 
-                        border-8 border-transparent border-t-gray-800"
-        />
-      </div>
-    );
-  }
-
+  // watcher to check the properties of the map
   useEffect(() => {
-    if (lat && lng) {
-      setViewState((prev) => ({
+    if (searchLat && searchlong) {
+      clearCurrentLocation();
+      setPinIconMap({ lat: searchLat, long: searchlong });
+      setViewMapState((prev) => ({
         ...prev,
-        longitude: lng,
-        latitude: lat,
+        longitude: searchlong,
+        latitude: searchLat,
         zoom: 10,
         transitionDuration: 1000,
         transitionInterpolator: new FlyToInterpolator(),
       }));
+      setShowPollenDetailsChart(true);
     }
-  }, [lat, lng]);
+  }, [searchLat, searchlong]);
+
+  useEffect(() => {
+    if (currentLocationLat && currentLocationLong) {
+      clearCurrentLocation();
+      setPinIconMap({ lat: currentLocationLat, long: currentLocationLong });
+      setViewMapState((prev) => ({
+        ...prev,
+        longitude: currentLocationLong,
+        latitude: currentLocationLat,
+        zoom: 10,
+        transitionDuration: 1000,
+        transitionInterpolator: new FlyToInterpolator(),
+      }));
+      setShowPollenDetailsChart(true);
+    }
+  }, [currentLocationLat, currentLocationLong]);
 
   return (
     <>
       <DeckGL
-        initialViewState={viewState}
+        initialViewState={viewMapState}
         controller={true}
-        layers={layers}
-        style={{ width: "100vw", height: "100vh" }}
-        viewState={viewState}
-        onViewStateChange={(e) =>
-          setViewState({
-            ...(e.viewState as {
-              longitude: number;
-              latitude: number;
-              zoom: number;
-              minZoom: number;
-              maxZoom: number;
-            }),
-          })
+        layers={[
+          baseMapLayer,
+          bavariaGeoJsonLayer,
+          germanyGeoJsonLayer,
+          pollenGridCellsLayer,
+          pinIconLayer,
+        ]}
+        style={{ width: "100vw", height: "100vh", cursor: "pointer" }}
+        viewState={viewMapState}
+        // This is triggered when the hand move the map
+        onViewStateChange={handleViewStateChange}
+        getCursor={handleCursor}
+      />
+      <MapTooltip hoverInfo={tooltipInfo} />
+      <MapZoomControls
+        zoom={viewMapState.zoom}
+        minZoom={viewMapState.minZoom}
+        maxZoom={viewMapState.maxZoom}
+        onZoomChange={(newZoom) =>
+          setViewMapState((prev) => ({ ...prev, zoom: newZoom }))
         }
       />
-      {renderTooltip()}
-      {/*  zoom buttons*/}
-      <div className="absolute bottom-10 right-8 z-50">
-        <div className="bg-card backdrop-blur-md rounded-xl shadow-lg flex flex-col">
-          <button
-            onClick={() =>
-              setViewState((prev) => ({
-                ...prev,
-                zoom: Math.min(prev.zoom + 1, prev.maxZoom),
-              }))
-            }
-            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-t-xl"
-          >
-            +
-          </button>
-          <button
-            onClick={() =>
-              setViewState((prev) => ({
-                ...prev,
-                zoom: Math.max(prev.zoom - 1, prev.minZoom),
-              }))
-            }
-            className="px-4 py-2 text-lg font-bold hover:bg-neutral-900 rounded-b-xl"
-          >
-            -
-          </button>
-        </div>
-      </div>
     </>
   );
 }

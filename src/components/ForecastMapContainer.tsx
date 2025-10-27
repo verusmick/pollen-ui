@@ -16,6 +16,16 @@ import { LoadingOverlay } from "./ui/LoadingOverlay";
 import { useLoadingStore } from "@/store/loadingStore";
 import { useTranslations } from "next-intl";
 
+import dynamic from "next/dynamic";
+import { PollenLegend } from "./ui/PollenLegend";
+import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
+
+const PollenDetailsChart = dynamic(
+  () => import("./ui/PollenDetailsChart").then((mod) => mod.PollenDetailsChart),
+  {
+    ssr: false,
+  }
+);
 export const ForecastMapContainer = () => {
   const t = useTranslations("forecastPage");
   const tSearch = useTranslations("forecastPage.search");
@@ -33,6 +43,9 @@ export const ForecastMapContainer = () => {
     lat: number;
     lng: number;
   } | null>(null);
+  const [selectorOpen, setSelectorOpen] = useState(false);
+  const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
+    usePollenDetailsChartStore();
 
   const pollenOptions = ["Birch", "Grass", "Alder"];
   const POLLEN_TYPE = "POLLEN_BIRCH";
@@ -145,22 +158,48 @@ export const ForecastMapContainer = () => {
       <ForecastMap pollenData={pollenData} />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch("title_tooltip_search")}>
-          <LocationSearch onSelect={(pos) => setUserLocation(pos)} />
+          {(open, setOpen) => (
+            <LocationSearch
+              open={open}
+             onSelect={(pos) => {
+              setUserLocation(pos);
+              setOpen(false); 
+            }}
+            />
+          )}
         </SearchCardToggle>
         <LocationButton tooltipText={tLocation("title_tooltip_location")} />
       </span>
       <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
       <span className="absolute top-18 z-50">
-        <PollenSelector options={pollenOptions} selected={pollenOptions[0]} />
+        <PollenSelector
+          options={pollenOptions}
+          selected={pollenOptions[0]}
+          onToggle={setSelectorOpen}
+        />
       </span>
-      <span className="absolute bottom-10 left-1/2 -translate-x-1/2">
+      {!selectorOpen && showPollenDetailsChart && (
+        <PollenDetailsChart onClose={() => setShowPollenDetailsChart(false)} />
+      )}
+
+      <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
           setPlaying={setPlaying}
           playing={playing}
           activeHour={selectedHour}
           onHourChange={handleSliderChange}
         />
-      </span>
+      </div>
+
+      {/* Legend centered below the timeline on small/medium screens */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 2xl:hidden">
+        <PollenLegend width={350} height={25} />
+      </div>
+
+      {/* Legend in the lower left corner for large screens */}
+      <div className="hidden 2xl:block absolute bottom-10 left-10 z-50">
+        <PollenLegend width={350} height={25} />
+      </div>
 
       {/* LoadingOverlay */}
       {loading && <LoadingOverlay message={t("message_loading")} />}

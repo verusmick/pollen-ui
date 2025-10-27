@@ -1,14 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface LocationState {
+interface CurrentLocationState {
   lat: number | null;
   lng: number | null;
   setLocation: (coords: { lat: number; lng: number }) => void;
   clearLocation: () => void;
 }
 
-export const useLocationStore = create<LocationState>()(
+export const useCurrentLocationStore = create<CurrentLocationState>()(
   persist(
     (set) => ({
       lat: null,

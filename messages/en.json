@@ -19,6 +19,13 @@
       "description_permission_granted": "Permission granted! You can now access location data.",
       "description_permission_denied": "Permission denied. Please enable it in browser settings.",
       "title_button_location": "Request permission"
+    },
+    "legend": {
+      "low": "Low",
+      "moderate": "Moderate",
+      "medium": "Medium",
+      "high": "High",
+      "very_high": "Very high"
     }
   }
 }
