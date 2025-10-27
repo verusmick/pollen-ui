@@ -24,9 +24,9 @@ import { useCurrentLocationStore } from "@/store/currentLocationStore";
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 const viewMapInitialState = {
-  longitude: 10.5,
-  latitude: 51,
-  zoom: 6.5,
+  longitude:11.5,
+  latitude: 48.8,
+  zoom: 7,
   minZoom: 5,
   maxZoom: 12,
 };
