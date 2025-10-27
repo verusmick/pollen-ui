@@ -32,7 +32,7 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
   return (
     <div
       className="absolute 2xl:top-44 md:top-40 left-4 2xl:left-10 md:left-8 bg-card rounded-lg p-4 md:p-5 z-50
-      w-[90vw] md:w-[35vw] h-[45vh] md:h-60 flex flex-col"
+     w-[25vw] h-[45vh] md:h-60 flex flex-col"
     >
       <div className="flex justify-between items-center font-bold mb-2">
         <span className="text-white text-sm md:text-md">{`${latitude} ${longitude}`}</span>
