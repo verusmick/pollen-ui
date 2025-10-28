@@ -1,5 +1,5 @@
 "use client";
-import { useSearchLocationStore } from "@/store/searchLocationStore";
+import { useSearchLocationStore } from "@/app/forecast/stores/searchLocationStore";
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useRef } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
