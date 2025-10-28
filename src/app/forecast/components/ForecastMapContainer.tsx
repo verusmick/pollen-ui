@@ -1,24 +1,33 @@
 "use client";
+
+import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+
+import { useEffect, useRef, useState } from "react";
+
 import {
   getForecastByCoords,
   getLatitudes,
   getLongitudes,
 } from "@/lib/api/forecast";
-import { useEffect, useState, useRef } from "react";
-import ForecastMap from "@/components/ForecastMap";
-import { ForecastHeader } from "./ui/ForecastHeader";
-import { PollenSelector } from "./ui/PollenSelector";
-import { SearchCardToggle } from "./ui/SearchCardToggle";
-import PollenTimeline from "./ui/PollenTimeline";
-import { LocationButton } from "./ui/LocationButton";
-import { LocationSearch } from "./ui/LocationSearch";
-import { LoadingOverlay } from "./ui/LoadingOverlay";
-import { useLoadingStore } from "@/store/loadingStore";
-import { useTranslations } from "next-intl";
 
-import dynamic from "next/dynamic";
-import { PollenLegend } from "./ui/PollenLegend";
-import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
+import {
+  useLoadingStore,
+  usePollenDetailsChartStore,
+} from "@/app/forecast/stores";
+
+import {
+  LoadingOverlay,
+  ForecastMap,
+  SearchCardToggle,
+  LocationSearch,
+  LocationButton,
+  ForecastHeader,
+  PollenSelector,
+  PollenLegend,
+} from "@/app/forecast/components";
+
+import PollenTimeline from "./ui/PollenTimeline";
 
 const PollenDetailsChart = dynamic(
   () => import("./ui/PollenDetailsChart").then((mod) => mod.PollenDetailsChart),
@@ -161,10 +170,10 @@ export const ForecastMapContainer = () => {
           {(open, setOpen) => (
             <LocationSearch
               open={open}
-             onSelect={(pos) => {
-              setUserLocation(pos);
-              setOpen(false); 
-            }}
+              onSelect={(pos) => {
+                setUserLocation(pos);
+                setOpen(false);
+              }}
             />
           )}
         </SearchCardToggle>
@@ -206,3 +215,6 @@ export const ForecastMapContainer = () => {
     </div>
   );
 };
+
+
+export default ForecastMapContainer;

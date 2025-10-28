@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BiMap, BiX } from "react-icons/bi";
 import { TbLocationFilled } from "react-icons/tb";
 import { Tooltip } from "./Tooltip";
-import { useCurrentLocationStore } from "@/store/currentLocationStore";
+import { useCurrentLocationStore } from "@/app/forecast/stores/currentLocationStore";
 import { useTranslations } from "next-intl";
 
 interface LocationButtonProps {

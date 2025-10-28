@@ -1,24 +1,26 @@
 "use client";
+
 import { useMemo, useState, useEffect } from "react";
+
 import { DeckGL } from "@deck.gl/react";
-import { TileLayer } from "@deck.gl/geo-layers";
-import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-import { BitmapLayer, IconLayer } from "@deck.gl/layers";
 import { FlyToInterpolator } from "@deck.gl/core";
+import { TileLayer } from "@deck.gl/geo-layers";
+import { GeoJsonLayer, PolygonLayer, BitmapLayer, IconLayer } from "@deck.gl/layers";
+
+import type { Feature, FeatureCollection } from "geojson";
 
 import bavariaGeo from "@/data/bavaria.geo.json";
 import germanyGeo from "@/data/germany.geo.json";
 
-import MapZoomControls from "./MapZoomControls";
-import MapTooltip from "./MapTooltip";
+import { 
+  useCurrentLocationStore, 
+  usePollenDetailsChartStore, 
+  useSearchLocationStore 
+} from "@/app/forecast/stores";
 
-import filterPointsInRegion from "../utils/filterPointsInRegion";
-import { useSearchLocationStore } from "@/store/searchLocationStore";
-import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
+import { MapTooltip, MapZoomControls } from "@/app/forecast/components";
 
-import type { Feature } from "geojson";
-import type { FeatureCollection } from "geojson";
-import { useCurrentLocationStore } from "@/store/currentLocationStore";
+import filterPointsInRegion from "@/utils/filterPointsInRegion";
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
