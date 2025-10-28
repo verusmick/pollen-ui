@@ -110,13 +110,13 @@ export const ForecastMapContainer = () => {
   const loadInitialData = async () => {
     setLoading(true, "Loading initial pollen data...");
     try {
-      const longs = await getLongitudes();
-      const lats = await getLatitudes();
-      setLongitudes(longs);
-      setLatitudes(lats);
+      // const longs = await getLongitudes();
+      // const lats = await getLatitudes();
+      // setLongitudes(longs);
+      // setLatitudes(lats);
 
       const res = await getForecastByCoords({ from, to, pollen: POLLEN_TYPE });
-      addNewPollenData(res, longs, lats, 0);
+      // addNewPollenData(res, longs, lats, 0);
     } catch (err) {
       console.error("Failed to load initial data", err);
     } finally {
