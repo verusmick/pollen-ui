@@ -47,7 +47,7 @@ export const ForecastMapContainer = () => {
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
 
-  const pollenOptions = ["Birch", "Grass", "Alder"];
+  const pollenOptions = ["Birchs", "Grass", "Alder"];
   const POLLEN_TYPE = "POLLEN_BIRCH";
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
