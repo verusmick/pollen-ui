@@ -35,20 +35,20 @@ export async function getForecastByCoords(params: {
 //   return res.json();
 // }
 
-// export async function getLongitudes() {
-//   const url = `${BASE_URL}/longitudes`;
-//   const res = await fetch(url);
-//   if (!res.ok) {
-//     throw new Error(`Forecast API error: ${res.statusText}`);
-//   }
-//   return res.json();
-// }
+export async function getLongitudes() {
+  const url = `${BASE_URL}/longitudes`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Forecast API error: ${res.statusText}`);
+  }
+  return res.json();
+}
 
-// export async function getLatitudes() {
-//   const url = `${BASE_URL}/latitudes`;
-//   const res = await fetch(url);
-//   if (!res.ok) {
-//     throw new Error(`Forecast API error: ${res.statusText}`);
-//   }
-//   return res.json();
-// }
+export async function getLatitudes() {
+  const url = `${BASE_URL}/latitudes`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Forecast API error: ${res.statusText}`);
+  }
+  return res.json();
+}

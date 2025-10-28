@@ -1,8 +1,8 @@
 "use client";
 import {
   getForecastByCoords,
-  // getLatitudes,
-  // getLongitudes,
+  getLatitudes,
+  getLongitudes,
 } from "@/lib/api/forecast";
 import { useEffect, useState, useRef } from "react";
 import ForecastMap from "@/components/ForecastMap";
@@ -47,7 +47,7 @@ export const ForecastMapContainer = () => {
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
 
-  const pollenOptions = ["Birchs", "Grass", "Alder"];
+  const pollenOptions = ["Birch", "Grass", "Alder"];
   const POLLEN_TYPE = "POLLEN_BIRCH";
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
@@ -110,13 +110,13 @@ export const ForecastMapContainer = () => {
   const loadInitialData = async () => {
     setLoading(true, "Loading initial pollen data...");
     try {
-      // const longs = await getLongitudes();
-      // const lats = await getLatitudes();
-      // setLongitudes(longs);
-      // setLatitudes(lats);
+      const longs = await getLongitudes();
+      const lats = await getLatitudes();
+      setLongitudes(longs);
+      setLatitudes(lats);
 
       const res = await getForecastByCoords({ from, to, pollen: POLLEN_TYPE });
-      // addNewPollenData(res, longs, lats, 0);
+      addNewPollenData(res, longs, lats, 0);
     } catch (err) {
       console.error("Failed to load initial data", err);
     } finally {
