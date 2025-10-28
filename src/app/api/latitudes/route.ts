@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
 
-const BASE_URL = 'http://forecast.enjambre.com.bo/api';
+const BASE_URL = process.env.SILAM_API_BASE!;
+const USER = process.env.SILAM_USER!;
+const PASS = process.env.SILAM_PASS!;
 
 export async function GET() {
-  const res = await fetch(`${BASE_URL}/latitudes`);
+  const forwardUrl = `${BASE_URL}/latitudes`;
+
+  const res = await fetch(forwardUrl, {
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${USER}:${PASS}`).toString('base64')}`,
+    },
+  });
 
   if (!res.ok) {
     return NextResponse.json(
