@@ -197,7 +197,7 @@ export const ForecastMapContainer = () => {
       </div>
 
       {/* Legend in the lower left corner for large screens */}
-      <div className="hidden 2xl:block absolute bottom-10 left-10 z-50">
+      <div className="hidden 2xl:block absolute bottom-14 left-10 z-50">
         <PollenLegend width={350} height={25} />
       </div>
 
