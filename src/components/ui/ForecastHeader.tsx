@@ -8,7 +8,7 @@ interface ForecastHeaderProps {
 }
 
 export const ForecastHeader = ({
-  title = "Forecast Map",
+  title = "Forecast Map test",
   iconSrc = "/zaum.png",
 }: ForecastHeaderProps) => {
   return (
