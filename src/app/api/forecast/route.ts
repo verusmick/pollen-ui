@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BASE_URL = 'https://berlin.silam.pollenscience.eu/api/api';
-
-// Use environment variables instead of hardcoding credentials
+const BASE_URL = process.env.SILAM_API_BASE!;
 const USER = process.env.SILAM_USER!;
 const PASS = process.env.SILAM_PASS!;
 

@@ -1,11 +1,6 @@
 const isServer = typeof window === 'undefined';
 
-// Use internal proxy in production (browser-safe)
-// Use external API directly in local dev (since no HTTPS restriction)
-const BASE_URL =
-  !isServer && process.env.NODE_ENV === 'development'
-    ? 'https://berlin.silam.pollenscience.eu/api/api'
-    : '/api';
+const BASE_URL ='/api';
 
 export async function getForecastByCoords(params: {
   from: number;
@@ -15,14 +10,14 @@ export async function getForecastByCoords(params: {
   lat?: number;
 }) {
   const { from, to, pollen, lon = 0, lat = 0 } = params;
-  const url = `${BASE_URL}/forecast?from=${from}&to=${to}&pollen=${pollen}&lon=${lon}&lat=${lat}`;
+  const url = `${BASE_URL}/forecast?from=${from}&to=${to}&pollen=${pollen}`;
+
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Forecast API error: ${res.statusText}`);
   }
   return res.json();
 }
-
 // export async function getForecastWithIntervals(params: {
 //   from: number;
 //   to: number;

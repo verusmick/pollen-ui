@@ -1,8 +1,8 @@
 "use client";
 import {
   getForecastByCoords,
-  getLatitudes,
-  getLongitudes,
+  // getLatitudes,
+  // getLongitudes,
 } from "@/lib/api/forecast";
 import { useEffect, useState, useRef } from "react";
 import ForecastMap from "@/components/ForecastMap";
