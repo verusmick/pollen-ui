@@ -1,6 +1,6 @@
 "use client";
 
-import { usePollenStore } from "@/store/pollenStore";
+import { usePollenStore } from "@/app/forecast/stores/pollenStore";
 import { useState, useRef, useEffect } from "react";
 import { BiChevronDown } from "react-icons/bi";
 
