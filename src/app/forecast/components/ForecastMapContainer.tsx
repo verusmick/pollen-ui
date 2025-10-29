@@ -211,8 +211,6 @@ export const ForecastMapContainer = () => {
       {/* Contenedor separado para el card */}
       <div
         className="fixed left-10 bottom-40 2xl:bottom-24"
-        onMouseEnter={() => setLegendOpen(true)}
-        onMouseLeave={() => setLegendOpen(false)}
       >
         <PollenLegendCard
           open={legendOpen}
