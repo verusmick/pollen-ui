@@ -22,11 +22,19 @@
       "loading": "Getting location"
     },
     "legend": {
+      "legend_title": "Allergy level Range",
+      "none": "None",
+      "very_low":"Very low",
       "low": "Low",
       "moderate": "Moderate",
-      "medium": "Medium",
       "high": "High",
-      "very_high": "Very high"
+      "very_high": "Very high",
+      "none_leg": "No allergy risk",
+      "very_low_leg":"Very low allergy risk",
+      "low_leg": "Low allergy risk",
+      "moderate_leg": "Moderate allergy risk",
+      "high_leg": "High allergy risk",
+      "very_high_leg": "Very high allergy risk"
     }
   }
 }

@@ -9,6 +9,7 @@ export * from './ui/LocationButton';
 export * from './ui/LocationSearch';
 export * from './ui/PollenDetailsChart';
 export * from './ui/PollenLegend';
+export * from "./ui/PollenLegendCard";
 export * from './ui/PollenSelector';
 export * from './ui/PollenTimeline';
 export * from './ui/SearchCardToggle';
