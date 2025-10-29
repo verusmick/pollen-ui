@@ -13,6 +13,7 @@ import {
 
 import {
   useLoadingStore,
+  usePartialLoadingStore,
   usePollenDetailsChartStore,
 } from "@/app/forecast/stores";
 
@@ -25,6 +26,7 @@ import {
   ForecastHeader,
   PollenSelector,
   PollenLegend,
+  PollenLegendCard,
 } from "@/app/forecast/components";
 
 import PollenTimeline from "./ui/PollenTimeline";
@@ -40,7 +42,9 @@ export const ForecastMapContainer = () => {
   const tSearch = useTranslations("forecastPage.search");
   const tLocation = useTranslations("forecastPage.show_your_location");
   const { loading, setLoading } = useLoadingStore();
+  const { setPartialLoading } = usePartialLoadingStore();
   const [loadingHour, setLoadingHour] = useState(0);
+  const [legendOpen, setLegendOpen] = useState(false);
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number]>
   >([]);
@@ -53,9 +57,9 @@ export const ForecastMapContainer = () => {
     lng: number;
   } | null>(null);
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const legendCardRef = useRef<HTMLDivElement>(null);
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
-
   const pollenOptions = ["Birch", "Grass", "Alder"];
   const POLLEN_TYPE = "POLLEN_BIRCH";
   const from = 1649894400;
@@ -99,7 +103,7 @@ export const ForecastMapContainer = () => {
   const loadHour = async (hour: number) => {
     if (!longitudes.length || !latitudes.length) return;
     if (allDataRef.current[hour]) return;
-
+    setPartialLoading(true);
     setLoadingHour(hour);
     const start = from + 60 * 60 * hour;
     const end = to + 60 * 60 * hour;
@@ -114,6 +118,9 @@ export const ForecastMapContainer = () => {
     } catch (err) {
       console.error("Failed to load hour", hour, err);
     }
+    finally {
+    setPartialLoading(false);
+  }
   };
 
   const loadInitialData = async () => {
@@ -190,7 +197,6 @@ export const ForecastMapContainer = () => {
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart onClose={() => setShowPollenDetailsChart(false)} />
       )}
-
       <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
           setPlaying={setPlaying}
@@ -199,22 +205,31 @@ export const ForecastMapContainer = () => {
           onHourChange={handleSliderChange}
         />
       </div>
-
-      {/* Legend centered below the timeline on small/medium screens */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 2xl:hidden">
+      <div
+        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-10 2xl:translate-x-0 2xl:bottom-14"
+        onMouseEnter={() => setLegendOpen(true)}
+        onMouseLeave={() => setLegendOpen(false)}
+      >
         <PollenLegend width={350} height={25} />
       </div>
-
-      {/* Legend in the lower left corner for large screens */}
-      <div className="hidden 2xl:block absolute bottom-10 left-10 z-50">
-        <PollenLegend width={350} height={25} />
+      {/* Separate container for the card */}ˇ
+      <div className="fixed left-10 bottom-40 2xl:bottom-24">
+        <PollenLegendCard
+          open={legendOpen}
+          levels={[
+            { key: "very_low", color: "#00e838" },
+            { key: "low", color: "#a5eb02" },
+            { key: "moderate", color: "#ebbb02" },
+            { key: "high", color: "#f27200" },
+            { key: "very_high", color: "#ff0000" },
+          ]}
+          cardRef={legendCardRef}
+        />
       </div>
-
       {/* LoadingOverlay */}
       {loading && <LoadingOverlay message={t("message_loading")} />}
     </div>
   );
 };
-
 
 export default ForecastMapContainer;
