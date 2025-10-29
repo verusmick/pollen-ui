@@ -208,7 +208,7 @@ export const ForecastMapContainer = () => {
       >
         <PollenLegend width={350} height={25} />
       </div>
-      {/* Contenedor separado para el card */}
+      {/* Separate container for the card */}ˇ
       <div
         className="fixed left-10 bottom-40 2xl:bottom-24"
       >
