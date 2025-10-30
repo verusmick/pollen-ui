@@ -1,13 +1,10 @@
 "use client";
-
-import React from "react";
-
 interface LoadingSpinnerProps {
   size?: number;
   color?: string;
 }
 
-const LoadingSpinner = ({ size, color }: LoadingSpinnerProps) => {
+export const LoadingSpinner = ({ size, color }: LoadingSpinnerProps) => {
   return (
     <div
       className={`border-4 ${color} border-t-transparent rounded-full animate-spin`}
@@ -16,4 +13,4 @@ const LoadingSpinner = ({ size, color }: LoadingSpinnerProps) => {
   );
 };
 
-export default LoadingSpinner;
+

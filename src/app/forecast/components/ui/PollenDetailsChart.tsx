@@ -11,11 +11,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
+import { LoadingSpinner } from "@/app/forecast/components";
 interface PollenChartProps {
   onClose?: () => void;
 }
-
 interface PollenData {
   timestamp: number;
   value: number;
@@ -23,8 +22,11 @@ interface PollenData {
 
 export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
   const [data, setData] = useState<PollenData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
+
     const now = new Date();
     const hoursInterval = 3;
     const totalPoints = (24 / hoursInterval) * 2;
@@ -37,7 +39,10 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
       })
     );
 
-    setData(fakeData);
+    setTimeout(() => {
+      setData(fakeData);
+      setLoading(false);
+    }, 1000);
   }, []);
 
   const latitude = "-16.5";
@@ -100,84 +105,93 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
           <BiX size={20} className="text-white" />
         </button>
 
-        <div className="overflow-x-auto w-full h-full search-scroll">
-          <ResponsiveContainer width={data.length * 60} height="100%">
-            <LineChart
-              data={data}
-              margin={{ top: 42, right: 20, bottom: 10, left: -25 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#fff"
-                vertical={true}
-                horizontal={true}
-                opacity={0.3}
-              />
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <LoadingSpinner size={40} color="border-gray-200" />
+          </div>
+        ) : (
+          <div className="overflow-x-auto w-full h-full search-scroll">
+            <ResponsiveContainer width={data.length * 60} height="100%">
+              <LineChart
+                data={data}
+                margin={{ top: 42, right: 20, bottom: 10, left: -25 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#fff"
+                  vertical={true}
+                  horizontal={true}
+                  opacity={0.3}
+                />
 
-              <XAxis
-                dataKey="timestamp"
-                tick={<CustomTick />}
-                interval={0}
-                tickLine={false}
-              />
-              <YAxis style={{ fontSize: 10, fill: "#fff" }} tickLine={false} />
+                <XAxis
+                  dataKey="timestamp"
+                  tick={<CustomTick />}
+                  interval={0}
+                  tickLine={false}
+                />
+                <YAxis
+                  style={{ fontSize: 10, fill: "#fff" }}
+                  tickLine={false}
+                />
 
-              <Tooltip
-                content={({ active, payload, coordinate }) => {
-                  if (active && payload && payload.length) {
-                    const value = payload[0].value;
-                    const offsetTop = 10;
-                    const tooltipMargin = 10;
-                    const x = coordinate?.x ?? 0;
+                <Tooltip
+                  content={({ active, payload, coordinate }) => {
+                    if (active && payload && payload.length) {
+                      const value = payload[0].value;
+                      const offsetTop = 10;
+                      const tooltipMargin = 10;
+                      const x = coordinate?.x ?? 0;
 
-                    return (
-                      <div
-                        className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
+                      return (
+                        <div
+                          className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
                      text-[11px] whitespace-nowrap border border-white/40 
                      px-1 py-0.5 pointer-events-none"
-                        style={{
-                          left: x,
-                          top: offsetTop - tooltipMargin,
-                        }}
-                      >
-                        <div className="font-bold text-center">{value}</div>
-                        <div className="text-[9px] text-gray-300">
-                          Pollen/m³
+                          style={{
+                            left: x,
+                            top: offsetTop - tooltipMargin,
+                          }}
+                        >
+                          <div className="font-bold text-center">{value}</div>
+                          <div className="text-[9px] text-gray-300">
+                            Pollen/m³
+                          </div>
                         </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
+                      );
+                    }
+                    return null;
+                  }}
+                />
 
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#fff"
-                dot={(props: any) => {
-                  const { cx, cy, value, index } = props;
-                  return (
-                    <circle
-                      key={`dot-${index}`}
-                      cx={cx}
-                      cy={cy}
-                      r={4}
-                      fill={getColorByValue(value)}
-                      strokeWidth={1.5}
-                    />
-                  );
-                }}
-                activeDot={{
-                  r: 6,
-                  stroke: "#ffae42",
-                  strokeWidth: 3,
-                  fill: "#1E293B",
-                }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#fff"
+                  dot={(props: any) => {
+                    const { cx, cy, value, index } = props;
+                    return (
+                      <circle
+                        key={`dot-${index}`}
+                        cx={cx}
+                        cy={cy}
+                        r={4}
+                        fill={getColorByValue(value)}
+                        strokeWidth={1.5}
+                      />
+                    );
+                  }}
+                  activeDot={{
+                    r: 6,
+                    stroke: "#ffae42",
+                    strokeWidth: 3,
+                    fill: "#1E293B",
+                  }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
     </div>
   );
