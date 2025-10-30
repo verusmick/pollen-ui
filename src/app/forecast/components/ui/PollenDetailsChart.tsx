@@ -104,7 +104,7 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
           <ResponsiveContainer width={data.length * 60} height="100%">
             <LineChart
               data={data}
-              margin={{ top: 10, right: 20, bottom: 10, left: -25 }}
+              margin={{ top: 42, right: 20, bottom: 10, left: -25 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -123,24 +123,31 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
               <YAxis style={{ fontSize: 10, fill: "#fff" }} tickLine={false} />
 
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "#1E293B",
-                  border: "none",
-                  borderRadius: "6px",
-                  color: "#fff",
-                }}
-                labelFormatter={(value) => {
-                  const item = data.find((d) => d.timestamp === value);
-                  if (!item) return "";
-                  const date = new Date(item.timestamp);
-                  return `${date
-                    .getHours()
-                    .toString()
-                    .padStart(2, "0")}:00 - ${date.toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}`;
+                content={({ active, payload, coordinate }) => {
+                  if (active && payload && payload.length) {
+                    const value = payload[0].value;
+                    const offsetTop = 10;
+                    const tooltipMargin = 10;
+                    const x = coordinate?.x ?? 0;
+
+                    return (
+                      <div
+                        className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
+                     text-[11px] whitespace-nowrap border border-white/40 
+                     px-1 py-0.5 pointer-events-none"
+                        style={{
+                          left: x,
+                          top: offsetTop - tooltipMargin,
+                        }}
+                      >
+                        <div className="font-bold text-center">{value}</div>
+                        <div className="text-[9px] text-gray-300">
+                          Pollen/m³
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
                 }}
               />
 
