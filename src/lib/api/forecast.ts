@@ -1,6 +1,6 @@
 const isServer = typeof window === 'undefined';
 
-const BASE_URL ='/api';
+const BASE_URL = '/api';
 
 export async function getForecastByCoords(params: {
   from: number;
@@ -49,6 +49,51 @@ export async function getLatitudes() {
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Forecast API error: ${res.statusText}`);
+  }
+  return res.json();
+}
+
+// export async function getHourlyForecast(params: {
+//   date: string;
+//   hour: number;
+//   pollen: string;
+//   box: string;
+//   intervals: string;
+// }) {
+//   const { date, hour, pollen, box, intervals } = params;
+
+//   const url = `/api/forecast/hour?date=${date}&hour=${hour}&pollen=${pollen}&box=${encodeURIComponent(
+//     box
+//   )}&intervals=${encodeURIComponent(intervals)}`;
+
+//   const res = await fetch(url);
+//   if (!res.ok) {
+//     throw new Error(`Forecast Hour API error: ${res.statusText}`);
+//   }
+//   return res.json();
+// }
+
+
+export async function getHourlyForecast(params: {
+  date: string;
+  hour: number;
+  pollen: string;
+  box: string;
+  intervals?: string;
+  includeCoords?: boolean
+}) {
+  const query = new URLSearchParams({
+    date: params.date,
+    hour: params.hour.toString(),
+    pollen: params.pollen,
+    box: params.box,
+    // intervals: params.intervals,
+    include_coords: (params.includeCoords || false).toString()
+  });
+
+  const res = await fetch(`/api/forecast/hour?${query.toString()}`);
+  if (!res.ok) {
+    throw new Error(`Forecast Hour API error: ${res.statusText}`);
   }
   return res.json();
 }

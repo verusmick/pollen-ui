@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   getForecastByCoords,
+  getHourlyForecast,
   getLatitudes,
   getLongitudes,
 } from "@/lib/api/forecast";
@@ -29,6 +30,10 @@ import {
 } from "@/app/forecast/components";
 
 import PollenTimeline from "./ui/PollenTimeline";
+import {
+  DEFAULT_POLLEN_API_KEY,
+  type PollenApiKey,
+} from "@/app/forecast/constants";
 
 const PollenDetailsChart = dynamic(
   () => import("./ui/PollenDetailsChart").then((mod) => mod.PollenDetailsChart),
@@ -63,7 +68,19 @@ export const ForecastMapContainer = () => {
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
 
+  const [pollenSelected, setPollenSelected] = useState<PollenApiKey>(
+    DEFAULT_POLLEN_API_KEY
+  );
+
+  // const currentDate = new Date().toISOString().split('T')[0];
+  // todo: remove this hardcoded date when the API will be able
+  const currentDate: string = "2022-04-14";
+
   const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
+
+  const handlePollenChange = (apiKey: PollenApiKey) => {
+    setPollenSelected(apiKey);
+  };
 
   const addNewPollenData = (
     forecasts: number[],
@@ -107,12 +124,12 @@ export const ForecastMapContainer = () => {
     const end = to + 60 * 60 * hour;
 
     try {
-      const res = await getForecastByCoords({
-        from: start,
-        to: end,
-        pollen: POLLEN_TYPE,
-      });
-      addNewPollenData(res, longitudes, latitudes, hour);
+      // const { data: res } = await getHourlyForecast({
+      //   date: currentDate,
+      //   // to: end,
+      //   pollen: POLLEN_TYPE,
+      // });
+      // addNewPollenData(res, longitudes, latitudes, hour);
     } catch (err) {
       console.error("Failed to load hour", hour, err);
     }
@@ -121,12 +138,25 @@ export const ForecastMapContainer = () => {
   const loadInitialData = async () => {
     setLoading(true, "Loading initial pollen data...");
     try {
-      const longs = await getLongitudes();
-      const lats = await getLatitudes();
+      const {
+        data: res,
+        latitudes,
+        longitudes,
+      } = await getHourlyForecast({
+        date: currentDate,
+        hour: 1,
+        pollen: pollenSelected,
+        box: "8.5,47.0,13.5,50.0",
+        // box: "13.22,52,13.70,53",
+        // intervals: "1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9",
+        includeCoords: true,
+      });
+
+      const longs = longitudes;
+      const lats = latitudes;
       setLongitudes(longs);
       setLatitudes(lats);
-
-      const res = await getForecastByCoords({ from, to, pollen: POLLEN_TYPE });
+      // const res = await getForecastByCoords({ from, to, pollen: POLLEN_TYPE });
       addNewPollenData(res, longs, lats, 0);
     } catch (err) {
       console.error("Failed to load initial data", err);
@@ -183,11 +213,7 @@ export const ForecastMapContainer = () => {
       </span>
       <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
       <span className="absolute top-18 z-50">
-        <PollenSelector
-          options={pollenOptions}
-          selected={pollenOptions[0]}
-          onToggle={setSelectorOpen}
-        />
+        <PollenSelector onChange={handlePollenChange} />
       </span>
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart onClose={() => setShowPollenDetailsChart(false)} />
@@ -200,7 +226,6 @@ export const ForecastMapContainer = () => {
           onHourChange={handleSliderChange}
         />
       </div>
-      
       <div
         className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-10 2xl:translate-x-0 2xl:bottom-14"
         onMouseEnter={() => setLegendOpen(true)}
@@ -209,9 +234,7 @@ export const ForecastMapContainer = () => {
         <PollenLegend width={350} height={25} />
       </div>
       {/* Separate container for the card */}ˇ
-      <div
-        className="fixed left-10 bottom-40 2xl:bottom-24"
-      >
+      <div className="fixed left-10 bottom-40 2xl:bottom-24">
         <PollenLegendCard
           open={legendOpen}
           levels={[
