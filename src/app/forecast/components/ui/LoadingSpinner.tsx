@@ -1,17 +1,10 @@
 "use client";
-
-import React from "react";
-import { usePartialLoadingStore } from "@/app/forecast/stores";
 interface LoadingSpinnerProps {
   size?: number;
   color?: string;
 }
 
-const LoadingSpinner = ({ size = 40, color = "border-blue-500" }: LoadingSpinnerProps) => {
-  const isLoading = usePartialLoadingStore((state) => state.isLoading);
-
-  if (!isLoading) return null;
-
+export const LoadingSpinner = ({ size, color }: LoadingSpinnerProps) => {
   return (
     <div
       className={`border-4 ${color} border-t-transparent rounded-full animate-spin`}
@@ -20,4 +13,4 @@ const LoadingSpinner = ({ size = 40, color = "border-blue-500" }: LoadingSpinner
   );
 };
 
-export default LoadingSpinner;
+
