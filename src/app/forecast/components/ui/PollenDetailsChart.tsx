@@ -85,7 +85,7 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
   return (
     <div
       className="absolute 2xl:top-44 md:top-40 left-4 2xl:left-10 md:left-8 
-                 bg-card rounded-lg p-4 md:p-5 z-50 w-[25vw] h-[45vh] md:h-60 
+                 bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-60 
                  flex flex-col overflow-hidden"
     >
       <div className="relative flex-1 w-full h-full">
@@ -155,10 +155,11 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
                 type="monotone"
                 dataKey="value"
                 stroke="#fff"
-                dot={(props) => {
-                  const { cx, cy, value } = props;
+                dot={(props: any) => {
+                  const { cx, cy, value, index } = props;
                   return (
                     <circle
+                      key={`dot-${index}`}
                       cx={cx}
                       cy={cy}
                       r={4}
