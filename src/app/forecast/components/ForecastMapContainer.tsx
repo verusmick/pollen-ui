@@ -14,6 +14,7 @@ import {
 
 import {
   useLoadingStore,
+  usePartialLoadingStore,
   usePollenDetailsChartStore,
 } from "@/app/forecast/stores";
 
@@ -27,6 +28,7 @@ import {
   PollenSelector,
   PollenLegend,
   PollenLegendCard,
+  LoadingSpinner,
 } from "@/app/forecast/components";
 
 import PollenTimeline from "./ui/PollenTimeline";
@@ -46,6 +48,7 @@ export const ForecastMapContainer = () => {
   const tSearch = useTranslations("forecastPage.search");
   const tLocation = useTranslations("forecastPage.show_your_location");
   const { loading, setLoading } = useLoadingStore();
+  const { partialLoading, setPartialLoading } = usePartialLoadingStore();
   const [loadingHour, setLoadingHour] = useState(0);
   const [legendOpen, setLegendOpen] = useState(false);
   const [pollenData, setPollenData] = useState<
@@ -118,7 +121,7 @@ export const ForecastMapContainer = () => {
   const loadHour = async (hour: number) => {
     if (!longitudes.length || !latitudes.length) return;
     if (allDataRef.current[hour]) return;
-
+    setPartialLoading(true);
     setLoadingHour(hour);
     const start = from + 60 * 60 * hour;
     const end = to + 60 * 60 * hour;
@@ -132,6 +135,8 @@ export const ForecastMapContainer = () => {
       // addNewPollenData(res, longitudes, latitudes, hour);
     } catch (err) {
       console.error("Failed to load hour", hour, err);
+    } finally {
+      setPartialLoading(false);
     }
   };
 
@@ -211,7 +216,15 @@ export const ForecastMapContainer = () => {
         </SearchCardToggle>
         <LocationButton tooltipText={tLocation("title_tooltip_location")} />
       </span>
-      <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
+      <div className="relative">
+        <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
+
+        {partialLoading && (
+          <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
+            <LoadingSpinner size={40} color="border-white" />
+          </div>
+        )}
+      </div>
       <span className="absolute top-18 z-50">
         <PollenSelector onChange={handlePollenChange} />
       </span>

@@ -12,6 +12,10 @@ import {
   YAxis,
 } from "recharts";
 import { LoadingSpinner } from "@/app/forecast/components";
+import {
+  usePartialLoadingStore,
+  useSearchLocationStore,
+} from "@/app/forecast/stores";
 interface PollenChartProps {
   onClose?: () => void;
 }
@@ -22,10 +26,10 @@ interface PollenData {
 
 export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
   const [data, setData] = useState<PollenData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { chartLoading, setChartLoading } = usePartialLoadingStore();
 
   useEffect(() => {
-    setLoading(true);
+    setChartLoading(true);
 
     const now = new Date();
     const hoursInterval = 3;
@@ -41,7 +45,7 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
 
     setTimeout(() => {
       setData(fakeData);
-      setLoading(false);
+      setChartLoading(false);
     }, 1000);
   }, []);
 
@@ -105,7 +109,7 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
           <BiX size={20} className="text-white" />
         </button>
 
-        {loading ? (
+        {chartLoading ? (
           <div className="flex justify-center items-center h-full">
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
