@@ -1,22 +1,17 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useEffect, useRef, useState } from "react";
+import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 
-import {
-  getForecastByCoords,
-  getHourlyForecast,
-  getLatitudes,
-  getLongitudes,
-} from "@/lib/api/forecast";
+import { getHourlyForecast } from '@/lib/api/forecast';
 
 import {
   useLoadingStore,
   usePartialLoadingStore,
   usePollenDetailsChartStore,
-} from "@/app/forecast/stores";
+} from '@/app/forecast/stores';
 
 import {
   LoadingOverlay,
@@ -29,57 +24,57 @@ import {
   PollenLegend,
   PollenLegendCard,
   LoadingSpinner,
-} from "@/app/forecast/components";
+  PollenTimeline,
+} from '@/app/forecast/components';
 
-import PollenTimeline from "./ui/PollenTimeline";
 import {
   DEFAULT_POLLEN_API_KEY,
   type PollenApiKey,
-} from "@/app/forecast/constants";
+} from '@/app/forecast/constants';
 
 const PollenDetailsChart = dynamic(
-  () => import("./ui/PollenDetailsChart").then((mod) => mod.PollenDetailsChart),
-  {
-    ssr: false,
-  }
+  () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+  { ssr: false }
 );
+
 export const ForecastMapContainer = () => {
-  const t = useTranslations("forecastPage");
-  const tSearch = useTranslations("forecastPage.search");
-  const tLocation = useTranslations("forecastPage.show_your_location");
+  const t = useTranslations('forecastPage');
+  const tSearch = useTranslations('forecastPage.search');
+  const tLocation = useTranslations('forecastPage.show_your_location');
+
   const { loading, setLoading } = useLoadingStore();
   const { partialLoading, setPartialLoading } = usePartialLoadingStore();
-  const [loadingHour, setLoadingHour] = useState(0);
-  const [legendOpen, setLegendOpen] = useState(false);
+  const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
+    usePollenDetailsChartStore();
+
+  const [pollenSelected, setPollenSelected] = useState<PollenApiKey>(
+    DEFAULT_POLLEN_API_KEY
+  );
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number]>
   >([]);
   const [longitudes, setLongitudes] = useState<number[]>([]);
   const [latitudes, setLatitudes] = useState<number[]>([]);
   const [selectedHour, setSelectedHour] = useState(0);
+  const [loadingHour, setLoadingHour] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
+  const [selectorOpen, setSelectorOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [selectorOpen, setSelectorOpen] = useState(false);
+  const [currentBox, setCurrentBox] = useState<number[] | null>(null);
+
   const legendCardRef = useRef<HTMLDivElement>(null);
-  const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
-    usePollenDetailsChartStore();
-  const pollenOptions = ["Birch", "Grass", "Alder"];
-  const POLLEN_TYPE = "POLLEN_BIRCH";
+  const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
+
   const from = 1649894400;
   const to = from + 59 * 60 + 59;
 
-  const [pollenSelected, setPollenSelected] = useState<PollenApiKey>(
-    DEFAULT_POLLEN_API_KEY
-  );
-
   // const currentDate = new Date().toISOString().split('T')[0];
-  // todo: remove this hardcoded date when the API will be able
-  const currentDate: string = "2022-04-14";
-
-  const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
+  // TODO: remove this hardcoded date when the API will be able
+  const currentDate: string = '2022-04-14';
 
   const handlePollenChange = (apiKey: PollenApiKey) => {
     setPollenSelected(apiKey);
@@ -134,37 +129,66 @@ export const ForecastMapContainer = () => {
       // });
       // addNewPollenData(res, longitudes, latitudes, hour);
     } catch (err) {
-      console.error("Failed to load hour", hour, err);
+      console.error('Failed to load hour', hour, err);
     } finally {
       setPartialLoading(false);
     }
   };
 
+  const handleRegionChange = useCallback((box: number[]) => {
+    console.log('tete', box);
+    setCurrentBox(box);
+  }, []);
+
   const loadInitialData = async () => {
-    setLoading(true, "Loading initial pollen data...");
+    getForecastData({
+      date: currentDate,
+      hour: 0,
+      pollen: pollenSelected,
+      // box: "8.5,47.0,13.5,50.0",
+      // box: "9.01708984374985, 46.51390491298438, 13.982910156249787, 50.986455071208994",
+      box: '7.7893676757813735, 46.51390491298438, 15.210632324218798, 50.986455071208994',
+      // box: currentBox,
+      // box: "13.22,52,13.70,`53",
+      // intervals: "1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9",
+      includeCoords: true,
+    });
+  };
+
+  const getForecastData = async ({
+    date,
+    hour,
+    pollen,
+    box,
+    includeCoords,
+  }: {
+    date: string;
+    hour: number;
+    pollen: PollenApiKey;
+    box: string;
+    includeCoords: boolean;
+  }) => {
+    // setLoading(true, "Loading initial pollen data...");
     try {
       const {
         data: res,
         latitudes,
         longitudes,
       } = await getHourlyForecast({
-        date: currentDate,
-        hour: 1,
-        pollen: pollenSelected,
-        box: "8.5,47.0,13.5,50.0",
-        // box: "13.22,52,13.70,53",
-        // intervals: "1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9",
-        includeCoords: true,
+        date,
+        hour,
+        pollen,
+        box,
+        includeCoords,
       });
 
       const longs = longitudes;
       const lats = latitudes;
       setLongitudes(longs);
       setLatitudes(lats);
-      // const res = await getForecastByCoords({ from, to, pollen: POLLEN_TYPE });
       addNewPollenData(res, longs, lats, 0);
     } catch (err) {
-      console.error("Failed to load initial data", err);
+      console.error('Failed to load initial data', err);
     } finally {
       setLoading(false);
     }
@@ -195,15 +219,21 @@ export const ForecastMapContainer = () => {
   }, [playing, selectedHour]);
 
   useEffect(() => {
-    loadInitialData();
-  }, []);
+    allDataRef.current = [];
+    if (currentBox) {
+      loadInitialData();
+    }
+  }, [currentBox]);
 
   return (
     <div className="relative h-screen w-screen">
       {/* Main content */}
-      <ForecastMap pollenData={pollenData} />
+      <ForecastMap
+        pollenData={pollenData}
+        onRegionChange={handleRegionChange}
+      />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        <SearchCardToggle title={tSearch("title_tooltip_search")}>
+        <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
@@ -214,10 +244,10 @@ export const ForecastMapContainer = () => {
             />
           )}
         </SearchCardToggle>
-        <LocationButton tooltipText={tLocation("title_tooltip_location")} />
+        <LocationButton tooltipText={tLocation('title_tooltip_location')} />
       </span>
       <div className="relative">
-        <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
+        <ForecastHeader title={t('title')} iconSrc="/zaum.png" />
 
         {partialLoading && (
           <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
@@ -251,17 +281,17 @@ export const ForecastMapContainer = () => {
         <PollenLegendCard
           open={legendOpen}
           levels={[
-            { key: "very_low", color: "#00e838" },
-            { key: "low", color: "#a5eb02" },
-            { key: "moderate", color: "#ebbb02" },
-            { key: "high", color: "#f27200" },
-            { key: "very_high", color: "#ff0000" },
+            { key: 'very_low', color: '#00e838' },
+            { key: 'low', color: '#a5eb02' },
+            { key: 'moderate', color: '#ebbb02' },
+            { key: 'high', color: '#f27200' },
+            { key: 'very_high', color: '#ff0000' },
           ]}
           cardRef={legendCardRef}
         />
       </div>
       {/* LoadingOverlay */}
-      {loading && <LoadingOverlay message={t("message_loading")} />}
+      {loading && <LoadingOverlay message={t('message_loading')} />}
     </div>
   );
 };
