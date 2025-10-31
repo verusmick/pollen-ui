@@ -186,25 +186,15 @@ export const ForecastMapContainer = () => {
         </SearchCardToggle>
         <LocationButton tooltipText={tLocation("title_tooltip_location")} />
       </span>
-      {/*Demo Loading partial*/}
       <div className="relative">
-        <span
-          onClick={() => {
-            setPartialLoading(true);
-            setTimeout(() => setPartialLoading(false), 2000);
-          }}
-          className="cursor-pointer"
-        >
-          <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
-        </span>
+        <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
 
         {partialLoading && (
-          <div className="fixed inset-0 flex justify-center items-center bg-white/50 z-50">
-            <LoadingSpinner size={40} color="border-blue-500" />
+          <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
+            <LoadingSpinner size={40} color="border-white" />
           </div>
         )}
       </div>
-      {/*end*/}
       <span className="absolute top-18 z-50">
         <PollenSelector
           options={pollenOptions}
