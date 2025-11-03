@@ -1,21 +1,17 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useEffect, useRef, useState } from "react";
+import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 
-import {
-  getForecastByCoords,
-  getLatitudes,
-  getLongitudes,
-} from "@/lib/api/forecast";
+import { getHourlyForecast } from '@/lib/api/forecast';
 
 import {
   useLoadingStore,
   usePartialLoadingStore,
   usePollenDetailsChartStore,
-} from "@/app/forecast/stores";
+} from '@/app/forecast/stores';
 
 import {
   LoadingOverlay,
@@ -28,45 +24,65 @@ import {
   PollenLegend,
   PollenLegendCard,
   LoadingSpinner,
-} from "@/app/forecast/components";
+  PollenTimeline,
+} from '@/app/forecast/components';
 
-import PollenTimeline from "./ui/PollenTimeline";
+import {
+  DEFAULT_POLLEN_API_KEY,
+  type PollenApiKey,
+} from '@/app/forecast/constants';
 
 const PollenDetailsChart = dynamic(
-  () => import("./ui/PollenDetailsChart").then((mod) => mod.PollenDetailsChart),
-  {
-    ssr: false,
-  }
+  () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+  { ssr: false }
 );
+
 export const ForecastMapContainer = () => {
-  const t = useTranslations("forecastPage");
-  const tSearch = useTranslations("forecastPage.search");
-  const tLocation = useTranslations("forecastPage.show_your_location");
+  const t = useTranslations('forecastPage');
+  const tSearch = useTranslations('forecastPage.search');
+  const tLocation = useTranslations('forecastPage.show_your_location');
+
   const { loading, setLoading } = useLoadingStore();
   const { partialLoading, setPartialLoading } = usePartialLoadingStore();
-  const [loadingHour, setLoadingHour] = useState(0);
-  const [legendOpen, setLegendOpen] = useState(false);
+  const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
+    usePollenDetailsChartStore();
+
+  const [pollenSelected, setPollenSelected] = useState<PollenApiKey>(
+    DEFAULT_POLLEN_API_KEY
+  );
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number]>
   >([]);
-  const [longitudes, setLongitudes] = useState<number[]>([]);
-  const [latitudes, setLatitudes] = useState<number[]>([]);
+
   const [selectedHour, setSelectedHour] = useState(0);
+  const [loadingHour, setLoadingHour] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
+  const [selectorOpen, setSelectorOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [selectorOpen, setSelectorOpen] = useState(false);
-  const legendCardRef = useRef<HTMLDivElement>(null);
-  const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
-    usePollenDetailsChartStore();
-  const pollenOptions = ["Birch", "Grass", "Alder"];
-  const POLLEN_TYPE = "POLLEN_BIRCH";
-  const from = 1649894400;
-  const to = from + 59 * 60 + 59;
+  const [currentBox, setCurrentBox] = useState<number[] | null>(null);
 
+  const legendCardRef = useRef<HTMLDivElement>(null);
   const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
+
+  // Build 48-hour window (from 00:00 today)
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+
+  // const currentDate = new Date().toISOString().split('T')[0];
+  // TODO: remove this hardcoded date when the API will be able
+  const currentDate: string = '2022-04-15';
+
+  const handlePollenChange = (apiKey: PollenApiKey) => {
+    setPollenSelected(apiKey);
+  };
 
   const addNewPollenData = (
     forecasts: number[],
@@ -90,7 +106,6 @@ export const ForecastMapContainer = () => {
           else if (value <= 200) value = 0.6;
           else if (value <= 400) value = 0.8;
           else value = 0.9;
-          // values.push({ long: lon, lat: lat, value });
           values.push([lat, long, value]);
         }
         i++;
@@ -98,50 +113,59 @@ export const ForecastMapContainer = () => {
     }
 
     allDataRef.current[hour] = values;
-    if (hour === selectedHour) setPollenData(values);
+    setPollenData(values);
   };
 
   const loadHour = async (hour: number) => {
-    if (!longitudes.length || !latitudes.length) return;
-    if (allDataRef.current[hour]) return;
-    setPartialLoading(true);
     setLoadingHour(hour);
-    const start = from + 60 * 60 * hour;
-    const end = to + 60 * 60 * hour;
+
+    // --- Handle 48h range logic ---
+    // Start from 00:00 today
+    // const now = new Date();
+    const now = new Date(currentDate);
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+    const todayStr = startOfToday.toISOString().split('T')[0];
+
+    // Compute if the hour belongs to today or tomorrow
+    const isNextDay = hour >= 24;
+    const dateToUse = isNextDay
+      ? new Date(startOfToday.getTime() + 24 * 3600 * 1000)
+      : startOfToday;
+
+    const dateStr = dateToUse.toISOString().split('T')[0];
+    const hourForApi = isNextDay ? hour - 24 : hour;
 
     try {
-      const res = await getForecastByCoords({
-        from: start,
-        to: end,
-        pollen: POLLEN_TYPE,
+      const {
+        data: res,
+        latitudes,
+        longitudes,
+      } = await getHourlyForecast({
+        date: dateStr,
+        hour: hourForApi,
+        pollen: pollenSelected,
+        // box: currentBox?.join(','),
+        box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
+        includeCoords: true,
       });
+
       addNewPollenData(res, longitudes, latitudes, hour);
     } catch (err) {
-      console.error("Failed to load hour", hour, err);
-    } finally {
-      setPartialLoading(false);
-    }
-  };
-
-  const loadInitialData = async () => {
-    setLoading(true, "Loading initial pollen data...");
-    try {
-      const longs = await getLongitudes();
-      const lats = await getLatitudes();
-      setLongitudes(longs);
-      setLatitudes(lats);
-
-      const res = await getForecastByCoords({ from, to, pollen: POLLEN_TYPE });
-      addNewPollenData(res, longs, lats, 0);
-    } catch (err) {
-      console.error("Failed to load initial data", err);
+      console.error('Failed to load hour', hour, err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Slider
+  const handleRegionChange = useCallback((box: number[]) => {
+    setCurrentBox(box);
+  }, []);
 
+  // Handle hour change
   const handleSliderChange = async (hour: number) => {
     setPlaying(false);
     setSelectedHour(hour);
@@ -149,13 +173,12 @@ export const ForecastMapContainer = () => {
     setPollenData(allDataRef.current[hour] || []);
   };
 
-  // Play (Timeline)
-
+  // Playback
   useEffect(() => {
     if (!playing) return;
 
     const interval = setInterval(async () => {
-      const nextHour = (selectedHour + 1) % 49;
+      const nextHour = (selectedHour + 1) % 48;
       setSelectedHour(nextHour);
       await loadHour(nextHour);
       setPollenData(allDataRef.current[nextHour] || []);
@@ -164,16 +187,25 @@ export const ForecastMapContainer = () => {
     return () => clearInterval(interval);
   }, [playing, selectedHour]);
 
+  // Set current hour on mount
   useEffect(() => {
-    loadInitialData();
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffHours = Math.floor(
+      (now.getTime() - start.getTime()) / (1000 * 60 * 60)
+    );
+    setSelectedHour(diffHours);
+    loadHour(diffHours);
   }, []);
-
   return (
     <div className="relative h-screen w-screen">
       {/* Main content */}
-      <ForecastMap pollenData={pollenData} />
+      <ForecastMap
+        pollenData={pollenData}
+        onRegionChange={handleRegionChange}
+      />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        <SearchCardToggle title={tSearch("title_tooltip_search")}>
+        <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
@@ -184,10 +216,10 @@ export const ForecastMapContainer = () => {
             />
           )}
         </SearchCardToggle>
-        <LocationButton tooltipText={tLocation("title_tooltip_location")} />
+        <LocationButton tooltipText={tLocation('title_tooltip_location')} />
       </span>
       <div className="relative">
-        <ForecastHeader title={t("title")} iconSrc="/zaum.png" />
+        <ForecastHeader title={t('title')} iconSrc="/zaum.png" />
 
         {partialLoading && (
           <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
@@ -196,11 +228,7 @@ export const ForecastMapContainer = () => {
         )}
       </div>
       <span className="absolute top-18 z-50">
-        <PollenSelector
-          options={pollenOptions}
-          selected={pollenOptions[0]}
-          onToggle={setSelectorOpen}
-        />
+        <PollenSelector onChange={handlePollenChange} />
       </span>
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart onClose={() => setShowPollenDetailsChart(false)} />
@@ -225,17 +253,17 @@ export const ForecastMapContainer = () => {
         <PollenLegendCard
           open={legendOpen}
           levels={[
-            { key: "very_low", color: "#00e838" },
-            { key: "low", color: "#a5eb02" },
-            { key: "moderate", color: "#ebbb02" },
-            { key: "high", color: "#f27200" },
-            { key: "very_high", color: "#ff0000" },
+            { key: 'very_low', color: '#00e838' },
+            { key: 'low', color: '#a5eb02' },
+            { key: 'moderate', color: '#ebbb02' },
+            { key: 'high', color: '#f27200' },
+            { key: 'very_high', color: '#ff0000' },
           ]}
           cardRef={legendCardRef}
         />
       </div>
       {/* LoadingOverlay */}
-      {loading && <LoadingOverlay message={t("message_loading")} />}
+      {loading && <LoadingOverlay message={t('message_loading')} />}
     </div>
   );
 };
