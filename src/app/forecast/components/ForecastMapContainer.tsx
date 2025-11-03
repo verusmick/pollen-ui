@@ -53,8 +53,7 @@ export const ForecastMapContainer = () => {
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number]>
   >([]);
-  const [longitudes, setLongitudes] = useState<number[]>([]);
-  const [latitudes, setLatitudes] = useState<number[]>([]);
+
   const [selectedHour, setSelectedHour] = useState(0);
   const [loadingHour, setLoadingHour] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -69,12 +68,17 @@ export const ForecastMapContainer = () => {
   const legendCardRef = useRef<HTMLDivElement>(null);
   const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
 
-  const from = 1649894400;
-  const to = from + 59 * 60 + 59;
+  // Build 48-hour window (from 00:00 today)
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
 
   // const currentDate = new Date().toISOString().split('T')[0];
   // TODO: remove this hardcoded date when the API will be able
-  const currentDate: string = '2022-04-14';
+  const currentDate: string = '2022-04-15';
 
   const handlePollenChange = (apiKey: PollenApiKey) => {
     setPollenSelected(apiKey);
@@ -102,7 +106,6 @@ export const ForecastMapContainer = () => {
           else if (value <= 200) value = 0.6;
           else if (value <= 400) value = 0.8;
           else value = 0.9;
-          // values.push({ long: lon, lat: lat, value });
           values.push([lat, long, value]);
         }
         i++;
@@ -110,92 +113,59 @@ export const ForecastMapContainer = () => {
     }
 
     allDataRef.current[hour] = values;
-    if (hour === selectedHour) setPollenData(values);
+    setPollenData(values);
   };
 
   const loadHour = async (hour: number) => {
-    if (!longitudes.length || !latitudes.length) return;
-    if (allDataRef.current[hour]) return;
-    setPartialLoading(true);
     setLoadingHour(hour);
-    const start = from + 60 * 60 * hour;
-    const end = to + 60 * 60 * hour;
 
-    try {
-      // const { data: res } = await getHourlyForecast({
-      //   date: currentDate,
-      //   // to: end,
-      //   pollen: POLLEN_TYPE,
-      // });
-      // addNewPollenData(res, longitudes, latitudes, hour);
-    } catch (err) {
-      console.error('Failed to load hour', hour, err);
-    } finally {
-      setPartialLoading(false);
-    }
-  };
+    // --- Handle 48h range logic ---
+    // Start from 00:00 today
+    // const now = new Date();
+    const now = new Date(currentDate);
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+    const todayStr = startOfToday.toISOString().split('T')[0];
 
-  const handleRegionChange = useCallback((box: number[]) => {
-    console.log('tete', box);
-    setCurrentBox(box);
-  }, []);
+    // Compute if the hour belongs to today or tomorrow
+    const isNextDay = hour >= 24;
+    const dateToUse = isNextDay
+      ? new Date(startOfToday.getTime() + 24 * 3600 * 1000)
+      : startOfToday;
 
-  const loadInitialData = async () => {
-    getForecastData({
-      date: currentDate,
-      hour: 0,
-      pollen: pollenSelected,
-      // box: "8.5,47.0,13.5,50.0",
-      // box: "9.01708984374985, 46.51390491298438, 13.982910156249787, 50.986455071208994",
-      box: '7.7893676757813735, 46.51390491298438, 15.210632324218798, 50.986455071208994',
-      // box: currentBox,
-      // box: "13.22,52,13.70,`53",
-      // intervals: "1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9",
-      includeCoords: true,
-    });
-  };
+    const dateStr = dateToUse.toISOString().split('T')[0];
+    const hourForApi = isNextDay ? hour - 24 : hour;
 
-  const getForecastData = async ({
-    date,
-    hour,
-    pollen,
-    box,
-    includeCoords,
-  }: {
-    date: string;
-    hour: number;
-    pollen: PollenApiKey;
-    box: string;
-    includeCoords: boolean;
-  }) => {
-    // setLoading(true, "Loading initial pollen data...");
     try {
       const {
         data: res,
         latitudes,
         longitudes,
       } = await getHourlyForecast({
-        date,
-        hour,
-        pollen,
-        box,
-        includeCoords,
+        date: dateStr,
+        hour: hourForApi,
+        pollen: pollenSelected,
+        // box: currentBox?.join(','),
+        box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
+        includeCoords: true,
       });
 
-      const longs = longitudes;
-      const lats = latitudes;
-      setLongitudes(longs);
-      setLatitudes(lats);
-      addNewPollenData(res, longs, lats, 0);
+      addNewPollenData(res, longitudes, latitudes, hour);
     } catch (err) {
-      console.error('Failed to load initial data', err);
+      console.error('Failed to load hour', hour, err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Slider
+  const handleRegionChange = useCallback((box: number[]) => {
+    setCurrentBox(box);
+  }, []);
 
+  // Handle hour change
   const handleSliderChange = async (hour: number) => {
     setPlaying(false);
     setSelectedHour(hour);
@@ -203,13 +173,12 @@ export const ForecastMapContainer = () => {
     setPollenData(allDataRef.current[hour] || []);
   };
 
-  // Play (Timeline)
-
+  // Playback
   useEffect(() => {
     if (!playing) return;
 
     const interval = setInterval(async () => {
-      const nextHour = (selectedHour + 1) % 49;
+      const nextHour = (selectedHour + 1) % 48;
       setSelectedHour(nextHour);
       await loadHour(nextHour);
       setPollenData(allDataRef.current[nextHour] || []);
@@ -218,13 +187,16 @@ export const ForecastMapContainer = () => {
     return () => clearInterval(interval);
   }, [playing, selectedHour]);
 
+  // Set current hour on mount
   useEffect(() => {
-    allDataRef.current = [];
-    if (currentBox) {
-      loadInitialData();
-    }
-  }, [currentBox]);
-
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffHours = Math.floor(
+      (now.getTime() - start.getTime()) / (1000 * 60 * 60)
+    );
+    setSelectedHour(diffHours);
+    loadHour(diffHours);
+  }, []);
   return (
     <div className="relative h-screen w-screen">
       {/* Main content */}
