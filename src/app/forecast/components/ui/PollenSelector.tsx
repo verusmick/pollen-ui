@@ -1,40 +1,48 @@
 "use client";
 
-import { usePollenStore } from "@/store/pollenStore";
+import { usePollenStore } from "@/app/forecast/stores/pollenStore";
 import { useState, useRef, useEffect } from "react";
 import { BiChevronDown } from "react-icons/bi";
 
-interface ForecastSelectorProps {
-  options: string[];
-  selected?: string;
-  onChange?: (value: string) => void;
+import {
+  POLLENS,
+  POLLEN_OPTIONS,
+  type PollenLabel,
+  type PollenApiKey,
+} from "@/app/forecast/constants";
+
+interface PollenSelectorProps {
+  onChange?: (value: PollenApiKey) => void;
   onToggle?: (open: boolean) => void;
 }
 
-export const PollenSelector = ({
-  options,
-  selected,
-  onChange,
-  onToggle,
-}: ForecastSelectorProps) => {
+export const PollenSelector = ({ onChange, onToggle }: PollenSelectorProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const selectedOption = usePollenStore((state) => state.selectedPollen);
-  const setSelectedOption = usePollenStore((state) => state.setSelectedPollen);
+  const selectedPollenApiKey = usePollenStore((state) => state.selectedPollen);
+  const setSelectedPollen = usePollenStore((state) => state.setSelectedPollen);
 
   // Notify parent after isOpen changes
   useEffect(() => {
     onToggle?.(isOpen);
   }, [isOpen, onToggle]);
 
-  const handleOptionClick = (option: string) => {
-    setSelectedOption(option);
-    onChange?.(option);
+  const handleOptionClick = (apiKey: PollenApiKey) => {
+    setSelectedPollen(apiKey);
+    onChange?.(apiKey);
     setIsOpen(false);
   };
 
   const handleToggle = () => setIsOpen((prev) => !prev);
+
+  // Get display label for selected pollen
+  const getSelectedLabel = (): PollenLabel => {
+    const pollen = Object.values(POLLENS).find(
+      (p) => p.apiKey === selectedPollenApiKey
+    );
+    return pollen?.label || POLLEN_OPTIONS[0];
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -68,12 +76,12 @@ export const PollenSelector = ({
       <button
         onClick={handleToggle}
         className="
-      w-full bg-card text-white px-2 py-1 flex justify-between items-center
-      rounded-md shadow-md text-base
-      transition cursor-pointer
-    "
+          w-full bg-card text-white px-2 py-1 flex justify-between items-center
+          rounded-md shadow-md text-base
+          transition cursor-pointer
+        "
       >
-        {selectedOption || options[0]}
+        {getSelectedLabel()}
         <BiChevronDown
           className={`w-4 h-4 text-white transform transition-transform ${
             isOpen ? "rotate-180" : "rotate-0"
@@ -83,17 +91,17 @@ export const PollenSelector = ({
 
       {isOpen && (
         <ul className="w-full bg-card rounded-lg shadow-lg max-h-60 overflow-auto border border-card mt-1 text-base">
-          {options.map((opt) => (
+          {Object.values(POLLENS).map((pollen) => (
             <li
-              key={opt}
-              onClick={() => handleOptionClick(opt)}
+              key={pollen.apiKey}
+              onClick={() => handleOptionClick(pollen.apiKey)}
               className={`cursor-pointer px-2 py-1 hover:bg-neutral-700/40 transition ${
-                opt === selectedOption
+                pollen.apiKey === selectedPollenApiKey
                   ? "font-semibold bg-neutral-700 text-white"
                   : "text-white"
               }`}
             >
-              {opt}
+              {pollen.label}
             </li>
           ))}
         </ul>

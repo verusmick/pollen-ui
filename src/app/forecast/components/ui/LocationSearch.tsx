@@ -1,5 +1,5 @@
 "use client";
-import { useSearchLocationStore } from "@/store/searchLocationStore";
+import { useSearchLocationStore } from "@/app/forecast/stores/searchLocationStore";
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useRef } from "react";
 import { BiSearch, BiX } from "react-icons/bi";
@@ -13,6 +13,7 @@ export const LocationSearch = ({
 }) => {
   const t = useTranslations("forecastPage.search");
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,7 +62,20 @@ export const LocationSearch = ({
     }
   }, [open]);
 
- // Function to select a suggestion
+  useEffect(() => {
+    if (highlightIndex >= 0 && listRef.current) {
+      const activeItem = listRef.current.children[
+        highlightIndex
+      ] as HTMLElement;
+      if(activeItem){
+        activeItem.scrollIntoView({
+          block:"nearest",
+          behavior:"smooth"
+        })
+      }
+    }
+  },[highlightIndex]);
+  // Function to select a suggestion
   const handleSelect = (item: any) => {
     const selected = {
       lat: parseFloat(item.lat),
@@ -134,7 +148,7 @@ export const LocationSearch = ({
 
       {/* Suggestions */}
       {suggestions.length > 0 && (
-        <ul className="list-none flex flex-col gap-1 max-h-[50vh] overflow-auto search-scroll">
+        <ul ref={listRef} className="list-none flex flex-col gap-1 max-h-[50vh] overflow-auto search-scroll">
           {suggestions.map((item, index) => {
             const display = item.display_name;
             const regex = new RegExp(`(${query})`, "gi");
@@ -155,7 +169,10 @@ export const LocationSearch = ({
               >
                 {parts.map((part: string, i: number) =>
                   part.toLowerCase() === query.toLowerCase() ? (
-                    <span key={i} className="underline font-bold text-indigo-400">
+                    <span
+                      key={i}
+                      className="underline font-bold text-indigo-400"
+                    >
                       {part}
                     </span>
                   ) : (

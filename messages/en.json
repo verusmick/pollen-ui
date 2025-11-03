@@ -18,14 +18,23 @@
       "description_card_location": "Click below to request permission to access your location.",
       "description_permission_granted": "Permission granted! You can now access location data.",
       "description_permission_denied": "Permission denied. Please enable it in browser settings.",
-      "title_button_location": "Request permission"
+      "title_button_location": "Your location",
+      "loading": "Getting location"
     },
     "legend": {
+      "legend_title": "Allergy level Range",
+      "none": "None",
+      "very_low":"Very low",
       "low": "Low",
       "moderate": "Moderate",
-      "medium": "Medium",
       "high": "High",
-      "very_high": "Very high"
+      "very_high": "Very high",
+      "none_leg": "No allergy risk",
+      "very_low_leg":"Very low allergy risk",
+      "low_leg": "Low allergy risk",
+      "moderate_leg": "Moderate allergy risk",
+      "high_leg": "High allergy risk",
+      "very_high_leg": "Very high allergy risk"
     }
   }
 }

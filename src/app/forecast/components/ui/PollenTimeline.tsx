@@ -1,32 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { FaPlay, FaPause } from "react-icons/fa";
-import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-
-const hours = [
-  "06:00",
-  "07:00",
-  "08:00",
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-  "18:00",
-  "19:00",
-  "20:00",
-  "21:00",
-  "22:00",
-  "23:00",
-  "00:00",
-  "01:00",
-  "02:00",
-];
+import { useEffect, useMemo, useRef } from 'react';
+import { FaPlay, FaPause } from 'react-icons/fa';
+import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 
 interface Props {
   setPlaying: (playing: boolean | ((p: boolean) => boolean)) => void;
@@ -43,10 +19,42 @@ export default function PollenTimeline({
 }: Props) {
   const barRef = useRef<HTMLDivElement>(null);
 
+  // Generate 48 hours starting from 00:00 today
+  const hours = useMemo(() => {
+    const now = new Date();
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
+    const list: { label: string; date: string; hour: number }[] = [];
+
+    for (let i = 0; i < 48; i++) {
+      const d = new Date(startOfToday.getTime() + i * 3600 * 1000);
+      const hourStr = d.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const dateStr = d.toLocaleDateString(undefined, {
+        day: '2-digit',
+        month: 'short',
+      });
+      list.push({ label: hourStr, date: dateStr, hour: i });
+    }
+    return list;
+  }, []);
+
+  // console.log('--->', hours);
+
+  // Scroll to active hour
   useEffect(() => {
     if (barRef.current) {
       const activeEl = barRef.current.children[activeHour] as HTMLElement;
-      activeEl?.scrollIntoView({ behavior: "smooth", inline: "center" });
+      activeEl?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
     }
   }, [activeHour]);
 
@@ -78,26 +86,32 @@ export default function PollenTimeline({
         >
           {hours.map((h, i) => (
             <div
-              key={h}
+              key={i}
               className="flex flex-col items-center relative min-w-[32px] sm:min-w-[40px] md:min-w-[48px] lg:min-w-[60px]"
             >
+              {/* Hour bar */}
               <div
                 className={`h-2 w-full rounded-sm ${
-                  i <= activeHour ? "bg-blue-500" : "bg-slate-700"
+                  i <= activeHour ? 'bg-blue-500' : 'bg-slate-700'
                 }`}
               />
+              {/* Hour label */}
               <span
                 className={`text-[10px] sm:text-[11px] md:text-[12px] mt-1 ${
                   i === activeHour
-                    ? "text-white font-semibold"
-                    : "text-gray-400"
+                    ? 'text-white font-semibold'
+                    : 'text-gray-400'
                 }`}
               >
-                {h}
+                {h.label}
               </span>
-              {/* Dividing line */}
-              <div className="absolute top-0 left-full h-4 w-[1px] bg-gray-700"></div>
-              {/* Overlay clicable */}
+              {/* Date label only when date changes */}
+              {(i === 0 || hours[i].date !== hours[i - 1]?.date) && (
+                <span className="text-[10px] text-gray-500 -mt-1">
+                  {h.date}
+                </span>
+              )}
+              {/* Clickable overlay */}
               <button
                 className="absolute inset-0 w-full h-full opacity-0"
                 onClick={() => onHourChange(i)}

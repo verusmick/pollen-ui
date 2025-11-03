@@ -1,48 +1,62 @@
-"use client";
-import { useMemo, useState, useEffect } from "react";
-import { DeckGL } from "@deck.gl/react";
-import { TileLayer } from "@deck.gl/geo-layers";
-import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
-import { BitmapLayer, IconLayer } from "@deck.gl/layers";
-import { FlyToInterpolator } from "@deck.gl/core";
+'use client';
 
-import bavariaGeo from "@/data/bavaria.geo.json";
-import germanyGeo from "@/data/germany.geo.json";
+import { useMemo, useState, useEffect } from 'react';
 
-import MapZoomControls from "./MapZoomControls";
-import MapTooltip from "./MapTooltip";
+import { DeckGL } from '@deck.gl/react';
+import { FlyToInterpolator } from '@deck.gl/core';
+import { TileLayer } from '@deck.gl/geo-layers';
+import {
+  GeoJsonLayer,
+  PolygonLayer,
+  BitmapLayer,
+  IconLayer,
+} from '@deck.gl/layers';
 
-import filterPointsInRegion from "../utils/filterPointsInRegion";
-import { useSearchLocationStore } from "@/store/searchLocationStore";
-import { usePollenDetailsChartStore } from "@/store/pollenDetailsChartStore";
+import type { Feature, FeatureCollection } from 'geojson';
 
-import type { Feature } from "geojson";
-import type { FeatureCollection } from "geojson";
-import { useCurrentLocationStore } from "@/store/currentLocationStore";
+import bavariaGeo from '@/data/bavaria.geo.json';
+import germanyGeo from '@/data/germany.geo.json';
+
+import {
+  useCurrentLocationStore,
+  usePollenDetailsChartStore,
+  useSearchLocationStore,
+} from '@/app/forecast/stores';
+   
+import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
+
+import filterPointsInRegion from '@/utils/filterPointsInRegion';
+import { getBoundsFromViewState, useDebounce } from '@/utils';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 const viewMapInitialState = {
-  longitude:11.5,
+  longitude: 11.5,
   latitude: 48.8,
   zoom: 7,
   minZoom: 5,
   maxZoom: 12,
 };
 
-export default function ForecastMap({ pollenData }: { pollenData: any }) {
+export default function ForecastMap({
+  pollenData,
+  onRegionChange,
+}: {
+  pollenData: any;
+  onRegionChange: (box: number[]) => void;
+}) {
   const [viewMapState, setViewMapState] = useState(viewMapInitialState);
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
     y: number;
   } | null>(null);
-
   const [pinIconMap, setPinIconMap] = useState<{
     lat: null | number;
     long: null | number;
   }>({ lat: null, long: null });
+  const [bounds, setBounds] = useState<number[] | null>(null);
 
   const {
     lat: searchLat,
@@ -58,10 +72,13 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   } = useCurrentLocationStore((state) => state);
   const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
 
+  const debouncedBounds = useDebounce(bounds, 300);
+
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
     const filteredPoints = filterPointsInRegion(pollenData, bavariaGeo);
+    // const filteredPoints = pollenData;
     // Create grid cells from filtered points
     return filteredPoints.map(([lat, lon, intensity = 0.5]) => {
       // Create a square quadrant around each point
@@ -84,7 +101,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   }, [pollenData]);
 
   const pollenGridCellsLayer = new PolygonLayer({
-    id: "pollen-grid",
+    id: 'pollen-grid',
     data: gridCells,
     getPolygon: (d: any) => d.polygon,
     getFillColor: (d: any) => {
@@ -137,13 +154,13 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
   const pinIconLayer =
     pinIconMap.lat && pinIconMap.long
       ? new IconLayer({
-          id: "search-marker",
+          id: 'search-marker',
           data: [{ position: [pinIconMap.long, pinIconMap.lat], name }],
-          getIcon: () => "marker",
+          getIcon: () => 'marker',
           getColor: (d) => [33, 33, 33],
           getPosition: (d) => d.position,
           getSize: () => 41,
-          iconAtlas: "/map_icon.png",
+          iconAtlas: '/map_icon.png',
           iconMapping: {
             marker: {
               x: 0,
@@ -153,7 +170,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
               anchorY: 128,
               mask: true,
             },
-            "marker-warning": {
+            'marker-warning': {
               x: 128,
               y: 0,
               width: 128,
@@ -168,8 +185,8 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
   // Free OpenStreetMap base layer
   const baseMapLayer = new TileLayer({
-    id: "base-map",
-    data: "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    id: 'base-map',
+    data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
     minZoom: 0,
     maxZoom: 19,
     tileSize: 256,
@@ -178,7 +195,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
       // Handle different types of bounding boxes
       const bounds: [number, number, number, number] =
-        "west" in bbox
+        'west' in bbox
           ? [bbox.west, bbox.south, bbox.east, bbox.north]
           : [bbox.left, bbox.bottom, bbox.right, bbox.top];
 
@@ -192,7 +209,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
 
   // Bavaria boundary
   const bavariaGeoJsonLayer = new GeoJsonLayer({
-    id: "bavaria-boundary",
+    id: 'bavaria-boundary',
     data: bavariaGeo as FeatureCollection,
     filled: false,
     stroked: true,
@@ -206,10 +223,10 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     const bavariaCoords = germanyGeo.features[0].geometry.coordinates;
 
     const maskPolygon: Feature = {
-      type: "Feature",
+      type: 'Feature',
       properties: {},
       geometry: {
-        type: "Polygon",
+        type: 'Polygon',
         coordinates: [
           // World bounds
           [
@@ -226,7 +243,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     };
 
     return new GeoJsonLayer({
-      id: "mask-layer",
+      id: 'mask-layer',
       data: [maskPolygon],
       filled: true,
       stroked: false,
@@ -234,22 +251,24 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
     });
   }, []);
 
-  const handleViewStateChange = (e: any) =>
-    setViewMapState({
-      ...(e.viewState as {
-        longitude: number;
-        latitude: number;
-        zoom: number;
-        minZoom: number;
-        maxZoom: number;
-      }),
-    });
+  const handleViewStateChange = (e: any) => {
+    const nextViewState = e.viewState;
+    setViewMapState(nextViewState);
+    const nextBounds = getBoundsFromViewState(nextViewState);
+    setBounds(nextBounds);
+  };
 
   const handleCursor = ({ isDragging, isHovering }: any) => {
-    if (isDragging) return "grabbing";
-    if (isHovering) return "pointer";
-    return "grab";
+    if (isDragging) return 'grabbing';
+    if (isHovering) return 'pointer';
+    return 'grab';
   };
+
+  useEffect(() => {
+    if (debouncedBounds && onRegionChange) {
+      onRegionChange(debouncedBounds);
+    }
+  }, [debouncedBounds, onRegionChange]);
 
   // watcher to check the properties of the map
   useEffect(() => {
@@ -296,7 +315,7 @@ export default function ForecastMap({ pollenData }: { pollenData: any }) {
           pollenGridCellsLayer,
           pinIconLayer,
         ]}
-        style={{ width: "100vw", height: "100vh", cursor: "pointer" }}
+        style={{ width: '100vw', height: '100vh', cursor: 'pointer' }}
         viewState={viewMapState}
         // This is triggered when the hand move the map
         onViewStateChange={handleViewStateChange}
