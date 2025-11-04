@@ -32,7 +32,6 @@ import {
   type PollenApiKey,
 } from '@/app/forecast/constants';
 import { useHourlyForecast } from '../hooks/useHourlyForecast';
-import { useQueryClient } from '@tanstack/react-query';
 
 const PollenDetailsChart = dynamic(
   () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
@@ -81,8 +80,15 @@ export const ForecastMapContainer = () => {
   // const currentDate = new Date().toISOString().split('T')[0];
   // TODO: remove this hardcoded date when the API will be able
   const currentDate: string = '2022-04-15';
-  const queryClient = useQueryClient();
-
+  const { data } = useHourlyForecast({
+    date: currentDate,
+    hour: 2,
+    pollen: pollenSelected,
+    // box: currentBox?.join(','),
+    box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
+    includeCoords: true,
+  });
+  
   const handlePollenChange = (apiKey: PollenApiKey) => {
     setPollenSelected(apiKey);
   };
@@ -122,13 +128,18 @@ export const ForecastMapContainer = () => {
   const loadHour = async (hour: number) => {
     setLoadingHour(hour);
 
+    // --- Handle 48h range logic ---
+    // Start from 00:00 today
+    // const now = new Date();
     const now = new Date(currentDate);
     const startOfToday = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate()
     );
+    const todayStr = startOfToday.toISOString().split('T')[0];
 
+    // Compute if the hour belongs to today or tomorrow
     const isNextDay = hour >= 24;
     const dateToUse = isNextDay
       ? new Date(startOfToday.getTime() + 24 * 3600 * 1000)
@@ -137,32 +148,21 @@ export const ForecastMapContainer = () => {
     const dateStr = dateToUse.toISOString().split('T')[0];
     const hourForApi = isNextDay ? hour - 24 : hour;
 
-    const params = {
-      date: dateStr,
-      hour: hourForApi,
-      pollen: pollenSelected,
-      box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
-      includeCoords: true,
-    };
-
     try {
-      //Check if it's already cached
-      let cached = queryClient.getQueryData(['hourlyForecast', params]);
+      const {
+        data: res,
+        latitudes,
+        longitudes,
+      } = await getHourlyForecast({
+        date: dateStr,
+        hour: hourForApi,
+        pollen: pollenSelected,
+        // box: currentBox?.join(','),
+        box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
+        includeCoords: true,
+      });
 
-      //If it's not there, it retrieves and caches it
-      if (!cached) {
-        cached = await queryClient.fetchQuery({
-          queryKey: ['hourlyForecast', params],
-          queryFn: () => getHourlyForecast(params),
-          staleTime: 1000 * 60 * 10,
-        });
-      }
-
-      // Use data (cached or new)
-      if (cached) {
-        const { data: res, latitudes, longitudes } = cached;
-        addNewPollenData(res, longitudes, latitudes, hour);
-      }
+      addNewPollenData(res, longitudes, latitudes, hour);
     } catch (err) {
       console.error('Failed to load hour', hour, err);
     } finally {

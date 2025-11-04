@@ -1,5 +1,3 @@
-'use client';
-
 import { useQuery } from '@tanstack/react-query';
 import { getHourlyForecast } from '@/lib/api/forecast';
 import type { PollenApiKey } from '@/app/forecast/constants';
