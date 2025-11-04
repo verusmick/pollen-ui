@@ -31,6 +31,7 @@ import {
   DEFAULT_POLLEN_API_KEY,
   type PollenApiKey,
 } from '@/app/forecast/constants';
+import { useHourlyForecast } from '../hooks/useHourlyForecast';
 
 const PollenDetailsChart = dynamic(
   () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
@@ -79,7 +80,15 @@ export const ForecastMapContainer = () => {
   // const currentDate = new Date().toISOString().split('T')[0];
   // TODO: remove this hardcoded date when the API will be able
   const currentDate: string = '2022-04-15';
-
+  const { data } = useHourlyForecast({
+    date: currentDate,
+    hour: 2,
+    pollen: pollenSelected,
+    // box: currentBox?.join(','),
+    box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
+    includeCoords: true,
+  });
+  
   const handlePollenChange = (apiKey: PollenApiKey) => {
     setPollenSelected(apiKey);
   };
