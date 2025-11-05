@@ -1,48 +1,43 @@
-"use client";
-
-import { usePollenStore } from "@/app/forecast/stores/pollenStore";
-import { useState, useRef, useEffect } from "react";
-import { BiChevronDown } from "react-icons/bi";
+'use client';
+import { useState, useRef, useEffect } from 'react';
+import { BiChevronDown } from 'react-icons/bi';
 
 import {
-  POLLENS,
-  POLLEN_OPTIONS,
-  type PollenLabel,
-  type PollenApiKey,
-} from "@/app/forecast/constants";
+  POLLEN_ENTRIES,
+  type PollenConfig,
+  DEFAULT_POLLEN,
+} from '@/app/forecast/constants';
 
 interface PollenSelectorProps {
-  onChange?: (value: PollenApiKey) => void;
+  value?: PollenConfig;
+  onChange?: (value: PollenConfig) => void;
   onToggle?: (open: boolean) => void;
 }
 
-export const PollenSelector = ({ onChange, onToggle }: PollenSelectorProps) => {
+export const PollenSelector = ({
+  value = DEFAULT_POLLEN,
+  onChange,
+  onToggle,
+}: PollenSelectorProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [selected, setSelected] = useState<PollenConfig>(value);
 
-  const selectedPollenApiKey = usePollenStore((state) => state.selectedPollen);
-  const setSelectedPollen = usePollenStore((state) => state.setSelectedPollen);
+  useEffect(() => {
+    setSelected(value);
+  }, [value]);
 
-  // Notify parent after isOpen changes
   useEffect(() => {
     onToggle?.(isOpen);
   }, [isOpen, onToggle]);
 
-  const handleOptionClick = (apiKey: PollenApiKey) => {
-    setSelectedPollen(apiKey);
-    onChange?.(apiKey);
+  const handleOptionClick = (pollen: PollenConfig) => {
+    setSelected(pollen);
+    onChange?.(pollen);
     setIsOpen(false);
   };
 
   const handleToggle = () => setIsOpen((prev) => !prev);
-
-  // Get display label for selected pollen
-  const getSelectedLabel = (): PollenLabel => {
-    const pollen = Object.values(POLLENS).find(
-      (p) => p.apiKey === selectedPollenApiKey
-    );
-    return pollen?.label || POLLEN_OPTIONS[0];
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,8 +48,8 @@ export const PollenSelector = ({ onChange, onToggle }: PollenSelectorProps) => {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
@@ -81,27 +76,33 @@ export const PollenSelector = ({ onChange, onToggle }: PollenSelectorProps) => {
           transition cursor-pointer
         "
       >
-        {getSelectedLabel()}
+        {selected.label}
         <BiChevronDown
           className={`w-4 h-4 text-white transform transition-transform ${
-            isOpen ? "rotate-180" : "rotate-0"
+            isOpen ? 'rotate-180' : 'rotate-0'
           }`}
         />
       </button>
 
       {isOpen && (
         <ul className="w-full bg-card rounded-lg shadow-lg max-h-60 overflow-auto border border-card mt-1 text-base">
-          {Object.values(POLLENS).map((pollen) => (
+          {POLLEN_ENTRIES.map(({ key, label, apiKey, defaultBaseDate }) => (
             <li
-              key={pollen.apiKey}
-              onClick={() => handleOptionClick(pollen.apiKey)}
+              key={apiKey}
+              onClick={() =>
+                handleOptionClick({
+                  apiKey,
+                  label,
+                  defaultBaseDate,
+                } as PollenConfig)
+              }
               className={`cursor-pointer px-2 py-1 hover:bg-neutral-700/40 transition ${
-                pollen.apiKey === selectedPollenApiKey
-                  ? "font-semibold bg-neutral-700 text-white"
-                  : "text-white"
+                apiKey === selected.apiKey
+                  ? 'font-semibold bg-neutral-700 text-white'
+                  : 'text-white'
               }`}
             >
-              {pollen.label}
+              {label}
             </li>
           ))}
         </ul>
