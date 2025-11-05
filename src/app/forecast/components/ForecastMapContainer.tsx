@@ -88,7 +88,7 @@ export const ForecastMapContainer = () => {
     box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
     includeCoords: true,
   });
-  
+
   const handlePollenChange = (apiKey: PollenApiKey) => {
     setPollenSelected(apiKey);
   };
@@ -212,6 +212,8 @@ export const ForecastMapContainer = () => {
       <ForecastMap
         pollenData={pollenData}
         onRegionChange={handleRegionChange}
+        pollenSelected={pollenSelected}
+        currentDate={currentDate}
       />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>

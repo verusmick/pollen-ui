@@ -22,11 +22,16 @@ import {
   usePollenDetailsChartStore,
   useSearchLocationStore,
 } from '@/app/forecast/stores';
-   
+
 import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
+import {
+  fetchChartData,
+  getLatitudes,
+  getLongitudes,
+} from '@/lib/api/forecast';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -42,8 +47,12 @@ const viewMapInitialState = {
 export default function ForecastMap({
   pollenData,
   onRegionChange,
+  pollenSelected,
+  currentDate,
 }: {
   pollenData: any;
+  pollenSelected: string;
+  currentDate: string;
   onRegionChange: (box: number[]) => void;
 }) {
   const [viewMapState, setViewMapState] = useState(viewMapInitialState);
@@ -100,6 +109,21 @@ export default function ForecastMap({
     });
   }, [pollenData]);
 
+  function findClosestValue(value: number, array: number[]) {
+    let closest = array[0];
+    let minDist = Math.abs(value - closest);
+
+    for (const v of array) {
+      const dist = Math.abs(value - v);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = v;
+      }
+    }
+
+    return closest;
+  }
+
   const pollenGridCellsLayer = new PolygonLayer({
     id: 'pollen-grid',
     data: gridCells,
@@ -134,19 +158,28 @@ export default function ForecastMap({
       //   setTooltipInfo(null); // Hide tooltip when not hovering
       // }
     },
-    onClick: (info: any) => {
-      // Show tooltip on hover
-      if (info.object) {
-        clearCurrentLocation();
-        setPinIconMap({ lat: info.coordinate[1], long: info.coordinate[0] });
-        setShowPollenDetailsChart(true);
-        // setTooltipInfo({
-        //   object: info.object,
-        //   x: info.x,
-        //   y: info.y,
-        // });
-      } else {
-        // setTooltipInfo(null); // Hide tooltip when not hovering
+    onClick: async (info: any) => {
+      if (!info.object) return;
+      const clickLat = info.coordinate[1];
+      const clickLon = info.coordinate[0];
+      try {
+        const [latitudes, longitudes] = await Promise.all([
+          getLatitudes(),
+          getLongitudes(),
+        ]);
+        const closestLat = findClosestValue(clickLat, latitudes);
+        const closestLon = findClosestValue(clickLon, longitudes);
+        setPinIconMap({ lat: closestLat, long: closestLon });
+        const chartData = await fetchChartData({
+          lat: closestLat,
+          lon: closestLon,
+          pollen: pollenSelected,
+          date: currentDate,
+          hour: 21,
+        });
+        console.log("chardata", chartData)
+      } catch (err) {
+        console.error('Error fetching chart data:', err);
       }
     },
   });
