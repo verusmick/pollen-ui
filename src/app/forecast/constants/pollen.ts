@@ -2,14 +2,17 @@ export const POLLENS = {
   BIRCH: {
     apiKey: 'POLLEN_BIRCH' as const,
     label: 'Birch' as const,
+    defaultBaseDate: '2022-04-15', // fallback test data
   },
   GRASS: {
     apiKey: 'POLLEN_GRASS' as const,
     label: 'Grass' as const,
+    defaultBaseDate: '2023-06-01',
   },
   ALDER: {
     apiKey: 'POLLEN_ALDER' as const,
     label: 'Alder' as const,
+    defaultBaseDate: '2024-02-14',
   },
 } as const;
 

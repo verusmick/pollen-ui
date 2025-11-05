@@ -31,6 +31,7 @@ export default function PollenTimeline({
       0,
       0
     );
+
     const list: { label: string; date: string; hour: number }[] = [];
 
     for (let i = 0; i < 48; i++) {
@@ -47,8 +48,6 @@ export default function PollenTimeline({
     }
     return list;
   }, []);
-
-  // console.log('--->', hours);
 
   // Scroll to active hour
   useEffect(() => {
