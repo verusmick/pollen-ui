@@ -46,7 +46,6 @@ export const ForecastMapContainer = () => {
 
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
-
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number]>
   >([]);
@@ -164,6 +163,11 @@ export const ForecastMapContainer = () => {
 
     return () => clearInterval(interval);
   }, [playing, pollenSelected.apiKey]);
+
+  useEffect(() => {
+    if (!mapDataIsLoading) setLoading(false);
+    // if (!loading) setPartialLoading(mapDataIsLoading);
+  }, [mapDataIsLoading]);
 
   useEffect(() => {
     if (!mapData) return;
