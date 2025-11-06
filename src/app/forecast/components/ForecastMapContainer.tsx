@@ -84,6 +84,7 @@ export const ForecastMapContainer = () => {
   } = useHourlyForecast(forecastParams);
 
   const handlePollenChange = (newPollen: PollenConfig) => {
+    setPartialLoading(true);
     setPollenSelected(newPollen);
   };
 
@@ -128,6 +129,7 @@ export const ForecastMapContainer = () => {
       // });
 
       setPollenData(values);
+      setPartialLoading(false);
     },
     []
   );
@@ -183,6 +185,7 @@ export const ForecastMapContainer = () => {
     if (allDataRef.current[pollenKey]?.[selectedHour]) {
       const cached = JSON.parse(allDataRef.current[pollenKey][selectedHour]);
       setPollenData(cached);
+      setPartialLoading(false);
       return;
     }
 
