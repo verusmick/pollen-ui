@@ -1,5 +1,6 @@
 'use client';
 
+import dayjs from 'dayjs';
 import { useEffect, useMemo, useRef } from 'react';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
@@ -9,6 +10,7 @@ interface Props {
   playing: boolean;
   activeHour: number;
   onHourChange: (hour: number) => void;
+  baseDate: string;
 }
 
 export default function PollenTimeline({
@@ -16,38 +18,24 @@ export default function PollenTimeline({
   activeHour,
   onHourChange,
   playing,
+  baseDate,
 }: Props) {
   const barRef = useRef<HTMLDivElement>(null);
 
   // Generate 48 hours starting from 00:00 today
   const hours = useMemo(() => {
-    const now = new Date();
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      0,
-      0,
-      0,
-      0
-    );
-
+    const startOfDay = new Date(baseDate + 'T00:00:00');
     const list: { label: string; date: string; hour: number }[] = [];
 
     for (let i = 0; i < 48; i++) {
-      const d = new Date(startOfToday.getTime() + i * 3600 * 1000);
-      const hourStr = d.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      const dateStr = d.toLocaleDateString(undefined, {
-        day: '2-digit',
-        month: 'short',
-      });
+      const d = new Date(startOfDay.getTime() + i * 3600 * 1000);
+      const hourStr = dayjs(d).format('HH:mm');
+      const dateStr = dayjs(d).format('MMM D, YYYY');
+
       list.push({ label: hourStr, date: dateStr, hour: i });
     }
     return list;
-  }, []);
+  }, [baseDate]);
 
   // Scroll to active hour
   useEffect(() => {
