@@ -63,11 +63,11 @@ export const ForecastMapContainer = () => {
 
   // const currentDate = new Date().toISOString().split('T')[0];
   // TODO: remove this hardcoded date when the API will be able
-  const currentDate: string = pollenSelected.defaultBaseDate;
+  // const currentDate: string = pollenSelected.defaultBaseDate;
 
   const forecastParams = useMemo(
     () => ({
-      date: currentDate,
+      date: pollenSelected.defaultBaseDate,
       hour: selectedHour,
       pollen: pollenSelected.apiKey,
       box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
@@ -238,6 +238,7 @@ export const ForecastMapContainer = () => {
           playing={playing}
           activeHour={selectedHour}
           onHourChange={handleSliderChange}
+          baseDate={pollenSelected.defaultBaseDate}
         />
       </div>
       <div

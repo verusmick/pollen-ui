@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
 
 import { getHourlyForecast } from '@/lib/api/forecast';
@@ -13,27 +14,15 @@ export function useHourlyForecast(params: {
   intervals?: string
 }) {
   const normalizedParams = useMemo(() => {
-    const now = new Date(params.date);
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate()
-    );
-
-    const isNextDay = params.hour >= 24;
-    const dateToUse = isNextDay
-      ? new Date(startOfToday.getTime() + 24 * 3600 * 1000)
-      : startOfToday;
-
-    const dateStr = dateToUse.toISOString().split('T')[0];
-    const hourForApi = isNextDay ? params.hour - 24 : params.hour;
+    const dateToUse = dayjs(params.date + 'T00:00:00')
+      .add(params.hour >= 24 ? 1 : 0, 'day');
 
     return {
       ...params,
-      date: dateStr,
-      hour: hourForApi,
+      date: dateToUse.format('YYYY-MM-DD'),
+      hour: params.hour % 24,
     };
-  }, [params.date, params.hour, params.pollen, params.box, params.includeCoords, params.intervals]);
+  }, [params]);
   return useQuery({
     queryKey: ['hourlyForecast', normalizedParams],
     queryFn: () => getHourlyForecast(normalizedParams),
