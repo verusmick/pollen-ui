@@ -5,8 +5,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
-import { getHourlyForecast } from '@/lib/api/forecast';
-
 import {
   useLoadingStore,
   usePartialLoadingStore,
@@ -27,10 +25,7 @@ import {
   PollenTimeline,
 } from '@/app/forecast/components';
 
-import {
-  DEFAULT_POLLEN_API_KEY,
-  type PollenApiKey,
-} from '@/app/forecast/constants';
+import { DEFAULT_POLLEN, type PollenConfig } from '@/app/forecast/constants';
 import { useHourlyForecast } from '../hooks/useHourlyForecast';
 
 const PollenDetailsChart = dynamic(
@@ -48,16 +43,12 @@ export const ForecastMapContainer = () => {
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
 
-  const [pollenSelected, setPollenSelected] = useState<PollenApiKey>(
-    DEFAULT_POLLEN_API_KEY
-  );
+  const [pollenSelected, setPollenSelected] =
+    useState<PollenConfig>(DEFAULT_POLLEN);
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number]>
   >([]);
 
-  const [selectedHour, setSelectedHour] = useState(0);
-  const [loadingHour, setLoadingHour] = useState(0);
-  const [playing, setPlaying] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{
@@ -69,28 +60,28 @@ export const ForecastMapContainer = () => {
   const legendCardRef = useRef<HTMLDivElement>(null);
   const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
 
-  // Build 48-hour window (from 00:00 today)
-  const now = new Date();
-  const startOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate()
-  );
-
   // const currentDate = new Date().toISOString().split('T')[0];
   // TODO: remove this hardcoded date when the API will be able
-  const currentDate: string = '2022-04-15';
-  const { data } = useHourlyForecast({
+  const currentDate: string = pollenSelected.defaultBaseDate;
+
+  const [playing, setPlaying] = useState(false);
+  const [selectedHour, setSelectedHour] = useState(0);
+
+  const {
+    data: mapData,
+    isFetching,
+    isLoading: mapDataIsLoading,
+  } = useHourlyForecast({
     date: currentDate,
-    hour: 2,
-    pollen: pollenSelected,
+    hour: selectedHour,
+    pollen: pollenSelected.apiKey,
     // box: currentBox?.join(','),
     box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
     includeCoords: true,
   });
 
-  const handlePollenChange = (apiKey: PollenApiKey) => {
-    setPollenSelected(apiKey);
+  const handlePollenChange = (newPollen: PollenConfig) => {
+    setPollenSelected(newPollen);
   };
 
   const addNewPollenData = (
@@ -125,60 +116,23 @@ export const ForecastMapContainer = () => {
     setPollenData(values);
   };
 
-  const loadHour = async (hour: number) => {
-    setLoadingHour(hour);
-
-    // --- Handle 48h range logic ---
-    // Start from 00:00 today
-    // const now = new Date();
-    const now = new Date(currentDate);
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate()
-    );
-    const todayStr = startOfToday.toISOString().split('T')[0];
-
-    // Compute if the hour belongs to today or tomorrow
-    const isNextDay = hour >= 24;
-    const dateToUse = isNextDay
-      ? new Date(startOfToday.getTime() + 24 * 3600 * 1000)
-      : startOfToday;
-
-    const dateStr = dateToUse.toISOString().split('T')[0];
-    const hourForApi = isNextDay ? hour - 24 : hour;
-
-    try {
-      const {
-        data: res,
-        latitudes,
-        longitudes,
-      } = await getHourlyForecast({
-        date: dateStr,
-        hour: hourForApi,
-        pollen: pollenSelected,
-        // box: currentBox?.join(','),
-        box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
-        includeCoords: true,
-      });
-
-      addNewPollenData(res, longitudes, latitudes, hour);
-    } catch (err) {
-      console.error('Failed to load hour', hour, err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleRegionChange = useCallback((box: number[]) => {
     setCurrentBox(box);
   }, []);
+
+  const setCurrentHourOnMount = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffHours = Math.floor(
+      (now.getTime() - start.getTime()) / (1000 * 60 * 60)
+    );
+    handleSliderChange(diffHours);
+  };
 
   // Handle hour change
   const handleSliderChange = async (hour: number) => {
     setPlaying(false);
     setSelectedHour(hour);
-    await loadHour(hour);
     setPollenData(allDataRef.current[hour] || []);
   };
 
@@ -189,30 +143,37 @@ export const ForecastMapContainer = () => {
     const interval = setInterval(async () => {
       const nextHour = (selectedHour + 1) % 48;
       setSelectedHour(nextHour);
-      await loadHour(nextHour);
       setPollenData(allDataRef.current[nextHour] || []);
     }, 1000);
 
     return () => clearInterval(interval);
   }, [playing, selectedHour]);
 
-  // Set current hour on mount
   useEffect(() => {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const diffHours = Math.floor(
-      (now.getTime() - start.getTime()) / (1000 * 60 * 60)
-    );
-    setSelectedHour(diffHours);
-    loadHour(diffHours);
+    if (!mapDataIsLoading) setLoading(false);
+    // if (!loading) setPartialLoading(mapDataIsLoading);
+  }, [mapDataIsLoading]);
+
+  useEffect(() => {
+    if (mapData) {
+      const { data, longitudes, latitudes } = mapData;
+      addNewPollenData(data, longitudes, latitudes, selectedHour);
+    }
+  }, [mapData]);
+
+  // init
+  useEffect(() => {
+    // set Current Hour On Mount
+    setCurrentHourOnMount();
   }, []);
+
   return (
     <div className="relative h-screen w-screen">
       {/* Main content */}
       <ForecastMap
         pollenData={pollenData}
         onRegionChange={handleRegionChange}
-        pollenSelected={pollenSelected}
+        pollenSelected={pollenSelected.apiKey}
         currentDate={currentDate}
       />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
@@ -239,10 +200,12 @@ export const ForecastMapContainer = () => {
         )}
       </div>
       <span className="absolute top-18 z-50">
-        <PollenSelector onChange={handlePollenChange} />
+        <PollenSelector value={pollenSelected} onChange={handlePollenChange} />
       </span>
       {!selectorOpen && showPollenDetailsChart && (
-        <PollenDetailsChart onClose={() => setShowPollenDetailsChart(false)} />
+        <PollenDetailsChart
+          onClose={() => setShowPollenDetailsChart(false, '', null, null, null)}
+        />
       )}
       <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline

@@ -19,6 +19,7 @@ import germanyGeo from '@/data/germany.geo.json';
 
 import {
   useCurrentLocationStore,
+  usePartialLoadingStore,
   usePollenDetailsChartStore,
   useSearchLocationStore,
 } from '@/app/forecast/stores';
@@ -27,6 +28,7 @@ import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
+import { findClosestValue } from '@/app/forecast/utils';
 import {
   fetchChartData,
   getLatitudes,
@@ -56,6 +58,7 @@ export default function ForecastMap({
   onRegionChange: (box: number[]) => void;
 }) {
   const [viewMapState, setViewMapState] = useState(viewMapInitialState);
+  const { chartLoading, setChartLoading } = usePartialLoadingStore();
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
@@ -109,21 +112,6 @@ export default function ForecastMap({
     });
   }, [pollenData]);
 
-  function findClosestValue(value: number, array: number[]) {
-    let closest = array[0];
-    let minDist = Math.abs(value - closest);
-
-    for (const v of array) {
-      const dist = Math.abs(value - v);
-      if (dist < minDist) {
-        minDist = dist;
-        closest = v;
-      }
-    }
-
-    return closest;
-  }
-
   const pollenGridCellsLayer = new PolygonLayer({
     id: 'pollen-grid',
     data: gridCells,
@@ -160,16 +148,22 @@ export default function ForecastMap({
     },
     onClick: async (info: any) => {
       if (!info.object) return;
+
       const clickLat = info.coordinate[1];
       const clickLon = info.coordinate[0];
+
       try {
+        setChartLoading(true);
+        setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
         const [latitudes, longitudes] = await Promise.all([
           getLatitudes(),
           getLongitudes(),
         ]);
         const closestLat = findClosestValue(clickLat, latitudes);
         const closestLon = findClosestValue(clickLon, longitudes);
+
         setPinIconMap({ lat: closestLat, long: closestLon });
+
         const chartData = await fetchChartData({
           lat: closestLat,
           lon: closestLon,
@@ -177,9 +171,19 @@ export default function ForecastMap({
           date: currentDate,
           hour: 21,
         });
-        console.log("chardata", chartData)
+
+        // Guardamos datos + lat/lon en el store
+        setShowPollenDetailsChart(
+          true,
+          '',
+          chartData.data,
+          closestLat,
+          closestLon
+        );
       } catch (err) {
-        console.error('Error fetching chart data:', err);
+        console.error(err);
+      } finally {
+        setChartLoading(false);
       }
     },
   });
