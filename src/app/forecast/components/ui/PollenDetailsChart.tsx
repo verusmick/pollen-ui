@@ -22,32 +22,46 @@ interface PollenData {
   value: number | null;
 }
 
-export const PollenDetailsChart = ({ onClose }: { onClose?: () => void }) => {
+export const PollenDetailsChart = ({
+  onClose,
+  currentDate,
+}: {
+  onClose?: () => void;
+  currentDate: string;
+}) => {
   const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
   const { chartLoading } = usePartialLoadingStore();
   const [data, setData] = useState<PollenData[]>([]);
   const [locationName, setLocationName] = useState();
-  useEffect(() => {
-    if (!chartData) return;
 
-    const now = new Date();
+  useEffect(() => {
+    if (!chartData || !currentDate) return;
+
+    // Parse currentDate "YYYY-MM-DD" a Date
+    const [year, month, day] = currentDate.split('-').map(Number);
+    const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+
     const hoursInterval = 1;
 
     const updatedData = chartData.map((v: string | number, i: number) => ({
-      timestamp: now.getTime() + i * hoursInterval * 60 * 60 * 1000,
+      timestamp: startOfDay.getTime() + i * hoursInterval * 60 * 60 * 1000,
       value:
         typeof v === 'number' ? v : isNaN(parseInt(v)) ? null : parseInt(v),
     }));
 
     setData(updatedData);
-  }, [chartData]);
-
-  const getColorByValue = (value: number) => {
-    if (value >= 100) return '#ff0000';
-    if (value >= 70) return '#f27200';
-    if (value >= 50) return '#ebbb02';
-    if (value >= 25) return '#a5eb02';
-    return '#00e838';
+  }, [chartData, currentDate]);
+  const levels = [
+    { key: 'none', color: '#ffffff', max: 0 },
+    { key: 'very_low', color: '#00e838', max: 24 },
+    { key: 'low', color: '#a5eb02', max: 49 },
+    { key: 'moderate', color: '#ebbb02', max: 69 },
+    { key: 'high', color: '#f27200', max: 99 },
+    { key: 'very_high', color: '#ff0000', max: Infinity },
+  ];
+  const getLevelByValue = (value: number | null) => {
+    if (value === null) return levels[0]; // "none"
+    return levels.find((l) => value <= l.max) || levels[levels.length - 1];
   };
 
   const CustomTick = ({ x, y, payload }: any) => {
@@ -55,12 +69,15 @@ export const PollenDetailsChart = ({ onClose }: { onClose?: () => void }) => {
     if (!item) return null;
 
     const date = new Date(item.timestamp);
+
+    // Hora en formato HH:00
     const hourLabel = `${date.getHours().toString().padStart(2, '0')}:00`;
-    const dateLabel = date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    });
+
+    // Fecha en formato 02 Jun 2023 en inglés
+    const day = date.getDate().toString().padStart(2, '0');
+    const monthShort = date.toLocaleString('en-US', { month: 'short' });
+    const year = date.getFullYear();
+    const dateLabel = `${day} ${monthShort} ${year}`;
 
     return (
       <g transform={`translate(${x},${y})`}>
@@ -80,6 +97,7 @@ export const PollenDetailsChart = ({ onClose }: { onClose?: () => void }) => {
       </g>
     );
   };
+
   useEffect(() => {
     if (!latitude || !longitude) return;
     const fetchLocationName = async () => {
@@ -87,114 +105,122 @@ export const PollenDetailsChart = ({ onClose }: { onClose?: () => void }) => {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
       );
       const data = await res.json();
-      setLocationName(data.display_name);
+      const { road, suburb, city, town, village, country } = data.address;
+      const shortName = [road, suburb || city || town || village, country]
+        .filter(Boolean)
+        .join(', ');
+      setLocationName(shortName);
     };
     fetchLocationName();
   }, [latitude, longitude]);
+
   return (
     <div
       className="absolute 2xl:top-44 md:top-40 left-4 2xl:left-10 md:left-8
-              bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-60
-              flex flex-col overflow-hidden search-scroll"
+                    bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-65
+                    flex flex-col overflow-hidden"
     >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-2">
-        <div
-          className="flex items-center gap-2 text-white text-xs md:text-sm font-semibold truncate max-w-[80%]"
-          title={
-            locationName || `${latitude?.toFixed(3)}, ${longitude?.toFixed(3)}`
-          }
-        >
-          <span>📍</span>
-          <span className="truncate">
-            {locationName ||
-              `${latitude?.toFixed(3)}, ${longitude?.toFixed(3)}`}
+      <div className="relative flex-1 w-full h-full">
+        <div className="flex flex-col gap-1 text-white">
+          {locationName && (
+            <span
+              className="text-xs font-semibold text-white block truncate"
+              title={locationName}
+            >
+              📍 {locationName}
+            </span>
+          )}
+          <span className="text-xs text-gray-400">
+            Lat: {latitude?.toFixed(3)} | Lon: {longitude?.toFixed(3)}
           </span>
         </div>
 
         <button
-          className="rounded-full hover:bg-gray-800 transition-colors p-0.5"
+          className="absolute top-0 right-0 rounded-full hover:bg-gray-800 transition-colors"
           onClick={onClose}
         >
           <BiX size={20} className="text-white" />
         </button>
-      </div>
 
-      {/* Chart content */}
-      <div className="relative flex-1 w-full h-full overflow-x-auto">
         {chartLoading ? (
           <div className="flex justify-center items-center h-full">
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
         ) : (
-          <ResponsiveContainer width={data.length * 60} height="100%">
-            <LineChart
-              data={data}
-              margin={{ top: 20, right: 20, bottom: 10, left: -25 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#fff"
-                vertical
-                horizontal
-                opacity={0.3}
-              />
-              <XAxis
-                dataKey="timestamp"
-                tick={<CustomTick />}
-                interval={0}
-                tickLine={false}
-              />
-              <YAxis style={{ fontSize: 10, fill: '#fff' }} tickLine={false} />
-              <Tooltip
-                content={({ active, payload, coordinate }) => {
-                  if (active && payload && payload.length) {
-                    const value = payload[0].value;
-                    const x = coordinate?.x ?? 0;
+          <div className="overflow-x-auto w-full h-[20vh] search-scroll">
+            <ResponsiveContainer minWidth={data.length * 60} height="100%">
+              <LineChart
+                data={data}
+                margin={{ top: 35, right: 20, bottom: 5, left: -25 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#fff"
+                  vertical
+                  horizontal
+                  opacity={0.3}
+                />
+                <XAxis
+                  dataKey="timestamp"
+                  tick={<CustomTick />}
+                  interval={0}
+                  tickLine={false}
+                />
+                <YAxis
+                  style={{ fontSize: 10, fill: '#fff' }}
+                  tickLine={false}
+                />
+                <Tooltip
+                  content={({ active, payload, coordinate }) => {
+                    if (active && payload && payload.length) {
+                      const value = payload[0].value;
+                      const x = coordinate?.x ?? 0;
+                      return (
+                        <div
+                          className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
+                                     text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
+                          style={{ left: x, top: 0 }}
+                        >
+                          <div className="font-bold text-center text-[9px]">
+                            {value ?? 'NA'}
+                          </div>
+                          <div className="text-[8px] text-gray-300">
+                            Pollen/m³
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#fff"
+                  dot={({ cx, cy, value, index }) => {
+                    if (value === null) return null;
+                    const level = getLevelByValue(value);
                     return (
-                      <div
-                        className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
-                               text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
-                        style={{ left: x, top: 0 }}
-                      >
-                        <div className="font-bold text-center">
-                          {value ?? 'NA'}
-                        </div>
-                        <div className="text-[9px] text-gray-300">
-                          Pollen/m³
-                        </div>
-                      </div>
+                      <circle
+                        key={index}
+                        cx={cx}
+                        cy={cy}
+                        r={4}
+                        fill={level.color}
+                        strokeWidth={1.5}
+                      />
                     );
-                  }
-                  return null;
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#fff"
-                dot={({ cx, cy, value, index }) => {
-                  if (value === null) return null;
-                  return (
-                    <circle
-                      key={index}
-                      cx={cx}
-                      cy={cy}
-                      r={4}
-                      fill={getColorByValue(value)}
-                      strokeWidth={1.5}
-                    />
-                  );
-                }}
-                activeDot={{
-                  r: 6,
-                  stroke: '#ffae42',
-                  strokeWidth: 3,
-                  fill: '#1E293B',
-                }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+                  }}
+                  activeDot={{
+                    r: 6,
+                    stroke: '#ffae42',
+                    strokeWidth: 3,
+                    fill: '#1E293B',
+                  }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </div>
     </div>

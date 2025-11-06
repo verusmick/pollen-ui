@@ -76,6 +76,7 @@ export const ForecastMapContainer = () => {
     hour: selectedHour,
     pollen: pollenSelected.apiKey,
     // box: currentBox?.join(','),
+    intervals: pollenSelected.apiIntervals,
     box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
     includeCoords: true,
   });
@@ -90,27 +91,26 @@ export const ForecastMapContainer = () => {
     lats: number[],
     hour: number
   ) => {
-    let values: Array<[long: number, lat: number, value: number]> = [];
-    if (!forecasts.length || forecasts.length !== longs.length * lats.length) {
-      allDataRef.current[hour] = values;
+    const expectedLength = longs.length * lats.length;
+    if (!forecasts.length || forecasts.length !== expectedLength) {
+      console.warn(
+        `Invalid data: forecasts length (${forecasts.length}) doesn't match expected length (${expectedLength})`
+      );
+      allDataRef.current[hour] = [];
+      setPollenData([]);
       return;
     }
 
-    let i = 0;
-    for (let long of longs) {
-      for (let lat of lats) {
-        let value = forecasts[i];
-        if (value > 0) {
-          if (value >= 1 && value <= 30) value = 0.2;
-          else if (value <= 100) value = 0.4;
-          else if (value <= 200) value = 0.6;
-          else if (value <= 400) value = 0.8;
-          else value = 0.9;
-          values.push([lat, long, value]);
-        }
-        i++;
-      }
-    }
+    const values = forecasts.map((forecast, index) => {
+      const longIndex = Math.floor(index / lats.length);
+      const latIndex = index % lats.length;
+
+      return [
+        lats[latIndex], // lat
+        longs[longIndex], // long
+        forecast / 10, // value
+      ] as [number, number, number];
+    });
 
     allDataRef.current[hour] = values;
     setPollenData(values);
@@ -166,6 +166,7 @@ export const ForecastMapContainer = () => {
     // set Current Hour On Mount
     setCurrentHourOnMount();
   }, []);
+  
 
   return (
     <div className="relative h-screen w-screen">
@@ -175,6 +176,7 @@ export const ForecastMapContainer = () => {
         onRegionChange={handleRegionChange}
         pollenSelected={pollenSelected.apiKey}
         currentDate={currentDate}
+        selectedHour={selectedHour}
       />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
@@ -205,6 +207,7 @@ export const ForecastMapContainer = () => {
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart
           onClose={() => setShowPollenDetailsChart(false, '', null, null, null)}
+          currentDate={currentDate}
         />
       )}
       <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">

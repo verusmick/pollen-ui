@@ -51,10 +51,12 @@ export default function ForecastMap({
   onRegionChange,
   pollenSelected,
   currentDate,
+  selectedHour
 }: {
   pollenData: any;
   pollenSelected: string;
   currentDate: string;
+  selectedHour:number;
   onRegionChange: (box: number[]) => void;
 }) {
   const [viewMapState, setViewMapState] = useState(viewMapInitialState);
@@ -169,7 +171,7 @@ export default function ForecastMap({
           lon: closestLon,
           pollen: pollenSelected,
           date: currentDate,
-          hour: 21,
+          hour: selectedHour,
         });
 
         // Guardamos datos + lat/lon en el store
