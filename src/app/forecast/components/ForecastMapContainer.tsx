@@ -48,7 +48,6 @@ export const ForecastMapContainer = () => {
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number]>
   >([]);
-
   const [legendOpen, setLegendOpen] = useState(false);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{
@@ -56,16 +55,15 @@ export const ForecastMapContainer = () => {
     lng: number;
   } | null>(null);
   const [currentBox, setCurrentBox] = useState<number[] | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [selectedHour, setSelectedHour] = useState(0);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
-  
+
   // const currentDate = new Date().toISOString().split('T')[0];
   // TODO: remove this hardcoded date when the API will be able
   const currentDate: string = pollenSelected.defaultBaseDate;
-
-  const [playing, setPlaying] = useState(false);
-  const [selectedHour, setSelectedHour] = useState(0);
 
   const {
     data: mapData,
@@ -84,6 +82,10 @@ export const ForecastMapContainer = () => {
   const handlePollenChange = (newPollen: PollenConfig) => {
     setPollenSelected(newPollen);
   };
+
+  const handleRegionChange = useCallback((box: number[]) => {
+    setCurrentBox(box);
+  }, []);
 
   const addNewPollenData = (
     forecasts: number[],
@@ -105,20 +107,16 @@ export const ForecastMapContainer = () => {
       const longIndex = Math.floor(index / lats.length);
       const latIndex = index % lats.length;
 
-      return [
-        lats[latIndex], // lat
-        longs[longIndex], // long
-        forecast / 10, // value
-      ] as [number, number, number];
+      return [lats[latIndex], longs[longIndex], forecast / 10] as [
+        number,
+        number,
+        number
+      ];
     });
 
     allDataRef.current[hour] = values;
     setPollenData(values);
   };
-
-  const handleRegionChange = useCallback((box: number[]) => {
-    setCurrentBox(box);
-  }, []);
 
   const setCurrentHourOnMount = () => {
     const now = new Date();
@@ -169,7 +167,6 @@ export const ForecastMapContainer = () => {
 
   return (
     <div className="relative h-screen w-screen">
-      {/* Main content */}
       <ForecastMap
         pollenData={pollenData}
         onRegionChange={handleRegionChange}
@@ -232,7 +229,6 @@ export const ForecastMapContainer = () => {
           cardRef={legendCardRef}
         />
       </div>
-      {/* LoadingOverlay */}
       {loading && <LoadingOverlay message={t('message_loading')} />}
     </div>
   );
