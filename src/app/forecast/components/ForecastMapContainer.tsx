@@ -152,11 +152,17 @@ export const ForecastMapContainer = () => {
   }, [mapDataIsLoading]);
 
   useEffect(() => {
-    if (mapData) {
-      const { data, longitudes, latitudes } = mapData;
-      addNewPollenData(data, longitudes, latitudes, selectedHour);
+    if (!mapData) return;
+
+    if (allDataRef.current[selectedHour]?.length) {
+      setPollenData(allDataRef.current[selectedHour]);
+      return;
     }
-  }, [mapData]);
+
+    const { data, longitudes, latitudes } = mapData;
+
+    addNewPollenData(data, longitudes, latitudes, selectedHour);
+  }, [mapData, selectedHour]);
 
   // init
   useEffect(() => {
