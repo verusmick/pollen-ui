@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import dayjs from 'dayjs';
 
 import {
   useLoadingStore,
@@ -45,6 +46,7 @@ export const ForecastMapContainer = () => {
 
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
+
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number]>
   >([]);
@@ -84,6 +86,7 @@ export const ForecastMapContainer = () => {
   } = useHourlyForecast(forecastParams);
 
   const handlePollenChange = (newPollen: PollenConfig) => {
+    setPartialLoading(true);
     setPollenSelected(newPollen);
   };
 
@@ -128,18 +131,10 @@ export const ForecastMapContainer = () => {
       // });
 
       setPollenData(values);
+      setPartialLoading(false);
     },
     []
   );
-
-  const setCurrentHourOnMount = () => {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const diffHours = Math.floor(
-      (now.getTime() - start.getTime()) / (1000 * 60 * 60)
-    );
-    handleSliderChange(diffHours);
-  };
 
   // Handle hour change
   const handleSliderChange = useCallback(
@@ -171,11 +166,6 @@ export const ForecastMapContainer = () => {
   }, [playing, pollenSelected.apiKey]);
 
   useEffect(() => {
-    if (!mapDataIsLoading) setLoading(false);
-    // if (!loading) setPartialLoading(mapDataIsLoading);
-  }, [mapDataIsLoading]);
-
-  useEffect(() => {
     if (!mapData) return;
 
     const pollenKey = pollenSelected.apiKey;
@@ -183,6 +173,7 @@ export const ForecastMapContainer = () => {
     if (allDataRef.current[pollenKey]?.[selectedHour]) {
       const cached = JSON.parse(allDataRef.current[pollenKey][selectedHour]);
       setPollenData(cached);
+      setPartialLoading(false);
       return;
     }
 
@@ -194,7 +185,8 @@ export const ForecastMapContainer = () => {
   // init
   useEffect(() => {
     // set Current Hour On Mount
-    setCurrentHourOnMount();
+    const diffHours = dayjs().diff(dayjs().startOf('day'), 'hour');
+    handleSliderChange(diffHours);
   }, []);
 
   return (

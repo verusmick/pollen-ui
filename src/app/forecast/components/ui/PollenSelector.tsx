@@ -87,7 +87,7 @@ export const PollenSelector = ({
       {isOpen && (
         <ul className="w-full bg-card rounded-lg shadow-lg max-h-60 overflow-auto border border-card mt-1 text-base">
           {POLLEN_ENTRIES.map(
-            ({ key, label, apiKey, defaultBaseDate, apiIntervals }) => (
+            ({ key, label, apiKey, defaultBaseDate, apiIntervals, levels }) => (
               <li
                 key={apiKey}
                 onClick={() =>
@@ -96,6 +96,7 @@ export const PollenSelector = ({
                     label,
                     defaultBaseDate,
                     apiIntervals,
+                    levels,
                   } as PollenConfig)
                 }
                 className={`cursor-pointer px-2 py-1 hover:bg-neutral-700/40 transition ${
