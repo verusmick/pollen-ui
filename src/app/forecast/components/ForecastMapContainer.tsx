@@ -59,7 +59,7 @@ export const ForecastMapContainer = () => {
   const [selectedHour, setSelectedHour] = useState(0);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
-  const allDataRef = useRef<[long: number, lat: number, value: number][][]>([]);
+  const allDataRef = useRef<Record<string, Record<number, string>>>({});
 
   // const currentDate = new Date().toISOString().split('T')[0];
   // TODO: remove this hardcoded date when the API will be able
@@ -92,11 +92,18 @@ export const ForecastMapContainer = () => {
   }, []);
 
   const addNewPollenData = useCallback(
-    (forecasts: number[], longs: number[], lats: number[], hour: number) => {
+    (
+      forecasts: number[],
+      longs: number[],
+      lats: number[],
+      hour: number,
+      pollenKey: string
+    ) => {
       const expectedLength = longs.length * lats.length;
 
       if (!forecasts.length || forecasts.length !== expectedLength) {
-        allDataRef.current[hour] = [];
+        allDataRef.current[pollenKey] ??= {};
+        allDataRef.current[pollenKey][hour] = JSON.stringify([]);
         setPollenData([]);
         return;
       }
@@ -111,7 +118,15 @@ export const ForecastMapContainer = () => {
           ] as [number, number, number]
       );
 
-      allDataRef.current[hour] = values;
+      allDataRef.current[pollenKey] ??= {};
+      allDataRef.current[pollenKey][hour] = JSON.stringify(values);
+
+      // todo: Prune distant hours in case of memory leaks
+      // Object.keys(allDataRef.current[pollenKey]).forEach((h) => {
+      //   if (Math.abs(Number(h) - hour) > 1)
+      //     delete allDataRef.current[pollenKey][h];
+      // });
+
       setPollenData(values);
     },
     []
@@ -127,24 +142,33 @@ export const ForecastMapContainer = () => {
   };
 
   // Handle hour change
-  const handleSliderChange = useCallback((hour: number) => {
-    setPlaying(false);
-    setSelectedHour(hour);
-    setPollenData(allDataRef.current[hour] || []);
-  }, []);
+  const handleSliderChange = useCallback(
+    (hour: number) => {
+      setPlaying(false);
+      setSelectedHour(hour);
+      const pollenKey = pollenSelected.apiKey;
+      const cached = allDataRef.current[pollenKey]?.[hour];
+      setPollenData(cached ? JSON.parse(cached) : []);
+    },
+    [pollenSelected.apiKey]
+  );
 
   // Playback
   useEffect(() => {
     if (!playing) return;
 
-    const interval = setInterval(async () => {
-      const nextHour = (selectedHour + 1) % 48;
-      setSelectedHour(nextHour);
-      setPollenData(allDataRef.current[nextHour] || []);
+    const interval = setInterval(() => {
+      setSelectedHour((prevHour) => {
+        const nextHour = (prevHour + 1) % 48;
+        const pollenKey = pollenSelected.apiKey;
+        const cached = allDataRef.current[pollenKey]?.[nextHour];
+        setPollenData(cached ? JSON.parse(cached) : []);
+        return nextHour;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [playing, selectedHour]);
+  }, [playing, pollenSelected.apiKey]);
 
   useEffect(() => {
     if (!mapDataIsLoading) setLoading(false);
@@ -154,14 +178,17 @@ export const ForecastMapContainer = () => {
   useEffect(() => {
     if (!mapData) return;
 
-    if (allDataRef.current[selectedHour]?.length) {
-      setPollenData(allDataRef.current[selectedHour]);
+    const pollenKey = pollenSelected.apiKey;
+
+    if (allDataRef.current[pollenKey]?.[selectedHour]) {
+      const cached = JSON.parse(allDataRef.current[pollenKey][selectedHour]);
+      setPollenData(cached);
       return;
     }
 
     const { data, longitudes, latitudes } = mapData;
 
-    addNewPollenData(data, longitudes, latitudes, selectedHour);
+    addNewPollenData(data, longitudes, latitudes, selectedHour, pollenKey);
   }, [mapData, selectedHour]);
 
   // init
