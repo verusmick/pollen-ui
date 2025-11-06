@@ -10,6 +10,7 @@ export function useHourlyForecast(params: {
   pollen: PollenApiKey;
   box: string;
   includeCoords?: boolean;
+  intervals?: string
 }) {
   const normalizedParams = useMemo(() => {
     const now = new Date(params.date);
@@ -32,7 +33,7 @@ export function useHourlyForecast(params: {
       date: dateStr,
       hour: hourForApi,
     };
-  }, [params.date, params.hour, params.pollen, params.box, params.includeCoords]);
+  }, [params.date, params.hour, params.pollen, params.box, params.includeCoords, params.intervals]);
   return useQuery({
     queryKey: ['hourlyForecast', normalizedParams],
     queryFn: () => getHourlyForecast(normalizedParams),

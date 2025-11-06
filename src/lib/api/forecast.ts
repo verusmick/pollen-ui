@@ -82,14 +82,19 @@ export async function getHourlyForecast(params: {
   intervals?: string;
   includeCoords?: boolean
 }) {
-  const query = new URLSearchParams({
+  const queryParams: Record<string, string> = {
     date: params.date,
     hour: params.hour.toString(),
     pollen: params.pollen,
     box: params.box,
-    // intervals: params.intervals,
     include_coords: (params.includeCoords || false).toString()
-  });
+  };
+
+  if (params.intervals !== undefined) {
+    queryParams.intervals = params.intervals;
+  }
+
+  const query = new URLSearchParams(queryParams);
 
   const res = await fetch(`/api/forecast/hour?${query.toString()}`);
   if (!res.ok) {

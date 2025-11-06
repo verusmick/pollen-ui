@@ -86,25 +86,28 @@ export const PollenSelector = ({
 
       {isOpen && (
         <ul className="w-full bg-card rounded-lg shadow-lg max-h-60 overflow-auto border border-card mt-1 text-base">
-          {POLLEN_ENTRIES.map(({ key, label, apiKey, defaultBaseDate }) => (
-            <li
-              key={apiKey}
-              onClick={() =>
-                handleOptionClick({
-                  apiKey,
-                  label,
-                  defaultBaseDate,
-                } as PollenConfig)
-              }
-              className={`cursor-pointer px-2 py-1 hover:bg-neutral-700/40 transition ${
-                apiKey === selected.apiKey
-                  ? 'font-semibold bg-neutral-700 text-white'
-                  : 'text-white'
-              }`}
-            >
-              {label}
-            </li>
-          ))}
+          {POLLEN_ENTRIES.map(
+            ({ key, label, apiKey, defaultBaseDate, apiIntervals }) => (
+              <li
+                key={apiKey}
+                onClick={() =>
+                  handleOptionClick({
+                    apiKey,
+                    label,
+                    defaultBaseDate,
+                    apiIntervals,
+                  } as PollenConfig)
+                }
+                className={`cursor-pointer px-2 py-1 hover:bg-neutral-700/40 transition ${
+                  apiKey === selected.apiKey
+                    ? 'font-semibold bg-neutral-700 text-white'
+                    : 'text-white'
+                }`}
+              >
+                {label}
+              </li>
+            )
+          )}
         </ul>
       )}
     </div>
