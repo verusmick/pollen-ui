@@ -25,14 +25,22 @@ export default function PollenTimeline({
   // Generate 48 hours starting from 00:00 today
   const hours = useMemo(() => {
     const startOfDay = new Date(baseDate + 'T00:00:00');
-    const list: { label: string; date: string; hour: number }[] = [];
+    const list: {
+      label: string;
+      date: string;
+      hour: number;
+      showDate: boolean;
+    }[] = [];
 
     for (let i = 0; i < 48; i++) {
       const d = new Date(startOfDay.getTime() + i * 3600 * 1000);
       const hourStr = dayjs(d).format('HH:mm');
       const dateStr = dayjs(d).format('MMM D, YYYY');
 
-      list.push({ label: hourStr, date: dateStr, hour: i });
+      // Show date every 6 hours (0, 6, 12, 18, 24, 30, 36, 42)
+      const showDate = i % 6 === 0;
+
+      list.push({ label: hourStr, date: dateStr, hour: i, showDate });
     }
     return list;
   }, [baseDate]);
@@ -92,8 +100,8 @@ export default function PollenTimeline({
               >
                 {h.label}
               </span>
-              {/* Date label only when date changes */}
-              {(i === 0 || hours[i].date !== hours[i - 1]?.date) && (
+              {/* Date label every 6 hours */}
+              {h.showDate && (
                 <span className="text-[10px] text-gray-500 -mt-1">
                   {h.date}
                 </span>
