@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BiX } from 'react-icons/bi';
 import {
   CartesianGrid,
@@ -16,6 +16,7 @@ import {
   usePartialLoadingStore,
   usePollenDetailsChartStore,
 } from '@/app/forecast/stores';
+import { useTranslations } from 'next-intl';
 
 interface PollenData {
   timestamp: number;
@@ -29,18 +30,20 @@ export const PollenDetailsChart = ({
   onClose?: () => void;
   currentDate: string;
 }) => {
+  const t = useTranslations('forecastPage.legend');
   const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
   const { chartLoading } = usePartialLoadingStore();
   const [data, setData] = useState<PollenData[]>([]);
-  const [locationName, setLocationName] = useState();
+  const [locationName, setLocationName] = useState<string>();
+  const [activePoint, setActivePoint] = useState<number | null>(null);
+  const [tooltipActive, setTooltipActive] = useState(false);
+  const tooltipTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!chartData || !currentDate) return;
 
-    // Parse currentDate "YYYY-MM-DD" a Date
     const [year, month, day] = currentDate.split('-').map(Number);
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
-
     const hoursInterval = 1;
 
     const updatedData = chartData.map((v: string | number, i: number) => ({
@@ -51,6 +54,7 @@ export const PollenDetailsChart = ({
 
     setData(updatedData);
   }, [chartData, currentDate]);
+
   const levels = [
     { key: 'none', color: '#ffffff', max: 0 },
     { key: 'very_low', color: '#00e838', max: 24 },
@@ -59,8 +63,9 @@ export const PollenDetailsChart = ({
     { key: 'high', color: '#f27200', max: 99 },
     { key: 'very_high', color: '#ff0000', max: Infinity },
   ];
+
   const getLevelByValue = (value: number | null) => {
-    if (value === null) return levels[0]; // "none"
+    if (value === null) return levels[0];
     return levels.find((l) => value <= l.max) || levels[levels.length - 1];
   };
 
@@ -69,11 +74,7 @@ export const PollenDetailsChart = ({
     if (!item) return null;
 
     const date = new Date(item.timestamp);
-
-    // Hora en formato HH:00
     const hourLabel = `${date.getHours().toString().padStart(2, '0')}:00`;
-
-    // Fecha en formato 02 Jun 2023 en inglés
     const day = date.getDate().toString().padStart(2, '0');
     const monthShort = date.toLocaleString('en-US', { month: 'short' });
     const year = date.getFullYear();
@@ -98,6 +99,43 @@ export const PollenDetailsChart = ({
     );
   };
 
+  const renderTooltip = useCallback(
+    ({ active, payload, coordinate }: any) => {
+      if (active && payload && payload.length) {
+        const value = payload[0].value;
+        const x = coordinate?.x ?? 0;
+
+        // 🔹 Cancelar cualquier timeout previo
+        if (tooltipTimeout.current) clearTimeout(tooltipTimeout.current);
+
+        // Activar inmediatamente
+        if (activePoint !== value) setActivePoint(value);
+        if (!tooltipActive) setTooltipActive(true);
+
+        return (
+          <div
+            className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
+                     text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
+            style={{ left: x, top: 0 }}
+          >
+            <div className="font-bold text-center text-[9px]">
+              {value ?? 'NA'}
+            </div>
+            <div className="text-[8px] text-gray-300">Pollen/m³</div>
+          </div>
+        );
+      } else {
+        // 🔹 Esperar 150 ms antes de ocultar
+        tooltipTimeout.current = setTimeout(() => {
+          setTooltipActive(false);
+          setActivePoint(null);
+        }, 150);
+      }
+      return null;
+    },
+    [activePoint, tooltipActive]
+  );
+
   useEffect(() => {
     if (!latitude || !longitude) return;
     const fetchLocationName = async () => {
@@ -117,7 +155,7 @@ export const PollenDetailsChart = ({
   return (
     <div
       className="absolute 2xl:top-44 md:top-40 left-4 2xl:left-10 md:left-8
-                    bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-65
+                    bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68
                     flex flex-col overflow-hidden"
     >
       <div className="relative flex-1 w-full h-full">
@@ -133,6 +171,12 @@ export const PollenDetailsChart = ({
           <span className="text-xs text-gray-400">
             Lat: {latitude?.toFixed(3)} | Lon: {longitude?.toFixed(3)}
           </span>
+
+          {tooltipActive && activePoint !== null && (
+            <span className="text-xs text-gray-400 transition-opacity duration-150">
+              Level range: {t(getLevelByValue(activePoint).key)}
+            </span>
+          )}
         </div>
 
         <button
@@ -170,29 +214,7 @@ export const PollenDetailsChart = ({
                   style={{ fontSize: 10, fill: '#fff' }}
                   tickLine={false}
                 />
-                <Tooltip
-                  content={({ active, payload, coordinate }) => {
-                    if (active && payload && payload.length) {
-                      const value = payload[0].value;
-                      const x = coordinate?.x ?? 0;
-                      return (
-                        <div
-                          className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
-                                     text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
-                          style={{ left: x, top: 0 }}
-                        >
-                          <div className="font-bold text-center text-[9px]">
-                            {value ?? 'NA'}
-                          </div>
-                          <div className="text-[8px] text-gray-300">
-                            Pollen/m³
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
+                <Tooltip content={renderTooltip} />
                 <Line
                   type="monotone"
                   dataKey="value"

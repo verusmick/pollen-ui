@@ -170,8 +170,8 @@ export default function ForecastMap({
           lat: closestLat,
           lon: closestLon,
           pollen: pollenSelected,
-          date: currentDate,
-          hour: selectedHour,
+          date: "2022-04-15",
+          hour: 0,
         });
 
         // Guardamos datos + lat/lon en el store
