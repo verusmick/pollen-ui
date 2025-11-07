@@ -16,6 +16,7 @@ import {
   usePollenDetailsChartStore,
 } from '@/app/forecast/stores';
 import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
+import { useTranslations } from 'next-intl';
 
 interface PollenData {
   timestamp: number;
@@ -31,6 +32,7 @@ export const PollenDetailsChart = ({
   currentDate: string;
   pollenSelected: string;
 }) => {
+  const t = useTranslations('forecastPage.chart_location');
   const pollenConfig = getPollenByApiKey(pollenSelected as PollenApiKey);
   const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
   const { chartLoading } = usePartialLoadingStore();
@@ -96,38 +98,103 @@ export const PollenDetailsChart = ({
     );
   };
 
-  useEffect(() => {
-    if (!latitude || !longitude) return;
-    const fetchLocationName = async () => {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-      );
-      const data = await res.json();
-      const { road, suburb, city, town, village, country } = data.address;
-      const shortName = [road, suburb || city || town || village, country]
-        .filter(Boolean)
-        .join(', ');
-      setLocationName(shortName);
-    };
-    fetchLocationName();
-  }, [latitude, longitude]);
+  const fetchLocationName = async (latitude: number, longitude: number) => {
+    if (!latitude || !longitude) return '';
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+    );
+    const data = await res.json();
+    const { road, suburb, city, town, village, country } = data.address;
+    const shortName = [road, suburb || city || town || village, country]
+      .filter(Boolean)
+      .join(', ');
+    return shortName;
+  };
+  const scrollToCurrentHour = (
+    data: PollenData[],
+    chartContainer: HTMLDivElement | null,
+    setActiveIndex: (index: number) => void
+  ) => {
+    if (!data.length || !chartContainer) return;
 
-  useEffect(() => {
-    if (!data.length || !chartContainerRef.current) return;
     const now = new Date();
     const currentHour = now.getHours();
+
     const index = data.findIndex(
       (item) => new Date(item.timestamp).getHours() === currentHour
     );
+
     if (index !== -1) {
       setActiveIndex(index);
-      const scrollPosition =
-        index * 60 - chartContainerRef.current.clientWidth / 2;
-      chartContainerRef.current.scrollTo({
+      const scrollPosition = index * 60 - chartContainer.clientWidth / 2;
+      chartContainer.scrollTo({
         left: scrollPosition > 0 ? scrollPosition : 0,
         behavior: 'smooth',
       });
     }
+  };
+  const ensureTooltipVisible = (
+    chartContainer: HTMLDivElement | null,
+    tooltipLeft: number,
+    tooltipWidth: number
+  ) => {
+    if (!chartContainer) return;
+
+    const containerLeft = chartContainer.scrollLeft;
+    const containerRight = containerLeft + chartContainer.clientWidth;
+
+    const tooltipRight = tooltipLeft + tooltipWidth;
+
+    if (tooltipRight > containerRight) {
+      chartContainer.scrollTo({
+        left: tooltipRight - chartContainer.clientWidth + 10, 
+        behavior: 'smooth',
+      });
+    }
+
+    if (tooltipLeft < containerLeft) {
+      chartContainer.scrollTo({
+        left: tooltipLeft - 10,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleMouseMove = (
+    state: any,
+    activeIndex: number | null,
+    setActiveIndex: (index: number) => void
+  ) => {
+    if (!state.isTooltipActive) return;
+
+    const index = Number(state.activeTooltipIndex);
+    if (!isNaN(index) && index !== activeIndex) {
+      setActiveIndex(index);
+
+      const tooltipWidth = 50; 
+      const tooltipLeft = index * 60 + 35 - tooltipWidth / 2; 
+
+      ensureTooltipVisible(
+        chartContainerRef.current,
+        tooltipLeft,
+        tooltipWidth
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (!latitude || !longitude) return;
+
+    const getLocation = async () => {
+      const name = await fetchLocationName(latitude, longitude);
+      if (name) setLocationName(name);
+    };
+
+    getLocation();
+  }, [latitude, longitude]);
+
+  useEffect(() => {
+    scrollToCurrentHour(data, chartContainerRef.current, setActiveIndex);
   }, [data]);
 
   const activePoint = activeIndex !== null ? data[activeIndex] : null;
@@ -142,15 +209,12 @@ export const PollenDetailsChart = ({
         <div className="flex flex-col gap-1 text-white">
           {!latitude || !longitude ? (
             <span className="text-xs text-gray-400 animate-pulse">
-              📍 Getting location...
+              📍 {t('getting_location')}
             </span>
           ) : (
             <>
-              <span
-                className="text-xs font-semibold text-white block truncate"
-                title={locationName || 'Loading location name...'}
-              >
-                📍 {locationName || 'Loading name...'}
+              <span className="text-xs font-semibold text-white block truncate">
+                📍 {locationName || t('loading_name')}
               </span>
               <span className="text-xs text-gray-400">
                 Lat: {latitude.toFixed(3)} | Lon: {longitude.toFixed(3)}
@@ -184,13 +248,9 @@ export const PollenDetailsChart = ({
               <LineChart
                 data={data}
                 margin={{ top: 35, right: 20, bottom: 5, left: -25 }}
-                onMouseMove={(state) => {
-                  if (!state.isTooltipActive) return;
-                  const index = Number(state.activeTooltipIndex);
-                  if (!isNaN(index) && index !== activeIndex) {
-                    setActiveIndex(index);
-                  }
-                }}
+                onMouseMove={(state) =>
+                  handleMouseMove(state, activeIndex, setActiveIndex)
+                }
                 onMouseLeave={() => {
                   setActiveIndex(null);
                 }}
@@ -229,7 +289,7 @@ export const PollenDetailsChart = ({
                     );
                   }}
                   activeDot={({ cx, cy }) => {
-                    if (!activePoint) return <g />; 
+                    if (!activePoint) return <g />;
                     return (
                       <circle
                         cx={cx}
@@ -257,7 +317,7 @@ export const PollenDetailsChart = ({
                 <div className="font-bold text-center text-[10px]">
                   {activePoint.value ?? 'NA'}
                 </div>
-                <div className="text-[9px] text-gray-300">Pollen/m³</div>
+                <div className="text-[9px] text-gray-300">{t('pollen')}</div>
               </div>
             )}
           </div>
