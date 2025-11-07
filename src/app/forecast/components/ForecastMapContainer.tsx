@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import dayjs from 'dayjs';
 
 import {
   useLoadingStore,
@@ -84,6 +85,7 @@ export const ForecastMapContainer = () => {
   } = useHourlyForecast(forecastParams);
 
   const handlePollenChange = (newPollen: PollenConfig) => {
+    setPartialLoading(true);
     setPollenSelected(newPollen);
   };
 
@@ -128,18 +130,10 @@ export const ForecastMapContainer = () => {
       // });
 
       setPollenData(values);
+      setPartialLoading(false);
     },
     []
   );
-
-  const setCurrentHourOnMount = () => {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const diffHours = Math.floor(
-      (now.getTime() - start.getTime()) / (1000 * 60 * 60)
-    );
-    handleSliderChange(diffHours);
-  };
 
   // Handle hour change
   const handleSliderChange = useCallback(
@@ -183,6 +177,7 @@ export const ForecastMapContainer = () => {
     if (allDataRef.current[pollenKey]?.[selectedHour]) {
       const cached = JSON.parse(allDataRef.current[pollenKey][selectedHour]);
       setPollenData(cached);
+      setPartialLoading(false);
       return;
     }
 
@@ -194,9 +189,9 @@ export const ForecastMapContainer = () => {
   // init
   useEffect(() => {
     // set Current Hour On Mount
-    setCurrentHourOnMount();
+    const diffHours = dayjs().diff(dayjs().startOf('day'), 'hour');
+    handleSliderChange(diffHours);
   }, []);
-  
 
   return (
     <div className="relative h-screen w-screen">
@@ -205,7 +200,6 @@ export const ForecastMapContainer = () => {
         onRegionChange={handleRegionChange}
         pollenSelected={pollenSelected.apiKey}
         currentDate={pollenSelected.defaultBaseDate}
-        selectedHour={selectedHour}
       />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
@@ -216,10 +210,16 @@ export const ForecastMapContainer = () => {
                 setUserLocation(pos);
                 setOpen(false);
               }}
+              currentDate={pollenSelected.defaultBaseDate}
+          pollenSelected={pollenSelected.apiKey}
             />
           )}
         </SearchCardToggle>
-        <LocationButton tooltipText={tLocation('title_tooltip_location')} />
+        <LocationButton
+          tooltipText={tLocation('title_tooltip_location')}
+          currentDate={pollenSelected.defaultBaseDate}
+          pollenSelected={pollenSelected.apiKey}
+        />
       </span>
       <div className="relative">
         <ForecastHeader title={t('title')} iconSrc="/zaum.png" />
@@ -236,7 +236,8 @@ export const ForecastMapContainer = () => {
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart
           onClose={() => setShowPollenDetailsChart(false, '', null, null, null)}
-          currentDate={pollenSelected.defaultBaseDate }
+          currentDate={pollenSelected.defaultBaseDate}
+          pollenSelected={pollenSelected.apiKey}
         />
       )}
       <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">

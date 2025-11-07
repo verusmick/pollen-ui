@@ -28,12 +28,16 @@ import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
-import { findClosestValue } from '@/app/forecast/utils';
+import {
+  fetchAndShowPollenChart,
+  findClosestValue,
+} from '@/app/forecast/utils';
 import {
   fetchChartData,
   getLatitudes,
   getLongitudes,
 } from '@/lib/api/forecast';
+import { addDaysToDate } from '../utils/addDaysToDate';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -51,16 +55,15 @@ export default function ForecastMap({
   onRegionChange,
   pollenSelected,
   currentDate,
-  selectedHour
 }: {
   pollenData: any;
   pollenSelected: string;
   currentDate: string;
-  selectedHour:number;
+
   onRegionChange: (box: number[]) => void;
 }) {
   const [viewMapState, setViewMapState] = useState(viewMapInitialState);
-  const { chartLoading, setChartLoading } = usePartialLoadingStore();
+  const { setChartLoading } = usePartialLoadingStore();
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
@@ -71,7 +74,7 @@ export default function ForecastMap({
     long: null | number;
   }>({ lat: null, long: null });
   const [bounds, setBounds] = useState<number[] | null>(null);
-
+  const days = addDaysToDate(currentDate, 3);
   const {
     lat: searchLat,
     lng: searchlong,
@@ -163,25 +166,14 @@ export default function ForecastMap({
         ]);
         const closestLat = findClosestValue(clickLat, latitudes);
         const closestLon = findClosestValue(clickLon, longitudes);
-
         setPinIconMap({ lat: closestLat, long: closestLon });
-
-        const chartData = await fetchChartData({
-          lat: closestLat,
-          lon: closestLon,
+        await fetchAndShowPollenChart({
+          lat: clickLat,
+          lng: clickLon,
           pollen: pollenSelected,
-          date: "2022-04-15",
-          hour: 0,
+          days,
+          setShowPollenDetailsChart,
         });
-
-        // Guardamos datos + lat/lon en el store
-        setShowPollenDetailsChart(
-          true,
-          '',
-          chartData.data,
-          closestLat,
-          closestLon
-        );
       } catch (err) {
         console.error(err);
       } finally {

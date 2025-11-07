@@ -1,29 +1,46 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { BiMap, BiX } from "react-icons/bi";
-import { TbLocationFilled } from "react-icons/tb";
-import { Tooltip } from "./Tooltip";
-import { useCurrentLocationStore } from "@/app/forecast/stores/currentLocationStore";
-import { useTranslations } from "next-intl";
+import { useState, useEffect } from 'react';
+import { BiMap, BiX } from 'react-icons/bi';
+import { TbLocationFilled } from 'react-icons/tb';
+import { Tooltip } from './Tooltip';
+import { useCurrentLocationStore } from '@/app/forecast/stores/currentLocationStore';
+import { useTranslations } from 'next-intl';
+import { addDaysToDate } from '@/app/forecast/utils';
+import {
+  usePartialLoadingStore,
+  usePollenDetailsChartStore,
+} from '@/app/forecast/stores';
+import { fetchAndShowPollenChart } from '@/app/forecast/utils';
 
 interface LocationButtonProps {
   tooltipText: string;
+  pollenSelected: string;
+  currentDate: string;
 }
 
-export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
-  const t = useTranslations("forecastPage.show_your_location");
+export const LocationButton = ({
+  tooltipText,
+  currentDate,
+  pollenSelected,
+}: LocationButtonProps) => {
+  const t = useTranslations('forecastPage.show_your_location');
   const [open, setOpen] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<
-    "idle" | "granted" | "denied" | "prompt"
-  >("idle");
+    'idle' | 'granted' | 'denied' | 'prompt'
+  >('idle');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { setChartLoading } = usePartialLoadingStore();
   const setLocation = useCurrentLocationStore((state) => state.setLocation);
+  const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
+
+  const days = addDaysToDate(currentDate, 3);
+
   useEffect(() => {
     if (navigator.permissions) {
-      navigator.permissions.query({ name: "geolocation" }).then((result) => {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
         setPermissionStatus(result.state);
         result.onchange = () => setPermissionStatus(result.state);
       });
@@ -32,27 +49,45 @@ export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
 
   const handleRequestPermission = () => {
     if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser.");
+      setError('Geolocation is not supported by your browser.');
       return;
     }
 
+    setOpen(false);
     setLoading(true);
+    setError(null);
+
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLoading(false);
+      async (position) => {
         const coords = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
-        setPermissionStatus("granted");
-        setError(null);
+        setPermissionStatus('granted');
         setLocation(coords);
-        setOpen(false);
+
+        try {
+          setChartLoading(true);
+          await fetchAndShowPollenChart({
+            lat: coords.lat,
+            lng: coords.lng,
+            pollen: pollenSelected,
+            days,
+            setShowPollenDetailsChart,
+          });
+        } catch (err) {
+          console.error('Error fetching pollen data:', err);
+          setError('Failed to load pollen data. Please try again.');
+        } finally {
+          setLoading(false);
+          setChartLoading(false);
+        }
       },
       (err) => {
         setLoading(false);
         if (err.code === err.PERMISSION_DENIED) {
-          setPermissionStatus("denied");
+          setPermissionStatus('denied');
+          setError('Permission denied for geolocation.');
         } else {
           setError(err.message);
         }
@@ -95,11 +130,11 @@ export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
               id="locationModalTitle"
               className="text-xl font-semibold text-center"
             >
-              {t("name_company")}
+              {t('name_company')}
             </h2>
 
             <p className="text-sm text-gray-300 text-center">
-              {t("description_card_location")}
+              {t('description_card_location')}
             </p>
 
             <button
@@ -108,22 +143,22 @@ export const LocationButton = ({ tooltipText }: LocationButtonProps) => {
               disabled={loading}
             >
               {loading ? (
-                t("loading")
+                t('loading')
               ) : (
                 <>
-                  <BiMap size={20} /> {t("title_button_location")}
+                  <BiMap size={20} /> {t('title_button_location')}
                 </>
               )}
             </button>
 
-            {permissionStatus === "granted" && (
+            {permissionStatus === 'granted' && !loading && (
               <p className="text-center text-sm text-green-400">
-                ✅ {t("description_permission_granted")}
+                ✅ {t('description_permission_granted')}
               </p>
             )}
-            {permissionStatus === "denied" && (
+            {permissionStatus === 'denied' && !loading && (
               <p className="text-center text-sm text-red-400">
-                ⚠️ {t("description_permission_denied")}
+                ⚠️ {t('description_permission_denied')}
               </p>
             )}
             {error && (
