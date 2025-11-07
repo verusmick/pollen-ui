@@ -1,3 +1,4 @@
+type PollenLevel = { label: string; min: number; max: number };
 export const POLLENS = {
   BIRCH: {
     apiKey: 'POLLEN_BIRCH' as const,
@@ -10,7 +11,7 @@ export const POLLENS = {
       { label: 'Moderate', min: 101, max: 200 },
       { label: 'High', min: 201, max: 400 },
       { label: 'Very High', min: 401, max: 1000 },
-    ],
+    ] as PollenLevel[],
   },
   GRASS: {
     apiKey: 'POLLEN_GRASS' as const,
@@ -23,7 +24,7 @@ export const POLLENS = {
       { label: 'Moderate', min: 51, max: 100 },
       { label: 'High', min: 101, max: 200 },
       { label: 'Very High', min: 201, max: 1000 },
-    ],
+    ] as PollenLevel[],
   },
   ALDER: {
     apiKey: 'POLLEN_ALDER' as const,
@@ -36,7 +37,7 @@ export const POLLENS = {
       { label: 'Moderate', min: 101, max: 200 },
       { label: 'High', min: 201, max: 400 },
       { label: 'Very High', min: 401, max: 1000 },
-    ],
+    ] as PollenLevel[],
   },
 } as const;
 

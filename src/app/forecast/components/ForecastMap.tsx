@@ -151,34 +151,42 @@ export default function ForecastMap({
       //   setTooltipInfo(null); // Hide tooltip when not hovering
       // }
     },
-    onClick: async (info: any) => {
+    onClick: (info: any) => {
       if (!info.object) return;
 
       const clickLat = info.coordinate[1];
       const clickLon = info.coordinate[0];
 
-      try {
-        setChartLoading(true);
-        setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
-        const [latitudes, longitudes] = await Promise.all([
-          getLatitudes(),
-          getLongitudes(),
-        ]);
-        const closestLat = findClosestValue(clickLat, latitudes);
-        const closestLon = findClosestValue(clickLon, longitudes);
-        setPinIconMap({ lat: closestLat, long: closestLon });
-        await fetchAndShowPollenChart({
-          lat: clickLat,
-          lng: clickLon,
-          pollen: pollenSelected,
-          days,
-          setShowPollenDetailsChart,
-        });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setChartLoading(false);
-      }
+      const handleClick = async () => {
+        try {
+          setChartLoading(true);
+          setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
+
+          const [latitudes, longitudes] = await Promise.all([
+            getLatitudes(),
+            getLongitudes(),
+          ]);
+
+          const closestLat = findClosestValue(clickLat, latitudes);
+          const closestLon = findClosestValue(clickLon, longitudes);
+
+          setPinIconMap({ lat: closestLat, long: closestLon });
+
+          await fetchAndShowPollenChart({
+            lat: clickLat,
+            lng: clickLon,
+            pollen: pollenSelected,
+            days,
+            setShowPollenDetailsChart,
+          });
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setChartLoading(false);
+        }
+      };
+
+      handleClick();
     },
   });
 
