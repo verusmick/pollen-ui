@@ -30,7 +30,7 @@ import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
 import {
   fetchAndShowPollenChart,
-  findClosestValue,
+  findClosestCoordinate,
 } from '@/app/forecast/utils';
 import {
   fetchChartData,
@@ -167,8 +167,8 @@ export default function ForecastMap({
             getLongitudes(),
           ]);
 
-          const closestLat = findClosestValue(clickLat, latitudes);
-          const closestLon = findClosestValue(clickLon, longitudes);
+          const closestLat = findClosestCoordinate(clickLat, latitudes);
+          const closestLon = findClosestCoordinate(clickLon, longitudes);
 
           setPinIconMap({ lat: closestLat, long: closestLon });
 

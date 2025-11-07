@@ -1,10 +1,9 @@
-// utils/fetchAndShowPollenChart.ts
 import {
   getLatitudes,
   getLongitudes,
   fetchChartData,
 } from '@/lib/api/forecast';
-import { findClosestValue } from './findClosestValue';
+import { findClosestCoordinate } from './findClosestCoordinate';
 
 interface FetchChartParams {
   lat: number;
@@ -32,8 +31,8 @@ export const fetchAndShowPollenChart = async ({
       getLatitudes(),
       getLongitudes(),
     ]);
-    const closestLat = findClosestValue(lat, latitudes);
-    const closestLon = findClosestValue(lng, longitudes);
+    const closestLat = findClosestCoordinate(lat, latitudes);
+    const closestLon = findClosestCoordinate(lng, longitudes);
 
     const chartData = await fetchChartData({
       lat: closestLat,
@@ -45,7 +44,7 @@ export const fetchAndShowPollenChart = async ({
 
     setShowPollenDetailsChart(true, '', chartData.data, closestLat, closestLon);
   } catch (error) {
-    console.error('Error cargando datos del gráfico:', error);
+    console.error('Error loading chart data:', error);
     throw error;
   }
 };
