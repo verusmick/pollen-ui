@@ -4,3 +4,4 @@ export * from "./pollenDetailsChartStore";
 export * from "./pollenStore";
 export * from "./searchLocationStore";
 export * from "./partialLoadingStore";
+export * from './useCoordinatesStore';

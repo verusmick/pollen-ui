@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
 import {
+  useCoordinatesStore,
   useLoadingStore,
   usePartialLoadingStore,
   usePollenDetailsChartStore,
@@ -48,6 +49,7 @@ export const ForecastMapContainer = () => {
   const { partialLoading, setPartialLoading } = usePartialLoadingStore();
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
+  const { setLatitudes, setLongitudes } = useCoordinatesStore();
 
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
@@ -184,7 +186,8 @@ export const ForecastMapContainer = () => {
     }
 
     const { data, longitudes, latitudes } = mapData;
-
+    setLatitudes(latitudes);
+    setLongitudes(longitudes);
     addNewPollenData(data, longitudes, latitudes, selectedHour, pollenKey);
   }, [mapData, selectedHour]);
 
