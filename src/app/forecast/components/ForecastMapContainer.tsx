@@ -26,7 +26,13 @@ import {
   PollenTimeline,
 } from '@/app/forecast/components';
 
-import { DEFAULT_POLLEN, type PollenConfig } from '@/app/forecast/constants';
+import {
+  DEFAULT_POLLEN,
+  LEVEL_COLORS,
+  POLLENS,
+  type PollenApiKey,
+  type PollenConfig,
+} from '@/app/forecast/constants';
 import { useHourlyForecast } from '../hooks/useHourlyForecast';
 
 const PollenDetailsChart = dynamic(
@@ -147,6 +153,32 @@ export const ForecastMapContainer = () => {
     [pollenSelected.apiKey]
   );
 
+  const getLevelsForLegend = (pollenApiKey: PollenApiKey) => {
+    const pollen = Object.values(POLLENS).find(
+      (p) => p.apiKey === pollenApiKey
+    );
+    if (!pollen) return [];
+
+    return pollen.levels.map((level, idx, arr) => {
+      const key = level.label
+        .toLowerCase()
+        .replace(/\s+/g, '_') as keyof typeof LEVEL_COLORS;
+
+      let maxLabel = level.max.toString();
+
+      if (idx === arr.length - 1) {
+        maxLabel = `>${level.max}`;
+      }
+      return {
+        key,
+        color: LEVEL_COLORS[key],
+        min: level.min,
+        max: maxLabel,
+        label: level.label,
+      };
+    });
+  };
+
   // Playback
   useEffect(() => {
     if (!playing) return;
@@ -211,7 +243,7 @@ export const ForecastMapContainer = () => {
                 setOpen(false);
               }}
               currentDate={pollenSelected.defaultBaseDate}
-          pollenSelected={pollenSelected.apiKey}
+              pollenSelected={pollenSelected.apiKey}
             />
           )}
         </SearchCardToggle>
@@ -260,13 +292,7 @@ export const ForecastMapContainer = () => {
       <div className="fixed left-10 bottom-40 2xl:bottom-24">
         <PollenLegendCard
           open={legendOpen}
-          levels={[
-            { key: 'very_low', color: '#00e838' },
-            { key: 'low', color: '#a5eb02' },
-            { key: 'moderate', color: '#ebbb02' },
-            { key: 'high', color: '#f27200' },
-            { key: 'very_high', color: '#ff0000' },
-          ]}
+          levels={getLevelsForLegend(pollenSelected.apiKey)}
           cardRef={legendCardRef}
         />
       </div>

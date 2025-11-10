@@ -33,6 +33,7 @@ export const PollenDetailsChart = ({
   pollenSelected: string;
 }) => {
   const t = useTranslations('forecastPage.chart_location');
+  const p = useTranslations('forecastPage');
   const pollenConfig = getPollenByApiKey(pollenSelected as PollenApiKey);
   const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
   const { chartLoading } = usePartialLoadingStore();
@@ -199,7 +200,7 @@ export const PollenDetailsChart = ({
     const index = getCurrentHourIndex(data);
     setActiveIndex(index);
   }, [data]);
-  
+
   useEffect(() => {
     if (!latitude || !longitude) return;
 
@@ -330,7 +331,7 @@ export const PollenDetailsChart = ({
                 <div className="font-bold text-center text-[10px]">
                   {activePoint.value ?? 'NA'}
                 </div>
-                <div className="text-[9px] text-gray-300">{t('pollen')}</div>
+                <div className="text-[9px] text-gray-300">{p('pollen')}</div>
               </div>
             )}
           </div>

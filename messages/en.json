@@ -6,6 +6,7 @@
     "title": "Forecast Map",
     "description": "Interactive pollen forecast map",
     "message_loading": "Pollen Forecast Map",
+    "pollen": "pollen/m³",
     "search": {
       "title_tooltip_search": "Search",
       "loading": "Loading",
@@ -23,8 +24,7 @@
     },
     "chart_location": {
       "getting_location": "Getting location...",
-      "loading_name": "Loading location name...",
-      "pollen": "Pollen/m³"
+      "loading_name": "Loading location name..."
     },
     "legend": {
       "legend_title": "Allergy level Range",
