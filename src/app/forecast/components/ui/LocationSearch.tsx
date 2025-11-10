@@ -7,7 +7,7 @@ import {
   usePartialLoadingStore,
   usePollenDetailsChartStore,
 } from '@/app/forecast/stores';
-import { fetchAndShowPollenChart, addDaysToDate } from '@/app/forecast/utils';
+import { fetchAndShowPollenChart } from '@/app/forecast/utils';
 
 export const LocationSearch = ({
   onSelect,
@@ -30,7 +30,6 @@ export const LocationSearch = ({
   const { setChartLoading } = usePartialLoadingStore();
   const setLocation = useSearchLocationStore((state) => state.setLocation);
   const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
-  const days = addDaysToDate(currentDate, 3);
 
   useEffect(() => {
     if (!query) {
@@ -106,7 +105,7 @@ export const LocationSearch = ({
         lat: selected.lat,
         lng: selected.lng,
         pollen: pollenSelected,
-        days,
+        date: currentDate,
         setShowPollenDetailsChart,
       });
       setChartLoading(false);

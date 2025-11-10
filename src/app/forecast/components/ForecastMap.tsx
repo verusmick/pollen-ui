@@ -29,7 +29,6 @@ import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
 import {
-  addDaysToDate,
   fetchAndShowPollenChart,
   findClosestCoordinate,
 } from '@/app/forecast/utils';
@@ -70,7 +69,6 @@ export default function ForecastMap({
     long: null | number;
   }>({ lat: null, long: null });
   const [bounds, setBounds] = useState<number[] | null>(null);
-  const days = addDaysToDate(currentDate, 3);
   const {
     lat: searchLat,
     lng: searchlong,
@@ -104,7 +102,7 @@ export default function ForecastMap({
           lat: clickLat,
           lng: clickLon,
           pollen: pollenSelected,
-          days,
+          date: currentDate,
           setShowPollenDetailsChart,
         });
       } catch (error) {
@@ -118,7 +116,7 @@ export default function ForecastMap({
       setShowPollenDetailsChart,
       setPinIconMap,
       pollenSelected,
-      days,
+      currentDate,
     ]
   );
   // Convert your API data to grid cells

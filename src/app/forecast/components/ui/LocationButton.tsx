@@ -6,7 +6,6 @@ import { TbLocationFilled } from 'react-icons/tb';
 import { Tooltip } from './Tooltip';
 import { useCurrentLocationStore } from '@/app/forecast/stores/currentLocationStore';
 import { useTranslations } from 'next-intl';
-import { addDaysToDate } from '@/app/forecast/utils';
 import {
   usePartialLoadingStore,
   usePollenDetailsChartStore,
@@ -36,8 +35,7 @@ export const LocationButton = ({
   const setLocation = useCurrentLocationStore((state) => state.setLocation);
   const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
 
-  const days = addDaysToDate(currentDate, 3);
-
+  // 🧠 Check permission once
   useEffect(() => {
     if (!navigator.permissions) return;
     navigator.permissions.query({ name: 'geolocation' }).then((result) => {
@@ -77,7 +75,7 @@ export const LocationButton = ({
         lat: coords.lat,
         lng: coords.lng,
         pollen: pollenSelected,
-        days,
+        date: currentDate,
         setShowPollenDetailsChart,
       });
     } catch (err: any) {
@@ -93,7 +91,7 @@ export const LocationButton = ({
       setChartLoading(false);
     }
   }, [
-    days,
+    currentDate,
     getUserLocation,
     pollenSelected,
     setChartLoading,

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import {
   getLatitudes,
   getLongitudes,
@@ -9,7 +10,7 @@ interface FetchChartParams {
   lat: number;
   lng: number;
   pollen: string;
-  days: string;
+  date: string; // ← fecha base que le pasas (ej. "2025-11-10")
   setShowPollenDetailsChart: (
     show: boolean,
     title?: string,
@@ -23,7 +24,7 @@ export const fetchAndShowPollenChart = async ({
   lat,
   lng,
   pollen,
-  days,
+  date,
   setShowPollenDetailsChart,
 }: FetchChartParams) => {
   try {
@@ -31,14 +32,17 @@ export const fetchAndShowPollenChart = async ({
       getLatitudes(),
       getLongitudes(),
     ]);
+
     const closestLat = findClosestCoordinate(lat, latitudes);
     const closestLon = findClosestCoordinate(lng, longitudes);
+    
+    const futureDate = dayjs(date).add(2, 'day').format('YYYY-MM-DD');
 
     const chartData = await fetchChartData({
       lat: closestLat,
       lon: closestLon,
       pollen,
-      date: days,
+      date: futureDate,
       hour: 0,
     });
 

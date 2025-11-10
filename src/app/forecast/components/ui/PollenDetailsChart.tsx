@@ -41,23 +41,33 @@ export const PollenDetailsChart = ({
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!chartData || !currentDate) return;
+  const processChartData = (
+    chartData: Record<string, string | number>,
+    currentDate: string
+  ): PollenData[] => {
+    if (!chartData || !currentDate) return [];
+
     const [year, month, day] = currentDate.split('-').map(Number);
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
     const hoursInterval = 1;
     const reversedChartData = Object.values(chartData).reverse();
 
-    const updatedData = reversedChartData.map(
-      (v: string | number, i: number) => ({
-        timestamp: startOfDay.getTime() + i * hoursInterval * 60 * 60 * 1000,
-        value:
-          typeof v === 'number' ? v : isNaN(parseInt(v)) ? null : parseInt(v),
-      })
-    );
+    return reversedChartData.map((v: string | number, i: number) => ({
+      timestamp: startOfDay.getTime() + i * hoursInterval * 60 * 60 * 1000,
+      value:
+        typeof v === 'number' ? v : isNaN(parseInt(v)) ? null : parseInt(v),
+    }));
+  };
+  const getCurrentHourIndex = (data: PollenData[]): number => {
+    if (!data.length) return 0;
 
-    setData(updatedData);
-  }, [chartData, currentDate]);
+    const now = new Date();
+    const currentHour = now.getHours();
+    const index = data.findIndex(
+      (item) => new Date(item.timestamp).getHours() === currentHour
+    );
+    return index !== -1 ? index : 0;
+  };
 
   const getLevelByValue = (value: number | null) => {
     if (!pollenConfig || value === null || value < 1)
@@ -110,6 +120,7 @@ export const PollenDetailsChart = ({
       .join(', ');
     return shortName;
   };
+
   const scrollToCurrentHour = (
     data: PollenData[],
     chartContainer: HTMLDivElement | null,
@@ -133,6 +144,7 @@ export const PollenDetailsChart = ({
       });
     }
   };
+
   const ensureTooltipVisible = (
     chartContainer: HTMLDivElement | null,
     tooltipLeft: number,
@@ -147,7 +159,7 @@ export const PollenDetailsChart = ({
 
     if (tooltipRight > containerRight) {
       chartContainer.scrollTo({
-        left: tooltipRight - chartContainer.clientWidth + 10, 
+        left: tooltipRight - chartContainer.clientWidth + 10,
         behavior: 'smooth',
       });
     }
@@ -160,19 +172,15 @@ export const PollenDetailsChart = ({
     }
   };
 
-  const handleMouseMove = (
-    state: any,
-    activeIndex: number | null,
-    setActiveIndex: (index: number) => void
-  ) => {
+  const handleMouseMove = (state: any) => {
     if (!state.isTooltipActive) return;
 
     const index = Number(state.activeTooltipIndex);
     if (!isNaN(index) && index !== activeIndex) {
       setActiveIndex(index);
 
-      const tooltipWidth = 50; 
-      const tooltipLeft = index * 60 + 35 - tooltipWidth / 2; 
+      const tooltipWidth = 50;
+      const tooltipLeft = index * 60 + 35 - tooltipWidth / 2;
 
       ensureTooltipVisible(
         chartContainerRef.current,
@@ -182,6 +190,16 @@ export const PollenDetailsChart = ({
     }
   };
 
+  useEffect(() => {
+    const updatedData = processChartData(chartData || {}, currentDate);
+    setData(updatedData);
+  }, [chartData, currentDate]);
+
+  useEffect(() => {
+    const index = getCurrentHourIndex(data);
+    setActiveIndex(index);
+  }, [data]);
+  
   useEffect(() => {
     if (!latitude || !longitude) return;
 
@@ -248,12 +266,7 @@ export const PollenDetailsChart = ({
               <LineChart
                 data={data}
                 margin={{ top: 35, right: 20, bottom: 5, left: -25 }}
-                onMouseMove={(state) =>
-                  handleMouseMove(state, activeIndex, setActiveIndex)
-                }
-                onMouseLeave={() => {
-                  setActiveIndex(null);
-                }}
+                onMouseMove={handleMouseMove}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
