@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 
 import { DeckGL } from '@deck.gl/react';
 import { FlyToInterpolator } from '@deck.gl/core';
@@ -29,15 +29,11 @@ import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
 import {
+  addDaysToDate,
   fetchAndShowPollenChart,
   findClosestCoordinate,
 } from '@/app/forecast/utils';
-import {
-  fetchChartData,
-  getLatitudes,
-  getLongitudes,
-} from '@/lib/api/forecast';
-import { addDaysToDate } from '../utils/addDaysToDate';
+import { getLatitudes, getLongitudes } from '@/lib/api/forecast';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -91,6 +87,40 @@ export default function ForecastMap({
 
   const debouncedBounds = useDebounce(bounds, 300);
 
+  const handleGridCellClick = useCallback(
+    async (clickLat: number, clickLon: number) => {
+      try {
+        setChartLoading(true);
+        setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
+        const [latitudes, longitudes] = await Promise.all([
+          getLatitudes(),
+          getLongitudes(),
+        ]);
+        const closestLat = findClosestCoordinate(clickLat, latitudes);
+        const closestLon = findClosestCoordinate(clickLon, longitudes);
+
+        setPinIconMap({ lat: closestLat, long: closestLon });
+        await fetchAndShowPollenChart({
+          lat: clickLat,
+          lng: clickLon,
+          pollen: pollenSelected,
+          days,
+          setShowPollenDetailsChart,
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setChartLoading(false);
+      }
+    },
+    [
+      setChartLoading,
+      setShowPollenDetailsChart,
+      setPinIconMap,
+      pollenSelected,
+      days,
+    ]
+  );
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
@@ -153,40 +183,7 @@ export default function ForecastMap({
     },
     onClick: (info: any) => {
       if (!info.object) return;
-
-      const clickLat = info.coordinate[1];
-      const clickLon = info.coordinate[0];
-
-      const handleClick = async () => {
-        try {
-          setChartLoading(true);
-          setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
-
-          const [latitudes, longitudes] = await Promise.all([
-            getLatitudes(),
-            getLongitudes(),
-          ]);
-
-          const closestLat = findClosestCoordinate(clickLat, latitudes);
-          const closestLon = findClosestCoordinate(clickLon, longitudes);
-
-          setPinIconMap({ lat: closestLat, long: closestLon });
-
-          await fetchAndShowPollenChart({
-            lat: clickLat,
-            lng: clickLon,
-            pollen: pollenSelected,
-            days,
-            setShowPollenDetailsChart,
-          });
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setChartLoading(false);
-        }
-      };
-
-      handleClick();
+      handleGridCellClick(info.coordinate[1], info.coordinate[0]);
     },
   });
 
