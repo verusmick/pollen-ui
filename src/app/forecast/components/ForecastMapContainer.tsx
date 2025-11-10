@@ -28,11 +28,10 @@ import {
 
 import {
   DEFAULT_POLLEN,
-  LEVEL_COLORS,
-  POLLENS,
-  type PollenApiKey,
+  getLevelsForLegend,
   type PollenConfig,
 } from '@/app/forecast/constants';
+
 import { useHourlyForecast } from '../hooks/useHourlyForecast';
 
 const PollenDetailsChart = dynamic(
@@ -152,32 +151,6 @@ export const ForecastMapContainer = () => {
     },
     [pollenSelected.apiKey]
   );
-
-  const getLevelsForLegend = (pollenApiKey: PollenApiKey) => {
-    const pollen = Object.values(POLLENS).find(
-      (p) => p.apiKey === pollenApiKey
-    );
-    if (!pollen) return [];
-
-    return pollen.levels.map((level, idx, arr) => {
-      const key = level.label
-        .toLowerCase()
-        .replace(/\s+/g, '_') as keyof typeof LEVEL_COLORS;
-
-      let maxLabel = level.max.toString();
-
-      if (idx === arr.length - 1) {
-        maxLabel = `>${level.max}`;
-      }
-      return {
-        key,
-        color: LEVEL_COLORS[key],
-        min: level.min,
-        max: maxLabel,
-        label: level.label,
-      };
-    });
-  };
 
   // Playback
   useEffect(() => {

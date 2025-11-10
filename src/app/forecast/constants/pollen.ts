@@ -64,7 +64,30 @@ export const POLLEN_ENTRIES = Object.entries(POLLENS).map(([key, value]) => ({
 export const getPollenByApiKey = (apiKey: PollenApiKey) => {
   return Object.values(POLLENS).find((p) => p.apiKey === apiKey);
 };
+export const getLevelsForLegend = (pollenApiKey: PollenApiKey) => {
+  const pollen = Object.values(POLLENS).find((p) => p.apiKey === pollenApiKey);
+  if (!pollen) return [];
 
+  return pollen.levels.map((level, idx, arr) => {
+    const key = level.label
+      .toLowerCase()
+      .replace(/\s+/g, '_') as keyof typeof LEVEL_COLORS;
+
+    let maxLabel = level.max.toString();
+
+    if (idx === arr.length - 1) {
+      maxLabel = `>${level.max}`;
+    }
+
+    return {
+      key,
+      color: LEVEL_COLORS[key],
+      min: level.min,
+      max: maxLabel,
+      label: level.label,
+    };
+  });
+};
 // Types
 export type PollenKey = keyof typeof POLLENS;
 export type PollenApiKey = (typeof POLLENS)[PollenKey]['apiKey'];

@@ -19,8 +19,7 @@ export const PollenLegendCard = ({
   levels,
   cardRef,
 }: PollenLegendCardProps) => {
-  const t = useTranslations('forecastPage.legend');
-  const p = useTranslations('forecastPage');
+  const t = useTranslations('forecastPage');
 
   return (
     <div
@@ -32,8 +31,8 @@ export const PollenLegendCard = ({
       }`}
     >
       <div className="text-xs font-semibold flex justify-between mb-2">
-        <span> {t('legend_title')}</span>
-        <span className="text-right">{p('pollen')}</span>
+        <span> {t('legend.legend_title')}</span>
+        <span className="text-right">{t('pollen')}</span>
       </div>
 
       <ul className="text-xs space-y-2">
@@ -45,7 +44,7 @@ export const PollenLegendCard = ({
             ></span>
 
             <span className="flex-1 min-w-20">
-              <b>{t(level.key)}</b>
+              <b>{t(`legend.${level.key}`)}</b>
             </span>
 
             <span className="shrink-0 min-w-[50px] text-right">
