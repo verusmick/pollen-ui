@@ -128,11 +128,11 @@ export const ForecastMapContainer = () => {
       allDataRef.current[pollenKey] ??= {};
       allDataRef.current[pollenKey][hour] = JSON.stringify(values);
 
-      // todo: Prune distant hours in case of memory leaks
-      // Object.keys(allDataRef.current[pollenKey]).forEach((h) => {
-      //   if (Math.abs(Number(h) - hour) > 1)
-      //     delete allDataRef.current[pollenKey][h];
-      // });
+      Object.keys(allDataRef.current[pollenKey]).forEach((h) => {
+        if (Math.abs(Number(h) - hour) > 2) {
+          delete allDataRef.current[pollenKey][h];
+        }
+      });
 
       setPollenData(values);
       setPartialLoading(false);
@@ -145,9 +145,6 @@ export const ForecastMapContainer = () => {
     (hour: number) => {
       setPlaying(false);
       setSelectedHour(hour);
-      const pollenKey = pollenSelected.apiKey;
-      const cached = allDataRef.current[pollenKey]?.[hour];
-      setPollenData(cached ? JSON.parse(cached) : []);
     },
     [pollenSelected.apiKey]
   );
@@ -155,19 +152,19 @@ export const ForecastMapContainer = () => {
   // Playback
   useEffect(() => {
     if (!playing) return;
-
+    let isFetchingNext = false;
     const interval = setInterval(() => {
+      if (isFetchingNext || mapDataIsLoading || isFetching) return;
+      isFetchingNext = true;
       setSelectedHour((prevHour) => {
         const nextHour = (prevHour + 1) % 48;
-        const pollenKey = pollenSelected.apiKey;
-        const cached = allDataRef.current[pollenKey]?.[nextHour];
-        setPollenData(cached ? JSON.parse(cached) : []);
+        isFetchingNext = false;
         return nextHour;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [playing, pollenSelected.apiKey]);
+  }, [playing, mapDataIsLoading, isFetching]);
 
   useEffect(() => {
     if (!mapDataIsLoading) setLoading(false);
