@@ -211,7 +211,7 @@ export const ForecastMapContainer = () => {
                 setOpen(false);
               }}
               currentDate={pollenSelected.defaultBaseDate}
-          pollenSelected={pollenSelected.apiKey}
+              pollenSelected={pollenSelected.apiKey}
             />
           )}
         </SearchCardToggle>
@@ -231,7 +231,11 @@ export const ForecastMapContainer = () => {
         )}
       </div>
       <span className="absolute top-18 z-50">
-        <PollenSelector value={pollenSelected} onChange={handlePollenChange} />
+        <PollenSelector
+          value={pollenSelected}
+          onChange={handlePollenChange}
+          onToggle={(open) => setSelectorOpen(open)}
+        />
       </span>
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart
