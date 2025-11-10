@@ -117,6 +117,7 @@ export const ForecastMapContainer = () => {
     if (cached) {
       setPollenData(cached);
       prefetchNextHours(forecastParams, selectedHour, 3);
+      setPartialLoading(false);
       return;
     }
 
