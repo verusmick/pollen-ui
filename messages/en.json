@@ -6,6 +6,7 @@
     "title": "Forecast Map",
     "description": "Interactive pollen forecast map",
     "message_loading": "Pollen Forecast Map",
+    "pollen": "pollen/m³",
     "search": {
       "title_tooltip_search": "Search",
       "loading": "Loading",
@@ -21,16 +22,20 @@
       "title_button_location": "Your location",
       "loading": "Getting location"
     },
+    "chart_location": {
+      "getting_location": "Getting location...",
+      "loading_name": "Loading location name..."
+    },
     "legend": {
       "legend_title": "Allergy level Range",
       "none": "None",
-      "very_low":"Very low",
+      "very_low": "Very low",
       "low": "Low",
       "moderate": "Moderate",
       "high": "High",
       "very_high": "Very high",
       "none_leg": "No allergy risk",
-      "very_low_leg":"Very low allergy risk",
+      "very_low_leg": "Very low allergy risk",
       "low_leg": "Low allergy risk",
       "moderate_leg": "Moderate allergy risk",
       "high_leg": "High allergy risk",

@@ -1,77 +1,94 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { BiX } from "react-icons/bi";
+import { useEffect, useRef, useState } from 'react';
+import { BiX } from 'react-icons/bi';
 import {
   CartesianGrid,
-  Line,
   LineChart,
   ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
-} from "recharts";
-import { LoadingSpinner } from "@/app/forecast/components";
+  Line,
+} from 'recharts';
+import { LoadingSpinner } from '@/app/forecast/components';
 import {
   usePartialLoadingStore,
-  useSearchLocationStore,
-} from "@/app/forecast/stores";
-interface PollenChartProps {
-  onClose?: () => void;
-}
+  usePollenDetailsChartStore,
+} from '@/app/forecast/stores';
+import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
+import { useTranslations } from 'next-intl';
+
 interface PollenData {
   timestamp: number;
-  value: number;
+  value: number | null;
 }
 
-export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
+export const PollenDetailsChart = ({
+  onClose,
+  currentDate,
+  pollenSelected,
+}: {
+  onClose?: () => void;
+  currentDate: string;
+  pollenSelected: string;
+}) => {
+  const t = useTranslations('forecastPage');
+  const pollenConfig = getPollenByApiKey(pollenSelected as PollenApiKey);
+  const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
+  const { chartLoading } = usePartialLoadingStore();
   const [data, setData] = useState<PollenData[]>([]);
-  const { chartLoading, setChartLoading } = usePartialLoadingStore();
+  const [locationName, setLocationName] = useState<string>();
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setChartLoading(true);
+  const processChartData = (
+    chartData: Record<string, string | number>,
+    currentDate: string
+  ): PollenData[] => {
+    if (!chartData || !currentDate) return [];
+
+    const [year, month, day] = currentDate.split('-').map(Number);
+    const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+    const hoursInterval = 1;
+    const reversedChartData = Object.values(chartData).reverse();
+
+    return reversedChartData.map((v: string | number, i: number) => ({
+      timestamp: startOfDay.getTime() + i * hoursInterval * 60 * 60 * 1000,
+      value:
+        typeof v === 'number' ? v : isNaN(parseInt(v)) ? null : parseInt(v),
+    }));
+  };
+  const getCurrentHourIndex = (data: PollenData[]): number => {
+    if (!data.length) return 0;
 
     const now = new Date();
-    const hoursInterval = 3;
-    const totalPoints = (24 / hoursInterval) * 2;
-
-    const fakeData: PollenData[] = Array.from(
-      { length: totalPoints },
-      (_, i) => ({
-        timestamp: now.getTime() + i * hoursInterval * 60 * 60 * 1000,
-        value: Math.floor(Math.random() * 120),
-      })
+    const currentHour = now.getHours();
+    const index = data.findIndex(
+      (item) => new Date(item.timestamp).getHours() === currentHour
     );
-
-    setTimeout(() => {
-      setData(fakeData);
-      setChartLoading(false);
-    }, 1000);
-  }, []);
-
-  const latitude = "-16.5";
-  const longitude = "-68.1";
-
-  const getColorByValue = (value: number) => {
-    if (value >= 100) return "#ff0000";
-    if (value >= 70) return "#f27200";
-    if (value >= 50) return "#ebbb02";
-    if (value >= 25) return "#a5eb02";
-    return "#00e838";
+    return index !== -1 ? index : 0;
   };
 
-  const CustomTick = (props: any) => {
-    const { x, y, payload } = props;
+  const getLevelByValue = (value: number | null) => {
+    if (!pollenConfig || value === null || value < 1)
+      return { label: 'none', color: '#fff' };
+    const colors = ['#00e838', '#a5eb02', '#ebbb02', '#f27200', '#ff0000'];
+    const levels = pollenConfig.levels;
+    const level =
+      levels.find((l) => value >= l.min && value <= l.max) ||
+      levels[levels.length - 1];
+    return { ...level, color: colors[levels.indexOf(level)] || '#fff' };
+  };
+
+  const CustomTick = ({ x, y, payload }: any) => {
     const item = data[payload.index];
     if (!item) return null;
     const date = new Date(item.timestamp);
-    const hourLabel = `${date.getHours().toString().padStart(2, "0")}:00`;
-    const dateLabel = date.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
-
+    const hourLabel = `${date.getHours().toString().padStart(2, '0')}:00`;
+    const day = date.getDate().toString().padStart(2, '0');
+    const monthShort = date.toLocaleString('en-US', { month: 'short' });
+    const year = date.getFullYear();
+    const dateLabel = `${day} ${monthShort} ${year}`;
     return (
       <g transform={`translate(${x},${y})`}>
         <text x={0} y={0} dy={10} textAnchor="middle" fill="#fff" fontSize={10}>
@@ -91,15 +108,142 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
     );
   };
 
+  const fetchLocationName = async (latitude: number, longitude: number) => {
+    if (!latitude || !longitude) return '';
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+    );
+    const data = await res.json();
+    const { road, suburb, city, town, village, country } = data.address;
+    const shortName = [road, suburb || city || town || village, country]
+      .filter(Boolean)
+      .join(', ');
+    return shortName;
+  };
+
+  const scrollToCurrentHour = (
+    data: PollenData[],
+    chartContainer: HTMLDivElement | null,
+    setActiveIndex: (index: number) => void
+  ) => {
+    if (!data.length || !chartContainer) return;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    const index = data.findIndex(
+      (item) => new Date(item.timestamp).getHours() === currentHour
+    );
+
+    if (index !== -1) {
+      setActiveIndex(index);
+      const scrollPosition = index * 60 - chartContainer.clientWidth / 2;
+      chartContainer.scrollTo({
+        left: scrollPosition > 0 ? scrollPosition : 0,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const ensureTooltipVisible = (
+    chartContainer: HTMLDivElement | null,
+    tooltipLeft: number,
+    tooltipWidth: number
+  ) => {
+    if (!chartContainer) return;
+
+    const containerLeft = chartContainer.scrollLeft;
+    const containerRight = containerLeft + chartContainer.clientWidth;
+
+    const tooltipRight = tooltipLeft + tooltipWidth;
+
+    if (tooltipRight > containerRight) {
+      chartContainer.scrollTo({
+        left: tooltipRight - chartContainer.clientWidth + 10,
+        behavior: 'smooth',
+      });
+    }
+
+    if (tooltipLeft < containerLeft) {
+      chartContainer.scrollTo({
+        left: tooltipLeft - 10,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleMouseMove = (state: any) => {
+    if (!state.isTooltipActive) return;
+
+    const index = Number(state.activeTooltipIndex);
+    if (!isNaN(index) && index !== activeIndex) {
+      setActiveIndex(index);
+
+      const tooltipWidth = 50;
+      const tooltipLeft = index * 60 + 35 - tooltipWidth / 2;
+
+      ensureTooltipVisible(
+        chartContainerRef.current,
+        tooltipLeft,
+        tooltipWidth
+      );
+    }
+  };
+
+  useEffect(() => {
+    const updatedData = processChartData(chartData || {}, currentDate);
+    setData(updatedData);
+  }, [chartData, currentDate]);
+
+  useEffect(() => {
+    const index = getCurrentHourIndex(data);
+    setActiveIndex(index);
+  }, [data]);
+
+  useEffect(() => {
+    if (!latitude || !longitude) return;
+
+    const getLocation = async () => {
+      const name = await fetchLocationName(latitude, longitude);
+      if (name) setLocationName(name);
+    };
+
+    getLocation();
+  }, [latitude, longitude]);
+
+  useEffect(() => {
+    scrollToCurrentHour(data, chartContainerRef.current, setActiveIndex);
+  }, [data]);
+
+  const activePoint = activeIndex !== null ? data[activeIndex] : null;
+
   return (
     <div
-      className="absolute 2xl:top-44 md:top-40 left-4 2xl:left-10 md:left-8 
-                 bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-60 
-                 flex flex-col overflow-hidden"
+      className="absolute 2xl:top-44 md:top-40 left-4 2xl:left-10 md:left-8
+                  bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68
+                  flex flex-col overflow-hidden"
     >
       <div className="relative flex-1 w-full h-full">
-        <div className="text-white text-sm font-bold">
-          {latitude} {longitude}
+        <div className="flex flex-col gap-1 text-white">
+          {!latitude || !longitude ? (
+            <span className="text-xs text-gray-400 animate-pulse">
+              📍 {t('chart_location.getting_location')}
+            </span>
+          ) : (
+            <>
+              <span className="text-xs font-semibold text-white block truncate">
+                📍 {locationName || t('chart_location.loading_name')}
+              </span>
+              <span className="text-xs text-gray-400">
+                Lat: {latitude.toFixed(3)} | Lon: {longitude.toFixed(3)}
+              </span>
+              {activePoint && (
+                <span className="text-xs text-gray-400 transition-opacity duration-150">
+                  Level range: {getLevelByValue(activePoint.value).label}
+                </span>
+              )}
+            </>
+          )}
         </div>
 
         <button
@@ -114,20 +258,21 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
         ) : (
-          <div className="overflow-x-auto w-full h-full search-scroll">
-            <ResponsiveContainer width={data.length * 60} height="100%">
+          <div
+            ref={chartContainerRef}
+            className="flex-1 h-[180px] overflow-x-auto search-scroll relative"
+          >
+            <ResponsiveContainer minWidth={data.length * 60} height="100%">
               <LineChart
                 data={data}
-                margin={{ top: 42, right: 20, bottom: 10, left: -25 }}
+                margin={{ top: 35, right: 20, bottom: 5, left: -25 }}
+                onMouseMove={handleMouseMove}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
                   stroke="#fff"
-                  vertical={true}
-                  horizontal={true}
                   opacity={0.3}
                 />
-
                 <XAxis
                   dataKey="timestamp"
                   tick={<CustomTick />}
@@ -135,65 +280,59 @@ export const PollenDetailsChart = ({ onClose }: PollenChartProps) => {
                   tickLine={false}
                 />
                 <YAxis
-                  style={{ fontSize: 10, fill: "#fff" }}
+                  style={{ fontSize: 10, fill: '#fff' }}
                   tickLine={false}
                 />
-
-                <Tooltip
-                  content={({ active, payload, coordinate }) => {
-                    if (active && payload && payload.length) {
-                      const value = payload[0].value;
-                      const offsetTop = 10;
-                      const tooltipMargin = 10;
-                      const x = coordinate?.x ?? 0;
-
-                      return (
-                        <div
-                          className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
-                     text-[11px] whitespace-nowrap border border-white/40 
-                     px-1 py-0.5 pointer-events-none"
-                          style={{
-                            left: x,
-                            top: offsetTop - tooltipMargin,
-                          }}
-                        >
-                          <div className="font-bold text-center">{value}</div>
-                          <div className="text-[9px] text-gray-300">
-                            Pollen/m³
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-
                 <Line
                   type="monotone"
                   dataKey="value"
                   stroke="#fff"
-                  dot={(props: any) => {
-                    const { cx, cy, value, index } = props;
+                  dot={({ cx, cy, value, index }) => {
+                    if (value === null) return <g key={index} />;
+                    const level = getLevelByValue(value);
                     return (
                       <circle
-                        key={`dot-${index}`}
+                        key={index}
                         cx={cx}
                         cy={cy}
                         r={4}
-                        fill={getColorByValue(value)}
+                        fill={level.color}
                         strokeWidth={1.5}
                       />
                     );
                   }}
-                  activeDot={{
-                    r: 6,
-                    stroke: "#ffae42",
-                    strokeWidth: 3,
-                    fill: "#1E293B",
+                  activeDot={({ cx, cy }) => {
+                    if (!activePoint) return <g />;
+                    return (
+                      <circle
+                        cx={cx}
+                        cy={cy}
+                        r={6}
+                        stroke="#ffae42"
+                        strokeWidth={3}
+                        fill="#1E293B"
+                      />
+                    );
                   }}
                 />
               </LineChart>
             </ResponsiveContainer>
+
+            {activePoint && (
+              <div
+                className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
+                text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
+                style={{
+                  left: (activeIndex ?? 0) * 60 + 35,
+                  top: 0,
+                }}
+              >
+                <div className="font-bold text-center text-[10px]">
+                  {activePoint.value ?? 'NA'}
+                </div>
+                <div className="text-[9px] text-gray-300">{t('pollen')}</div>
+              </div>
+            )}
           </div>
         )}
       </div>
