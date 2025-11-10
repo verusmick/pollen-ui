@@ -23,8 +23,9 @@ export const usePollenCacheManager = () => {
   const pruneCache = useCallback((pollenKey: string, currentHour: number, range = 2) => {
     const hours = Object.keys(allDataRef.current[pollenKey] || {});
     for (const h of hours) {
-      if (Math.abs(Number(h) - currentHour) > range) {
-        delete allDataRef.current[pollenKey][h];
+      const hourIndex = Number(h);
+      if (Math.abs(hourIndex - currentHour) > range) {
+        delete allDataRef.current[pollenKey][hourIndex];
       }
     }
   }, []);
