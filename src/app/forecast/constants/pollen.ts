@@ -1,3 +1,4 @@
+type PollenLevel = { label: string; min: number; max: number };
 export const POLLENS = {
   BIRCH: {
     apiKey: 'POLLEN_BIRCH' as const,
@@ -10,7 +11,7 @@ export const POLLENS = {
       { label: 'Moderate', min: 101, max: 200 },
       { label: 'High', min: 201, max: 400 },
       { label: 'Very High', min: 401, max: 1000 },
-    ],
+    ] as PollenLevel[],
   },
   GRASS: {
     apiKey: 'POLLEN_GRASS' as const,
@@ -23,7 +24,7 @@ export const POLLENS = {
       { label: 'Moderate', min: 51, max: 100 },
       { label: 'High', min: 101, max: 200 },
       { label: 'Very High', min: 201, max: 1000 },
-    ],
+    ] as PollenLevel[],
   },
   ALDER: {
     apiKey: 'POLLEN_ALDER' as const,
@@ -36,23 +37,30 @@ export const POLLENS = {
       { label: 'Moderate', min: 101, max: 200 },
       { label: 'High', min: 201, max: 400 },
       { label: 'Very High', min: 401, max: 1000 },
-    ],
+    ] as PollenLevel[],
   },
 } as const;
 
 // Helper arrays for different use cases
-export const POLLEN_OPTIONS = Object.values(POLLENS).map(pollen => pollen.label);
-export const POLLEN_API_KEYS = Object.values(POLLENS).map(pollen => pollen.apiKey);
+export const POLLEN_OPTIONS = Object.values(POLLENS).map(
+  (pollen) => pollen.label
+);
+export const POLLEN_API_KEYS = Object.values(POLLENS).map(
+  (pollen) => pollen.apiKey
+);
 export const POLLEN_ENTRIES = Object.entries(POLLENS).map(([key, value]) => ({
   key: key as PollenKey,
-  ...value
+  ...value,
 }));
+export const getPollenByApiKey = (apiKey: PollenApiKey) => {
+  return Object.values(POLLENS).find((p) => p.apiKey === apiKey);
+};
 
 // Types
 export type PollenKey = keyof typeof POLLENS;
-export type PollenApiKey = typeof POLLENS[PollenKey]['apiKey'];
-export type PollenLabel = typeof POLLENS[PollenKey]['label'];
-export type PollenConfig = typeof POLLENS[PollenKey];
+export type PollenApiKey = (typeof POLLENS)[PollenKey]['apiKey'];
+export type PollenLabel = (typeof POLLENS)[PollenKey]['label'];
+export type PollenConfig = (typeof POLLENS)[PollenKey];
 
 // Defaults
 export const DEFAULT_POLLEN_KEY: PollenKey = 'BIRCH';

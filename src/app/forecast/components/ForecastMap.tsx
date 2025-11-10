@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 
 import { DeckGL } from '@deck.gl/react';
 import { FlyToInterpolator } from '@deck.gl/core';
@@ -19,14 +19,20 @@ import germanyGeo from '@/data/germany.geo.json';
 
 import {
   useCurrentLocationStore,
+  usePartialLoadingStore,
   usePollenDetailsChartStore,
   useSearchLocationStore,
 } from '@/app/forecast/stores';
-   
+
 import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
+import {
+  fetchAndShowPollenChart,
+  findClosestCoordinate,
+} from '@/app/forecast/utils';
+import { getLatitudes, getLongitudes } from '@/lib/api/forecast';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -42,11 +48,17 @@ const viewMapInitialState = {
 export default function ForecastMap({
   pollenData,
   onRegionChange,
+  pollenSelected,
+  currentDate,
 }: {
   pollenData: any;
+  pollenSelected: string;
+  currentDate: string;
+
   onRegionChange: (box: number[]) => void;
 }) {
   const [viewMapState, setViewMapState] = useState(viewMapInitialState);
+  const { setChartLoading } = usePartialLoadingStore();
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
@@ -57,7 +69,6 @@ export default function ForecastMap({
     long: null | number;
   }>({ lat: null, long: null });
   const [bounds, setBounds] = useState<number[] | null>(null);
-
   const {
     lat: searchLat,
     lng: searchlong,
@@ -74,6 +85,40 @@ export default function ForecastMap({
 
   const debouncedBounds = useDebounce(bounds, 300);
 
+  const handleGridCellClick = useCallback(
+    async (clickLat: number, clickLon: number) => {
+      try {
+        setChartLoading(true);
+        setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
+        const [latitudes, longitudes] = await Promise.all([
+          getLatitudes(),
+          getLongitudes(),
+        ]);
+        const closestLat = findClosestCoordinate(clickLat, latitudes);
+        const closestLon = findClosestCoordinate(clickLon, longitudes);
+
+        setPinIconMap({ lat: closestLat, long: closestLon });
+        await fetchAndShowPollenChart({
+          lat: clickLat,
+          lng: clickLon,
+          pollen: pollenSelected,
+          date: currentDate,
+          setShowPollenDetailsChart,
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setChartLoading(false);
+      }
+    },
+    [
+      setChartLoading,
+      setShowPollenDetailsChart,
+      setPinIconMap,
+      pollenSelected,
+      currentDate,
+    ]
+  );
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
@@ -135,19 +180,8 @@ export default function ForecastMap({
       // }
     },
     onClick: (info: any) => {
-      // Show tooltip on hover
-      if (info.object) {
-        clearCurrentLocation();
-        setPinIconMap({ lat: info.coordinate[1], long: info.coordinate[0] });
-        setShowPollenDetailsChart(true);
-        // setTooltipInfo({
-        //   object: info.object,
-        //   x: info.x,
-        //   y: info.y,
-        // });
-      } else {
-        // setTooltipInfo(null); // Hide tooltip when not hovering
-      }
+      if (!info.object) return;
+      handleGridCellClick(info.coordinate[1], info.coordinate[0]);
     },
   });
 

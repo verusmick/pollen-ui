@@ -198,6 +198,8 @@ export const ForecastMapContainer = () => {
       <ForecastMap
         pollenData={pollenData}
         onRegionChange={handleRegionChange}
+        pollenSelected={pollenSelected.apiKey}
+        currentDate={pollenSelected.defaultBaseDate}
       />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
@@ -208,10 +210,16 @@ export const ForecastMapContainer = () => {
                 setUserLocation(pos);
                 setOpen(false);
               }}
+              currentDate={pollenSelected.defaultBaseDate}
+          pollenSelected={pollenSelected.apiKey}
             />
           )}
         </SearchCardToggle>
-        <LocationButton tooltipText={tLocation('title_tooltip_location')} />
+        <LocationButton
+          tooltipText={tLocation('title_tooltip_location')}
+          currentDate={pollenSelected.defaultBaseDate}
+          pollenSelected={pollenSelected.apiKey}
+        />
       </span>
       <div className="relative">
         <ForecastHeader title={t('title')} iconSrc="/zaum.png" />
@@ -226,7 +234,11 @@ export const ForecastMapContainer = () => {
         <PollenSelector value={pollenSelected} onChange={handlePollenChange} />
       </span>
       {!selectorOpen && showPollenDetailsChart && (
-        <PollenDetailsChart onClose={() => setShowPollenDetailsChart(false)} />
+        <PollenDetailsChart
+          onClose={() => setShowPollenDetailsChart(false, '', null, null, null)}
+          currentDate={pollenSelected.defaultBaseDate}
+          pollenSelected={pollenSelected.apiKey}
+        />
       )}
       <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
