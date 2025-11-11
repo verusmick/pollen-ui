@@ -234,7 +234,7 @@ export const ForecastMapContainer = () => {
 
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart
-          onClose={() => setShowPollenDetailsChart(false)}
+          onClose={() => setShowPollenDetailsChart(false  )}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
           loading={chartLoading}

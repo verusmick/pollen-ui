@@ -1,7 +1,10 @@
 import dayjs from 'dayjs';
 import { fetchChartData } from '@/lib/api/forecast';
 import { findClosestCoordinate } from './findClosestCoordinate';
-import { useCoordinatesStore } from '@/app/forecast/stores';
+import {
+  useCoordinatesStore,
+  usePollenDetailsChartStore,
+} from '@/app/forecast/stores';
 
 interface FetchChartParams {
   lat: number;
@@ -37,13 +40,21 @@ export const fetchAndShowPollenChart = async ({
 
     const futureDate = dayjs(date).add(2, 'day').format('YYYY-MM-DD');
 
-    const chartData = await fetchChartData({
+    const chartDataPromise = fetchChartData({
       lat: closestLat,
       lon: closestLon,
       pollen,
       date: futureDate,
       hour: 0,
     });
+
+    // Check if the user has not yet closed the chart before assigning the data.
+    const chartData = await chartDataPromise;
+
+    const { show } = usePollenDetailsChartStore.getState();
+    if (!show) {
+      return;
+    }
 
     setShowPollenDetailsChart(true, '', chartData.data, closestLat, closestLon);
   } catch (error) {
