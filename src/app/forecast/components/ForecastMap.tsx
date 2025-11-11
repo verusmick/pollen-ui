@@ -90,14 +90,7 @@ export default function ForecastMap({
       try {
         setChartLoading(true);
         setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
-        const [latitudes, longitudes] = await Promise.all([
-          getLatitudes(),
-          getLongitudes(),
-        ]);
-        const closestLat = findClosestCoordinate(clickLat, latitudes);
-        const closestLon = findClosestCoordinate(clickLon, longitudes);
-
-        setPinIconMap({ lat: closestLat, long: closestLon });
+        setPinIconMap({ lat: clickLat, long: clickLon });
         await fetchAndShowPollenChart({
           lat: clickLat,
           lng: clickLon,
@@ -106,7 +99,7 @@ export default function ForecastMap({
           setShowPollenDetailsChart,
         });
       } catch (error) {
-        console.error(error);
+        console.error('Error clicking on the map', error);
       } finally {
         setChartLoading(false);
       }
@@ -119,6 +112,7 @@ export default function ForecastMap({
       currentDate,
     ]
   );
+
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];

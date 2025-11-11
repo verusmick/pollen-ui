@@ -27,10 +27,12 @@ export const PollenDetailsChart = ({
   onClose,
   currentDate,
   pollenSelected,
+  loading,
 }: {
   onClose?: () => void;
   currentDate: string;
   pollenSelected: string;
+  loading: boolean;
 }) => {
   const t = useTranslations('forecastPage');
   const pollenConfig = getPollenByApiKey(pollenSelected as PollenApiKey);
@@ -253,7 +255,7 @@ export const PollenDetailsChart = ({
           <BiX size={20} className="text-white" />
         </button>
 
-        {chartLoading ? (
+        {chartLoading || loading ? (
           <div className="flex justify-center items-center h-full">
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
