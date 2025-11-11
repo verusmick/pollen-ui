@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 
 import { DeckGL } from '@deck.gl/react';
 import { FlyToInterpolator } from '@deck.gl/core';
@@ -18,6 +18,7 @@ import bavariaGeo from '@/data/bavaria.geo.json';
 import germanyGeo from '@/data/germany.geo.json';
 
 import {
+  useCoordinatesStore,
   useCurrentLocationStore,
   usePartialLoadingStore,
   usePollenDetailsChartStore,
@@ -28,7 +29,7 @@ import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
-import { fetchAndShowPollenChart } from '@/app/forecast/utils';
+import { fetchAndShowPollenChart, findClosestCoordinate } from '@/app/forecast/utils';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -61,11 +62,7 @@ export default function ForecastMap({
     y: number;
   } | null>(null);
   const [bounds, setBounds] = useState<number[] | null>(null);
-  const {
-    lat: searchLat,
-    lng: searchlong,
-    name,
-  } = useSearchLocationStore();
+  const { lat: searchLat, lng: searchlong, name } = useSearchLocationStore();
   const {
     lat: currentLocationLat,
     lng: currentLocationLong,
@@ -77,25 +74,35 @@ export default function ForecastMap({
     latitude,
     longitude,
   } = usePollenDetailsChartStore();
-
+  const lastRequestId = useRef<string | null>(null);
   const debouncedBounds = useDebounce(bounds, 300);
 
   const handleGridCellClick = useCallback(
     async (clickLat: number, clickLon: number) => {
+      setChartLoading(true);
+      const requestId = `${clickLat}-${clickLon}-${Date.now()}`;
+      lastRequestId.current = requestId;
+
+      const { latitudes, longitudes } = useCoordinatesStore.getState();
+      const closestLat = findClosestCoordinate(clickLat, latitudes);
+      const closestLon = findClosestCoordinate(clickLon, longitudes);
+
       try {
-        setChartLoading(true);
-        setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
+        setShowPollenDetailsChart(true, '', null, closestLat, closestLon);
         await fetchAndShowPollenChart({
-          lat: clickLat,
-          lng: clickLon,
+          lat: closestLat,
+          lng: closestLon,
           pollen: pollenSelected,
           date: currentDate,
           setShowPollenDetailsChart,
+          requestId,
         });
       } catch (error) {
         console.error('Error clicking on the map', error);
       } finally {
-        setChartLoading(false);
+        if (lastRequestId.current === requestId) {
+          setChartLoading(false);
+        }
       }
     },
     [setChartLoading, setShowPollenDetailsChart, pollenSelected, currentDate]
