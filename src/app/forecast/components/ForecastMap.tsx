@@ -28,11 +28,7 @@ import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
-import {
-  fetchAndShowPollenChart,
-  findClosestCoordinate,
-} from '@/app/forecast/utils';
-import { getLatitudes, getLongitudes } from '@/lib/api/forecast';
+import { fetchAndShowPollenChart } from '@/app/forecast/utils';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -64,16 +60,11 @@ export default function ForecastMap({
     x: number;
     y: number;
   } | null>(null);
-  const [pinIconMap, setPinIconMap] = useState<{
-    lat: null | number;
-    long: null | number;
-  }>({ lat: null, long: null });
   const [bounds, setBounds] = useState<number[] | null>(null);
   const {
     lat: searchLat,
     lng: searchlong,
     name,
-    boundingbox,
   } = useSearchLocationStore();
   const {
     lat: currentLocationLat,
@@ -81,7 +72,11 @@ export default function ForecastMap({
     clearLocation: clearCurrentLocation,
     setLocation: setCurrentLocation,
   } = useCurrentLocationStore((state) => state);
-  const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
+  const {
+    setShow: setShowPollenDetailsChart,
+    latitude,
+    longitude,
+  } = usePollenDetailsChartStore();
 
   const debouncedBounds = useDebounce(bounds, 300);
 
@@ -90,7 +85,6 @@ export default function ForecastMap({
       try {
         setChartLoading(true);
         setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
-        setPinIconMap({ lat: clickLat, long: clickLon });
         await fetchAndShowPollenChart({
           lat: clickLat,
           lng: clickLon,
@@ -104,13 +98,7 @@ export default function ForecastMap({
         setChartLoading(false);
       }
     },
-    [
-      setChartLoading,
-      setShowPollenDetailsChart,
-      setPinIconMap,
-      pollenSelected,
-      currentDate,
-    ]
+    [setChartLoading, setShowPollenDetailsChart, pollenSelected, currentDate]
   );
 
   // Convert your API data to grid cells
@@ -180,12 +168,12 @@ export default function ForecastMap({
   });
 
   const pinIconLayer =
-    pinIconMap.lat && pinIconMap.long
+    latitude && longitude
       ? new IconLayer({
           id: 'search-marker',
-          data: [{ position: [pinIconMap.long, pinIconMap.lat], name }],
+          data: [{ position: [longitude, latitude], name }],
           getIcon: () => 'marker',
-          getColor: (d) => [33, 33, 33],
+          getColor: () => [33, 33, 33],
           getPosition: (d) => d.position,
           getSize: () => 41,
           iconAtlas: '/map_icon.png',
@@ -197,14 +185,6 @@ export default function ForecastMap({
               height: 128,
               anchorY: 128,
               mask: true,
-            },
-            'marker-warning': {
-              x: 128,
-              y: 0,
-              width: 128,
-              height: 128,
-              anchorY: 128,
-              mask: false,
             },
           },
           pickable: true,
@@ -291,7 +271,18 @@ export default function ForecastMap({
     if (isHovering) return 'pointer';
     return 'grab';
   };
-
+  const openChartAtLocation = (lat: number, lng: number) => {
+    clearCurrentLocation();
+    setViewMapState((prev) => ({
+      ...prev,
+      longitude: lng,
+      latitude: lat,
+      zoom: 10,
+      transitionDuration: 1000,
+      transitionInterpolator: new FlyToInterpolator(),
+    }));
+    setShowPollenDetailsChart(true, '', null, lat, lng);
+  };
   useEffect(() => {
     if (debouncedBounds && onRegionChange) {
       onRegionChange(debouncedBounds);
@@ -301,33 +292,13 @@ export default function ForecastMap({
   // watcher to check the properties of the map
   useEffect(() => {
     if (searchLat && searchlong) {
-      clearCurrentLocation();
-      setPinIconMap({ lat: searchLat, long: searchlong });
-      setViewMapState((prev) => ({
-        ...prev,
-        longitude: searchlong,
-        latitude: searchLat,
-        zoom: 10,
-        transitionDuration: 1000,
-        transitionInterpolator: new FlyToInterpolator(),
-      }));
-      setShowPollenDetailsChart(true);
+      openChartAtLocation(searchLat, searchlong);
     }
   }, [searchLat, searchlong]);
 
   useEffect(() => {
     if (currentLocationLat && currentLocationLong) {
-      clearCurrentLocation();
-      setPinIconMap({ lat: currentLocationLat, long: currentLocationLong });
-      setViewMapState((prev) => ({
-        ...prev,
-        longitude: currentLocationLong,
-        latitude: currentLocationLat,
-        zoom: 10,
-        transitionDuration: 1000,
-        transitionInterpolator: new FlyToInterpolator(),
-      }));
-      setShowPollenDetailsChart(true);
+      openChartAtLocation(currentLocationLat, currentLocationLong);
     }
   }, [currentLocationLat, currentLocationLong]);
 

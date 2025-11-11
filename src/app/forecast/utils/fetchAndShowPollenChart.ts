@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { fetchChartData } from '@/lib/api/forecast';
 import { findClosestCoordinate } from './findClosestCoordinate';
-import { useCoordinatesStore } from '@/app/forecast/stores'; // store global
+import { useCoordinatesStore } from '@/app/forecast/stores';
 
 interface FetchChartParams {
   lat: number;

@@ -30,6 +30,13 @@ export const usePollenDetailsChartStore = create<PollenDetailsChartState>(
       data = null,
       latitude = null,
       longitude = null
-    ) => set({ show: value, message, data, latitude, longitude }),
+    ) =>
+      set({
+        show: value,
+        message,
+        data,
+        latitude: value ? latitude : null,
+        longitude: value ? longitude : null,
+      }),
   })
 );
