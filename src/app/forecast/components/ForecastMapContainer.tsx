@@ -38,7 +38,7 @@ import {
   usePollenCacheManager,
   usePollenPrefetch,
 } from '@/app/forecast/hooks';
-import { fetchAndShowPollenChart } from '../utils';
+import { fetchAndShowPollenChart } from '@/app/forecast/utils';
 
 const PollenDetailsChart = dynamic(
   () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
@@ -234,7 +234,7 @@ export const ForecastMapContainer = () => {
 
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart
-          onClose={() => setShowPollenDetailsChart(false  )}
+          onClose={() => setShowPollenDetailsChart(false)}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
           loading={chartLoading}

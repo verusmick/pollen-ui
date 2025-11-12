@@ -71,8 +71,8 @@ export default function ForecastMap({
   } = useCurrentLocationStore((state) => state);
   const {
     setShow: setShowPollenDetailsChart,
-    latitude,
-    longitude,
+    latitude: pollenDetailsChartLatitude,
+    longitude: pollenDetailsChartLongitude,
   } = usePollenDetailsChartStore();
   const lastRequestId = useRef<string | null>(null);
   const debouncedBounds = useDebounce(bounds, 300);
@@ -175,10 +175,10 @@ export default function ForecastMap({
   });
 
   const pinIconLayer =
-    latitude && longitude
+    pollenDetailsChartLatitude && pollenDetailsChartLongitude
       ? new IconLayer({
           id: 'search-marker',
-          data: [{ position: [longitude, latitude], name }],
+          data: [{ position: [pollenDetailsChartLongitude, pollenDetailsChartLatitude], name }],
           getIcon: () => 'marker',
           getColor: () => [33, 33, 33],
           getPosition: (d) => d.position,
