@@ -21,6 +21,7 @@ export const LocationSearch = ({
   pollenSelected: string;
 }) => {
   const t = useTranslations('forecastPage.search');
+  const apiBase = process.env.NEXT_PUBLIC_NOMINATIM_API;
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [query, setQuery] = useState('');
@@ -31,65 +32,6 @@ export const LocationSearch = ({
   const setLocation = useSearchLocationStore((state) => state.setLocation);
   const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
 
-  useEffect(() => {
-    if (!query) {
-      setSuggestions([]);
-      return;
-    }
-
-    const timeout = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?` +
-            new URLSearchParams({
-              q: query,
-              format: 'json',
-              addressdetails: '1',
-              limit: '8',
-              countrycodes: 'de',
-              viewbox: '9.5000,47.2700,13.8000,50.5667',
-              bounded: '1',
-            }),
-          {
-            headers: {
-              'Accept-Language': 'en',
-            },
-          }
-        );
-        const data = await res.json();
-        setSuggestions(data);
-        setHighlightIndex(data.length > 0 ? 0 : -1);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }, 400);
-
-    return () => clearTimeout(timeout);
-  }, [query]);
-
-  // Focus when opened
-  useEffect(() => {
-    if (open && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (highlightIndex >= 0 && listRef.current) {
-      const activeItem = listRef.current.children[
-        highlightIndex
-      ] as HTMLElement;
-      if (activeItem) {
-        activeItem.scrollIntoView({
-          block: 'nearest',
-          behavior: 'smooth',
-        });
-      }
-    }
-  }, [highlightIndex]);
   // Function to select a suggestion
   const handleSelect = async (item: any) => {
     const selected = {
@@ -136,6 +78,72 @@ export const LocationSearch = ({
       handleSelect(suggestions[highlightIndex]);
     }
   };
+  const fetchSuggestions = async (q: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${apiBase}/search?` +
+          new URLSearchParams({
+            q,
+            format: 'json',
+            addressdetails: '1',
+            limit: '8',
+            countrycodes: 'de',
+            viewbox: '9.5000,47.2700,13.8000,50.5667',
+            bounded: '1',
+          }),
+        {
+          headers: {
+            'Accept-Language': 'en',
+          },
+        }
+      );
+      const data = await res.json();
+      setSuggestions(data);
+      setHighlightIndex(data.length > 0 ? 0 : -1);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const scrollToHighlightedItem = () => {
+    if (highlightIndex >= 0 && listRef.current) {
+      const activeItem = listRef.current.children[
+        highlightIndex
+      ] as HTMLElement;
+
+      if (activeItem) {
+        activeItem.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth',
+        });
+      }
+    }
+  };
+  useEffect(() => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      fetchSuggestions(query);
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [query]);
+
+  // Focus when opened
+  useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    scrollToHighlightedItem();
+  }, [highlightIndex]);
 
   return (
     <div className="relative w-full flex flex-col gap-2">

@@ -136,11 +136,11 @@ export const ForecastMapContainer = () => {
       setChartLoading(false);
     }
   };
-  useEffect(() => {
-    if (!mapData) return;
-
+  
+  const handleMapDataUpdate = () => {
     const pollenKey = pollenSelected.apiKey;
     const cached = getCached(pollenKey, selectedHour);
+
     if (cached) {
       setPollenData(cached);
       prefetchNextHours(forecastParams, selectedHour, 3);
@@ -168,6 +168,12 @@ export const ForecastMapContainer = () => {
 
     prefetchNextHours(forecastParams, selectedHour, 3);
     setPartialLoading(false);
+  };
+
+  useEffect(() => {
+    if (!mapData) return;
+
+    handleMapDataUpdate();
   }, [mapData, selectedHour]);
 
   useEffect(() => {

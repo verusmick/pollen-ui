@@ -7,6 +7,7 @@ import {
   type PollenConfig,
   DEFAULT_POLLEN,
 } from '@/app/forecast/constants';
+import { useClickOutside } from '@/app/forecast/hooks';
 
 interface PollenSelectorProps {
   value?: PollenConfig;
@@ -23,6 +24,8 @@ export const PollenSelector = ({
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<PollenConfig>(value);
 
+  useClickOutside(dropdownRef, () => setIsOpen(false), isOpen);
+
   useEffect(() => {
     setSelected(value);
   }, [value]);
@@ -38,19 +41,6 @@ export const PollenSelector = ({
   };
 
   const handleToggle = () => setIsOpen((prev) => !prev);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
     <div
