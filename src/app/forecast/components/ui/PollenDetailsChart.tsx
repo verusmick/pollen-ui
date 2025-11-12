@@ -139,9 +139,11 @@ export const PollenDetailsChart = ({
 
     if (index !== -1) {
       setActiveIndex(index);
-      const scrollPosition = index * 60 - chartContainer.clientWidth / 2;
+      const pointPosition = index * 60 + 30; 
+      const scrollPosition = pointPosition - chartContainer.clientWidth / 2;
+
       chartContainer.scrollTo({
-        left: scrollPosition > 0 ? scrollPosition : 0,
+        left: Math.max(scrollPosition, 0),
         behavior: 'smooth',
       });
     }
@@ -214,7 +216,9 @@ export const PollenDetailsChart = ({
   }, [latitude, longitude]);
 
   useEffect(() => {
-    scrollToCurrentHour(data, chartContainerRef.current, setActiveIndex);
+    if (data.length > 0 && chartContainerRef.current) {
+      scrollToCurrentHour(data, chartContainerRef.current, setActiveIndex);
+    }
   }, [data]);
 
   const activePoint = activeIndex !== null ? data[activeIndex] : null;
@@ -260,81 +264,95 @@ export const PollenDetailsChart = ({
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
         ) : (
-          <div
-            ref={chartContainerRef}
-            className="flex-1 h-[180px] overflow-x-auto search-scroll relative"
-          >
-            <ResponsiveContainer minWidth={data.length * 60} height="100%">
-              <LineChart
-                data={data}
-                margin={{ top: 35, right: 20, bottom: 5, left: -25 }}
-                onMouseMove={handleMouseMove}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#fff"
-                  opacity={0.3}
-                />
-                <XAxis
-                  dataKey="timestamp"
-                  tick={<CustomTick />}
-                  interval={0}
-                  tickLine={false}
-                />
-                <YAxis
-                  style={{ fontSize: 10, fill: '#fff' }}
-                  tickLine={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#fff"
-                  dot={({ cx, cy, value, index }) => {
-                    if (value === null) return <g key={index} />;
-                    const level = getLevelByValue(value);
-                    return (
-                      <circle
-                        key={index}
-                        cx={cx}
-                        cy={cy}
-                        r={4}
-                        fill={level.color}
-                        strokeWidth={1.5}
-                      />
-                    );
-                  }}
-                  activeDot={({ cx, cy }) => {
-                    if (!activePoint) return <g />;
-                    return (
-                      <circle
-                        cx={cx}
-                        cy={cy}
-                        r={6}
-                        stroke="#ffae42"
-                        strokeWidth={3}
-                        fill="#1E293B"
-                      />
-                    );
-                  }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="flex h-[180px]">
+            <div className="w-8">
+              <ResponsiveContainer minWidth={data.length * 60} height="100%">
+                <LineChart
+                  data={data}
+                  margin={{ top: 35, right: 0, bottom: 45, left: -30 }}
+                >
+                  <YAxis
+                    dataKey="value"
+                    style={{ fontSize: 10, fill: '#fff' }}
+                    tickLine={false}
+                    axisLine={false} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div
+              ref={chartContainerRef}
+              className="flex-1 overflow-x-auto relative search-scroll"
+            >
+              <ResponsiveContainer minWidth={data.length * 60} height="100%">
+                <LineChart
+                  data={data}
+                  margin={{ top: 35, right: 20, bottom: 5, left: -35 }}
+                  onMouseMove={handleMouseMove}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="#fff"
+                    opacity={0.3}
+                  />
+                  <XAxis
+                    dataKey="timestamp"
+                    tick={<CustomTick />}
+                    interval={0}
+                    tickLine={false}
+                  />
+                  <YAxis tick={false} tickLine={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#fff"
+                    dot={({ cx, cy, value, index }) => {
+                      if (value === null) return <g key={index} />;
+                      const level = getLevelByValue(value);
+                      return (
+                        <circle
+                          key={index}
+                          cx={cx}
+                          cy={cy}
+                          r={4}
+                          fill={level.color}
+                          strokeWidth={1.5}
+                        />
+                      );
+                    }}
+                    activeDot={({ cx, cy }) => {
+                      if (!activePoint) return <g />;
+                      return (
+                        <circle
+                          cx={cx}
+                          cy={cy}
+                          r={6}
+                          stroke="#ffae42"
+                          strokeWidth={3}
+                          fill="#1E293B"
+                        />
+                      );
+                    }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
 
-            {activePoint && (
-              <div
-                className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
+              {activePoint && (
+                <div
+                  className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
                   text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
-                style={{
-                  left: (activeIndex ?? 0) * 60 + 35,
-                  top: 0,
-                }}
-              >
-                <div className="font-bold text-center text-[10px]">
-                  {activePoint.value ?? 'NA'}
+                  style={{
+                    left: (activeIndex ?? 0) * 60 + 30,
+                    top: 0,
+                  }}
+                >
+                  <div className="font-bold text-center text-[10px]">
+                    {activePoint.value ?? 'NA'}
+                  </div>
+                  <div className="text-[9px] text-gray-300">{t('pollen')}</div>
                 </div>
-                <div className="text-[9px] text-gray-300">{t('pollen')}</div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
       </div>
