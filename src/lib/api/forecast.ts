@@ -77,7 +77,7 @@ export async function getHourlyForecast(params: {
   date: string;
   hour: number;
   pollen: string;
-  box: string;
+  box?: string;
   intervals?: string;
   includeCoords?: boolean;
 }) {
@@ -85,9 +85,12 @@ export async function getHourlyForecast(params: {
     date: params.date,
     hour: params.hour.toString(),
     pollen: params.pollen,
-    box: params.box,
     include_coords: (params.includeCoords || false).toString(),
   };
+
+  if (params.box !== undefined) {
+    queryParams.box = params.box;
+  }
 
   if (params.intervals !== undefined) {
     queryParams.intervals = params.intervals;
