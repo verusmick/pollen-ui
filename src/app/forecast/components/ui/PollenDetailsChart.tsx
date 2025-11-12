@@ -140,7 +140,7 @@ export const PollenDetailsChart = ({
 
     if (index !== -1) {
       setActiveIndex(index);
-      const pointPosition = index * 60 + 30; 
+      const pointPosition = index * 60 + 30;
       const scrollPosition = pointPosition - chartContainer.clientWidth / 2;
 
       chartContainer.scrollTo({
@@ -194,7 +194,15 @@ export const PollenDetailsChart = ({
       );
     }
   };
-
+  const getLocation = async (
+    latitude: number,
+    longitude: number,
+    setLocationName: (name: string) => void,
+    fetchLocationName: (lat: number, lon: number) => Promise<string>
+  ) => {
+    const name = await fetchLocationName(latitude, longitude);
+    if (name) setLocationName(name);
+  };
   useEffect(() => {
     const updatedData = processChartData(chartData || {}, currentDate);
     setData(updatedData);
@@ -207,13 +215,7 @@ export const PollenDetailsChart = ({
 
   useEffect(() => {
     if (!latitude || !longitude) return;
-
-    const getLocation = async () => {
-      const name = await fetchLocationName(latitude, longitude);
-      if (name) setLocationName(name);
-    };
-
-    getLocation();
+    getLocation(latitude, longitude, setLocationName, fetchLocationName);
   }, [latitude, longitude]);
 
   useEffect(() => {
@@ -276,7 +278,7 @@ export const PollenDetailsChart = ({
                     dataKey="value"
                     style={{ fontSize: 10, fill: '#fff' }}
                     tickLine={false}
-                    axisLine={false} 
+                    axisLine={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
