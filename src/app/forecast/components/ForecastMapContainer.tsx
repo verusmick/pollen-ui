@@ -38,6 +38,7 @@ import {
   usePollenCacheManager,
   usePollenPrefetch,
 } from '@/app/forecast/hooks';
+import { fetchAndShowPollenChart } from '@/app/forecast/utils';
 
 const PollenDetailsChart = dynamic(
   () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
@@ -50,7 +51,8 @@ export const ForecastMapContainer = () => {
   const tLocation = useTranslations('forecastPage.show_your_location');
 
   const { loading, setLoading } = useLoadingStore();
-  const { partialLoading, setPartialLoading } = usePartialLoadingStore();
+  const { partialLoading, setPartialLoading, chartLoading, setChartLoading } =
+    usePartialLoadingStore();
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
   const { setLatitudes, setLongitudes } = useCoordinatesStore();
@@ -108,7 +110,32 @@ export const ForecastMapContainer = () => {
     onNextHour: () => setSelectedHour((prev) => (prev + 1) % 48),
     intervalMs: 1000,
   });
+  const loadPollenChart = async (
+    pollenSelected: { apiKey: string; defaultBaseDate: string },
+    setChartLoading: (v: boolean) => void
+  ) => {
+    const { latitude, longitude, setShow } =
+      usePollenDetailsChartStore.getState();
 
+    if (!latitude || !longitude) return;
+
+    setChartLoading(true);
+    setShow(true, '', null, latitude, longitude);
+
+    try {
+      await fetchAndShowPollenChart({
+        lat: latitude,
+        lng: longitude,
+        pollen: pollenSelected.apiKey,
+        date: pollenSelected.defaultBaseDate,
+        setShowPollenDetailsChart: setShow,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setChartLoading(false);
+    }
+  };
   useEffect(() => {
     if (!mapData) return;
 
@@ -152,6 +179,12 @@ export const ForecastMapContainer = () => {
     handleSliderChange(diffHours);
   }, []);
 
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      loadPollenChart(pollenSelected, setChartLoading);
+    });
+  }, [pollenSelected.apiKey]);
+
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap
@@ -192,14 +225,19 @@ export const ForecastMapContainer = () => {
         )}
       </div>
       <span className="absolute top-18 z-50">
-        <PollenSelector value={pollenSelected} onChange={handlePollenChange} />
+        <PollenSelector
+          value={pollenSelected}
+          onChange={handlePollenChange}
+          onToggle={(open) => setSelectorOpen(open)}
+        />
       </span>
 
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart
-          onClose={() => setShowPollenDetailsChart(false, '', null, null, null)}
+          onClose={() => setShowPollenDetailsChart(false)}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
+          loading={chartLoading}
         />
       )}
       <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">

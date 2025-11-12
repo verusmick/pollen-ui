@@ -27,10 +27,12 @@ export const PollenDetailsChart = ({
   onClose,
   currentDate,
   pollenSelected,
+  loading,
 }: {
   onClose?: () => void;
   currentDate: string;
   pollenSelected: string;
+  loading: boolean;
 }) => {
   const t = useTranslations('forecastPage');
   const pollenConfig = getPollenByApiKey(pollenSelected as PollenApiKey);
@@ -220,8 +222,8 @@ export const PollenDetailsChart = ({
   return (
     <div
       className="absolute 2xl:top-44 md:top-40 left-4 2xl:left-10 md:left-8
-                  bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68
-                  flex flex-col overflow-hidden"
+                    bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68
+                    flex flex-col overflow-hidden"
     >
       <div className="relative flex-1 w-full h-full">
         <div className="flex flex-col gap-1 text-white">
@@ -253,7 +255,7 @@ export const PollenDetailsChart = ({
           <BiX size={20} className="text-white" />
         </button>
 
-        {chartLoading ? (
+        {chartLoading || loading ? (
           <div className="flex justify-center items-center h-full">
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
@@ -321,7 +323,7 @@ export const PollenDetailsChart = ({
             {activePoint && (
               <div
                 className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
-                text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
+                  text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
                 style={{
                   left: (activeIndex ?? 0) * 60 + 35,
                   top: 0,

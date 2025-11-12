@@ -77,7 +77,7 @@ export async function getHourlyForecast(params: {
   date: string;
   hour: number;
   pollen: string;
-  box: string;
+  box?: string;
   intervals?: string;
   includeCoords?: boolean;
 }) {
@@ -85,9 +85,12 @@ export async function getHourlyForecast(params: {
     date: params.date,
     hour: params.hour.toString(),
     pollen: params.pollen,
-    box: params.box,
-    include_coords: (params.includeCoords || false).toString()
+    include_coords: (params.includeCoords || false).toString(),
   };
+
+  if (params.box !== undefined) {
+    queryParams.box = params.box;
+  }
 
   if (params.intervals !== undefined) {
     queryParams.intervals = params.intervals;
@@ -108,6 +111,7 @@ export async function fetchChartData(params: {
   pollen: string;
   date: string;
   hour: number;
+  signal?: AbortSignal;
 }) {
   const query = new URLSearchParams({
     date: params.date,
@@ -117,7 +121,9 @@ export async function fetchChartData(params: {
     lat: params.lat.toString(),
   });
 
-  const res = await fetch(`/api/forecast/series?${query.toString()}`);
+  const res = await fetch(`/api/forecast/series?${query.toString()}`, {
+    signal: params.signal,
+  });
   if (!res.ok) {
     throw new Error(`Chart API error: ${res.statusText}`);
   }
