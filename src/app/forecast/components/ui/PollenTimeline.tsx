@@ -59,7 +59,7 @@ export default function PollenTimeline({
         {/* Play / Pause */}
         <button
           onClick={() => setPlaying((p) => !p)}
-          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition flex-shrink-0"
+          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition shrink-0"
         >
           {playing ? <FaPause size={14} /> : <FaPlay size={14} />}
         </button>
@@ -69,7 +69,7 @@ export default function PollenTimeline({
           onClick={() =>
             onHourChange(activeHour === 0 ? hours.length - 1 : activeHour - 1)
           }
-          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition flex-shrink-0"
+          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition shrink-0"
         >
           <MdChevronLeft size={18} />
         </button>
@@ -77,12 +77,12 @@ export default function PollenTimeline({
         {/* Timeline */}
         <div
           ref={barRef}
-          className="relative flex overflow-x-auto gap-[2px] scrollbar-hide flex-1 border-t border-gray-700 pt-2 px-1 sm:px-2 md:px-4"
+          className="relative flex overflow-x-auto gap-0.5 scrollbar-hide flex-1 border-t border-gray-700 pt-2 pb-3 px-1 sm:px-2 md:px-4"
         >
           {hours.map((h, i) => (
             <div
               key={i}
-              className="flex flex-col items-center relative min-w-[32px] sm:min-w-[40px] md:min-w-[48px] lg:min-w-[60px]"
+              className="flex flex-col items-center relative min-w-8 sm:min-w-10 md:min-w-12 lg:min-w-[60px]"
             >
               {/* Hour bar */}
               <div
@@ -118,7 +118,7 @@ export default function PollenTimeline({
         {/* Step forward */}
         <button
           onClick={() => onHourChange((activeHour + 1) % hours.length)}
-          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition flex-shrink-0"
+          className="p-2 bg-neutral-700/40 rounded hover:bg-slate-700 transition shrink-0"
         >
           <MdChevronRight size={18} />
         </button>

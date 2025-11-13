@@ -290,7 +290,7 @@ export const PollenDetailsChart = ({
               <ResponsiveContainer minWidth={data.length * 60} height="100%">
                 <LineChart
                   data={data}
-                  margin={{ top: 35, right: 20, bottom: 5, left: -35 }}
+                  margin={{ top: 35, right: 20, bottom: 10, left: -35 }}
                   onMouseMove={handleMouseMove}
                 >
                   <CartesianGrid
