@@ -246,7 +246,7 @@ export const ForecastMapContainer = () => {
           loading={chartLoading}
         />
       )}
-      <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
+      <div className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
           setPlaying={setPlaying}
           playing={playing}
