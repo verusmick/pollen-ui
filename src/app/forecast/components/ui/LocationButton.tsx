@@ -35,7 +35,7 @@ export const LocationButton = ({
   const setLocation = useCurrentLocationStore((state) => state.setLocation);
   const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
 
-  // 🧠 Check permission once
+  // Check permission once
   useEffect(() => {
     if (!navigator.permissions) return;
     navigator.permissions.query({ name: 'geolocation' }).then((result) => {
