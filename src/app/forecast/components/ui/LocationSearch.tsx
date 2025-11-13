@@ -21,7 +21,7 @@ export const LocationSearch = ({
   pollenSelected: string;
 }) => {
   const t = useTranslations('forecastPage.search');
-  const apiBase = process.env.NEXT_PUBLIC_NOMINATIM_API;
+  const nominatimApi = process.env.NEXT_PUBLIC_NOMINATIM_API;
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [query, setQuery] = useState('');
@@ -82,7 +82,7 @@ export const LocationSearch = ({
     setLoading(true);
     try {
       const res = await fetch(
-        `${apiBase}/search?` +
+        `${nominatimApi}/search?` +
           new URLSearchParams({
             q,
             format: 'json',

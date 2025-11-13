@@ -34,7 +34,7 @@ export const PollenDetailsChart = ({
   pollenSelected: string;
   loading: boolean;
 }) => {
-  const apiBase = process.env.NEXT_PUBLIC_NOMINATIM_API;
+  const nominatimApi = process.env.NEXT_PUBLIC_NOMINATIM_API;
   const t = useTranslations('forecastPage');
   const pollenConfig = getPollenByApiKey(pollenSelected as PollenApiKey);
   const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
@@ -114,7 +114,7 @@ export const PollenDetailsChart = ({
   const fetchLocationName = async (latitude: number, longitude: number) => {
     if (!latitude || !longitude) return '';
     const res = await fetch(
-      `${apiBase}/reverse?format=json&lat=${latitude}&lon=${longitude}`
+      `${nominatimApi}/reverse?format=json&lat=${latitude}&lon=${longitude}`
     );
     const data = await res.json();
     const { road, suburb, city, town, village, country } = data.address;
