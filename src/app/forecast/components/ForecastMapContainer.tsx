@@ -241,6 +241,7 @@ export const ForecastMapContainer = () => {
               }}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
+              boundary={boundaryMapBox}
             />
           )}
         </SearchCardToggle>
