@@ -70,10 +70,22 @@ export const ForecastMapContainer = () => {
   } | null>(null);
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState(0);
+  const [timelineStartHour, setTimelineStartHour] = useState(0);
+  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
+
+  const handlePlayPause = () => {
+    if (!playing) {
+      setTimelineStartHour(selectedHour);
+      setTimelineHasWrapped(false);
+      setPlaying(true);
+    } else {
+      setPlaying(false);
+    }
+  };
 
   const forecastParams = useMemo(
     () => ({
@@ -107,9 +119,24 @@ export const ForecastMapContainer = () => {
     playing,
     isFetching,
     isLoading: mapDataIsLoading,
-    onNextHour: () => setSelectedHour((prev) => (prev + 1) % 48),
+    onNextHour: () => {
+      setSelectedHour((prevHour) => {
+        const nextHour = prevHour + 1;
+        if (!timelineHasWrapped && nextHour > 47) {
+          setTimelineHasWrapped(true);
+          return 0;
+        }
+        if (timelineHasWrapped && nextHour > timelineStartHour) {
+          setPlaying(false);
+          return prevHour;
+        }
+        return nextHour;
+      });
+    },
+
     intervalMs: 1000,
   });
+
   const loadPollenChart = async (
     pollenSelected: { apiKey: string; defaultBaseDate: string },
     setChartLoading: (v: boolean) => void
@@ -136,7 +163,7 @@ export const ForecastMapContainer = () => {
       setChartLoading(false);
     }
   };
-  
+
   const handleMapDataUpdate = () => {
     const pollenKey = pollenSelected.apiKey;
     const cached = getCached(pollenKey, selectedHour);
@@ -148,7 +175,7 @@ export const ForecastMapContainer = () => {
       return;
     }
 
-    const { data, longitudes = [], latitudes=[] } = mapData;
+    const { data, longitudes = [], latitudes = [] } = mapData;
     setLatitudes(latitudes);
     setLongitudes(longitudes);
 
@@ -248,7 +275,7 @@ export const ForecastMapContainer = () => {
       )}
       <div className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
-          setPlaying={setPlaying}
+          setPlaying={handlePlayPause}
           playing={playing}
           activeHour={selectedHour}
           onHourChange={handleSliderChange}
