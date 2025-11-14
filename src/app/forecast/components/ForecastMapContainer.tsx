@@ -148,7 +148,7 @@ export const ForecastMapContainer = () => {
       return;
     }
 
-    const { data, longitudes, latitudes } = mapData;
+    const { data, longitudes = [], latitudes=[] } = mapData;
     setLatitudes(latitudes);
     setLongitudes(longitudes);
 
