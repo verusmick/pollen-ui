@@ -70,10 +70,20 @@ export const ForecastMapContainer = () => {
   } | null>(null);
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState(0);
+  const [startHour, setStartHour] = useState(0);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
+
+  const handlePlayPause = () => {
+    if (!playing) {
+      setStartHour(selectedHour);
+      setPlaying(true);
+    } else {
+      setPlaying(false);
+    }
+  };
 
   const forecastParams = useMemo(
     () => ({
@@ -107,9 +117,19 @@ export const ForecastMapContainer = () => {
     playing,
     isFetching,
     isLoading: mapDataIsLoading,
-    onNextHour: () => setSelectedHour((prev) => (prev + 1) % 48),
+    onNextHour: () => {
+      setSelectedHour((prev) => {
+        if (prev < 47) {
+          return prev + 1;
+        } else {
+          setPlaying(false);
+          return startHour;
+        }
+      });
+    },
     intervalMs: 1000,
   });
+
   const loadPollenChart = async (
     pollenSelected: { apiKey: string; defaultBaseDate: string },
     setChartLoading: (v: boolean) => void
@@ -136,7 +156,7 @@ export const ForecastMapContainer = () => {
       setChartLoading(false);
     }
   };
-  
+
   const handleMapDataUpdate = () => {
     const pollenKey = pollenSelected.apiKey;
     const cached = getCached(pollenKey, selectedHour);
@@ -248,7 +268,7 @@ export const ForecastMapContainer = () => {
       )}
       <div className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
-          setPlaying={setPlaying}
+          setPlaying={handlePlayPause}
           playing={playing}
           activeHour={selectedHour}
           onHourChange={handleSliderChange}
