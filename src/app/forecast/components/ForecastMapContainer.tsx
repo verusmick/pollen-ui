@@ -29,6 +29,7 @@ import {
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
+  getRegionBounds,
   type PollenConfig,
 } from '@/app/forecast/constants';
 
@@ -77,6 +78,8 @@ export const ForecastMapContainer = () => {
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
 
+  const boundaryMapBox = getRegionBounds();
+
   const handlePlayPause = () => {
     if (!playing) {
       setTimelineStartHour(selectedHour);
@@ -92,7 +95,7 @@ export const ForecastMapContainer = () => {
       date: pollenSelected.defaultBaseDate,
       hour: selectedHour,
       pollen: pollenSelected.apiKey,
-      box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
+      box: boundaryMapBox,
       intervals: pollenSelected.apiIntervals,
       includeCoords: true,
     }),
