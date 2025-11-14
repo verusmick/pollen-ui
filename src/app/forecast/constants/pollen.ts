@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 
 type PollenLevel = { label: string; min: number; max: number };
 
-const USE_CURRENT_DATE = true;
+const USE_CURRENT_DATE = false;
 
 const getDefaultBaseDate = (fallbackDate: string) =>
   USE_CURRENT_DATE ? dayjs().format('YYYY-MM-DD') : fallbackDate;
