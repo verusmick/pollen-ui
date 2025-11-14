@@ -77,7 +77,7 @@ export default function PollenTimeline({
         {/* Timeline */}
         <div
           ref={barRef}
-          className="relative flex overflow-x-auto gap-0.5 scrollbar-hide flex-1 border-t border-gray-700 pt-2 pb-2 px-1 sm:px-2 md:px-4"
+          className="relative flex overflow-x-auto gap-0.5 scrollbar-hide flex-1 border-t border-gray-700 pt-2 pb-1 px-1 sm:px-2 md:px-4"
         >
           {hours.map((h, i) => (
             <div

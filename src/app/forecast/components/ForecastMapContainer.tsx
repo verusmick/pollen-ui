@@ -70,8 +70,8 @@ export const ForecastMapContainer = () => {
   } | null>(null);
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState(0);
-  const [startHour, setStartHour] = useState(0);
-  const [hasWrapped, setHasWrapped] = useState(false);
+  const [timelineStartHour, setTimelineStartHour] = useState(0);
+  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
@@ -79,8 +79,8 @@ export const ForecastMapContainer = () => {
 
   const handlePlayPause = () => {
     if (!playing) {
-      setStartHour(selectedHour);
-      setHasWrapped(false);
+      setTimelineStartHour(selectedHour);
+      setTimelineHasWrapped(false);
       setPlaying(true);
     } else {
       setPlaying(false);
@@ -120,24 +120,20 @@ export const ForecastMapContainer = () => {
     isFetching,
     isLoading: mapDataIsLoading,
     onNextHour: () => {
-      setSelectedHour((prev) => {
-        if (!hasWrapped) {
-          if (prev < 47) {
-            return prev + 1;
-          } else {
-            setHasWrapped(true);
-            return 0;
-          }
-        } else {
-          if (prev < startHour) {
-            return prev + 1;
-          } else {
-            setPlaying(false);
-            return prev;
-          }
+      setSelectedHour((prevHour) => {
+        const nextHour = prevHour + 1;
+        if (!timelineHasWrapped && nextHour > 47) {
+          setTimelineHasWrapped(true);
+          return 0;
         }
+        if (timelineHasWrapped && nextHour > timelineStartHour) {
+          setPlaying(false);
+          return prevHour;
+        }
+        return nextHour;
       });
     },
+
     intervalMs: 1000,
   });
 
@@ -179,7 +175,7 @@ export const ForecastMapContainer = () => {
       return;
     }
 
-    const { data, longitudes, latitudes } = mapData;
+    const { data, longitudes = [], latitudes = [] } = mapData;
     setLatitudes(latitudes);
     setLongitudes(longitudes);
 
