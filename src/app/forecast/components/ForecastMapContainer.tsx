@@ -95,7 +95,7 @@ export const ForecastMapContainer = () => {
       date: pollenSelected.defaultBaseDate,
       hour: selectedHour,
       pollen: pollenSelected.apiKey,
-      box: boundaryMapBox,
+      box: boundaryMapBox.join(','),
       intervals: pollenSelected.apiIntervals,
       includeCoords: true,
     }),
