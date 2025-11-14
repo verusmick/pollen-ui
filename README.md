@@ -34,3 +34,32 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Branch naming
+
+feature/_, fix/_, hotfix/\* → PR → develop
+
+## Recommended Flow
+This project uses a multi-environment branching strategy to support different configurations of the Pollen Forecast application.
+
+```text
+feature/*        →  Pull Request  →  develop
+
+develop          →  merge →  env/testing
+develop          →  merge →  env/bavaria-static
+develop          →  merge →  env/bavaria-realtime
+develop          →  merge →  env/germany-static
+```
+
+## Changing a Specific Environment
+
+If a change is required **only for one environment**, follow this workflow:
+
+### 1. Start from the target environment branch
+```bash
+git checkout env/<target-env
+```
+
+### 2. Create a feature branch based on that environment
+```bash
+git checkout -b feature/<env>-<short-description>
+```

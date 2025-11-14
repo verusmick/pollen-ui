@@ -9,7 +9,7 @@ export function useHourlyForecast(params: {
   date: string;
   hour: number;
   pollen: PollenApiKey;
-  box: string;
+  box?: string;
   includeCoords?: boolean;
   intervals?: string
 }) {

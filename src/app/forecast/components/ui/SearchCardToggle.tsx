@@ -1,34 +1,25 @@
-"use client";
-import React, { useState, useRef, useEffect } from "react";
-import { BiSearch, BiX } from "react-icons/bi";
-import { Tooltip } from "./Tooltip";
+'use client';
+import React, { useState, useRef, useEffect } from 'react';
+import { BiSearch, BiX } from 'react-icons/bi';
+import { Tooltip } from './Tooltip';
+import { useClickOutside } from "@/app/forecast/hooks"
 
 interface SearchCardToggleProps {
   title?: string;
-  children?: (open: boolean, setOpen: (value: boolean) => void) => React.ReactNode;
+  children?: (
+    open: boolean,
+    setOpen: (value: boolean) => void
+  ) => React.ReactNode;
 }
 
 export const SearchCardToggle = ({
-  title = "Search",
+  title = 'Search',
   children,
 }: SearchCardToggleProps) => {
   const [open, setOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Close on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open]);
+  useClickOutside(cardRef, () => setOpen(false), open);
 
   return (
     <div className="relative">
@@ -55,7 +46,9 @@ export const SearchCardToggle = ({
             {title}
           </h3>
           <div className="text-white">
-            {typeof children === "function" ? children(open, setOpen) : children}
+            {typeof children === 'function'
+              ? children(open, setOpen)
+              : children}
           </div>
         </div>
       )}

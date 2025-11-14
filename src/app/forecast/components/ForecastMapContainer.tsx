@@ -29,6 +29,7 @@ import {
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
+  getRegionBounds,
   type PollenConfig,
 } from '@/app/forecast/constants';
 
@@ -38,6 +39,7 @@ import {
   usePollenCacheManager,
   usePollenPrefetch,
 } from '@/app/forecast/hooks';
+import { fetchAndShowPollenChart } from '@/app/forecast/utils';
 
 const PollenDetailsChart = dynamic(
   () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
@@ -50,7 +52,8 @@ export const ForecastMapContainer = () => {
   const tLocation = useTranslations('forecastPage.show_your_location');
 
   const { loading, setLoading } = useLoadingStore();
-  const { partialLoading, setPartialLoading } = usePartialLoadingStore();
+  const { partialLoading, setPartialLoading, chartLoading, setChartLoading } =
+    usePartialLoadingStore();
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
   const { setLatitudes, setLongitudes } = useCoordinatesStore();
@@ -68,17 +71,31 @@ export const ForecastMapContainer = () => {
   } | null>(null);
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState(0);
+  const [timelineStartHour, setTimelineStartHour] = useState(0);
+  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
+
+  const boundaryMapBox = getRegionBounds();
+
+  const handlePlayPause = () => {
+    if (!playing) {
+      setTimelineStartHour(selectedHour);
+      setTimelineHasWrapped(false);
+      setPlaying(true);
+    } else {
+      setPlaying(false);
+    }
+  };
 
   const forecastParams = useMemo(
     () => ({
       date: pollenSelected.defaultBaseDate,
       hour: selectedHour,
       pollen: pollenSelected.apiKey,
-      box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
+      box: boundaryMapBox.join(','),
       intervals: pollenSelected.apiIntervals,
       includeCoords: true,
     }),
@@ -105,15 +122,55 @@ export const ForecastMapContainer = () => {
     playing,
     isFetching,
     isLoading: mapDataIsLoading,
-    onNextHour: () => setSelectedHour((prev) => (prev + 1) % 48),
+    onNextHour: () => {
+      setSelectedHour((prevHour) => {
+        const nextHour = prevHour + 1;
+        if (!timelineHasWrapped && nextHour > 47) {
+          setTimelineHasWrapped(true);
+          return 0;
+        }
+        if (timelineHasWrapped && nextHour > timelineStartHour) {
+          setPlaying(false);
+          return prevHour;
+        }
+        return nextHour;
+      });
+    },
+
     intervalMs: 1000,
   });
 
-  useEffect(() => {
-    if (!mapData) return;
+  const loadPollenChart = async (
+    pollenSelected: { apiKey: string; defaultBaseDate: string },
+    setChartLoading: (v: boolean) => void
+  ) => {
+    const { latitude, longitude, setShow } =
+      usePollenDetailsChartStore.getState();
 
+    if (!latitude || !longitude) return;
+
+    setChartLoading(true);
+    setShow(true, '', null, latitude, longitude);
+
+    try {
+      await fetchAndShowPollenChart({
+        lat: latitude,
+        lng: longitude,
+        pollen: pollenSelected.apiKey,
+        date: pollenSelected.defaultBaseDate,
+        setShowPollenDetailsChart: setShow,
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setChartLoading(false);
+    }
+  };
+
+  const handleMapDataUpdate = () => {
     const pollenKey = pollenSelected.apiKey;
     const cached = getCached(pollenKey, selectedHour);
+
     if (cached) {
       setPollenData(cached);
       prefetchNextHours(forecastParams, selectedHour, 3);
@@ -121,7 +178,7 @@ export const ForecastMapContainer = () => {
       return;
     }
 
-    const { data, longitudes, latitudes } = mapData;
+    const { data, longitudes = [], latitudes = [] } = mapData;
     setLatitudes(latitudes);
     setLongitudes(longitudes);
 
@@ -141,6 +198,12 @@ export const ForecastMapContainer = () => {
 
     prefetchNextHours(forecastParams, selectedHour, 3);
     setPartialLoading(false);
+  };
+
+  useEffect(() => {
+    if (!mapData) return;
+
+    handleMapDataUpdate();
   }, [mapData, selectedHour]);
 
   useEffect(() => {
@@ -151,6 +214,12 @@ export const ForecastMapContainer = () => {
     const diffHours = dayjs().diff(dayjs().startOf('day'), 'hour');
     handleSliderChange(diffHours);
   }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      loadPollenChart(pollenSelected, setChartLoading);
+    });
+  }, [pollenSelected.apiKey]);
 
   return (
     <div className="relative h-screen w-screen">
@@ -172,6 +241,7 @@ export const ForecastMapContainer = () => {
               }}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
+              boundary={boundaryMapBox}
             />
           )}
         </SearchCardToggle>
@@ -192,19 +262,24 @@ export const ForecastMapContainer = () => {
         )}
       </div>
       <span className="absolute top-18 z-50">
-        <PollenSelector value={pollenSelected} onChange={handlePollenChange} />
+        <PollenSelector
+          value={pollenSelected}
+          onChange={handlePollenChange}
+          onToggle={(open) => setSelectorOpen(open)}
+        />
       </span>
 
       {!selectorOpen && showPollenDetailsChart && (
         <PollenDetailsChart
-          onClose={() => setShowPollenDetailsChart(false, '', null, null, null)}
+          onClose={() => setShowPollenDetailsChart(false)}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
+          loading={chartLoading}
         />
       )}
-      <div className="absolute bottom-13 sm:bottom-13 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
+      <div className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
-          setPlaying={setPlaying}
+          setPlaying={handlePlayPause}
           playing={playing}
           activeHour={selectedHour}
           onHourChange={handleSliderChange}
