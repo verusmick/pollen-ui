@@ -71,6 +71,7 @@ export const ForecastMapContainer = () => {
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState(0);
   const [startHour, setStartHour] = useState(0);
+  const [hasWrapped, setHasWrapped] = useState(false);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
@@ -79,6 +80,7 @@ export const ForecastMapContainer = () => {
   const handlePlayPause = () => {
     if (!playing) {
       setStartHour(selectedHour);
+      setHasWrapped(false);
       setPlaying(true);
     } else {
       setPlaying(false);
@@ -119,11 +121,20 @@ export const ForecastMapContainer = () => {
     isLoading: mapDataIsLoading,
     onNextHour: () => {
       setSelectedHour((prev) => {
-        if (prev < 47) {
-          return prev + 1;
+        if (!hasWrapped) {
+          if (prev < 47) {
+            return prev + 1;
+          } else {
+            setHasWrapped(true);
+            return 0;
+          }
         } else {
-          setPlaying(false);
-          return startHour;
+          if (prev < startHour) {
+            return prev + 1;
+          } else {
+            setPlaying(false);
+            return prev;
+          }
         }
       });
     },
