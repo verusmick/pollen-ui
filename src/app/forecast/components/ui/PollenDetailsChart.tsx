@@ -266,6 +266,10 @@ export const PollenDetailsChart = ({
           <div className="flex justify-center items-center h-full">
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
+        ) : data.length === 0 ? (
+          <div className="flex justify-center items-center h-full text-gray-400 text-sm">
+            {t('chart_location.msg_chart_no_data')}
+          </div>
         ) : (
           <div className="flex h-[180px]">
             <div className="w-8">
