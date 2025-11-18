@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BiMap, BiX } from 'react-icons/bi';
 import { TbLocationFilled } from 'react-icons/tb';
-import { Tooltip } from './Tooltip';
 import { useCurrentLocationStore } from '@/app/forecast/stores/currentLocationStore';
 import { useTranslations } from 'next-intl';
 import {
@@ -11,6 +10,7 @@ import {
   usePollenDetailsChartStore,
 } from '@/app/forecast/stores';
 import { fetchAndShowPollenChart } from '@/app/forecast/utils';
+import { Tooltip } from '@/app/components';
 
 interface LocationButtonProps {
   tooltipText: string;

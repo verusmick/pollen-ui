@@ -25,7 +25,7 @@ import {
   useSearchLocationStore,
 } from '@/app/forecast/stores';
 
-import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
+import { MapTooltip } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
@@ -35,6 +35,7 @@ import {
   getInitialViewState,
   getRegionGeo,
 } from '@/app/forecast/utils';
+import { MapZoomControls } from '@/app/components';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
