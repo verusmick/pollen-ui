@@ -229,15 +229,19 @@ export default function ForecastMap({
   });
 
   // Bavaria boundary
-  const bavariaGeoJsonLayer = new GeoJsonLayer({
-    id: 'bavaria-boundary',
-    data: bavariaGeo as FeatureCollection,
-    filled: false,
-    stroked: true,
-    getLineColor: [78, 77, 77],
-    lineWidthMinPixels: 1.5,
-    getLineWidth: 1,
-  });
+  const bavariaGeoJsonLayer = () => {
+    const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
+    if (region !== 'BAVARIA') return null;
+    return new GeoJsonLayer({
+      id: 'bavaria-boundary',
+      data: bavariaGeo as FeatureCollection,
+      filled: false,
+      stroked: true,
+      getLineColor: [78, 77, 77],
+      lineWidthMinPixels: 1.5,
+      getLineWidth: 1,
+    });
+  };
 
   // Create mask for area outside Germany
   const germanyGeoJsonLayer = useMemo(() => {
@@ -322,7 +326,7 @@ export default function ForecastMap({
         controller={true}
         layers={[
           baseMapLayer,
-          bavariaGeoJsonLayer,
+          bavariaGeoJsonLayer(),
           germanyGeoJsonLayer,
           pollenGridCellsLayer,
           pinIconLayer,
