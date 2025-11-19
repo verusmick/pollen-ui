@@ -11,13 +11,11 @@ import {
   Line,
 } from 'recharts';
 
-import {
-  usePartialLoadingStore,
-  usePollenDetailsChartStore,
-} from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/app/components';
+import { usePartialLoadingStore } from '@/app/stores';
 
 interface PollenData {
   timestamp: number;
@@ -228,9 +226,7 @@ export const PollenDetailsChart = ({
   const activePoint = activeIndex !== null ? data[activeIndex] : null;
 
   return (
-    <div
-      className="bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68 flex flex-col overflow-hidden"
-    >
+    <div className="bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68 flex flex-col overflow-hidden">
       <div className="relative flex-1 w-full h-full">
         <div className="flex justify-between items-start w-full mb-2">
           <div className="flex-1 min-w-0 flex flex-col gap-1">
