@@ -43,8 +43,9 @@ import {
   LocationButton,
 } from '@/app/components';
 
+
 const PollenDetailsChart = dynamic(
-  () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+  () => import('../ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
   { ssr: false }
 );
 
