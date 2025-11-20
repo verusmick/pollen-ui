@@ -233,34 +233,39 @@ export const PollenDetailsChart = ({
                     flex flex-col overflow-hidden"
     >
       <div className="relative flex-1 w-full h-full">
-        <div className="flex flex-col gap-1 text-white">
-          {!latitude || !longitude ? (
-            <span className="text-xs text-gray-400 animate-pulse">
-              📍 {t('chart_location.getting_location')}
-            </span>
-          ) : (
-            <>
-              <span className="text-xs font-semibold text-white block truncate">
-                📍 {locationName || t('chart_location.loading_name')}
+        <div className="flex justify-between items-start w-full mb-2">
+          <div className="flex-1 min-w-0 flex flex-col gap-1">
+            {!latitude || !longitude ? (
+              <span className="text-xs text-gray-400 animate-pulse">
+                📍 {t('chart_location.getting_location')}
               </span>
-              <span className="text-xs text-gray-400">
-                Lat: {latitude.toFixed(3)} | Lon: {longitude.toFixed(3)}
-              </span>
-              {activePoint && (
-                <span className="text-xs text-gray-400 transition-opacity duration-150">
-                  Level range: {getLevelByValue(activePoint.value).label}
+            ) : (
+              <>
+                <span
+                  className="text-xs font-semibold text-white block truncate max-w-full"
+                  title={locationName}
+                >
+                  📍 {locationName || t('chart_location.loading_name')}
                 </span>
-              )}
-            </>
-          )}
-        </div>
+                <span className="text-xs text-gray-400">
+                  Lat: {latitude.toFixed(3)} | Lon: {longitude.toFixed(3)}
+                </span>
+                {activePoint && (
+                  <span className="text-xs text-gray-400 transition-opacity duration-150">
+                    Level range: {getLevelByValue(activePoint.value).label}
+                  </span>
+                )}
+              </>
+            )}
+          </div>
 
-        <button
-          className="absolute top-0 right-0 rounded-full hover:bg-gray-800 transition-colors"
-          onClick={onClose}
-        >
-          <BiX size={20} className="text-white" />
-        </button>
+          <button
+            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors flex-shrink-0"
+            onClick={onClose}
+          >
+            <BiX size={20} className="text-white" />
+          </button>
+        </div>
 
         {chartLoading || loading ? (
           <div className="flex justify-center items-center h-full">
