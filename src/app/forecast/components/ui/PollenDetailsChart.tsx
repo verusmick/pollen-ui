@@ -9,9 +9,8 @@ import {
   XAxis,
   YAxis,
   Line,
-  ReferenceLine,
-  Layer,
   ReferenceArea,
+  ReferenceLine,
 } from 'recharts';
 import { LoadingSpinner } from '@/app/forecast/components';
 import {
@@ -74,6 +73,7 @@ export const PollenDetailsChart = ({
     );
     return index !== -1 ? index : 0;
   };
+
   const currentHourIndex = getCurrentHourIndex(data);
 
   const getLevelByValue = (value: number | null) => {
@@ -124,33 +124,6 @@ export const PollenDetailsChart = ({
             year: 'numeric',
           })}
         </text>
-      </g>
-    );
-  };
-
-  const CustomGrid = ({ xAxis, data, currentHourIndex }: any) => {
-    if (!xAxis || !xAxis.map) return null;
-
-    return (
-      <g>
-        {xAxis.map((entry: any, i: number) => {
-          const isPast = i < currentHourIndex;
-          const isFuture = i > currentHourIndex;
-
-          return (
-            <line
-              key={i}
-              x1={entry.coordinate}
-              y1={0}
-              x2={entry.coordinate}
-              y2={180} // altura total del chart
-              stroke={isPast ? '#4ADE80' : isFuture ? '#F87171' : '#ffffff'}
-              strokeWidth={isPast || isFuture ? 1 : 2}
-              strokeDasharray={i === currentHourIndex ? '4 2' : '3 3'}
-              opacity={0.5}
-            />
-          );
-        })}
       </g>
     );
   };
@@ -304,7 +277,7 @@ export const PollenDetailsChart = ({
           </div>
 
           <button
-            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0"
+            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors flex-shrink-0"
             onClick={onClose}
           >
             <BiX size={20} className="text-white" />
@@ -351,20 +324,11 @@ export const PollenDetailsChart = ({
                     stroke="#fff"
                     opacity={0.3}
                   />
-
                   {currentHourIndex > 0 && (
                     <ReferenceArea
                       x1={data[0].timestamp}
                       x2={data[currentHourIndex - 1].timestamp}
                       fill="rgba(255,255,255,0.4)"
-                    />
-                  )}
-
-                  {currentHourIndex < data.length - 1 && (
-                    <ReferenceArea
-                      x1={data[currentHourIndex + 1].timestamp}
-                      x2={data[data.length - 1].timestamp}
-                      fill="rgba(255,255,255,0.1)"
                     />
                   )}
                   <XAxis
@@ -373,7 +337,7 @@ export const PollenDetailsChart = ({
                     interval={0}
                     tickLine={false}
                   />
-
+                  <YAxis tick={false} tickLine={false} />
                   {data.map((d, i) => {
                     const isPast = i < currentHourIndex;
                     const isFuture = i > currentHourIndex;
@@ -383,22 +347,35 @@ export const PollenDetailsChart = ({
                       <ReferenceLine
                         key={d.timestamp}
                         x={d.timestamp}
-                        stroke="#ffffff"
+                        stroke={
+                          isCurrent ? '#2b7fff' : isPast ? '#2b7fff' : '#9CA3AF'
+                        }
                         strokeOpacity={isCurrent ? 1 : isPast ? 0.5 : 1}
                         strokeWidth={isCurrent ? 2 : 1}
                         strokeDasharray={
-                          isCurrent ? '4 2' : isPast ? '5 5' : undefined
+                          isCurrent ? '4 2' : isPast ? '4 2' : "5 5"
                         }
                       />
                     );
                   })}
-
-                  <YAxis tick={false} tickLine={false} />
-
                   <Line
                     type="monotone"
                     dataKey="value"
                     stroke="#fff"
+                    dot={({ cx, cy, value, index }) => {
+                      if (value === null) return <g key={index} />;
+                      const level = getLevelByValue(value);
+                      return (
+                        <circle
+                          key={index}
+                          cx={cx}
+                          cy={cy}
+                          r={4}
+                          fill={level.color}
+                          strokeWidth={1.5}
+                        />
+                      );
+                    }}
                     activeDot={({ cx, cy }) => {
                       if (!activePoint) return <g />;
                       return (
