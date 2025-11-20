@@ -14,11 +14,13 @@ export const LocationSearch = ({
   open,
   currentDate,
   pollenSelected,
+  boundary,
 }: {
   onSelect: (pos: { lat: number; lng: number }) => void;
   open: boolean;
   currentDate: string;
   pollenSelected: string;
+  boundary: [number, number, number, number];
 }) => {
   const t = useTranslations('forecastPage.search');
   const nominatimApi = process.env.NEXT_PUBLIC_NOMINATIM_API;
@@ -89,7 +91,7 @@ export const LocationSearch = ({
             addressdetails: '1',
             limit: '8',
             countrycodes: 'de',
-            viewbox: '9.5000,47.2700,13.8000,50.5667',
+            viewbox: `${boundary[0]},${boundary[1]},${boundary[2]},${boundary[3]}`,
             bounded: '1',
           }),
         {

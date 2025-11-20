@@ -29,18 +29,15 @@ import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
-import { fetchAndShowPollenChart, findClosestCoordinate } from '@/app/forecast/utils';
+import {
+  fetchAndShowPollenChart,
+  findClosestCoordinate,
+  getInitialViewState,
+  getRegionGeo,
+} from '@/app/forecast/utils';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
-
-const viewMapInitialState = {
-  longitude: 11.5,
-  latitude: 48.8,
-  zoom: 7,
-  minZoom: 5,
-  maxZoom: 12,
-};
 
 export default function ForecastMap({
   pollenData,
@@ -54,7 +51,7 @@ export default function ForecastMap({
 
   onRegionChange: (box: number[]) => void;
 }) {
-  const [viewMapState, setViewMapState] = useState(viewMapInitialState);
+  const [viewMapState, setViewMapState] = useState(getInitialViewState);
   const { setChartLoading } = usePartialLoadingStore();
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
@@ -111,7 +108,7 @@ export default function ForecastMap({
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
-    const filteredPoints = filterPointsInRegion(pollenData, bavariaGeo);
+    const filteredPoints = filterPointsInRegion(pollenData, getRegionGeo());
     // const filteredPoints = pollenData;
     // Create grid cells from filtered points
     return filteredPoints.map(([lat, lon, intensity = 0.5]) => {
@@ -178,7 +175,15 @@ export default function ForecastMap({
     pollenDetailsChartLatitude && pollenDetailsChartLongitude
       ? new IconLayer({
           id: 'search-marker',
-          data: [{ position: [pollenDetailsChartLongitude, pollenDetailsChartLatitude], name }],
+          data: [
+            {
+              position: [
+                pollenDetailsChartLongitude,
+                pollenDetailsChartLatitude,
+              ],
+              name,
+            },
+          ],
           getIcon: () => 'marker',
           getColor: () => [33, 33, 33],
           getPosition: (d) => d.position,
@@ -223,15 +228,19 @@ export default function ForecastMap({
   });
 
   // Bavaria boundary
-  const bavariaGeoJsonLayer = new GeoJsonLayer({
-    id: 'bavaria-boundary',
-    data: bavariaGeo as FeatureCollection,
-    filled: false,
-    stroked: true,
-    getLineColor: [78, 77, 77],
-    lineWidthMinPixels: 1.5,
-    getLineWidth: 1,
-  });
+  const bavariaGeoJsonLayer = () => {
+    const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
+    if (region !== 'BAVARIA') return null;
+    return new GeoJsonLayer({
+      id: 'bavaria-boundary',
+      data: bavariaGeo as FeatureCollection,
+      filled: false,
+      stroked: true,
+      getLineColor: [78, 77, 77],
+      lineWidthMinPixels: 1.5,
+      getLineWidth: 1,
+    });
+  };
 
   // Create mask for area outside Germany
   const germanyGeoJsonLayer = useMemo(() => {
@@ -316,7 +325,7 @@ export default function ForecastMap({
         controller={true}
         layers={[
           baseMapLayer,
-          bavariaGeoJsonLayer,
+          bavariaGeoJsonLayer(),
           germanyGeoJsonLayer,
           pollenGridCellsLayer,
           pinIconLayer,

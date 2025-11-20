@@ -48,3 +48,18 @@ develop          →  merge →  env/testing
 develop          →  merge →  env/bavaria-static
 develop          →  merge →  env/bavaria-realtime
 develop          →  merge →  env/germany-static
+```
+
+## Changing a Specific Environment
+
+If a change is required **only for one environment**, follow this workflow:
+
+### 1. Start from the target environment branch
+```bash
+git checkout env/<target-env
+```
+
+### 2. Create a feature branch based on that environment
+```bash
+git checkout -b feature/<env>-<short-description>
+```
