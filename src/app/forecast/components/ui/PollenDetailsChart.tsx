@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
   Line,
+  ReferenceLine,
 } from 'recharts';
 import { LoadingSpinner } from '@/app/forecast/components';
 import {
@@ -71,6 +72,7 @@ export const PollenDetailsChart = ({
     );
     return index !== -1 ? index : 0;
   };
+  const currentHourIndex = getCurrentHourIndex(data);
 
   const getLevelByValue = (value: number | null) => {
     if (!pollenConfig || value === null || value < 1)
@@ -314,6 +316,12 @@ export const PollenDetailsChart = ({
                     tickLine={false}
                   />
                   <YAxis tick={false} tickLine={false} />
+                  <ReferenceLine
+                    x={data[currentHourIndex].timestamp}
+                    stroke="#fff"
+                    strokeWidth={2}
+                    strokeDasharray="4 2"
+                  />
                   <Line
                     type="monotone"
                     dataKey="value"
