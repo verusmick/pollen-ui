@@ -327,7 +327,7 @@ export const PollenDetailsChart = ({
                   {currentHourIndex > 0 && (
                     <ReferenceArea
                       x1={data[0].timestamp}
-                      x2={data[currentHourIndex - 1].timestamp}
+                      x2={data[currentHourIndex - 0].timestamp}
                       fill="rgba(255,255,255,0.4)"
                     />
                   )}
