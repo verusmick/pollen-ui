@@ -10,6 +10,8 @@ import {
   YAxis,
   Line,
   ReferenceLine,
+  Layer,
+  ReferenceArea,
 } from 'recharts';
 import { LoadingSpinner } from '@/app/forecast/components';
 import {
@@ -85,18 +87,27 @@ export const PollenDetailsChart = ({
     return { ...level, color: colors[levels.indexOf(level)] || '#fff' };
   };
 
-  const CustomTick = ({ x, y, payload }: any) => {
+  const CustomTick = ({ x, y, payload, currentHourIndex }: any) => {
     const item = data[payload.index];
     if (!item) return null;
+
     const date = new Date(item.timestamp);
-    const hourLabel = `${date.getHours().toString().padStart(2, '0')}:00`;
-    const day = date.getDate().toString().padStart(2, '0');
-    const monthShort = date.toLocaleString('en-US', { month: 'short' });
-    const year = date.getFullYear();
-    const dateLabel = `${day} ${monthShort} ${year}`;
+    const hour = date.getHours();
+    const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
+
+    const isCurrent = payload.index === currentHourIndex;
+
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={10} textAnchor="middle" fill="#fff" fontSize={10}>
+        <text
+          x={0}
+          y={0}
+          dy={10}
+          textAnchor="middle"
+          fill={isCurrent ? '#fff' : '#9CA3AF'}
+          fontSize={isCurrent ? 12 : 10}
+          fontWeight={isCurrent ? 'bold' : 'normal'}
+        >
           {hourLabel}
         </text>
         <text
@@ -104,11 +115,42 @@ export const PollenDetailsChart = ({
           y={0}
           dy={22}
           textAnchor="middle"
-          fill="#9CA3AF"
+          fill={isCurrent ? '#fff' : '#9CA3AF'}
           fontSize={9}
         >
-          {dateLabel}
+          {date.toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })}
         </text>
+      </g>
+    );
+  };
+
+  const CustomGrid = ({ xAxis, data, currentHourIndex }: any) => {
+    if (!xAxis || !xAxis.map) return null;
+
+    return (
+      <g>
+        {xAxis.map((entry: any, i: number) => {
+          const isPast = i < currentHourIndex;
+          const isFuture = i > currentHourIndex;
+
+          return (
+            <line
+              key={i}
+              x1={entry.coordinate}
+              y1={0}
+              x2={entry.coordinate}
+              y2={180} // altura total del chart
+              stroke={isPast ? '#4ADE80' : isFuture ? '#F87171' : '#ffffff'}
+              strokeWidth={isPast || isFuture ? 1 : 2}
+              strokeDasharray={i === currentHourIndex ? '4 2' : '3 3'}
+              opacity={0.5}
+            />
+          );
+        })}
       </g>
     );
   };
@@ -262,7 +304,7 @@ export const PollenDetailsChart = ({
           </div>
 
           <button
-            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors flex-shrink-0"
+            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0"
             onClick={onClose}
           >
             <BiX size={20} className="text-white" />
@@ -309,37 +351,54 @@ export const PollenDetailsChart = ({
                     stroke="#fff"
                     opacity={0.3}
                   />
+
+                  {currentHourIndex > 0 && (
+                    <ReferenceArea
+                      x1={data[0].timestamp}
+                      x2={data[currentHourIndex - 1].timestamp}
+                      fill="rgba(255,255,255,0.4)"
+                    />
+                  )}
+
+                  {currentHourIndex < data.length - 1 && (
+                    <ReferenceArea
+                      x1={data[currentHourIndex + 1].timestamp}
+                      x2={data[data.length - 1].timestamp}
+                      fill="rgba(255,255,255,0.1)"
+                    />
+                  )}
                   <XAxis
                     dataKey="timestamp"
-                    tick={<CustomTick />}
+                    tick={<CustomTick currentHourIndex={currentHourIndex} />}
                     interval={0}
                     tickLine={false}
                   />
+
+                  {data.map((d, i) => {
+                    const isPast = i < currentHourIndex;
+                    const isFuture = i > currentHourIndex;
+                    const isCurrent = i === currentHourIndex;
+
+                    return (
+                      <ReferenceLine
+                        key={d.timestamp}
+                        x={d.timestamp}
+                        stroke="#ffffff"
+                        strokeOpacity={isCurrent ? 1 : isPast ? 0.5 : 1}
+                        strokeWidth={isCurrent ? 2 : 1}
+                        strokeDasharray={
+                          isCurrent ? '4 2' : isPast ? '5 5' : undefined
+                        }
+                      />
+                    );
+                  })}
+
                   <YAxis tick={false} tickLine={false} />
-                  <ReferenceLine
-                    x={data[currentHourIndex].timestamp}
-                    stroke="#fff"
-                    strokeWidth={2}
-                    strokeDasharray="4 2"
-                  />
+
                   <Line
                     type="monotone"
                     dataKey="value"
                     stroke="#fff"
-                    dot={({ cx, cy, value, index }) => {
-                      if (value === null) return <g key={index} />;
-                      const level = getLevelByValue(value);
-                      return (
-                        <circle
-                          key={index}
-                          cx={cx}
-                          cy={cy}
-                          r={4}
-                          fill={level.color}
-                          strokeWidth={1.5}
-                        />
-                      );
-                    }}
                     activeDot={({ cx, cy }) => {
                       if (!activePoint) return <g />;
                       return (
