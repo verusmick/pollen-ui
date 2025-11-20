@@ -19,6 +19,7 @@ import {
 } from '@/app/forecast/stores';
 import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
+import { COLORS } from '@/app/styles/colors';
 
 interface PollenData {
   timestamp: number;
@@ -104,7 +105,7 @@ export const PollenDetailsChart = ({
           y={0}
           dy={10}
           textAnchor="middle"
-          fill={isCurrent ? '#fff' : '#9CA3AF'}
+          fill={isCurrent ? COLORS.white : COLORS.gray}
           fontSize={isCurrent ? 12 : 10}
           fontWeight={isCurrent ? 'bold' : 'normal'}
         >
@@ -115,7 +116,7 @@ export const PollenDetailsChart = ({
           y={0}
           dy={22}
           textAnchor="middle"
-          fill={isCurrent ? '#fff' : '#9CA3AF'}
+          fill={isCurrent ? COLORS.white : COLORS.gray}
           fontSize={9}
         >
           {date.toLocaleDateString('en-US', {
@@ -277,7 +278,7 @@ export const PollenDetailsChart = ({
           </div>
 
           <button
-            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors flex-shrink-0"
+            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0"
             onClick={onClose}
           >
             <BiX size={20} className="text-white" />
@@ -340,7 +341,6 @@ export const PollenDetailsChart = ({
                   <YAxis tick={false} tickLine={false} />
                   {data.map((d, i) => {
                     const isPast = i < currentHourIndex;
-                    const isFuture = i > currentHourIndex;
                     const isCurrent = i === currentHourIndex;
 
                     return (
@@ -348,12 +348,16 @@ export const PollenDetailsChart = ({
                         key={d.timestamp}
                         x={d.timestamp}
                         stroke={
-                          isCurrent ? '#2b7fff' : isPast ? '#2b7fff' : '#9CA3AF'
+                          isCurrent
+                            ? COLORS.blue
+                            : isPast
+                            ? COLORS.blue
+                            : COLORS.gray
                         }
                         strokeOpacity={isCurrent ? 1 : isPast ? 0.5 : 1}
                         strokeWidth={isCurrent ? 2 : 1}
                         strokeDasharray={
-                          isCurrent ? '4 2' : isPast ? '4 2' : "5 5"
+                          isCurrent ? '4 2' : isPast ? '4 2' : '5 5'
                         }
                       />
                     );
