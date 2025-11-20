@@ -9,6 +9,8 @@ import {
   XAxis,
   YAxis,
   Line,
+  ReferenceArea,
+  ReferenceLine,
 } from 'recharts';
 
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
@@ -16,6 +18,7 @@ import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/app/components';
 import { usePartialLoadingStore } from '@/app/stores';
+import { COLORS } from '@/app/styles/colors';
 
 interface PollenData {
   timestamp: number;
@@ -71,6 +74,8 @@ export const PollenDetailsChart = ({
     return index !== -1 ? index : 0;
   };
 
+  const currentHourIndex = getCurrentHourIndex(data);
+
   const getLevelByValue = (value: number | null) => {
     if (!pollenConfig || value === null || value < 1)
       return { label: 'none', color: '#fff' };
@@ -82,18 +87,27 @@ export const PollenDetailsChart = ({
     return { ...level, color: colors[levels.indexOf(level)] || '#fff' };
   };
 
-  const CustomTick = ({ x, y, payload }: any) => {
+  const CustomTick = ({ x, y, payload, currentHourIndex }: any) => {
     const item = data[payload.index];
     if (!item) return null;
+
     const date = new Date(item.timestamp);
-    const hourLabel = `${date.getHours().toString().padStart(2, '0')}:00`;
-    const day = date.getDate().toString().padStart(2, '0');
-    const monthShort = date.toLocaleString('en-US', { month: 'short' });
-    const year = date.getFullYear();
-    const dateLabel = `${day} ${monthShort} ${year}`;
+    const hour = date.getHours();
+    const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
+
+    const isCurrent = payload.index === currentHourIndex;
+
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={10} textAnchor="middle" fill="#fff" fontSize={10}>
+        <text
+          x={0}
+          y={0}
+          dy={10}
+          textAnchor="middle"
+          fill={isCurrent ? COLORS.white : COLORS.gray}
+          fontSize={isCurrent ? 12 : 10}
+          fontWeight={isCurrent ? 'bold' : 'normal'}
+        >
           {hourLabel}
         </text>
         <text
@@ -101,10 +115,14 @@ export const PollenDetailsChart = ({
           y={0}
           dy={22}
           textAnchor="middle"
-          fill="#9CA3AF"
+          fill={isCurrent ? COLORS.white : COLORS.gray}
           fontSize={9}
         >
-          {dateLabel}
+          {date.toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })}
         </text>
       </g>
     );
@@ -255,7 +273,7 @@ export const PollenDetailsChart = ({
           </div>
 
           <button
-            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors flex-shrink-0"
+            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0"
             onClick={onClose}
           >
             <BiX size={20} className="text-white" />
@@ -302,13 +320,43 @@ export const PollenDetailsChart = ({
                     stroke="#fff"
                     opacity={0.3}
                   />
+                  {currentHourIndex > 0 && (
+                    <ReferenceArea
+                      x1={data[0].timestamp}
+                      x2={data[currentHourIndex - 0].timestamp}
+                      fill="rgba(255,255,255,0.4)"
+                    />
+                  )}
                   <XAxis
                     dataKey="timestamp"
-                    tick={<CustomTick />}
+                    tick={<CustomTick currentHourIndex={currentHourIndex} />}
                     interval={0}
                     tickLine={false}
                   />
                   <YAxis tick={false} tickLine={false} />
+                  {data.map((d, i) => {
+                    const isPast = i < currentHourIndex;
+                    const isCurrent = i === currentHourIndex;
+
+                    return (
+                      <ReferenceLine
+                        key={d.timestamp}
+                        x={d.timestamp}
+                        stroke={
+                          isCurrent
+                            ? COLORS.blue
+                            : isPast
+                            ? COLORS.blue
+                            : COLORS.gray
+                        }
+                        strokeOpacity={isCurrent ? 1 : isPast ? 0.5 : 1}
+                        strokeWidth={isCurrent ? 2 : 1}
+                        strokeDasharray={
+                          isCurrent ? '4 2' : isPast ? '4 2' : '5 5'
+                        }
+                      />
+                    );
+                  })}
                   <Line
                     type="monotone"
                     dataKey="value"
