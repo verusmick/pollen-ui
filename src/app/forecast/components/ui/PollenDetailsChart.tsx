@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { BiX } from 'react-icons/bi';
 import {
   CartesianGrid,
@@ -128,7 +128,31 @@ export const PollenDetailsChart = ({
       </g>
     );
   };
-
+  const CustomDot = memo(
+    ({ cx, cy, value }: any) => {
+      if (value === null) return <g />;
+      const level = getLevelByValue(value);
+      return (
+        <circle cx={cx} cy={cy} r={4} fill={level.color} strokeWidth={1.5} />
+      );
+    },
+    (prev, next) => prev.value === next.value
+  );
+  const CustomActiveDot = memo(
+    ({ cx, cy }: any) => {
+      return (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={6}
+          stroke="#ffae42"
+          strokeWidth={3}
+          fill="#1E293B"
+        />
+      );
+    },
+    () => true
+  );
   const fetchLocationName = async (latitude: number, longitude: number) => {
     if (!latitude || !longitude) return '';
     const res = await fetch(
@@ -366,33 +390,18 @@ export const PollenDetailsChart = ({
                     type="monotone"
                     dataKey="value"
                     stroke="#fff"
-                    dot={({ cx, cy, value, index }) => {
-                      if (value === null) return <g key={index} />;
-                      const level = getLevelByValue(value);
-                      return (
-                        <circle
-                          key={index}
-                          cx={cx}
-                          cy={cy}
-                          r={4}
-                          fill={level.color}
-                          strokeWidth={1.5}
-                        />
-                      );
+                    isAnimationActive={false}
+                    dot={(props) => {
+                      const { key, ...rest } = props;
+                      return <CustomDot {...rest} key={key} />;
                     }}
-                    activeDot={({ cx, cy }) => {
-                      if (!activePoint) return <g />;
-                      return (
-                        <circle
-                          cx={cx}
-                          cy={cy}
-                          r={6}
-                          stroke="#ffae42"
-                          strokeWidth={3}
-                          fill="#1E293B"
-                        />
-                      );
-                    }}
+                    activeDot={(props) => {
+                      const { key, index, ...rest } = props;
+                      if (index === activeIndex) {
+                        return <CustomActiveDot {...rest} key={key} />;
+                      }
+                      return <g />;
+                    }}  
                   />
                 </LineChart>
               </ResponsiveContainer>
