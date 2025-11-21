@@ -1,4 +1,4 @@
-import { feature, point, polygon, bbox, booleanPointInPolygon } from "@turf/turf";
+import { point, polygon, bbox, booleanPointInPolygon } from "@turf/turf";
 import type { Feature, Polygon, FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 export default function filterPointsInRegion(

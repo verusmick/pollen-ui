@@ -27,7 +27,11 @@ import {
   usePollenCacheManager,
   usePollenPrefetch,
 } from '@/app/forecast/hooks';
-import { fetchAndShowPollenChart } from '@/app/forecast/utils';
+import {
+  computeResFromZoom,
+  fetchAndShowPollenChart,
+  getGridCellsResolution,
+} from '@/app/forecast/utils';
 import {
   LoadingSpinner,
   PanelHeader,
@@ -78,10 +82,13 @@ export const ForecastMapContainer = () => {
   const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
+  const pollenKeyRef = useRef(pollenSelected.apiKey);
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
+  const [boundaryMapBox, setBoundaryMapBox] = useState(getRegionBounds());
 
-  const boundaryMapBox = getRegionBounds();
+  const [gridCellsResolution, setGridCellsResolution] = useState(0.02);
+  const [resolution, setResolution] = useState<1 | 2 | 3>(1);
 
   const handlePlayPause = () => {
     if (!playing) {
@@ -101,8 +108,9 @@ export const ForecastMapContainer = () => {
       box: boundaryMapBox.join(','),
       intervals: pollenSelected.apiIntervals,
       includeCoords: true,
+      res: resolution,
     }),
-    [pollenSelected, selectedHour]
+    [pollenSelected, selectedHour, boundaryMapBox]
   );
 
   const {
@@ -203,6 +211,27 @@ export const ForecastMapContainer = () => {
     setPartialLoading(false);
   };
 
+  const handleRegionChange = useCallback(
+    ({
+      bBox,
+      zoom,
+    }: {
+      bBox: [number, number, number, number];
+      zoom: number;
+      pollenSelected: string;
+    }) => {
+      pruneCache(pollenKeyRef.current, selectedHour, 2);
+
+      const newRes = computeResFromZoom(zoom);
+      const newGridCellsResolution = getGridCellsResolution(newRes);
+
+      setResolution(newRes);
+      setGridCellsResolution(newGridCellsResolution);
+      setBoundaryMapBox(bBox);
+    },
+    [selectedHour, pruneCache]
+  );
+
   useEffect(() => {
     if (!mapData) return;
 
@@ -224,13 +253,18 @@ export const ForecastMapContainer = () => {
     });
   }, [pollenSelected.apiKey]);
 
+  useEffect(() => {
+    pollenKeyRef.current = pollenSelected.apiKey;
+  }, [pollenSelected.apiKey]);
+
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap
         pollenData={pollenData}
-        onRegionChange={() => {}}
+        onRegionChange={handleRegionChange}
         pollenSelected={pollenSelected.apiKey}
         currentDate={pollenSelected.defaultBaseDate}
+        gridCellsResolution={gridCellsResolution}
       />
 
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
@@ -244,7 +278,7 @@ export const ForecastMapContainer = () => {
               }}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
-              boundary={boundaryMapBox}
+              boundary={getRegionBounds()}
             />
           )}
         </SearchCardToggle>

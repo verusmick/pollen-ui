@@ -21,8 +21,8 @@ import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
 import { MapTooltip } from '@/app/forecast/components';
 
-import filterPointsInRegion from '@/utils/filterPointsInRegion';
-import { getBoundsFromViewState, useDebounce } from '@/utils';
+import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
+import { debounce, getBoundsFromViewState } from '@/utils';
 import {
   fetchAndShowPollenChart,
   findClosestCoordinate,
@@ -38,19 +38,23 @@ import {
 } from '@/app/stores';
 
 // Define the grid cell size in degrees
-const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
+// const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
 export default function ForecastMap({
   pollenData,
   onRegionChange,
   pollenSelected,
   currentDate,
+  gridCellsResolution,
 }: {
   pollenData: any;
   pollenSelected: string;
   currentDate: string;
-
-  onRegionChange: (box: number[]) => void;
+  gridCellsResolution: number;
+  onRegionChange: (arg: {
+    bBox: [number, number, number, number];
+    zoom: number;
+  }) => void;
 }) {
   const [viewMapState, setViewMapState] = useState(getInitialViewState);
   const { setChartLoading } = usePartialLoadingStore();
@@ -59,7 +63,6 @@ export default function ForecastMap({
     x: number;
     y: number;
   } | null>(null);
-  const [bounds, setBounds] = useState<number[] | null>(null);
   const { lat: searchLat, lng: searchlong, name } = useSearchLocationStore();
   const {
     lat: currentLocationLat,
@@ -73,7 +76,6 @@ export default function ForecastMap({
     longitude: pollenDetailsChartLongitude,
   } = usePollenDetailsChartStore();
   const lastRequestId = useRef<string | null>(null);
-  const debouncedBounds = useDebounce(bounds, 300);
 
   const handleGridCellClick = useCallback(
     async (clickLat: number, clickLon: number) => {
@@ -114,7 +116,7 @@ export default function ForecastMap({
     // Create grid cells from filtered points
     return filteredPoints.map(([lat, lon, intensity = 0.5]) => {
       // Create a square quadrant around each point
-      const halfCell = GRID_RESOLUTION / 2;
+      const halfCell = gridCellsResolution / 2;
 
       const quadrant = [
         [lon - halfCell, lat - halfCell], // bottom-left
@@ -276,12 +278,20 @@ export default function ForecastMap({
     });
   }, []);
 
-  const handleViewStateChange = (e: any) => {
+  const debouncedRegionUpdate = useRef(
+    debounce((viewState) => {
+      const bBox = getBoundsFromViewState(viewState);
+      const zoom = viewState.zoom;
+
+      onRegionChange?.({ bBox, zoom });
+    }, 150)
+  ).current;
+
+  const handleViewStateChange = useCallback((e: any) => {
     const nextViewState = e.viewState;
     setViewMapState(nextViewState);
-    const nextBounds = getBoundsFromViewState(nextViewState);
-    setBounds(nextBounds);
-  };
+    debouncedRegionUpdate(nextViewState);
+  }, []);
 
   const handleCursor = ({ isDragging, isHovering }: any) => {
     if (isDragging) return 'grabbing';
@@ -300,11 +310,6 @@ export default function ForecastMap({
     }));
     setShowPollenDetailsChart(true, '', null, lat, lng);
   };
-  useEffect(() => {
-    if (debouncedBounds && onRegionChange) {
-      onRegionChange(debouncedBounds);
-    }
-  }, [debouncedBounds, onRegionChange]);
 
   // watcher to check the properties of the map
   useEffect(() => {
