@@ -5,12 +5,7 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import {
-  useCoordinatesStore,
-  useLoadingStore,
-  usePartialLoadingStore,
-  usePollenDetailsChartStore,
-} from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
 import {
   ForecastMap,
@@ -42,9 +37,15 @@ import {
   SearchCardToggle,
   LocationButton,
 } from '@/app/components';
+import {
+  useCoordinatesStore,
+  useLoadingStore,
+  usePartialLoadingStore,
+} from '@/app/stores';
 
 const PollenDetailsChart = dynamic(
-  () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+  () =>
+    import('../ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
   { ssr: false }
 );
 

@@ -13,7 +13,8 @@ import {
   getRegionBounds,
   PollenConfig,
 } from '@/app/forecast/constants';
-import { usePartialLoadingStore } from '@/app/forecast/stores';
+import { usePartialLoadingStore } from '@/app/stores';
+
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
