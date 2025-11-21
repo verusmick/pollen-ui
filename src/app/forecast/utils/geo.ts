@@ -1,7 +1,6 @@
-
 export function computeResFromZoom(zoom: number): 1 | 2 | 3 {
-  if (zoom < 7) return 3;
-  if (zoom < 10) return 2;
+  if (zoom < 5.9) return 3;
+  if (zoom < 7.70) return 2;
   return 1;
 }
 

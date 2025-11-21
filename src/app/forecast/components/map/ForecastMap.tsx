@@ -284,7 +284,7 @@ export default function ForecastMap({
       const zoom = viewState.zoom;
 
       onRegionChange?.({ bBox, zoom });
-    }, 150)
+    }, 80)
   ).current;
 
   const handleViewStateChange = useCallback((e: any) => {
