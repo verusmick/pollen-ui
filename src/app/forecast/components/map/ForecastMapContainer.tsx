@@ -5,24 +5,12 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import {
-  useCoordinatesStore,
-  useLoadingStore,
-  usePartialLoadingStore,
-  usePollenDetailsChartStore,
-} from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
 import {
-  LoadingOverlay,
   ForecastMap,
-  SearchCardToggle,
-  LocationSearch,
-  LocationButton,
-  ForecastHeader,
-  PollenSelector,
   PollenLegend,
   PollenLegendCard,
-  LoadingSpinner,
   PollenTimeline,
 } from '@/app/forecast/components';
 
@@ -40,9 +28,24 @@ import {
   usePollenPrefetch,
 } from '@/app/forecast/hooks';
 import { fetchAndShowPollenChart } from '@/app/forecast/utils';
+import {
+  LoadingSpinner,
+  PanelHeader,
+  LoadingOverlay,
+  DropdownSelector,
+  LocationSearch,
+  SearchCardToggle,
+  LocationButton,
+} from '@/app/components';
+import {
+  useCoordinatesStore,
+  useLoadingStore,
+  usePartialLoadingStore,
+} from '@/app/stores';
 
 const PollenDetailsChart = dynamic(
-  () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+  () =>
+    import('../ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
   { ssr: false }
 );
 
@@ -252,31 +255,28 @@ export const ForecastMapContainer = () => {
           pollenSelected={pollenSelected.apiKey}
         />
       </span>
-      <div className="relative">
-        <ForecastHeader title={t('title')} iconSrc="/zaum.png" />
-
+      <div className="absolute top-8 left-8 z-50 flex flex-col gap-4">
+        <PanelHeader title={t('title')} iconSrc="/zaum.png" />
         {partialLoading && (
           <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
             <LoadingSpinner size={40} color="border-white" />
           </div>
         )}
-      </div>
-      <span className="absolute top-18 z-50">
-        <PollenSelector
+        <DropdownSelector
           value={pollenSelected}
           onChange={handlePollenChange}
           onToggle={(open) => setSelectorOpen(open)}
         />
-      </span>
+        {showPollenDetailsChart && !selectorOpen && (
+          <PollenDetailsChart
+            onClose={() => setShowPollenDetailsChart(false)}
+            currentDate={pollenSelected.defaultBaseDate}
+            pollenSelected={pollenSelected.apiKey}
+            loading={chartLoading}
+          />
+        )}
+      </div>
 
-      {!selectorOpen && showPollenDetailsChart && (
-        <PollenDetailsChart
-          onClose={() => setShowPollenDetailsChart(false)}
-          currentDate={pollenSelected.defaultBaseDate}
-          pollenSelected={pollenSelected.apiKey}
-          loading={chartLoading}
-        />
-      )}
       <div className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
           setPlaying={handlePlayPause}
@@ -288,7 +288,7 @@ export const ForecastMapContainer = () => {
       </div>
 
       <div
-        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-10 2xl:translate-x-0 2xl:bottom-14"
+        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-8 2xl:translate-x-0 2xl:bottom-14"
         onMouseEnter={() => setLegendOpen(true)}
         onMouseLeave={() => setLegendOpen(false)}
       >

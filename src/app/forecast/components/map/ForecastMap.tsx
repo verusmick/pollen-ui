@@ -17,15 +17,9 @@ import type { Feature, FeatureCollection } from 'geojson';
 import bavariaGeo from '@/data/bavaria.geo.json';
 import germanyGeo from '@/data/germany.geo.json';
 
-import {
-  useCoordinatesStore,
-  useCurrentLocationStore,
-  usePartialLoadingStore,
-  usePollenDetailsChartStore,
-  useSearchLocationStore,
-} from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
-import { MapTooltip, MapZoomControls } from '@/app/forecast/components';
+import { MapTooltip } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/filterPointsInRegion';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
@@ -35,6 +29,13 @@ import {
   getInitialViewState,
   getRegionGeo,
 } from '@/app/forecast/utils';
+import { MapZoomControls } from '@/app/components';
+import {
+  useCoordinatesStore,
+  useCurrentLocationStore,
+  usePartialLoadingStore,
+  useSearchLocationStore,
+} from '@/app/stores';
 
 // Define the grid cell size in degrees
 const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants

@@ -1,8 +1,9 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { BiSearch, BiX } from 'react-icons/bi';
-import { Tooltip } from './Tooltip';
+
 import { useClickOutside } from "@/app/forecast/hooks"
+import { Tooltip } from '@/app/components';
 
 interface SearchCardToggleProps {
   title?: string;
