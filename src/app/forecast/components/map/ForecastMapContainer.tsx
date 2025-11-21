@@ -218,7 +218,6 @@ export const ForecastMapContainer = () => {
     }: {
       bBox: [number, number, number, number];
       zoom: number;
-      pollenSelected: string;
     }) => {
       pruneCache(pollenKeyRef.current, selectedHour, 2);
 
