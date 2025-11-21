@@ -5,30 +5,19 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import {
-  useCoordinatesStore,
-  useLoadingStore,
-  usePartialLoadingStore,
-  usePollenDetailsChartStore,
-} from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
 import {
-  LoadingOverlay,
   ForecastMap,
-  SearchCardToggle,
-  LocationSearch,
-  LocationButton,
-  ForecastHeader,
-  PollenSelector,
   PollenLegend,
   PollenLegendCard,
-  LoadingSpinner,
   PollenTimeline,
 } from '@/app/forecast/components';
 
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
+  getRegionBounds,
   type PollenConfig,
 } from '@/app/forecast/constants';
 
@@ -38,10 +27,29 @@ import {
   usePollenCacheManager,
   usePollenPrefetch,
 } from '@/app/forecast/hooks';
-import { fetchAndShowPollenChart } from '@/app/forecast/utils';
+import {
+  computeResFromZoom,
+  fetchAndShowPollenChart,
+  getGridCellsResolution,
+} from '@/app/forecast/utils';
+import {
+  LoadingSpinner,
+  PanelHeader,
+  LoadingOverlay,
+  DropdownSelector,
+  LocationSearch,
+  SearchCardToggle,
+  LocationButton,
+} from '@/app/components';
+import {
+  useCoordinatesStore,
+  useLoadingStore,
+  usePartialLoadingStore,
+} from '@/app/stores';
 
 const PollenDetailsChart = dynamic(
-  () => import('./ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+  () =>
+    import('../ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
   { ssr: false }
 );
 
@@ -70,21 +78,39 @@ export const ForecastMapContainer = () => {
   } | null>(null);
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState(0);
+  const [timelineStartHour, setTimelineStartHour] = useState(0);
+  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
+  const pollenKeyRef = useRef(pollenSelected.apiKey);
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
+  const [boundaryMapBox, setBoundaryMapBox] = useState(getRegionBounds());
+
+  const [gridCellsResolution, setGridCellsResolution] = useState(0.02);
+  const [resolution, setResolution] = useState<1 | 2 | 3>(1);
+
+  const handlePlayPause = () => {
+    if (!playing) {
+      setTimelineStartHour(selectedHour);
+      setTimelineHasWrapped(false);
+      setPlaying(true);
+    } else {
+      setPlaying(false);
+    }
+  };
 
   const forecastParams = useMemo(
     () => ({
       date: pollenSelected.defaultBaseDate,
       hour: selectedHour,
       pollen: pollenSelected.apiKey,
-      box: '7.7893676757813735,46.51390491298438,15.210632324218798,50.986455071208994',
+      box: boundaryMapBox.join(','),
       intervals: pollenSelected.apiIntervals,
       includeCoords: true,
+      res: resolution,
     }),
-    [pollenSelected, selectedHour]
+    [pollenSelected, selectedHour, boundaryMapBox]
   );
 
   const {
@@ -107,9 +133,24 @@ export const ForecastMapContainer = () => {
     playing,
     isFetching,
     isLoading: mapDataIsLoading,
-    onNextHour: () => setSelectedHour((prev) => (prev + 1) % 48),
+    onNextHour: () => {
+      setSelectedHour((prevHour) => {
+        const nextHour = prevHour + 1;
+        if (!timelineHasWrapped && nextHour > 47) {
+          setTimelineHasWrapped(true);
+          return 0;
+        }
+        if (timelineHasWrapped && nextHour > timelineStartHour) {
+          setPlaying(false);
+          return prevHour;
+        }
+        return nextHour;
+      });
+    },
+
     intervalMs: 1000,
   });
+
   const loadPollenChart = async (
     pollenSelected: { apiKey: string; defaultBaseDate: string },
     setChartLoading: (v: boolean) => void
@@ -136,7 +177,7 @@ export const ForecastMapContainer = () => {
       setChartLoading(false);
     }
   };
-  
+
   const handleMapDataUpdate = () => {
     const pollenKey = pollenSelected.apiKey;
     const cached = getCached(pollenKey, selectedHour);
@@ -148,7 +189,7 @@ export const ForecastMapContainer = () => {
       return;
     }
 
-    const { data, longitudes, latitudes } = mapData;
+    const { data, longitudes = [], latitudes = [] } = mapData;
     setLatitudes(latitudes);
     setLongitudes(longitudes);
 
@@ -169,6 +210,26 @@ export const ForecastMapContainer = () => {
     prefetchNextHours(forecastParams, selectedHour, 3);
     setPartialLoading(false);
   };
+
+  const handleRegionChange = useCallback(
+    ({
+      bBox,
+      zoom,
+    }: {
+      bBox: [number, number, number, number];
+      zoom: number;
+    }) => {
+      pruneCache(pollenKeyRef.current, selectedHour, 2);
+
+      const newRes = computeResFromZoom(zoom);
+      const newGridCellsResolution = getGridCellsResolution(newRes);
+
+      setResolution(newRes);
+      setGridCellsResolution(newGridCellsResolution);
+      setBoundaryMapBox(bBox);
+    },
+    [selectedHour, pruneCache]
+  );
 
   useEffect(() => {
     if (!mapData) return;
@@ -191,13 +252,18 @@ export const ForecastMapContainer = () => {
     });
   }, [pollenSelected.apiKey]);
 
+  useEffect(() => {
+    pollenKeyRef.current = pollenSelected.apiKey;
+  }, [pollenSelected.apiKey]);
+
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap
         pollenData={pollenData}
-        onRegionChange={() => {}}
+        onRegionChange={handleRegionChange}
         pollenSelected={pollenSelected.apiKey}
         currentDate={pollenSelected.defaultBaseDate}
+        gridCellsResolution={gridCellsResolution}
       />
 
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
@@ -211,6 +277,7 @@ export const ForecastMapContainer = () => {
               }}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
+              boundary={getRegionBounds()}
             />
           )}
         </SearchCardToggle>
@@ -221,34 +288,31 @@ export const ForecastMapContainer = () => {
           pollenSelected={pollenSelected.apiKey}
         />
       </span>
-      <div className="relative">
-        <ForecastHeader title={t('title')} iconSrc="/zaum.png" />
-
+      <div className="absolute top-8 left-8 z-50 flex flex-col gap-4">
+        <PanelHeader title={t('title')} iconSrc="/zaum.png" />
         {partialLoading && (
           <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
             <LoadingSpinner size={40} color="border-white" />
           </div>
         )}
-      </div>
-      <span className="absolute top-18 z-50">
-        <PollenSelector
+        <DropdownSelector
           value={pollenSelected}
           onChange={handlePollenChange}
           onToggle={(open) => setSelectorOpen(open)}
         />
-      </span>
+        {showPollenDetailsChart && !selectorOpen && (
+          <PollenDetailsChart
+            onClose={() => setShowPollenDetailsChart(false)}
+            currentDate={pollenSelected.defaultBaseDate}
+            pollenSelected={pollenSelected.apiKey}
+            loading={chartLoading}
+          />
+        )}
+      </div>
 
-      {!selectorOpen && showPollenDetailsChart && (
-        <PollenDetailsChart
-          onClose={() => setShowPollenDetailsChart(false)}
-          currentDate={pollenSelected.defaultBaseDate}
-          pollenSelected={pollenSelected.apiKey}
-          loading={chartLoading}
-        />
-      )}
       <div className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
         <PollenTimeline
-          setPlaying={setPlaying}
+          setPlaying={handlePlayPause}
           playing={playing}
           activeHour={selectedHour}
           onHourChange={handleSliderChange}
@@ -257,7 +321,7 @@ export const ForecastMapContainer = () => {
       </div>
 
       <div
-        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-10 2xl:translate-x-0 2xl:bottom-14"
+        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-8 2xl:translate-x-0 2xl:bottom-14"
         onMouseEnter={() => setLegendOpen(true)}
         onMouseLeave={() => setLegendOpen(false)}
       >

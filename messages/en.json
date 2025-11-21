@@ -24,7 +24,8 @@
     },
     "chart_location": {
       "getting_location": "Getting location...",
-      "loading_name": "Loading location name..."
+      "loading_name": "Loading location name...",
+      "msg_chart_no_data": "No data is available for these coordinates"
     },
     "legend": {
       "legend_title": "Allergy level Range",

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { BiX } from 'react-icons/bi';
 import {
   CartesianGrid,
@@ -9,14 +9,16 @@ import {
   XAxis,
   YAxis,
   Line,
+  ReferenceArea,
+  ReferenceLine,
 } from 'recharts';
-import { LoadingSpinner } from '@/app/forecast/components';
-import {
-  usePartialLoadingStore,
-  usePollenDetailsChartStore,
-} from '@/app/forecast/stores';
+
+import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
+import { LoadingSpinner } from '@/app/components';
+import { usePartialLoadingStore } from '@/app/stores';
+import { COLORS } from '@/app/styles/colors';
 
 interface PollenData {
   timestamp: number;
@@ -72,6 +74,8 @@ export const PollenDetailsChart = ({
     return index !== -1 ? index : 0;
   };
 
+  const currentHourIndex = getCurrentHourIndex(data);
+
   const getLevelByValue = (value: number | null) => {
     if (!pollenConfig || value === null || value < 1)
       return { label: 'none', color: '#fff' };
@@ -83,18 +87,27 @@ export const PollenDetailsChart = ({
     return { ...level, color: colors[levels.indexOf(level)] || '#fff' };
   };
 
-  const CustomTick = ({ x, y, payload }: any) => {
+  const CustomTick = ({ x, y, payload, currentHourIndex }: any) => {
     const item = data[payload.index];
     if (!item) return null;
+
     const date = new Date(item.timestamp);
-    const hourLabel = `${date.getHours().toString().padStart(2, '0')}:00`;
-    const day = date.getDate().toString().padStart(2, '0');
-    const monthShort = date.toLocaleString('en-US', { month: 'short' });
-    const year = date.getFullYear();
-    const dateLabel = `${day} ${monthShort} ${year}`;
+    const hour = date.getHours();
+    const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
+
+    const isCurrent = payload.index === currentHourIndex;
+
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={10} textAnchor="middle" fill="#fff" fontSize={10}>
+        <text
+          x={0}
+          y={0}
+          dy={10}
+          textAnchor="middle"
+          fill={isCurrent ? COLORS.white : COLORS.gray}
+          fontSize={isCurrent ? 12 : 10}
+          fontWeight={isCurrent ? 'bold' : 'normal'}
+        >
           {hourLabel}
         </text>
         <text
@@ -102,15 +115,43 @@ export const PollenDetailsChart = ({
           y={0}
           dy={22}
           textAnchor="middle"
-          fill="#9CA3AF"
+          fill={isCurrent ? COLORS.white : COLORS.gray}
           fontSize={9}
         >
-          {dateLabel}
+          {date.toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })}
         </text>
       </g>
     );
   };
-
+  const CustomDot = memo(
+    ({ cx, cy, value }: any) => {
+      if (value === null) return <g />;
+      const level = getLevelByValue(value);
+      return (
+        <circle cx={cx} cy={cy} r={4} fill={level.color} strokeWidth={1.5} />
+      );
+    },
+    (prev, next) => prev.value === next.value
+  );
+  const CustomActiveDot = memo(
+    ({ cx, cy }: any) => {
+      return (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={6}
+          stroke="#ffae42"
+          strokeWidth={3}
+          fill="#1E293B"
+        />
+      );
+    },
+    () => true
+  );
   const fetchLocationName = async (latitude: number, longitude: number) => {
     if (!latitude || !longitude) return '';
     const res = await fetch(
@@ -227,44 +268,49 @@ export const PollenDetailsChart = ({
   const activePoint = activeIndex !== null ? data[activeIndex] : null;
 
   return (
-    <div
-      className="absolute 2xl:top-44 md:top-40 left-4 2xl:left-10 md:left-8
-                    bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68
-                    flex flex-col overflow-hidden"
-    >
+    <div className="bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68 flex flex-col overflow-hidden">
       <div className="relative flex-1 w-full h-full">
-        <div className="flex flex-col gap-1 text-white">
-          {!latitude || !longitude ? (
-            <span className="text-xs text-gray-400 animate-pulse">
-              📍 {t('chart_location.getting_location')}
-            </span>
-          ) : (
-            <>
-              <span className="text-xs font-semibold text-white block truncate">
-                📍 {locationName || t('chart_location.loading_name')}
+        <div className="flex justify-between items-start w-full mb-2">
+          <div className="flex-1 min-w-0 flex flex-col gap-1">
+            {!latitude || !longitude ? (
+              <span className="text-xs text-gray-400 animate-pulse">
+                📍 {t('chart_location.getting_location')}
               </span>
-              <span className="text-xs text-gray-400">
-                Lat: {latitude.toFixed(3)} | Lon: {longitude.toFixed(3)}
-              </span>
-              {activePoint && (
-                <span className="text-xs text-gray-400 transition-opacity duration-150">
-                  Level range: {getLevelByValue(activePoint.value).label}
+            ) : (
+              <>
+                <span
+                  className="text-xs font-semibold text-white block truncate max-w-full"
+                  title={locationName}
+                >
+                  📍 {locationName || t('chart_location.loading_name')}
                 </span>
-              )}
-            </>
-          )}
-        </div>
+                <span className="text-xs text-gray-400">
+                  Lat: {latitude.toFixed(3)} | Lon: {longitude.toFixed(3)}
+                </span>
+                {activePoint && (
+                  <span className="text-xs text-gray-400 transition-opacity duration-150">
+                    Level range: {getLevelByValue(activePoint.value).label}
+                  </span>
+                )}
+              </>
+            )}
+          </div>
 
-        <button
-          className="absolute top-0 right-0 rounded-full hover:bg-gray-800 transition-colors"
-          onClick={onClose}
-        >
-          <BiX size={20} className="text-white" />
-        </button>
+          <button
+            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0"
+            onClick={onClose}
+          >
+            <BiX size={20} className="text-white" />
+          </button>
+        </div>
 
         {chartLoading || loading ? (
           <div className="flex justify-center items-center h-full">
             <LoadingSpinner size={40} color="border-gray-200" />
+          </div>
+        ) : data.length === 0 ? (
+          <div className="flex justify-center items-center h-full text-gray-400 text-sm">
+            {t('chart_location.msg_chart_no_data')}
           </div>
         ) : (
           <div className="flex h-[180px]">
@@ -298,44 +344,59 @@ export const PollenDetailsChart = ({
                     stroke="#fff"
                     opacity={0.3}
                   />
+                  {currentHourIndex > 0 && (
+                    <ReferenceArea
+                      x1={data[0].timestamp}
+                      x2={data[currentHourIndex - 0].timestamp}
+                      fill="rgba(255,255,255,0.4)"
+                    />
+                  )}
                   <XAxis
                     dataKey="timestamp"
-                    tick={<CustomTick />}
+                    tick={<CustomTick currentHourIndex={currentHourIndex} />}
                     interval={0}
                     tickLine={false}
                   />
                   <YAxis tick={false} tickLine={false} />
+                  {data.map((d, i) => {
+                    const isPast = i < currentHourIndex;
+                    const isCurrent = i === currentHourIndex;
+
+                    return (
+                      <ReferenceLine
+                        key={d.timestamp}
+                        x={d.timestamp}
+                        stroke={
+                          isCurrent
+                            ? COLORS.blue
+                            : isPast
+                            ? COLORS.blue
+                            : COLORS.gray
+                        }
+                        strokeOpacity={isCurrent ? 1 : isPast ? 0.5 : 1}
+                        strokeWidth={isCurrent ? 2 : 1}
+                        strokeDasharray={
+                          isCurrent ? '4 2' : isPast ? '4 2' : '5 5'
+                        }
+                      />
+                    );
+                  })}
                   <Line
                     type="monotone"
                     dataKey="value"
                     stroke="#fff"
-                    dot={({ cx, cy, value, index }) => {
-                      if (value === null) return <g key={index} />;
-                      const level = getLevelByValue(value);
-                      return (
-                        <circle
-                          key={index}
-                          cx={cx}
-                          cy={cy}
-                          r={4}
-                          fill={level.color}
-                          strokeWidth={1.5}
-                        />
-                      );
+                    isAnimationActive={false}
+                    dot={(props) => {
+                      const { key, ...rest } = props;
+                      return <CustomDot {...rest} key={key} />;
                     }}
-                    activeDot={({ cx, cy }) => {
-                      if (!activePoint) return <g />;
-                      return (
-                        <circle
-                          cx={cx}
-                          cy={cy}
-                          r={6}
-                          stroke="#ffae42"
-                          strokeWidth={3}
-                          fill="#1E293B"
-                        />
-                      );
-                    }}
+                    activeDot={(props) => {
+                      const { key, index, ...rest } = props;
+                      if (index === activeIndex) {
+                        return <CustomActiveDot {...rest} key={key} />;
+                      }
+                      return <g />;
+                    }}  
                   />
                 </LineChart>
               </ResponsiveContainer>
