@@ -105,7 +105,7 @@ export async function getHourlyForecast(params: {
   return res.json();
 }
 
-export async function fetchChartData(params: {
+export async function   fetchChartData(params: {
   lat: number;
   lon: number;
   pollen: string;
