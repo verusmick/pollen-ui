@@ -32,7 +32,7 @@ export default function PollenTimeline({
       showDate: boolean;
     }[] = [];
 
-    for (let i = 0; i < 48; i++) {
+    for (let i = 0; i < 49; i++) {
       const d = new Date(startOfDay.getTime() + i * 3600 * 1000);
       const hourStr = dayjs(d).format('HH:mm');
       const dateStr = dayjs(d).format('MMM D, YYYY');
@@ -44,7 +44,6 @@ export default function PollenTimeline({
     }
     return list;
   }, [baseDate]);
-
   // Scroll to active hour
   useEffect(() => {
     if (barRef.current) {

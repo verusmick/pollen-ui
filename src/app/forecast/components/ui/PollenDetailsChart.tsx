@@ -55,14 +55,39 @@ export const PollenDetailsChart = ({
     const [year, month, day] = currentDate.split('-').map(Number);
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
     const hoursInterval = 1;
+
     const reversedChartData = Object.values(chartData).reverse();
 
-    return reversedChartData.map((v: string | number, i: number) => ({
+    const data = reversedChartData.map((v: string | number, i: number) => ({
       timestamp: startOfDay.getTime() + i * hoursInterval * 60 * 60 * 1000,
       value:
         typeof v === 'number' ? v : isNaN(parseInt(v)) ? null : parseInt(v),
     }));
+
+    const thirdMidnight = new Date(
+      year,
+      month - 1,
+      day + 2, 
+      0,
+      0,
+      0,
+      0
+    ).getTime();
+
+    const alreadyHasThirdMidnight = data.some(
+      (d) => d.timestamp === thirdMidnight
+    );
+
+    if (!alreadyHasThirdMidnight) {
+      data.push({
+        timestamp: thirdMidnight,
+        value: null,
+      });
+    }
+
+    return data;
   };
+
   const getCurrentHourIndex = (data: PollenData[]): number => {
     if (!data.length) return 0;
 
@@ -396,7 +421,7 @@ export const PollenDetailsChart = ({
                         return <CustomActiveDot {...rest} key={key} />;
                       }
                       return <g />;
-                    }}  
+                    }}
                   />
                 </LineChart>
               </ResponsiveContainer>

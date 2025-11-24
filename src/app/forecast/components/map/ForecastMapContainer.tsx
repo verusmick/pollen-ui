@@ -128,7 +128,7 @@ export const ForecastMapContainer = () => {
     onNextHour: () => {
       setSelectedHour((prevHour) => {
         const nextHour = prevHour + 1;
-        if (!timelineHasWrapped && nextHour > 47) {
+        if (!timelineHasWrapped && nextHour > 48) {
           setTimelineHasWrapped(true);
           return 0;
         }

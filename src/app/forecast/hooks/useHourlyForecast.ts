@@ -11,16 +11,16 @@ export function useHourlyForecast(params: {
   pollen: PollenApiKey;
   box?: string;
   includeCoords?: boolean;
-  intervals?: string
+  intervals?: string;
 }) {
   const normalizedParams = useMemo(() => {
-    const dateToUse = dayjs(params.date + 'T00:00:00')
-      .add(params.hour >= 24 ? 1 : 0, 'day');
+    const start = dayjs(params.date + 'T00:00:00');
+    const dateToUse = start.add(params.hour, 'hour');
 
     return {
       ...params,
       date: dateToUse.format('YYYY-MM-DD'),
-      hour: params.hour % 24,
+      hour: dateToUse.hour(),
     };
   }, [params]);
   return useQuery({
