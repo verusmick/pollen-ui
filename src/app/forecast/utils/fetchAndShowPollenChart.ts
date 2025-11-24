@@ -2,9 +2,9 @@ import dayjs from 'dayjs';
 import { fetchChartData } from '@/lib/api/forecast';
 import { findClosestCoordinate } from './findClosestCoordinate';
 import {
-  useCoordinatesStore,
   usePollenDetailsChartStore,
 } from '@/app/forecast/stores';
+import { useCoordinatesStore } from '@/app/stores';
 
 interface FetchChartParams {
   lat: number;

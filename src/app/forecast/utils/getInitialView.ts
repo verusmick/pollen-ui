@@ -22,7 +22,7 @@ export const getInitialViewState = () => {
   const maxDiff = Math.max(lonDiff, latDiff);
 
   let zoom = 7;
-  if (maxDiff > 8) zoom = 5.8;       // Germany wide
+  if (maxDiff > 8) zoom = 5.9;       // Germany wide
   else if (maxDiff > 4) zoom = 7;  // Bavaria
   else zoom = 7;                   // smaller regions
 
