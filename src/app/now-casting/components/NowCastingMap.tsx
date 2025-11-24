@@ -14,7 +14,7 @@ import type { Feature } from 'geojson';
 import germanyGeo from '@/data/germany.geo.json';
 
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
-import { getBoundsFromViewState, useDebounce } from '@/utils';
+import { getBoundsFromViewState, debounce } from '@/utils';
 import { MapZoomControls } from '@/app/components';
 import { MapTooltip } from '@/app/forecast/components';
 export default function NowCastingMap() {
