@@ -1,7 +1,7 @@
 'use client';
 import { getInitialViewState } from '@/app/forecast/utils';
 import { DeckGL } from '@deck.gl/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { TileLayer } from '@deck.gl/geo-layers';
 import {
   GeoJsonLayer,
@@ -9,6 +9,10 @@ import {
   BitmapLayer,
   IconLayer,
 } from '@deck.gl/layers';
+
+import type { Feature } from 'geojson';
+import germanyGeo from '@/data/germany.geo.json';
+
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
 import { MapZoomControls } from '@/app/components';
@@ -33,7 +37,7 @@ export default function NowCastingMap() {
           data: [
             {
               position: [
-                pollenDetailsChartLongitude,  
+                pollenDetailsChartLongitude,
                 pollenDetailsChartLatitude,
               ],
               name,
@@ -80,12 +84,47 @@ export default function NowCastingMap() {
       });
     },
   });
+
+  // Create mask for area outside Germany
+  const germanyGeoJsonLayer = useMemo(() => {
+    const bavariaCoords = germanyGeo.features[0].geometry.coordinates;
+
+    const maskPolygon: Feature = {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          // World bounds
+          [
+            [-180, -90],
+            [-180, 90],
+            [180, 90],
+            [180, -90],
+            [-180, -90],
+          ],
+          // Bavaria hole
+          ...bavariaCoords.flat(),
+        ],
+      },
+    };
+
+    return new GeoJsonLayer({
+      id: 'mask-layer',
+      data: [maskPolygon],
+      filled: true,
+      stroked: false,
+      getFillColor: [33, 33, 33, 180], // Dark gray
+    });
+  }, []);
+
   const handleViewStateChange = (e: any) => {
     const nextViewState = e.viewState;
     setViewMapState(nextViewState);
     const nextBounds = getBoundsFromViewState(nextViewState);
     setBounds(nextBounds);
   };
+
   const handleCursor = ({ isDragging, isHovering }: any) => {
     if (isDragging) return 'grabbing';
     if (isHovering) return 'pointer';
@@ -96,7 +135,7 @@ export default function NowCastingMap() {
       <DeckGL
         initialViewState={viewMapState}
         controller={true}
-        layers={[baseMapLayer, pinIconLayer]}
+        layers={[baseMapLayer, germanyGeoJsonLayer, pinIconLayer]}
         style={{ width: '100vw', height: '100vh', cursor: 'pointer' }}
         viewState={viewMapState}
         // This is triggered when the hand move the map
