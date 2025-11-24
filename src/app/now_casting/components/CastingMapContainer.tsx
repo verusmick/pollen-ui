@@ -1,6 +1,6 @@
 'use client';
 
-import { CastingMap } from '@/app/casting/components';
+import { CastingMap } from '@/app/now_casting/components';
 import {
   DropdownSelector,
   LocationButton,

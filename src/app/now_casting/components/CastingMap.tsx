@@ -33,7 +33,7 @@ export default function CastingMap() {
           data: [
             {
               position: [
-                pollenDetailsChartLongitude,
+                pollenDetailsChartLongitude,  
                 pollenDetailsChartLatitude,
               ],
               name,
