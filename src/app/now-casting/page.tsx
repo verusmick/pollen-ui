@@ -1,6 +1,6 @@
 import { NowCastingMapContainer } from '@/app/now-casting/components';
 
-export default function CastingPage() {
+export default function NowCastingPage() {
   return (
     <main>
       <div className="w-screen h-screen">

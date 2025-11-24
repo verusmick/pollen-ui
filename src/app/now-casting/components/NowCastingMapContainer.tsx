@@ -19,7 +19,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 export const NowCastingMapContainer = () => {
-  const t = useTranslations('castingPage');
+  const t = useTranslations('now_castingPage');
   const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
   const [pollenSelected, setPollenSelected] =
