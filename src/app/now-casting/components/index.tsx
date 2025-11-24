@@ -1,2 +1,2 @@
-export { default as CastingMapContainer } from './NowCastingMapContainer';
-export { default as CastingMap } from './NowCastingMap';
+export { default as NowCastingMapContainer } from './NowCastingMapContainer';
+export { default as NowCastingMap } from './NowCastingMap';

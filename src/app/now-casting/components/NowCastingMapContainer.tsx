@@ -1,6 +1,6 @@
 'use client';
 
-import { CastingMap } from '@/app/now-casting/components';
+import { NowCastingMap } from '@/app/now-casting/components';
 import {
   DropdownSelector,
   LocationButton,
@@ -38,7 +38,7 @@ export const NowCastingMapContainer = () => {
   };
   return (
     <div className="relative h-screen w-screen">
-      <CastingMap />
+      <NowCastingMap />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
