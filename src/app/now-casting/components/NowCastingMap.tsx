@@ -13,7 +13,7 @@ import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import { getBoundsFromViewState, useDebounce } from '@/utils';
 import { MapZoomControls } from '@/app/components';
 import { MapTooltip } from '@/app/forecast/components';
-export default function CastingMap() {
+export default function NowCastingMap() {
   const [viewMapState, setViewMapState] = useState(getInitialViewState);
   const [bounds, setBounds] = useState<number[] | null>(null);
   const [tooltipInfo, setTooltipInfo] = useState<{

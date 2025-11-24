@@ -1,6 +1,6 @@
 'use client';
 
-import { CastingMap } from '@/app/now_casting/components';
+import { CastingMap } from '@/app/now-casting/components';
 import {
   DropdownSelector,
   LocationButton,
@@ -18,7 +18,7 @@ import { usePartialLoadingStore } from '@/app/stores';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
-export const CastingMapContainer = () => {
+export const NowCastingMapContainer = () => {
   const t = useTranslations('castingPage');
   const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
@@ -73,4 +73,4 @@ export const CastingMapContainer = () => {
   );
 };
 
-export default CastingMapContainer;
+export default NowCastingMapContainer;
