@@ -24,7 +24,7 @@ export const PollenLegendCard = ({
   return (
     <div
       ref={cardRef}
-      className={`w-[320px] bg-card/80 text-white rounded-2xl shadow-lg p-4 backdrop-blur-md z-50 border border-none transition-all duration-300 ease-in-out ${
+      className={`w-[300px] bg-card/80 text-white rounded-2xl shadow-lg p-4 backdrop-blur-md z-50 border border-none transition-all duration-300 ease-in-out ${
         open
           ? 'opacity-100 translate-y-0 pointer-events-auto'
           : 'opacity-0 translate-y-2 pointer-events-none'

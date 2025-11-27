@@ -2,6 +2,10 @@
   "HomePage": {
     "title": "Hello world 2"
   },
+  "Sidebar": {
+    "title": "PollenScience.eu",
+    "pages":"Pages"
+  },
   "forecastPage": {
     "title": "Forecast Map",
     "description": "Interactive pollen forecast map",
