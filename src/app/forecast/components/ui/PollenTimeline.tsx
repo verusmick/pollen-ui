@@ -104,7 +104,6 @@ export default function PollenTimeline({
               >
                 {h.label}
               </span>
-              {/* Date label cada intervalo de 6 horas reales */}
               {h.showDate && (
                 <span className="text-[10px] text-gray-500 -mt-1">
                   {h.date}
