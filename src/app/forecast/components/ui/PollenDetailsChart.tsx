@@ -12,7 +12,7 @@ import {
   ReferenceArea,
   ReferenceLine,
 } from 'recharts';
-
+import dayjs from 'dayjs';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
@@ -59,23 +59,24 @@ export const PollenDetailsChart = ({
     currentDate: string
   ) => {
     if (!chartData || !currentDate) return [];
-    const [year, month, day] = currentDate.split('-').map(Number);
-    const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+
+    const startOfDay = dayjs(currentDate).startOf('day');
     const reversed = Object.values(chartData).reverse();
 
     return reversed.map((v: string | number, i: number) => {
-      const ts = startOfDay.getTime() + i * 3600 * 1000;
-      const date = new Date(ts);
+      const date = startOfDay.add(i, 'hour');
+      const value =
+        typeof v === 'number'
+          ? v
+          : isNaN(parseInt(v as string))
+          ? null
+          : parseInt(v as string);
+
       return {
-        timestamp: ts,
-        value:
-          typeof v === 'number' ? v : isNaN(parseInt(v)) ? null : parseInt(v),
-        hour: date.getHours(),
-        dateString: date.toLocaleDateString('en-US', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        }),
+        timestamp: date.valueOf(),
+        value,
+        hour: date.hour(),
+        dateString: date.format('DD MMM YYYY'),
       };
     });
   };
@@ -220,26 +221,36 @@ export const PollenDetailsChart = ({
     );
   });
 
+  const getLocationName = async (
+    latitude: number,
+    longitude: number,
+    nominatimApi: string,
+    signal?: AbortSignal
+  ) => {
+    const res = await fetch(
+      `${nominatimApi}/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+      { signal }
+    );
+    const data = await res.json();
+    const { road, suburb, city, town, village, country } = data.address;
+    return [road, suburb || city || town || village, country]
+      .filter(Boolean)
+      .join(', ');
+  };
+
   useEffect(() => {
     setData(processChartData(chartData || {}, currentDate));
   }, [chartData, currentDate]);
 
   useEffect(() => {
-    if (!latitude || !longitude) return;
+    if (!latitude || !longitude || !nominatimApi) return;
+
     const controller = new AbortController();
-    const fetchName = async () => {
-      const res = await fetch(
-        `${nominatimApi}/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-        { signal: controller.signal }
-      );
-      const data = await res.json();
-      const { road, suburb, city, town, village, country } = data.address;
-      const shortName = [road, suburb || city || town || village, country]
-        .filter(Boolean)
-        .join(', ');
-      setLocationName(shortName);
-    };
-    fetchName().catch(() => {});
+
+    getLocationName(latitude, longitude, nominatimApi, controller.signal)
+      .then(setLocationName)
+      .catch(() => {});
+
     return () => controller.abort();
   }, [latitude, longitude, nominatimApi]);
 
@@ -292,7 +303,7 @@ export const PollenDetailsChart = ({
             )}
           </div>
           <button
-            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0"
+            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0 cursor-pointer"
             onClick={onClose}
           >
             <BiX size={20} className="text-white" />
@@ -312,7 +323,7 @@ export const PollenDetailsChart = ({
             {canScrollLeft && (
               <button
                 onClick={scrollLeft}
-                className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-white bg-white/10 rounded-full p-1"
+                className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-white bg-white/10 rounded-full p-1 cursor-pointer"
               >
                 <BiChevronLeft size={20} />
               </button>
@@ -320,7 +331,7 @@ export const PollenDetailsChart = ({
             {canScrollRight && (
               <button
                 onClick={scrollRight}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 text-white bg-white/10 rounded-full p-1"
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 text-white bg-white/10 rounded-full p-1 cursor-pointer"
               >
                 <BiChevronRight size={20} />
               </button>
