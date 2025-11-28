@@ -257,7 +257,7 @@ export const ForecastMapContainer = () => {
   }, [pollenSelected.apiKey]);
 
   return (
-    <main className="flex-1 bg-gray-100 overflow-auto min-h-0">
+    <div>
       <ForecastMap
         pollenData={pollenData}
         onRegionChange={handleRegionChange}
@@ -265,7 +265,6 @@ export const ForecastMapContainer = () => {
         currentDate={pollenSelected.defaultBaseDate}
         gridCellsResolution={gridCellsResolution}
       />
-
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
@@ -337,7 +336,7 @@ export const ForecastMapContainer = () => {
       </div>
 
       {loading && <LoadingOverlay message={t('message_loading')} />}
-    </main>
+    </div>
   );
 };
 

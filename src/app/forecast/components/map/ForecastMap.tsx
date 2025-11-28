@@ -327,7 +327,6 @@ export default function ForecastMap({
   return (
     <>
       <DeckGL
-        initialViewState={viewMapState}
         controller={true}
         layers={[
           baseMapLayer,
