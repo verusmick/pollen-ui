@@ -8,6 +8,7 @@ const getDefaultBaseDate = (fallbackDate: string) =>
   USE_CURRENT_DATE ? dayjs().format('YYYY-MM-DD') : fallbackDate;
 
 export const LEVEL_COLORS = {
+  none: '#fff',
   very_low: '#00e838',
   low: '#a5eb02',
   moderate: '#ebbb02',

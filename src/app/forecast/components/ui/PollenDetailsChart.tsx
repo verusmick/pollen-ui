@@ -14,7 +14,11 @@ import {
 } from 'recharts';
 import dayjs from 'dayjs';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
-import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
+import {
+  getPollenByApiKey,
+  LEVEL_COLORS,
+  PollenApiKey,
+} from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/app/components';
 import { usePartialLoadingStore } from '@/app/stores';
@@ -91,19 +95,29 @@ export const PollenDetailsChart = ({
   const levelCache = useMemo(() => {
     const cache: Record<number, { label: string; color: string }> = {};
     if (!pollenConfig) return cache;
-    const colors = ['#00e838', '#a5eb02', '#ebbb02', '#f27200', '#ff0000'];
+
     data.forEach((d) => {
-      if (d.value !== null && !(d.value in cache)) {
+      if (d.value === null || d.value === 0) {
+        cache[d.value ?? 0] = { label: 'none', color: LEVEL_COLORS.none };
+        return;
+      }
+
+      if (!(d.value in cache)) {
         const levels = pollenConfig.levels;
         const level =
           levels.find((l) => d.value! >= l.min && d.value! <= l.max) ||
           levels[levels.length - 1];
+
+        const key = level.label
+          .toLowerCase()
+          .replace(/\s+/g, '_') as keyof typeof LEVEL_COLORS;
         cache[d.value!] = {
           ...level,
-          color: colors[levels.indexOf(level)] || '#fff',
+          color: LEVEL_COLORS[key] || LEVEL_COLORS.none,
         };
       }
     });
+
     return cache;
   }, [data, pollenConfig]);
 
