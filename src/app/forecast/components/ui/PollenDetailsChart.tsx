@@ -1,7 +1,7 @@
 'use client';
 
-import { memo, useEffect, useRef, useState } from 'react';
-import { BiX } from 'react-icons/bi';
+import { memo, useEffect, useRef, useState, useMemo } from 'react';
+import { BiX, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import {
   CartesianGrid,
   LineChart,
@@ -12,7 +12,7 @@ import {
   ReferenceArea,
   ReferenceLine,
 } from 'recharts';
-
+import dayjs from 'dayjs';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
@@ -23,6 +23,8 @@ import { COLORS } from '@/app/styles/colors';
 interface PollenData {
   timestamp: number;
   value: number | null;
+  hour: number;
+  dateString: string;
 }
 
 export const PollenDetailsChart = ({
@@ -41,62 +43,157 @@ export const PollenDetailsChart = ({
   const pollenConfig = getPollenByApiKey(pollenSelected as PollenApiKey);
   const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
   const { chartLoading } = usePartialLoadingStore();
+
   const [data, setData] = useState<PollenData[]>([]);
   const [locationName, setLocationName] = useState<string>();
-  const [activeIndex, setActiveIndex] = useState<number | null>(0);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const pointWidth = 60;
+
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const processChartData = (
     chartData: Record<string, string | number>,
     currentDate: string
-  ): PollenData[] => {
+  ) => {
     if (!chartData || !currentDate) return [];
 
-    const [year, month, day] = currentDate.split('-').map(Number);
-    const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
-    const hoursInterval = 1;
-    const reversedChartData = Object.values(chartData).reverse();
+    const startOfDay = dayjs(currentDate).startOf('day');
+    const reversed = Object.values(chartData).reverse();
 
-    return reversedChartData.map((v: string | number, i: number) => ({
-      timestamp: startOfDay.getTime() + i * hoursInterval * 60 * 60 * 1000,
-      value:
-        typeof v === 'number' ? v : isNaN(parseInt(v)) ? null : parseInt(v),
-    }));
+    return reversed.map((v: string | number, i: number) => {
+      const date = startOfDay.add(i, 'hour');
+      const value =
+        typeof v === 'number'
+          ? v
+          : isNaN(parseInt(v as string))
+          ? null
+          : parseInt(v as string);
+
+      return {
+        timestamp: date.valueOf(),
+        value,
+        hour: date.hour(),
+        dateString: date.format('DD MMM YYYY'),
+      };
+    });
   };
-  const getCurrentHourIndex = (data: PollenData[]): number => {
+
+  const currentHourIndex = useMemo(() => {
     if (!data.length) return 0;
-
-    const now = new Date();
-    const currentHour = now.getHours();
-    const index = data.findIndex(
-      (item) => new Date(item.timestamp).getHours() === currentHour
-    );
+    const nowHour = new Date().getHours();
+    const index = data.findIndex((d) => d.hour === nowHour);
     return index !== -1 ? index : 0;
-  };
+  }, [data]);
 
-  const currentHourIndex = getCurrentHourIndex(data);
-
-  const getLevelByValue = (value: number | null) => {
-    if (!pollenConfig || value === null || value < 1)
-      return { label: 'none', color: '#fff' };
+  const levelCache = useMemo(() => {
+    const cache: Record<number, { label: string; color: string }> = {};
+    if (!pollenConfig) return cache;
     const colors = ['#00e838', '#a5eb02', '#ebbb02', '#f27200', '#ff0000'];
-    const levels = pollenConfig.levels;
-    const level =
-      levels.find((l) => value >= l.min && value <= l.max) ||
-      levels[levels.length - 1];
-    return { ...level, color: colors[levels.indexOf(level)] || '#fff' };
+    data.forEach((d) => {
+      if (d.value !== null && !(d.value in cache)) {
+        const levels = pollenConfig.levels;
+        const level =
+          levels.find((l) => d.value! >= l.min && d.value! <= l.max) ||
+          levels[levels.length - 1];
+        cache[d.value!] = {
+          ...level,
+          color: colors[levels.indexOf(level)] || '#fff',
+        };
+      }
+    });
+    return cache;
+  }, [data, pollenConfig]);
+
+  const scrollToCurrentHour = () => {
+    if (!chartContainerRef.current || !data.length) return;
+    const el = chartContainerRef.current;
+    const scrollPos =
+      currentHourIndex * pointWidth + pointWidth / 2 - el.clientWidth / 2;
+    el.scrollTo({ left: Math.max(scrollPos, 0), behavior: 'smooth' });
+    setActiveIndex(currentHourIndex);
   };
 
-  const CustomTick = ({ x, y, payload, currentHourIndex }: any) => {
+  const throttledRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const updateActiveIndexByScroll = () => {
+    const container = chartContainerRef.current;
+    if (!container || !data.length) return;
+    const centerX = container.scrollLeft + container.clientWidth / 2;
+    const index = Math.round((centerX - pointWidth / 2) / pointWidth);
+    setActiveIndex(Math.max(0, Math.min(data.length - 1, index)));
+  };
+
+  const evaluateScroll = () => {
+    const container = chartContainerRef.current;
+    if (!container) return;
+    setCanScrollLeft(container.scrollLeft > 5);
+    setCanScrollRight(
+      container.scrollLeft + container.clientWidth < container.scrollWidth - 5
+    );
+  };
+
+  const onScroll = () => {
+    if (throttledRef.current) return;
+    throttledRef.current = setTimeout(() => {
+      updateActiveIndexByScroll();
+      evaluateScroll();
+      throttledRef.current = null;
+    }, 50);
+  };
+
+  const scrollLeft = () =>
+    chartContainerRef.current?.scrollBy({
+      left: -pointWidth,
+      behavior: 'smooth',
+    });
+  const scrollRight = () =>
+    chartContainerRef.current?.scrollBy({
+      left: pointWidth,
+      behavior: 'smooth',
+    });
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.stopPropagation();
+      scrollLeft();
+    } else if (e.key === 'ArrowRight') {
+      e.stopPropagation();
+      scrollRight();
+    }
+  };
+
+  const CustomDot = memo(
+    ({ cx, cy, value }: any) => {
+      if (value === null) return <g />;
+      const level = levelCache[value] || { label: 'none', color: '#fff' };
+      return (
+        <circle cx={cx} cy={cy} r={4} fill={level.color} strokeWidth={1.5} />
+      );
+    },
+    (prev, next) => prev.value === next.value
+  );
+
+  const CustomActiveDot = memo(
+    ({ cx, cy }: any) => (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={6}
+        stroke="#ffae42"
+        strokeWidth={3}
+        fill="#1E293B"
+      />
+    ),
+    () => true
+  );
+
+  const CustomTick = memo(({ x, y, payload }: any) => {
     const item = data[payload.index];
     if (!item) return null;
-
-    const date = new Date(item.timestamp);
-    const hour = date.getHours();
-    const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
-
     const isCurrent = payload.index === currentHourIndex;
-
     return (
       <g transform={`translate(${x},${y})`}>
         <text
@@ -108,7 +205,7 @@ export const PollenDetailsChart = ({
           fontSize={isCurrent ? 12 : 10}
           fontWeight={isCurrent ? 'bold' : 'normal'}
         >
-          {hourLabel}
+          {item.hour.toString().padStart(2, '0')}:00
         </text>
         <text
           x={0}
@@ -118,158 +215,67 @@ export const PollenDetailsChart = ({
           fill={isCurrent ? COLORS.white : COLORS.gray}
           fontSize={9}
         >
-          {date.toLocaleDateString('en-US', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-          })}
+          {item.dateString}
         </text>
       </g>
     );
-  };
-  const CustomDot = memo(
-    ({ cx, cy, value }: any) => {
-      if (value === null) return <g />;
-      const level = getLevelByValue(value);
-      return (
-        <circle cx={cx} cy={cy} r={4} fill={level.color} strokeWidth={1.5} />
-      );
-    },
-    (prev, next) => prev.value === next.value
-  );
-  const CustomActiveDot = memo(
-    ({ cx, cy }: any) => {
-      return (
-        <circle
-          cx={cx}
-          cy={cy}
-          r={6}
-          stroke="#ffae42"
-          strokeWidth={3}
-          fill="#1E293B"
-        />
-      );
-    },
-    () => true
-  );
-  const fetchLocationName = async (latitude: number, longitude: number) => {
-    if (!latitude || !longitude) return '';
+  });
+
+  const getLocationName = async (
+    latitude: number,
+    longitude: number,
+    nominatimApi: string,
+    signal?: AbortSignal
+  ) => {
     const res = await fetch(
-      `${nominatimApi}/reverse?format=json&lat=${latitude}&lon=${longitude}`
+      `${nominatimApi}/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+      { signal }
     );
     const data = await res.json();
     const { road, suburb, city, town, village, country } = data.address;
-    const shortName = [road, suburb || city || town || village, country]
+    return [road, suburb || city || town || village, country]
       .filter(Boolean)
       .join(', ');
-    return shortName;
   };
 
-  const scrollToCurrentHour = (
-    data: PollenData[],
-    chartContainer: HTMLDivElement | null,
-    setActiveIndex: (index: number) => void
-  ) => {
-    if (!data.length || !chartContainer) return;
-
-    const now = new Date();
-    const currentHour = now.getHours();
-
-    const index = data.findIndex(
-      (item) => new Date(item.timestamp).getHours() === currentHour
-    );
-
-    if (index !== -1) {
-      setActiveIndex(index);
-      const pointPosition = index * 60 + 30;
-      const scrollPosition = pointPosition - chartContainer.clientWidth / 2;
-
-      chartContainer.scrollTo({
-        left: Math.max(scrollPosition, 0),
-        behavior: 'smooth',
-      });
-    }
-  };
-
-  const ensureTooltipVisible = (
-    chartContainer: HTMLDivElement | null,
-    tooltipLeft: number,
-    tooltipWidth: number
-  ) => {
-    if (!chartContainer) return;
-
-    const containerLeft = chartContainer.scrollLeft;
-    const containerRight = containerLeft + chartContainer.clientWidth;
-
-    const tooltipRight = tooltipLeft + tooltipWidth;
-
-    if (tooltipRight > containerRight) {
-      chartContainer.scrollTo({
-        left: tooltipRight - chartContainer.clientWidth + 10,
-        behavior: 'smooth',
-      });
-    }
-
-    if (tooltipLeft < containerLeft) {
-      chartContainer.scrollTo({
-        left: tooltipLeft - 10,
-        behavior: 'smooth',
-      });
-    }
-  };
-
-  const handleMouseMove = (state: any) => {
-    if (!state.isTooltipActive) return;
-
-    const index = Number(state.activeTooltipIndex);
-    if (!isNaN(index) && index !== activeIndex) {
-      setActiveIndex(index);
-
-      const tooltipWidth = 50;
-      const tooltipLeft = index * 60 + 35 - tooltipWidth / 2;
-
-      ensureTooltipVisible(
-        chartContainerRef.current,
-        tooltipLeft,
-        tooltipWidth
-      );
-    }
-  };
-  const getLocation = async (
-    latitude: number,
-    longitude: number,
-    setLocationName: (name: string) => void,
-    fetchLocationName: (lat: number, lon: number) => Promise<string>
-  ) => {
-    const name = await fetchLocationName(latitude, longitude);
-    if (name) setLocationName(name);
-  };
   useEffect(() => {
-    const updatedData = processChartData(chartData || {}, currentDate);
-    setData(updatedData);
+    setData(processChartData(chartData || {}, currentDate));
   }, [chartData, currentDate]);
 
   useEffect(() => {
-    const index = getCurrentHourIndex(data);
-    setActiveIndex(index);
+    if (!latitude || !longitude || !nominatimApi) return;
+
+    const controller = new AbortController();
+
+    getLocationName(latitude, longitude, nominatimApi, controller.signal)
+      .then(setLocationName)
+      .catch(() => {});
+
+    return () => controller.abort();
+  }, [latitude, longitude, nominatimApi]);
+
+  useEffect(() => scrollToCurrentHour(), [data, currentHourIndex]);
+
+  useEffect(() => {
+    const container = chartContainerRef.current;
+    if (!container) return;
+    container.addEventListener('scroll', onScroll);
+    evaluateScroll();
+    return () => container.removeEventListener('scroll', onScroll);
   }, [data]);
 
   useEffect(() => {
-    if (!latitude || !longitude) return;
-    getLocation(latitude, longitude, setLocationName, fetchLocationName);
-  }, [latitude, longitude]);
-
-  useEffect(() => {
-    if (data.length > 0 && chartContainerRef.current) {
-      scrollToCurrentHour(data, chartContainerRef.current, setActiveIndex);
-    }
-  }, [data]);
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    return () =>
+      window.removeEventListener('keydown', handleKeyDown, { capture: true });
+  }, []);
 
   const activePoint = activeIndex !== null ? data[activeIndex] : null;
 
   return (
-    <div className="bg-card rounded-lg p-4 md:p-5 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68 flex flex-col overflow-hidden">
+    <div className="bg-card rounded-lg p-4 z-50 2xl:w-[25vw] w-[30vw] h-[45vh] md:h-68 flex flex-col overflow-hidden">
       <div className="relative flex-1 w-full h-full">
+        {/* Header */}
         <div className="flex justify-between items-start w-full mb-2">
           <div className="flex-1 min-w-0 flex flex-col gap-1">
             {!latitude || !longitude ? (
@@ -289,15 +295,15 @@ export const PollenDetailsChart = ({
                 </span>
                 {activePoint && (
                   <span className="text-xs text-gray-400 transition-opacity duration-150">
-                    Level range: {getLevelByValue(activePoint.value).label}
+                    Level range:{' '}
+                    {levelCache[activePoint.value ?? 0]?.label || 'none'}
                   </span>
                 )}
               </>
             )}
           </div>
-
           <button
-            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0"
+            className="ml-2 mt-1 rounded-full hover:bg-gray-800 transition-colors shrink-0 cursor-pointer"
             onClick={onClose}
           >
             <BiX size={20} className="text-white" />
@@ -308,12 +314,29 @@ export const PollenDetailsChart = ({
           <div className="flex justify-center items-center h-full">
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
-        ) : data.length === 0 ? (
+        ) : !data.length ? (
           <div className="flex justify-center items-center h-full text-gray-400 text-sm">
             {t('chart_location.msg_chart_no_data')}
           </div>
         ) : (
-          <div className="flex h-[180px]">
+          <div className="relative flex h-[180px]">
+            {canScrollLeft && (
+              <button
+                onClick={scrollLeft}
+                className="absolute left-8 top-1/2 -translate-y-1/2 z-20 text-white bg-white/10 rounded-full p-1 cursor-pointer"
+              >
+                <BiChevronLeft size={20} />
+              </button>
+            )}
+            {canScrollRight && (
+              <button
+                onClick={scrollRight}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 text-white bg-white/10 rounded-full p-1 cursor-pointer"
+              >
+                <BiChevronRight size={20} />
+              </button>
+            )}
+
             <div className="w-8">
               <ResponsiveContainer minWidth={data.length * 60} height="100%">
                 <LineChart
@@ -329,15 +352,18 @@ export const PollenDetailsChart = ({
                 </LineChart>
               </ResponsiveContainer>
             </div>
+
             <div
               ref={chartContainerRef}
               className="flex-1 overflow-x-auto relative search-scroll"
             >
-              <ResponsiveContainer minWidth={data.length * 60} height="100%">
+              <ResponsiveContainer
+                minWidth={data.length * pointWidth}
+                height="100%"
+              >
                 <LineChart
                   data={data}
                   margin={{ top: 35, right: 20, bottom: 10, left: -35 }}
-                  onMouseMove={handleMouseMove}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -347,40 +373,33 @@ export const PollenDetailsChart = ({
                   {currentHourIndex > 0 && (
                     <ReferenceArea
                       x1={data[0].timestamp}
-                      x2={data[currentHourIndex - 0].timestamp}
+                      x2={data[currentHourIndex].timestamp}
                       fill="rgba(255,255,255,0.4)"
                     />
                   )}
                   <XAxis
                     dataKey="timestamp"
-                    tick={<CustomTick currentHourIndex={currentHourIndex} />}
+                    tick={<CustomTick />}
                     interval={0}
                     tickLine={false}
                   />
                   <YAxis tick={false} tickLine={false} />
-                  {data.map((d, i) => {
-                    const isPast = i < currentHourIndex;
-                    const isCurrent = i === currentHourIndex;
-
-                    return (
-                      <ReferenceLine
-                        key={d.timestamp}
-                        x={d.timestamp}
-                        stroke={
-                          isCurrent
-                            ? COLORS.blue
-                            : isPast
-                            ? COLORS.blue
-                            : COLORS.gray
-                        }
-                        strokeOpacity={isCurrent ? 1 : isPast ? 0.5 : 1}
-                        strokeWidth={isCurrent ? 2 : 1}
-                        strokeDasharray={
-                          isCurrent ? '4 2' : isPast ? '4 2' : '5 5'
-                        }
-                      />
-                    );
-                  })}
+                  {data.map((d, i) => (
+                    <ReferenceLine
+                      key={d.timestamp}
+                      x={d.timestamp}
+                      stroke={i <= currentHourIndex ? COLORS.blue : COLORS.gray}
+                      strokeOpacity={
+                        i === currentHourIndex
+                          ? 1
+                          : i < currentHourIndex
+                          ? 0.5
+                          : 1
+                      }
+                      strokeWidth={i === currentHourIndex ? 2 : 1}
+                      strokeDasharray={i <= currentHourIndex ? '4 2' : '5 5'}
+                    />
+                  ))}
                   <Line
                     type="monotone"
                     dataKey="value"
@@ -388,25 +407,24 @@ export const PollenDetailsChart = ({
                     isAnimationActive={false}
                     dot={(props) => {
                       const { key, ...rest } = props;
-                      return <CustomDot {...rest} key={key} />;
+                      return <CustomDot key={key} {...rest} />;
                     }}
                     activeDot={(props) => {
-                      const { key, index, ...rest } = props;
-                      if (index === activeIndex) {
-                        return <CustomActiveDot {...rest} key={key} />;
+                      if (props.index === activeIndex) {
+                        const { key, ...rest } = props;
+                        return <CustomActiveDot key={key} {...rest} />;
                       }
                       return <g />;
-                    }}  
+                    }}
                   />
                 </LineChart>
               </ResponsiveContainer>
 
               {activePoint && (
                 <div
-                  className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md 
-                  text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
+                  className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
                   style={{
-                    left: (activeIndex ?? 0) * 60 + 30,
+                    left: activeIndex * pointWidth + pointWidth / 2,
                     top: 0,
                   }}
                 >
