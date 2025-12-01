@@ -186,7 +186,7 @@ export const PollenDetailsChart = ({
   };
 
   const CustomDot = memo(
-    ({ cx, cy, value, index }: any) => {
+    ({ cx, cy, value, index, ...rest }: any) => {
       if (value === null) return <g />;
 
       const level = levelCache[value] || { label: 'none', color: '#fff' };
@@ -196,12 +196,12 @@ export const PollenDetailsChart = ({
         <circle
           cx={cx}
           cy={cy}
-          r={isActive ? 6 : 4} 
+          r={isActive ? 6 : 4}
           fill={level.color}
           stroke={isActive ? '#fff' : undefined}
           strokeWidth={isActive ? 2 : 1.5}
-          style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-          onClick={() => setActiveIndex(index)}
+          style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+          onMouseEnter={() => setActiveIndex(index)}
         />
       );
     },
@@ -385,7 +385,10 @@ export const PollenDetailsChart = ({
               </ResponsiveContainer>
             </div>
 
-            <div ref={chartContainerRef} className="overflow-x-auto relative search-scroll">
+            <div
+              ref={chartContainerRef}
+              className="overflow-x-auto relative search-scroll"
+            >
               <div
                 style={{
                   minWidth: `${data.length * pointWidth}px`,
