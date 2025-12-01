@@ -68,7 +68,7 @@ export const NowCastingMapContainer = () => {
           value={pollenSelected}
           onChange={handlePollenChange}
           onToggle={(open) => setSelectorOpen(open)}
-          options={POLLEN_ENTRIES.map((entry) => entry as PollenConfig)}
+          options={[]}
           getLabel={(item) => item.label}
           getKey={(item) => item.apiKey}
         />

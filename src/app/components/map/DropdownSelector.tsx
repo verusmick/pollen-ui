@@ -48,7 +48,7 @@ export const DropdownSelector = <T,>({
         onClick={() => setIsOpen((prev) => !prev)}
         className="w-full bg-card text-white px-2 py-1 flex justify-between items-center rounded-md shadow-md text-base transition cursor-pointer"
       >
-        {selected ? getLabel(selected) : 'Select...'}
+        {selected ? getLabel(selected) : 'Select'}
         <BiChevronDown
           className={`w-4 h-4 text-white transform transition-transform ${
             isOpen ? 'rotate-180' : 'rotate-0'
