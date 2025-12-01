@@ -16,12 +16,14 @@ import {
 import { usePartialLoadingStore } from '@/app/stores';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNowCasting } from '../hook/useNowCasting';
 
 export const NowCastingMapContainer = () => {
   const t = useTranslations('now_castingPage');
   const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
+  const [gridCellsResolution, setGridCellsResolution] = useState(0.02);
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
   const [selectorOpen, setSelectorOpen] = useState(false);
@@ -36,9 +38,43 @@ export const NowCastingMapContainer = () => {
     setPartialLoading(true);
     setPollenSelected(newPollen);
   };
+  const [pollenData, setPollenData] = useState<
+    Array<[long: number, lat: number, value: number]>
+  >([]);
+  const { data: mapData, loading, error, fetchNowCasting } = useNowCasting();
+  useEffect(() => {
+    fetchNowCasting({
+      date: '2025-05-11',
+      hour: '12',
+      pollen: 'POLLEN_PINACEAE',
+      include_coords: true,
+    });
+  }, []);
+  const handleMapDataUpdate = () => {
+    const { data, longitudes = [], latitudes = [] } = mapData;
+    const latsCount = latitudes.length;
+    const values = data.map(
+      (nowCasting: number, index: number) =>
+        [
+          latitudes[index % latsCount],
+          longitudes[Math.floor(index / latsCount)],
+          nowCasting / 10,
+        ] as [number, number, number]
+    );
+    setPollenData(values);
+  };
+  useEffect(() => {
+    if (!mapData) return;
+
+    handleMapDataUpdate();
+  }, [mapData]);
+
   return (
     <div className="relative h-screen w-screen">
-      <NowCastingMap />
+      <NowCastingMap
+        pollenData={pollenData}
+        gridCellsResolution={gridCellsResolution}
+      />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (

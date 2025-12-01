@@ -107,7 +107,7 @@ export default function ForecastMap({
     },
     [setChartLoading, setShowPollenDetailsChart, pollenSelected, currentDate]
   );
-
+  
   // Convert your API data to grid cells
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
