@@ -398,7 +398,7 @@ export const PollenDetailsChart = ({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={data}
-                    margin={{ top: 35, right: 20, bottom: 15, left: -35 }}
+                    margin={{ top: 35, right: 30, bottom: 15, left: -35 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
