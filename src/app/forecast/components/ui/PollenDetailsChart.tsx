@@ -180,11 +180,19 @@ export const PollenDetailsChart = ({
   };
 
   const CustomDot = memo(
-    ({ cx, cy, value }: any) => {
+    ({ cx, cy, value, index }: any) => {
       if (value === null) return <g />;
       const level = levelCache[value] || { label: 'none', color: '#fff' };
       return (
-        <circle cx={cx} cy={cy} r={4} fill={level.color} strokeWidth={1.5} />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={4}
+          fill={level.color}
+          strokeWidth={1.5}
+          onMouseEnter={() => setActiveIndex(index)}
+          onMouseLeave={() => setActiveIndex(currentHourIndex)}
+        />
       );
     },
     (prev, next) => prev.value === next.value
