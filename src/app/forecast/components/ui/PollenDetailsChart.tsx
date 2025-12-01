@@ -14,7 +14,11 @@ import {
 } from 'recharts';
 import dayjs from 'dayjs';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
-import { getPollenByApiKey, PollenApiKey } from '@/app/forecast/constants';
+import {
+  getPollenByApiKey,
+  LEVEL_COLORS,
+  PollenApiKey,
+} from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/app/components';
 import { usePartialLoadingStore } from '@/app/stores';
@@ -91,19 +95,35 @@ export const PollenDetailsChart = ({
   const levelCache = useMemo(() => {
     const cache: Record<number, { label: string; color: string }> = {};
     if (!pollenConfig) return cache;
-    const colors = ['#00e838', '#a5eb02', '#ebbb02', '#f27200', '#ff0000'];
+
     data.forEach((d) => {
-      if (d.value !== null && !(d.value in cache)) {
+      if (d.value == null) return;
+
+      if (d.value === 0) {
+        cache[0] = {
+          label: 'Very Low',
+          color: LEVEL_COLORS.very_low,
+        };
+        return;
+      }
+
+      if (!(d.value in cache)) {
         const levels = pollenConfig.levels;
         const level =
           levels.find((l) => d.value! >= l.min && d.value! <= l.max) ||
           levels[levels.length - 1];
-        cache[d.value!] = {
+
+        const key = level.label
+          .toLowerCase()
+          .replace(/\s+/g, '_') as keyof typeof LEVEL_COLORS;
+
+        cache[d.value] = {
           ...level,
-          color: colors[levels.indexOf(level)] || '#fff',
+          color: LEVEL_COLORS[key] || LEVEL_COLORS.very_low,
         };
       }
     });
+
     return cache;
   }, [data, pollenConfig]);
 
@@ -166,14 +186,26 @@ export const PollenDetailsChart = ({
   };
 
   const CustomDot = memo(
-    ({ cx, cy, value }: any) => {
+    ({ cx, cy, value, index, ...rest }: any) => {
       if (value === null) return <g />;
+
       const level = levelCache[value] || { label: 'none', color: '#fff' };
+      const isActive = index === activeIndex;
+
       return (
-        <circle cx={cx} cy={cy} r={4} fill={level.color} strokeWidth={1.5} />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={isActive ? 6 : 4}
+          fill={level.color}
+          stroke={isActive ? '#fff' : undefined}
+          strokeWidth={isActive ? 2 : 1.5}
+          style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+          onMouseEnter={() => setActiveIndex(index)}
+        />
       );
     },
-    (prev, next) => prev.value === next.value
+    (prev, next) => prev.value === next.value && prev.index === next.index
   );
 
   const CustomActiveDot = memo(
@@ -355,70 +387,76 @@ export const PollenDetailsChart = ({
 
             <div
               ref={chartContainerRef}
-              className="flex-1 overflow-x-auto relative search-scroll"
+              className="overflow-x-auto relative search-scroll"
             >
-              <ResponsiveContainer
-                minWidth={data.length * pointWidth}
-                height="100%"
+              <div
+                style={{
+                  minWidth: `${data.length * pointWidth}px`,
+                  height: '100%',
+                }}
               >
-                <LineChart
-                  data={data}
-                  margin={{ top: 35, right: 20, bottom: 10, left: -35 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#fff"
-                    opacity={0.3}
-                  />
-                  {currentHourIndex > 0 && (
-                    <ReferenceArea
-                      x1={data[0].timestamp}
-                      x2={data[currentHourIndex].timestamp}
-                      fill="rgba(255,255,255,0.4)"
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={data}
+                    margin={{ top: 35, right: 30, bottom: 15, left: -35 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#fff"
+                      opacity={0.3}
                     />
-                  )}
-                  <XAxis
-                    dataKey="timestamp"
-                    tick={<CustomTick />}
-                    interval={0}
-                    tickLine={false}
-                  />
-                  <YAxis tick={false} tickLine={false} />
-                  {data.map((d, i) => (
-                    <ReferenceLine
-                      key={d.timestamp}
-                      x={d.timestamp}
-                      stroke={i <= currentHourIndex ? COLORS.blue : COLORS.gray}
-                      strokeOpacity={
-                        i === currentHourIndex
-                          ? 1
-                          : i < currentHourIndex
-                          ? 0.5
-                          : 1
-                      }
-                      strokeWidth={i === currentHourIndex ? 2 : 1}
-                      strokeDasharray={i <= currentHourIndex ? '4 2' : '5 5'}
+                    {currentHourIndex > 0 && (
+                      <ReferenceArea
+                        x1={data[0].timestamp}
+                        x2={data[currentHourIndex].timestamp}
+                        fill="rgba(255,255,255,0.4)"
+                      />
+                    )}
+                    <XAxis
+                      dataKey="timestamp"
+                      tick={<CustomTick />}
+                      interval={0}
+                      tickLine={false}
                     />
-                  ))}
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#fff"
-                    isAnimationActive={false}
-                    dot={(props) => {
-                      const { key, ...rest } = props;
-                      return <CustomDot key={key} {...rest} />;
-                    }}
-                    activeDot={(props) => {
-                      if (props.index === activeIndex) {
+                    <YAxis tick={false} tickLine={false} />
+                    {data.map((d, i) => (
+                      <ReferenceLine
+                        key={d.timestamp}
+                        x={d.timestamp}
+                        stroke={
+                          i <= currentHourIndex ? COLORS.blue : COLORS.gray
+                        }
+                        strokeOpacity={
+                          i === currentHourIndex
+                            ? 1
+                            : i < currentHourIndex
+                            ? 0.5
+                            : 1
+                        }
+                        strokeWidth={i === currentHourIndex ? 2 : 1}
+                        strokeDasharray={i <= currentHourIndex ? '4 2' : '5 5'}
+                      />
+                    ))}
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#fff"
+                      isAnimationActive={false}
+                      dot={(props) => {
                         const { key, ...rest } = props;
-                        return <CustomActiveDot key={key} {...rest} />;
-                      }
-                      return <g />;
-                    }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+                        return <CustomDot key={key} {...rest} />;
+                      }}
+                      activeDot={(props) => {
+                        if (props.index === activeIndex) {
+                          const { key, ...rest } = props;
+                          return <CustomActiveDot key={key} {...rest} />;
+                        }
+                        return <g />;
+                      }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
 
               {activePoint && (
                 <div
