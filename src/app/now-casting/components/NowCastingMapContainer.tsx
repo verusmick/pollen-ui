@@ -15,12 +15,12 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useNowCasting } from '../hook/useNowCasting';
 import { PollenLegend, PollenLegendCard } from '@/app/forecast/components';
-import {
-  getNowCastingLevelsForLegend,
-  NOWCASTING_POLLENS,
-  NowCastingPollenConfig,
-} from '@/app/forecast/constants/pollenNowCasting';
 import { useCurrentLocationStore } from '@/app/stores';
+import {
+  NowCastingPollenConfig,
+  NOWCASTING_POLLENS,
+  getNowCastingLevelsForLegend,
+} from '@/app/now-casting/constants';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();

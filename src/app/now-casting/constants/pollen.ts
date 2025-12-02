@@ -1,4 +1,4 @@
-import { BIRCH_CONFIG, LEVEL_COLORS } from './pollen';
+import { BIRCH_CONFIG, LEVEL_COLORS } from '@/app/forecast/constants';
 
 export const POLLEN_ALNUS = {
   ...BIRCH_CONFIG,
