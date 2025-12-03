@@ -14,12 +14,14 @@ interface LocationButtonProps {
   tooltipText: string;
   pollenSelected: string;
   currentDate: string;
+  onLocationRetrieved?: (coords: { lat: number; lng: number }) => void;
 }
 
 export const LocationButton = ({
   tooltipText,
   currentDate,
   pollenSelected,
+  onLocationRetrieved,
 }: LocationButtonProps) => {
   const t = useTranslations('forecastPage.show_your_location');
   const [open, setOpen] = useState(false);
@@ -67,6 +69,7 @@ export const LocationButton = ({
 
       setPermissionStatus('granted');
       setLocation(coords);
+      if (onLocationRetrieved) onLocationRetrieved(coords);
       setChartLoading(true);
 
       await fetchAndShowPollenChart({
