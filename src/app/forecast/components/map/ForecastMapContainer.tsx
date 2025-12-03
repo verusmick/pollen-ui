@@ -18,6 +18,7 @@ import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
   getRegionBounds,
+  POLLENS,
   type PollenConfig,
 } from '@/app/forecast/constants';
 
@@ -43,9 +44,11 @@ import {
 } from '@/app/components';
 import {
   useCoordinatesStore,
+  useCurrentLocationStore,
   useLoadingStore,
   usePartialLoadingStore,
 } from '@/app/stores';
+import { usePathname } from 'next/navigation';
 
 const PollenDetailsChart = dynamic(
   () =>
@@ -54,6 +57,7 @@ const PollenDetailsChart = dynamic(
 );
 
 export const ForecastMapContainer = () => {
+  const pathname = usePathname();
   const t = useTranslations('forecastPage');
   const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
@@ -64,7 +68,7 @@ export const ForecastMapContainer = () => {
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
   const { setLatitudes, setLongitudes } = useCoordinatesStore();
-
+  const { clearLocation: clearCurrentLocation } = useCurrentLocationStore();
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
   const [pollenData, setPollenData] = useState<
@@ -255,7 +259,10 @@ export const ForecastMapContainer = () => {
   useEffect(() => {
     pollenKeyRef.current = pollenSelected.apiKey;
   }, [pollenSelected.apiKey]);
-
+  useEffect(() => {
+    clearCurrentLocation();
+    setUserLocation(null);
+  }, [pathname]);
   return (
     <div className="relative h-screen w-screen">
       <ForecastMap
@@ -299,6 +306,7 @@ export const ForecastMapContainer = () => {
           value={pollenSelected}
           onChange={handlePollenChange}
           onToggle={(open) => setSelectorOpen(open)}
+          options={Object.values(POLLENS)}
         />
         {showPollenDetailsChart && !selectorOpen && (
           <PollenDetailsChart
