@@ -18,6 +18,7 @@ import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
   getRegionBounds,
+  POLLEN_ENTRIES,
   type PollenConfig,
 } from '@/app/forecast/constants';
 
@@ -299,6 +300,9 @@ export const ForecastMapContainer = () => {
           value={pollenSelected}
           onChange={handlePollenChange}
           onToggle={(open) => setSelectorOpen(open)}
+          options={POLLEN_ENTRIES.map((entry) => entry as PollenConfig)}
+          getLabel={(item) => item.label}
+          getKey={(item) => item.apiKey}
         />
         {showPollenDetailsChart && !selectorOpen && (
           <PollenDetailsChart
