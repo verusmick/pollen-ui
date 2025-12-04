@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FiCloud, FiChevronLeft, FiChevronRight, FiActivity } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -9,11 +9,11 @@ import Link from 'next/link';
 export function Sidebar() {
   const t = useTranslations('Sidebar');
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const routes = [
-    { label: 'Forecast', href: '/forecast', icon: FiCloud },
-    { label: 'Now Casting', href: '/now-casting', icon: FiActivity },
+    { label: 'Forecast', href: '/forecast' },
+    { label: 'Now Casting', href: '/now-casting' },
   ];
 
   const sidebarWidth = collapsed ? 0 : 256;
@@ -36,12 +36,12 @@ export function Sidebar() {
             collapsed ? 'hidden' : ''
           }`}
         >
-          {t('pages')}
+          {t('maps')}
         </h2>
 
         <nav className="flex-1">
           <ul className="space-y-2">
-            {routes.map(({ label, href, icon: Icon }) => {
+            {routes.map(({ label, href }) => {
               const isActive = pathname === href;
               if (collapsed) return null;
 
@@ -54,10 +54,6 @@ export function Sidebar() {
                       ${isActive ? 'bg-white/10' : 'hover:bg-gray-700'}
                     `}
                   >
-                    <Icon
-                      size={18}
-                      className={isActive ? 'text-white' : 'text-gray-300'}
-                    />
                     <span className={isActive ? 'text-white' : 'text-gray-300'}>
                       {label}
                     </span>
