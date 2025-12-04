@@ -1,3 +1,5 @@
+import { roundNumbersToInt } from '@/utils';
+
 const isServer = typeof window === 'undefined';
 
 const BASE_URL = '/api';
@@ -80,14 +82,14 @@ export async function getHourlyForecast(params: {
   box?: string;
   intervals?: string;
   includeCoords?: boolean;
-  res?: number
+  res?: number;
 }) {
   const queryParams: Record<string, string> = {
     date: params.date,
     hour: params.hour.toString(),
     pollen: params.pollen,
     include_coords: (params.includeCoords || false).toString(),
-    res: (params.res ?? 2).toString()
+    res: (params.res ?? 2).toString(),
   };
 
   if (params.box !== undefined) {
@@ -130,5 +132,6 @@ export async function fetchChartData(params: {
     throw new Error(`Chart API error: ${res.statusText}`);
   }
 
-  return res.json();
+  const data = await res.json();
+  return roundNumbersToInt(data);
 }
