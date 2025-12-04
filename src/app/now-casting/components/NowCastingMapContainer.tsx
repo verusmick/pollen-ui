@@ -11,6 +11,7 @@ import {
 import {
   DEFAULT_POLLEN,
   getRegionBounds,
+  POLLEN_ENTRIES,
   PollenConfig,
 } from '@/app/forecast/constants';
 import { usePartialLoadingStore } from '@/app/stores';
@@ -67,6 +68,9 @@ export const NowCastingMapContainer = () => {
           value={pollenSelected}
           onChange={handlePollenChange}
           onToggle={(open) => setSelectorOpen(open)}
+          options={[]}
+          getLabel={(item) => item.label}
+          getKey={(item) => item.apiKey}
         />
       </div>
     </div>
