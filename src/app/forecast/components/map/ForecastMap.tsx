@@ -336,7 +336,7 @@ export default function ForecastMap({
           pollenGridCellsLayer,
           pinIconLayer,
         ]}
-        style={{ width: '100vw', height: '100vh', cursor: 'pointer' }}
+        style={{ width: '100%', height: '100%', cursor: 'pointer' }}
         viewState={viewMapState}
         // This is triggered when the hand move the map
         onViewStateChange={handleViewStateChange}
