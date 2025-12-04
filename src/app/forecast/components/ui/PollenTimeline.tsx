@@ -58,7 +58,7 @@ export default function PollenTimeline({
   }, [activeHour]);
 
   return (
-    <div className="bg-card text-white rounded-lg shadow-md p-3 w-full max-w-3xl mx-auto backdrop-blur-sm search-scroll">
+    <div className="bg-card text-white rounded-lg shadow-md p-3 w-full max-w-2xl mx-auto backdrop-blur-sm search-scroll">
       <div className="flex items-center gap-2">
         {/* Play / Pause */}
         <button

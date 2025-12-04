@@ -18,6 +18,7 @@ import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
   getRegionBounds,
+  POLLEN_ENTRIES,
   type PollenConfig,
 } from '@/app/forecast/constants';
 
@@ -257,7 +258,7 @@ export const ForecastMapContainer = () => {
   }, [pollenSelected.apiKey]);
 
   return (
-    <div className="relative h-screen w-screen">
+    <main className="flex-1 bg-gray-100 overflow-auto min-h-0">
       <ForecastMap
         pollenData={pollenData}
         onRegionChange={handleRegionChange}
@@ -299,6 +300,9 @@ export const ForecastMapContainer = () => {
           value={pollenSelected}
           onChange={handlePollenChange}
           onToggle={(open) => setSelectorOpen(open)}
+          options={POLLEN_ENTRIES.map((entry) => entry as PollenConfig)}
+          getLabel={(item) => item.label}
+          getKey={(item) => item.apiKey}
         />
         {showPollenDetailsChart && !selectorOpen && (
           <PollenDetailsChart
@@ -321,14 +325,14 @@ export const ForecastMapContainer = () => {
       </div>
 
       <div
-        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-8 2xl:translate-x-0 2xl:bottom-14"
+        className="absolute z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-8 2xl:translate-x-0 2xl:bottom-13"
         onMouseEnter={() => setLegendOpen(true)}
         onMouseLeave={() => setLegendOpen(false)}
       >
-        <PollenLegend width={350} height={25} />
+        <PollenLegend width={300} height={25} />
       </div>
 
-      <div className="fixed left-10 bottom-40 2xl:bottom-24">
+      <div className="absolute left-8 bottom-40 2xl:bottom-24">
         <PollenLegendCard
           open={legendOpen}
           levels={getLevelsForLegend(pollenSelected.apiKey)}
@@ -337,7 +341,7 @@ export const ForecastMapContainer = () => {
       </div>
 
       {loading && <LoadingOverlay message={t('message_loading')} />}
-    </div>
+    </main>
   );
 };
 
