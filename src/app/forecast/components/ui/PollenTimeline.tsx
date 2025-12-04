@@ -5,12 +5,21 @@ import { useEffect, useMemo, useRef } from 'react';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 
+interface HourPoint {
+  label: string;
+  date: string;
+  hourIndex: number;
+  showDate: boolean;
+}
+
 interface Props {
   setPlaying: (playing: boolean | ((p: boolean) => boolean)) => void;
   playing: boolean;
   activeHour: number;
-  onHourChange: (hour: number) => void;
-  baseDate: string;
+  onHourChange: (hourIndex: number) => void;
+  baseDate: string; 
+  intervalHours?: number; 
+  totalHours?: number;
 }
 
 export default function PollenTimeline({
@@ -19,33 +28,28 @@ export default function PollenTimeline({
   onHourChange,
   playing,
   baseDate,
+  intervalHours = 1,
+  totalHours = 48,
 }: Props) {
   const barRef = useRef<HTMLDivElement>(null);
 
-  // Generate 48 hours starting from 00:00 today
-  const hours = useMemo(() => {
+  const hours: HourPoint[] = useMemo(() => {
     const startOfDay = new Date(baseDate + 'T00:00:00');
-    const list: {
-      label: string;
-      date: string;
-      hour: number;
-      showDate: boolean;
-    }[] = [];
+    const list: HourPoint[] = [];
 
-    for (let i = 0; i < 48; i++) {
-      const d = new Date(startOfDay.getTime() + i * 3600 * 1000);
+    for (let i = 0; i < totalHours / intervalHours; i++) {
+      const d = new Date(
+        startOfDay.getTime() + i * intervalHours * 3600 * 1000
+      );
       const hourStr = dayjs(d).format('HH:mm');
       const dateStr = dayjs(d).format('MMM D, YYYY');
-
-      // Show date every 6 hours (0, 6, 12, 18, 24, 30, 36, 42)
-      const showDate = i % 6 === 0;
-
-      list.push({ label: hourStr, date: dateStr, hour: i, showDate });
+      const showDate = i % Math.floor(6 / intervalHours) === 0; 
+      list.push({ label: hourStr, date: dateStr, hourIndex: i, showDate });
     }
-    return list;
-  }, [baseDate]);
 
-  // Scroll to active hour
+    return list;
+  }, [baseDate, intervalHours, totalHours]);
+
   useEffect(() => {
     if (barRef.current) {
       const activeEl = barRef.current.children[activeHour] as HTMLElement;
@@ -100,7 +104,6 @@ export default function PollenTimeline({
               >
                 {h.label}
               </span>
-              {/* Date label every 6 hours */}
               {h.showDate && (
                 <span className="text-[10px] text-gray-500 -mt-1">
                   {h.date}
