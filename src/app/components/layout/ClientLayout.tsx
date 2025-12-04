@@ -1,10 +1,7 @@
 import { Sidebar } from './Sidebar';
+import { Navbar } from './Navbar';
 
-export default function ClientLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen">
       <Sidebar />
