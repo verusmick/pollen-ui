@@ -1,6 +1,13 @@
 'use client';
 
-import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
+import {
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useSyncExternalStore,
+} from 'react';
 
 import { DeckGL } from '@deck.gl/react';
 import { FlyToInterpolator } from '@deck.gl/core';
@@ -134,104 +141,111 @@ export default function ForecastMap({
     });
   }, [pollenData]);
 
-  const pollenGridCellsLayer = new PolygonLayer({
-    id: 'pollen-grid',
-    data: gridCells,
-    getPolygon: (d: any) => d.polygon,
-    getFillColor: (d: any) => {
-      const intensity = d.intensity;
-      // Your color scale based on pollen intensity
-      if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
-      else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
-      else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
-      else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
-      else return [255, 0, 0, 60]; // Red - high
-    },
-    getLineColor: [0, 0, 0, 10],
-    // lineWidthMinPixels: 0.5,
-    filled: true,
-    stroked: true,
-    extruded: false,
-    // 🔥 HOVER CONFIGURATION
-    pickable: true,
-    autoHighlight: true,
-    highlightColor: [255, 255, 255, 100], // White highlight border
-    onHover: (info: any) => {
-      // Show tooltip on hover
-      // if (info.object) {
-      //   setTooltipInfo({
-      //     object: info.object,
-      //     x: info.x,
-      //     y: info.y,
-      //   });
-      // } else {
-      //   setTooltipInfo(null); // Hide tooltip when not hovering
-      // }
-    },
-    onClick: (info: any) => {
-      if (!info.object) return;
-      handleGridCellClick(info.coordinate[1], info.coordinate[0]);
-    },
-  });
+  const pollenGridCellsLayer = useMemo(
+    () =>
+      new PolygonLayer({
+        id: 'pollen-grid',
+        data: gridCells,
+        getPolygon: (d: any) => d.polygon,
+        getFillColor: (d: any) => {
+          const intensity = d.intensity;
+          // Your color scale based on pollen intensity
+          if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
+          else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
+          else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
+          else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
+          else return [255, 0, 0, 60]; // Red - high
+        },
+        getLineColor: [0, 0, 0, 10],
+        // lineWidthMinPixels: 0.5,
+        filled: true,
+        stroked: true,
+        extruded: false,
+        // 🔥 HOVER CONFIGURATION
+        pickable: true,
+        autoHighlight: true,
+        highlightColor: [255, 255, 255, 100], // White highlight border
+        onHover: (info: any) => {
+          // Show tooltip on hover
+          // if (info.object) {
+          //   setTooltipInfo({
+          //     object: info.object,
+          //     x: info.x,
+          //     y: info.y,
+          //   });
+          // } else {
+          //   setTooltipInfo(null); // Hide tooltip when not hovering
+          // }
+        },
+        onClick: (info: any) => {
+          if (!info.object) return;
+          handleGridCellClick(info.coordinate[1], info.coordinate[0]);
+        },
+      }),
+    [gridCells, handleGridCellClick]
+  );
 
-  const pinIconLayer =
-    pollenDetailsChartLatitude && pollenDetailsChartLongitude
-      ? new IconLayer({
-          id: 'search-marker',
-          data: [
-            {
-              position: [
-                pollenDetailsChartLongitude,
-                pollenDetailsChartLatitude,
-              ],
-              name,
-            },
-          ],
-          getIcon: () => 'marker',
-          getColor: () => [33, 33, 33],
-          getPosition: (d) => d.position,
-          getSize: () => 41,
-          iconAtlas: '/map_icon.png',
-          iconMapping: {
-            marker: {
-              x: 0,
-              y: 0,
-              width: 128,
-              height: 128,
-              anchorY: 128,
-              mask: true,
-            },
-          },
-          pickable: true,
-        })
-      : null;
+  const pinIconLayer = useMemo(() => {
+    if (!pollenDetailsChartLatitude || !pollenDetailsChartLongitude)
+      return null;
+
+    return new IconLayer({
+      id: 'search-marker',
+      data: [
+        {
+          position: [pollenDetailsChartLatitude, pollenDetailsChartLongitude],
+          name,
+        },
+      ],
+      getIcon: () => 'marker',
+      getColor: () => [33, 33, 33],
+      getPosition: (d) => d.position,
+      getSize: () => 41,
+      iconAtlas: '/map_icon.png',
+      iconMapping: {
+        marker: {
+          x: 0,
+          y: 0,
+          width: 128,
+          height: 128,
+          anchorY: 128,
+          mask: true,
+        },
+      },
+      pickable: true,
+    });
+  }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude, name]);
 
   // Free OpenStreetMap base layer
-  const baseMapLayer = new TileLayer({
-    id: 'base-map',
-    data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    minZoom: 0,
-    maxZoom: 19,
-    tileSize: 256,
-    renderSubLayers: (props) => {
-      const { bbox, data, id } = props.tile;
+  const baseMapLayer = useMemo(
+    () =>
+      new TileLayer({
+        id: 'base-map',
+        data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        minZoom: 0,
+        maxZoom: 19,
+        tileSize: 256,
+        renderSubLayers: (props) => {
+          const { bbox, data, id } = props.tile;
 
-      // Handle different types of bounding boxes
-      const bounds: [number, number, number, number] =
-        'west' in bbox
-          ? [bbox.west, bbox.south, bbox.east, bbox.north]
-          : [bbox.left, bbox.bottom, bbox.right, bbox.top];
+          // Handle different types of bounding boxes
+          const bounds: [number, number, number, number] =
+            'west' in bbox
+              ? [bbox.west, bbox.south, bbox.east, bbox.north]
+              : [bbox.left, bbox.bottom, bbox.right, bbox.top];
 
-      return new BitmapLayer({
-        id: `${id}-bitmap`,
-        image: data,
-        bounds,
-      });
-    },
-  });
+          return new BitmapLayer({
+            id: `${id}-bitmap`,
+            image: data,
+            bounds,
+          });
+        },
+      }),
+    []
+  );
 
   // Bavaria boundary
-  const bavariaGeoJsonLayer = () => {
+  const bavariaGeoJsonLayer = useMemo(() => {
     const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
     if (region !== 'BAVARIA') return null;
     return new GeoJsonLayer({
@@ -243,7 +257,7 @@ export default function ForecastMap({
       lineWidthMinPixels: 1.5,
       getLineWidth: 1,
     });
-  };
+  }, []);
 
   // Create mask for area outside Germany
   const germanyGeoJsonLayer = useMemo(() => {
@@ -293,11 +307,11 @@ export default function ForecastMap({
     debouncedRegionUpdate(nextViewState);
   }, []);
 
-  const handleCursor = ({ isDragging, isHovering }: any) => {
+  const handleCursor = useCallback(({ isDragging, isHovering }: any) => {
     if (isDragging) return 'grabbing';
     if (isHovering) return 'pointer';
     return 'grab';
-  };
+  }, []);
   const openChartAtLocation = (lat: number, lng: number) => {
     clearCurrentLocation();
     setViewMapState((prev) => ({
@@ -310,7 +324,6 @@ export default function ForecastMap({
     }));
     setShowPollenDetailsChart(true, '', null, lat, lng);
   };
-
   // watcher to check the properties of the map
   useEffect(() => {
     if (searchLat && searchlong) {
@@ -331,12 +344,16 @@ export default function ForecastMap({
         controller={true}
         layers={[
           baseMapLayer,
-          bavariaGeoJsonLayer(),
+          bavariaGeoJsonLayer,
           germanyGeoJsonLayer,
           pollenGridCellsLayer,
           pinIconLayer,
         ]}
-        style={{ width: '100%', height: '100%', cursor: 'pointer' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          cursor: 'pointer',
+        }}
         viewState={viewMapState}
         // This is triggered when the hand move the map
         onViewStateChange={handleViewStateChange}

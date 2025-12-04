@@ -8,7 +8,7 @@ export default function ClientLayout({
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <main className="flex-1 relative bg-gray-100 overflow-hidden">
+      <main className="flex-1 relative overflow-hidden h-full">
         {children}
       </main>
     </div>
