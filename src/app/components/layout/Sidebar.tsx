@@ -69,7 +69,7 @@ export function Sidebar() {
         onClick={() => setCollapsed(!collapsed)}
         className={`
           absolute top-1/2 -translate-y-1/2
-          bg-card hover:bg-card/80 p-2 rounded-full z-100
+          bg-card hover:bg-card/80 p-2 rounded-full z-100 cursor-pointer
         `}
         style={{ left: sidebarWidth - 16 }}
       >

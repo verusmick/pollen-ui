@@ -6,7 +6,6 @@ import {
   useEffect,
   useCallback,
   useRef,
-  useSyncExternalStore,
 } from 'react';
 
 import { DeckGL } from '@deck.gl/react';
