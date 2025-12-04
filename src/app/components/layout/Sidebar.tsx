@@ -1,16 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { FiCloud, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiCloud, FiChevronLeft, FiChevronRight, FiActivity } from 'react-icons/fi';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 export function Sidebar() {
   const t = useTranslations('Sidebar');
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
-  const routes = [{ label: 'Forecast', href: '/forecast', icon: FiCloud }];
+  const routes = [
+    { label: 'Forecast', href: '/forecast', icon: FiCloud },
+    { label: 'Now Casting', href: '/now-casting', icon: FiActivity },
+  ];
 
   const sidebarWidth = collapsed ? 0 : 256;
 
@@ -22,7 +26,6 @@ export function Sidebar() {
           ${collapsed ? 'w-0 p-0 overflow-hidden' : 'w-64 p-5'}
         `}
       >
-        {/* Header */}
         <div className={`flex items-center mb-8 ${collapsed ? 'hidden' : ''}`}>
           <img src="/zaum.png" alt="Logo" className="h-8 w-10 mr-3" />
           <span className="text-lg">{t('title')}</span>
@@ -43,20 +46,22 @@ export function Sidebar() {
               if (collapsed) return null;
 
               return (
-                <li
-                  key={href}
-                  className={`
-                    flex items-center gap-3 px-4 py-2 rounded cursor-pointer
-                    ${isActive ? 'bg-white/10' : 'hover:bg-gray-700'}
-                  `}
-                >
-                  <Icon
-                    size={18}
-                    className={isActive ? 'text-white' : 'text-gray-300'}
-                  />
-                  <span className={isActive ? 'text-white' : 'text-gray-300'}>
-                    {label}
-                  </span>
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className={`
+                      flex items-center gap-3 px-4 py-2 rounded cursor-pointer
+                      ${isActive ? 'bg-white/10' : 'hover:bg-gray-700'}
+                    `}
+                  >
+                    <Icon
+                      size={18}
+                      className={isActive ? 'text-white' : 'text-gray-300'}
+                    />
+                    <span className={isActive ? 'text-white' : 'text-gray-300'}>
+                      {label}
+                    </span>
+                  </Link>
                 </li>
               );
             })}
