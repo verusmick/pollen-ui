@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  useMemo,
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 
 import { DeckGL } from '@deck.gl/react';
 import { FlyToInterpolator } from '@deck.gl/core';
@@ -192,7 +186,7 @@ export default function ForecastMap({
       id: 'search-marker',
       data: [
         {
-          position: [pollenDetailsChartLatitude, pollenDetailsChartLongitude],
+          position: [pollenDetailsChartLongitude, pollenDetailsChartLatitude],
           name,
         },
       ],
