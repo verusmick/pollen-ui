@@ -1,6 +1,7 @@
 'use client';
 
-import { NowCastingMap } from '@/app/now-casting/components';
+import NowCastingMap from './NowCastingMap';
+
 import {
   DropdownSelector,
   LocationButton,
@@ -8,45 +9,45 @@ import {
   PanelHeader,
   SearchCardToggle,
 } from '@/app/components';
+
 import {
   DEFAULT_POLLEN,
   getRegionBounds,
-  POLLEN_ENTRIES,
   PollenConfig,
 } from '@/app/forecast/constants';
-import { usePartialLoadingStore } from '@/app/stores';
 
+import { usePartialLoadingStore } from '@/app/stores';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useSidebar } from '@/app/context/SidebarContext';
 
-export const NowCastingMapContainer = () => {
+export default function NowCastingMapContainer() {
   const t = useTranslations('now_castingPage');
   const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
+
+  const { sidebarWidth } = useSidebar();
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
-  const [selectorOpen, setSelectorOpen] = useState(false);
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-  const { partialLoading, setPartialLoading, chartLoading, setChartLoading } =
-    usePartialLoadingStore();
+
   const boundaryMapBox = getRegionBounds();
+  const { setPartialLoading } = usePartialLoadingStore();
+
   const handlePollenChange = (newPollen: PollenConfig) => {
     setPartialLoading(true);
     setPollenSelected(newPollen);
   };
+
   return (
-    <div className="relative h-screen w-screen">
+    <>
       <NowCastingMap />
+
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
               onSelect={(pos) => {
-                setUserLocation(pos);
                 setOpen(false);
               }}
               currentDate={pollenSelected.defaultBaseDate}
@@ -62,19 +63,21 @@ export const NowCastingMapContainer = () => {
           pollenSelected={pollenSelected.apiKey}
         />
       </span>
-      <div className="absolute top-8 left-8 z-50 flex flex-col gap-4">
+
+      <div
+        className="absolute top-8 z-50 flex flex-col gap-4 transition-all duration-300"
+        style={{ left: 30 + sidebarWidth }}
+      >
         <PanelHeader title={t('title')} iconSrc="/zaum.png" />
+
         <DropdownSelector
           value={pollenSelected}
           onChange={handlePollenChange}
-          onToggle={(open) => setSelectorOpen(open)}
           options={[]}
           getLabel={(item) => item.label}
           getKey={(item) => item.apiKey}
         />
       </div>
-    </div>
+    </>
   );
-};
-
-export default NowCastingMapContainer;
+}

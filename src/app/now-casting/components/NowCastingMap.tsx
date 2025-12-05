@@ -1,7 +1,7 @@
 'use client';
 import { getInitialViewState } from '@/app/forecast/utils';
 import { DeckGL } from '@deck.gl/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { TileLayer } from '@deck.gl/geo-layers';
 import {
   GeoJsonLayer,
@@ -17,9 +17,11 @@ import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import { getBoundsFromViewState, debounce } from '@/utils';
 import { MapZoomControls } from '@/app/components';
 import { MapTooltip } from '@/app/forecast/components';
+import { useSidebar } from '@/app/context/SidebarContext';
 export default function NowCastingMap() {
   const [viewMapState, setViewMapState] = useState(getInitialViewState);
   const [bounds, setBounds] = useState<number[] | null>(null);
+  const { sidebarWidth } = useSidebar();
   const [tooltipInfo, setTooltipInfo] = useState<{
     object: any;
     x: number;
@@ -130,14 +132,20 @@ export default function NowCastingMap() {
     if (isHovering) return 'pointer';
     return 'grab';
   };
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 50);
+
+    return () => clearTimeout(timeout);
+  }, [sidebarWidth]);
   return (
     <>
       <DeckGL
         initialViewState={viewMapState}
         controller={true}
         layers={[baseMapLayer, germanyGeoJsonLayer, pinIconLayer]}
-        style={{ width: '100vw', height: '100vh', cursor: 'pointer' }}
-        viewState={viewMapState}
+        style={{ width: '100%', height: '100%', cursor: 'pointer' }}
         // This is triggered when the hand move the map
         onViewStateChange={handleViewStateChange}
         getCursor={handleCursor}

@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  useMemo,
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-} from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 
 import { DeckGL } from '@deck.gl/react';
 import { FlyToInterpolator } from '@deck.gl/core';
@@ -82,6 +76,7 @@ export default function ForecastMap({
     longitude: pollenDetailsChartLongitude,
   } = usePollenDetailsChartStore();
   const lastRequestId = useRef<string | null>(null);
+  const deckRef = useRef<any>(null);
 
   const handleGridCellClick = useCallback(
     async (clickLat: number, clickLon: number) => {
@@ -336,9 +331,22 @@ export default function ForecastMap({
     }
   }, [currentLocationLat, currentLocationLong]);
 
+  useEffect(() => {
+    return () => {
+      if (deckRef.current) {
+        try {
+          deckRef.current.finalize();
+        } catch (e) {
+          console.warn('DeckGL finalize error', e);
+        }
+      }
+    };
+  }, []);
+
   return (
     <>
       <DeckGL
+        ref={deckRef}
         initialViewState={viewMapState}
         controller={true}
         layers={[
@@ -353,7 +361,6 @@ export default function ForecastMap({
           height: '100%',
           cursor: 'pointer',
         }}
-        viewState={viewMapState}
         // This is triggered when the hand move the map
         onViewStateChange={handleViewStateChange}
         getCursor={handleCursor}

@@ -1,14 +1,41 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Sidebar } from './Sidebar';
+import { SidebarContext } from '@/app/context/SidebarContext';
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [collapsed, setCollapsed] = useState(true);
+  const sidebarWidth = collapsed ? 0 : 256;
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <main className="flex-1 relative overflow-hidden h-full">{children}</main>
-    </div>
+    <SidebarContext.Provider value={{ sidebarWidth }}>
+      <div className="h-screen w-screen flex overflow-hidden relative">
+        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+
+        <main
+          className="flex-1 h-full overflow-hidden relative"
+          style={{ minWidth: 1 }} // VERY important to prevent WebGL crash
+        >
+          {children}
+        </main>
+      </div>
+    </SidebarContext.Provider>
   );
 }
