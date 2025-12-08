@@ -31,7 +31,7 @@ export default function ClientLayout({
 
         <main
           className="flex-1 h-full overflow-hidden relative"
-          style={{ minWidth: 1 }} // VERY important to prevent WebGL crash
+          style={{ minWidth: 1 }}
         >
           {children}
         </main>

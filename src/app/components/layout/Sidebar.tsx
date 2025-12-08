@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useClickOutside } from '@/app/forecast/hooks';
 
 export function Sidebar({
   collapsed,
@@ -15,6 +16,7 @@ export function Sidebar({
 }) {
   const t = useTranslations('Sidebar');
   const pathname = usePathname();
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const routes = [
     { label: 'Forecast', href: '/forecast' },
@@ -23,9 +25,11 @@ export function Sidebar({
 
   const sidebarWidth = collapsed ? 0 : 256;
 
+  useClickOutside(sidebarRef, () => setCollapsed(true), !collapsed);
   return (
     <>
       <aside
+        ref={sidebarRef}
         className={`
           fixed top-0 left-0 h-screen bg-card text-white border-r border-white/40 
           flex flex-col transition-all duration-300 overflow-hidden z-50
