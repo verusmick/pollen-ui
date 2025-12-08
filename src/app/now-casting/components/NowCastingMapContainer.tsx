@@ -52,6 +52,7 @@ export const NowCastingMapContainer = () => {
   const { data: mapData, loading, fetchNowCasting } = useNowCasting();
 
   useEffect(() => {
+    setPartialLoading(true);
     fetchNowCasting({
       date: pollenSelected.defaultBaseDate,
       hour: pollenSelected.defaultHour,
@@ -116,7 +117,7 @@ export const NowCastingMapContainer = () => {
       />
 
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        <SearchCardToggle title={tSearch('title_tooltip_search')}>
+        {/* <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
@@ -129,7 +130,7 @@ export const NowCastingMapContainer = () => {
               boundary={getRegionBounds()}
             />
           )}
-        </SearchCardToggle>
+        </SearchCardToggle> */}
 
         {/* <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
