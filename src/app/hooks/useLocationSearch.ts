@@ -1,6 +1,6 @@
   'use client';
   import { useState, useEffect, useRef } from 'react';
-  import { useSearchLocationStore } from '@/app/stores/map/searchLocationStore';
+  import { useSearchLocationStore } from '@/app/stores/maps/searchLocationStore';
   import { usePollenDetailsChartStore } from '@/app/forecast/stores';
   import { fetchAndShowPollenChart } from '@/app/forecast/utils';
   import { usePartialLoadingStore } from '@/app/stores';

@@ -27,7 +27,6 @@ import {
   fetchAndShowPollenChart,
   findClosestCoordinate,
   getInitialViewState,
-  getRegionGeo,
 } from '@/app/forecast/utils';
 import { MapZoomControls } from '@/app/components';
 import {
@@ -36,6 +35,7 @@ import {
   usePartialLoadingStore,
   useSearchLocationStore,
 } from '@/app/stores';
+import { getRegionGeo } from '@/app/utils/maps';
 
 // Define the grid cell size in degrees
 // const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
