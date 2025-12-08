@@ -111,8 +111,6 @@ export const NowCastingMapContainer = () => {
     });
   };
 
-  console.log('mapData', mapData);
-
   return (
     <div className="relative h-screen w-screen">
       <NowCastingMap
