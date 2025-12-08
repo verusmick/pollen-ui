@@ -186,7 +186,7 @@ export default function ForecastMap({
       id: 'search-marker',
       data: [
         {
-          position: [pollenDetailsChartLatitude, pollenDetailsChartLongitude],
+          position: [pollenDetailsChartLongitude, pollenDetailsChartLatitude],
           name,
         },
       ],
