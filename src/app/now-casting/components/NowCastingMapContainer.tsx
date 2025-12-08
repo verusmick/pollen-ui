@@ -26,8 +26,8 @@ import {
 } from '@/app/now-casting/constants';
 import { getRegionBounds } from '@/app/constants';
 import { useNowCasting } from '@/app/now-casting/hooks';
-import { useSidebar } from '@/app/context/SidebarContext';
-import { useIsLargeScreen } from '@/app/hooks/useIsLargeScreen';
+import { useSidebar } from '@/app/context';
+import { useIsLargeScreen } from '@/app/hooks';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();

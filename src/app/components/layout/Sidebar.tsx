@@ -5,7 +5,7 @@ import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useClickOutside } from '@/app/hooks/useClickOutside';
+import { useClickOutside } from '@/app/hooks';
 
 export function Sidebar({
   collapsed,

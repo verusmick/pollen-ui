@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { BiSearch, BiX } from 'react-icons/bi';
 import { Tooltip } from '@/app/components';
-import { useClickOutside } from '@/app/hooks/useClickOutside';
+import { useClickOutside } from '@/app/hooks';
 
 interface SearchCardToggleProps {
   title?: string;

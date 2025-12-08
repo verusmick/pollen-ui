@@ -7,10 +7,7 @@ import dayjs from 'dayjs';
 
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
-import {
-  ForecastMap,
-  PollenTimeline,
-} from '@/app/forecast/components';
+import { ForecastMap, PollenTimeline } from '@/app/forecast/components';
 
 import {
   DEFAULT_POLLEN,
@@ -48,8 +45,8 @@ import {
   useLoadingStore,
   usePartialLoadingStore,
 } from '@/app/stores';
-import { useSidebar } from '@/app/context/SidebarContext';
-import { useIsLargeScreen } from '@/app/hooks/useIsLargeScreen';
+import { useSidebar } from '@/app/context';
+import { useIsLargeScreen } from '@/app/hooks';
 
 const PollenDetailsChart = dynamic(
   () =>
