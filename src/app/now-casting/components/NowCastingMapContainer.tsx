@@ -8,6 +8,7 @@ import { NowCastingMap } from '@/app/now-casting/components';
 import {
   DropdownSelector,
   LoadingOverlay,
+  LoadingSpinner,
   LocationButton,
   LocationSearch,
   PanelHeader,
@@ -16,7 +17,7 @@ import {
   SearchCardToggle,
 } from '@/app/components';
 
-import { useCurrentLocationStore } from '@/app/stores';
+import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
@@ -47,14 +48,13 @@ export const NowCastingMapContainer = () => {
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const { clearLocation: clearCurrentLocation } = useCurrentLocationStore();
+  const { partialLoading, setPartialLoading } = usePartialLoadingStore();
   const { data: mapData, loading, fetchNowCasting } = useNowCasting();
-
-  const isMapReady = !loading && pollenData.length > 0;
 
   useEffect(() => {
     fetchNowCasting({
-      date: '2025-03-10',
-      hour: 15,
+      date: pollenSelected.defaultBaseDate,
+      hour: pollenSelected.defaultHour,
       pollen: pollenSelected.apiKey,
       includeCoords: true,
     });
@@ -95,8 +95,17 @@ export const NowCastingMapContainer = () => {
   };
 
   const handlePollenChange = (newPollen: PollenConfig) => {
+    setPartialLoading(true);
     setPollenSelected(newPollen);
+    fetchNowCasting({
+      date: newPollen.defaultBaseDate,
+      hour: newPollen.defaultHour,
+      pollen: newPollen.apiKey,
+      includeCoords: true,
+    });
   };
+
+  console.log('mapData', mapData);
 
   return (
     <div className="relative h-screen w-screen">
@@ -132,6 +141,11 @@ export const NowCastingMapContainer = () => {
 
       <div className="absolute top-8 left-8 z-50 flex flex-col gap-4">
         <PanelHeader title={t('title')} iconSrc="/zaum.png" />
+        {partialLoading && loading && (
+          <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
+            <LoadingSpinner size={40} color="border-white" />
+          </div>
+        )}
         <DropdownSelector
           value={pollenSelected}
           onChange={handlePollenChange}
@@ -158,7 +172,9 @@ export const NowCastingMapContainer = () => {
         />
       </div>
 
-      {!isMapReady && <LoadingOverlay message={t('message_loading')} />}
+      {loading && !mapData?.data?.length && (
+        <LoadingOverlay message={t('message_loading')} />
+      )}
     </div>
   );
 };
