@@ -10,7 +10,6 @@ export const getRegionGeo = () => {
   const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase();
 
   if (!region || !REGION_GEO[region]) {
-    console.warn(`Unknown region "${region}", falling back to GERMANY`);
     return bavariaGeo;
   }
 

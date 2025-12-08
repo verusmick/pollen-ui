@@ -1,13 +1,8 @@
-import { REGION_BOUNDS } from "@/app/constants/maps/regionBounds";
-// const viewMapInitialState = {
-//   longitude: 11.5,
-//   latitude: 48.8,
-//   zoom: 7,
-//   minZoom: 5,
-//   maxZoom: 12,
-// };
+import { REGION_BOUNDS } from "@/app/constants";
+
 export const getInitialViewState = () => {
-  const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
+  // const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
+  const region = 'BAVARIA';
   const bbox = REGION_BOUNDS[region] || REGION_BOUNDS.BAVARIA;
 
   const [minLon, minLat, maxLon, maxLat] = bbox;
