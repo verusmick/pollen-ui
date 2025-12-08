@@ -7,10 +7,7 @@ import dayjs from 'dayjs';
 
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
-import {
-  ForecastMap,
-  PollenTimeline,
-} from '@/app/forecast/components';
+import { ForecastMap, PollenTimeline } from '@/app/forecast/components';
 
 import {
   DEFAULT_POLLEN,
@@ -48,6 +45,8 @@ import {
   useLoadingStore,
   usePartialLoadingStore,
 } from '@/app/stores';
+import { useSidebar } from '@/app/context';
+import { useIsLargeScreen } from '@/app/hooks';
 
 const PollenDetailsChart = dynamic(
   () =>
@@ -59,6 +58,9 @@ export const ForecastMapContainer = () => {
   const t = useTranslations('forecastPage');
   const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
+
+  const { sidebarWidth } = useSidebar();
+  const isLargeScreen = useIsLargeScreen();
 
   const { loading, setLoading } = useLoadingStore();
   const { partialLoading, setPartialLoading, chartLoading, setChartLoading } =
@@ -260,15 +262,13 @@ export const ForecastMapContainer = () => {
 
   return (
     <>
-      <main className="flex-1 overflow-auto min-h-0 h-full">
-        <ForecastMap
-          pollenData={pollenData}
-          onRegionChange={handleRegionChange}
-          pollenSelected={pollenSelected.apiKey}
-          currentDate={pollenSelected.defaultBaseDate}
-          gridCellsResolution={gridCellsResolution}
-        />
-      </main>
+      <ForecastMap
+        pollenData={pollenData}
+        onRegionChange={handleRegionChange}
+        pollenSelected={pollenSelected.apiKey}
+        currentDate={pollenSelected.defaultBaseDate}
+        gridCellsResolution={gridCellsResolution}
+      />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
@@ -291,7 +291,10 @@ export const ForecastMapContainer = () => {
           pollenSelected={pollenSelected.apiKey}
         />
       </span>
-      <div className="absolute top-8 left-8 z-50 flex flex-col gap-4">
+      <div
+        className="absolute top-8 z-50 flex flex-col gap-4 transition-all duration-300"
+        style={{ left: 30 + sidebarWidth }}
+      >
         <PanelHeader title={t('title')} iconSrc="/zaum.png" />
         {partialLoading && (
           <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
@@ -316,7 +319,14 @@ export const ForecastMapContainer = () => {
         )}
       </div>
 
-      <div className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
+      <div
+        className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 z-40 transition-all duration-300"
+        style={{
+          transform: isLargeScreen
+            ? `translateX(calc(-50% + ${sidebarWidth}px))`
+            : 'translateX(-50%)',
+        }}
+      >
         <PollenTimeline
           setPlaying={handlePlayPause}
           playing={playing}
@@ -327,14 +337,26 @@ export const ForecastMapContainer = () => {
       </div>
 
       <div
-        className="absolute z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-8 2xl:translate-x-0 2xl:bottom-13"
+        className="absolute z-50 transition-all duration-300"
+        style={{
+          bottom: isLargeScreen ? 50 : 16,
+          left: isLargeScreen
+            ? sidebarWidth > 0
+              ? `${sidebarWidth + 30}px`
+              : '30px'
+            : '50%',
+          transform: isLargeScreen ? 'translateX(0)' : 'translateX(-50%)',
+        }}
         onMouseEnter={() => setLegendOpen(true)}
         onMouseLeave={() => setLegendOpen(false)}
       >
         <PollenLegend width={300} height={25} />
       </div>
 
-      <div className="absolute left-8 bottom-40 2xl:bottom-24">
+      <div
+        className="absolute bottom-45 2xl:bottom-24 transition-all duration-300"
+        style={{ left: 30 + sidebarWidth }}
+      >
         <PollenLegendCard
           open={legendOpen}
           levels={getLevelsForLegend(pollenSelected.apiKey)}

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { BiChevronDown } from 'react-icons/bi';
-import { useClickOutside } from '@/app/forecast/hooks';
-
+import { useClickOutside } from '@/app/hooks';
 interface DropdownSelectorProps<T> {
   value?: T;
   onChange?: (value: T) => void;
@@ -33,7 +32,7 @@ export const DropdownSelector = <T,>({
   useEffect(() => onToggle?.(isOpen), [isOpen, onToggle]);
 
   const handleOptionClick = (item: T) => {
-    setSelected(item);  
+    setSelected(item);
     onChange?.(item);
     setIsOpen(false);
   };

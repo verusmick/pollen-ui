@@ -1,5 +1,5 @@
 'use client';
-import { useLocationSearch } from '@/app/hooks/useLocationSearch';
+import { useLocationSearch } from '@/app/hooks';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { BiSearch, BiX } from 'react-icons/bi';

@@ -26,12 +26,17 @@ import {
 } from '@/app/now-casting/constants';
 import { getRegionBounds } from '@/app/constants';
 import { useNowCasting } from '@/app/now-casting/hooks';
+import { useSidebar } from '@/app/context';
+import { useIsLargeScreen } from '@/app/hooks';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
   const t = useTranslations('nowCastingPage');
   const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
+
+  const { sidebarWidth } = useSidebar();
+  const isLargeScreen = useIsLargeScreen();
 
   const [gridCellsResolution, setGridCellsResolution] = useState(0.008);
   const [pollenSelected, setPollenSelected] =
@@ -140,7 +145,10 @@ export const NowCastingMapContainer = () => {
         /> */}
       </span>
 
-      <div className="absolute top-8 left-8 z-50 flex flex-col gap-4">
+      <div
+        className="absolute top-8 z-50 flex flex-col gap-4 transition-all duration-300"
+        style={{ left: 30 + sidebarWidth }}
+      >
         <PanelHeader title={t('title')} iconSrc="/zaum.png" />
         {partialLoading && loading && (
           <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
@@ -158,14 +166,26 @@ export const NowCastingMapContainer = () => {
       </div>
 
       <div
-        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-8 2xl:translate-x-0 2xl:bottom-14"
+        className="absolute z-50 transition-all duration-300"
+        style={{
+          bottom: isLargeScreen ? 50 : 16,
+          left: isLargeScreen
+            ? sidebarWidth > 0
+              ? `${sidebarWidth + 30}px`
+              : '30px'
+            : '50%',
+          transform: isLargeScreen ? 'translateX(0)' : 'translateX(-50%)',
+        }}
         onMouseEnter={() => setLegendOpen(true)}
         onMouseLeave={() => setLegendOpen(false)}
       >
-        <PollenLegend width={350} height={25} />
+        <PollenLegend width={300} height={25} />
       </div>
 
-      <div className="fixed left-10 bottom-40 2xl:bottom-24">
+      <div
+        className="absolute  transition-all duration-300"
+        style={{ left: 30 + sidebarWidth, bottom: isLargeScreen ? 100 : 70 }}
+      >
         <PollenLegendCard
           open={legendOpen}
           levels={getLevelsForLegend(pollenSelected.apiKey)}
