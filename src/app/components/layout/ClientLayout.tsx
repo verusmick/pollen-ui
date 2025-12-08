@@ -12,13 +12,13 @@ export default function ClientLayout({
   const [collapsed, setCollapsed] = useState(true);
   const sidebarWidth = collapsed ? 0 : 256;
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setCollapsed(true);
-      }
-    };
+  const handleResize = () => {
+    if (window.innerWidth < 768) {
+      setCollapsed(true);
+    }
+  };
 
+  useEffect(() => {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);

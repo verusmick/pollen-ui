@@ -8,6 +8,7 @@ import { NowCastingMap } from '@/app/now-casting/components';
 import {
   DropdownSelector,
   LoadingOverlay,
+  LoadingSpinner,
   LocationButton,
   LocationSearch,
   PanelHeader,
@@ -16,7 +17,7 @@ import {
   SearchCardToggle,
 } from '@/app/components';
 
-import { useCurrentLocationStore } from '@/app/stores';
+import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
@@ -52,14 +53,14 @@ export const NowCastingMapContainer = () => {
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const { clearLocation: clearCurrentLocation } = useCurrentLocationStore();
+  const { partialLoading, setPartialLoading } = usePartialLoadingStore();
   const { data: mapData, loading, fetchNowCasting } = useNowCasting();
 
-  const isMapReady = !loading && pollenData.length > 0;
-
   useEffect(() => {
+    setPartialLoading(true);
     fetchNowCasting({
-      date: '2025-03-10',
-      hour: 15,
+      date: pollenSelected.defaultBaseDate,
+      hour: pollenSelected.defaultHour,
       pollen: pollenSelected.apiKey,
       includeCoords: true,
     });
@@ -100,8 +101,17 @@ export const NowCastingMapContainer = () => {
   };
 
   const handlePollenChange = (newPollen: PollenConfig) => {
+    setPartialLoading(true);
     setPollenSelected(newPollen);
+    fetchNowCasting({
+      date: newPollen.defaultBaseDate,
+      hour: newPollen.defaultHour,
+      pollen: newPollen.apiKey,
+      includeCoords: true,
+    });
   };
+
+  console.log('mapData', mapData);
 
   return (
     <div className="relative h-screen w-screen">
@@ -112,7 +122,7 @@ export const NowCastingMapContainer = () => {
       />
 
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        <SearchCardToggle title={tSearch('title_tooltip_search')}>
+        {/* <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
@@ -125,7 +135,7 @@ export const NowCastingMapContainer = () => {
               boundary={getRegionBounds()}
             />
           )}
-        </SearchCardToggle>
+        </SearchCardToggle> */}
 
         {/* <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
@@ -140,6 +150,11 @@ export const NowCastingMapContainer = () => {
         style={{ left: 30 + sidebarWidth }}
       >
         <PanelHeader title={t('title')} iconSrc="/zaum.png" />
+        {partialLoading && loading && (
+          <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
+            <LoadingSpinner size={40} color="border-white" />
+          </div>
+        )}
         <DropdownSelector
           value={pollenSelected}
           onChange={handlePollenChange}
@@ -178,7 +193,9 @@ export const NowCastingMapContainer = () => {
         />
       </div>
 
-      {!isMapReady && <LoadingOverlay message={t('message_loading')} />}
+      {loading && !mapData?.data?.length && (
+        <LoadingOverlay message={t('message_loading')} />
+      )}
     </div>
   );
 };

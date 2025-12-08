@@ -7,7 +7,22 @@ export const POLLENS = {
   ALNUS: {
     apiKey: 'POLLEN_ALNUS' as const,
     label: 'Alnus' as const,
-    defaultBaseDate: getDefaultBaseDate('2022-04-14'),
+    defaultBaseDate: getDefaultBaseDate('2025-03-10'),
+    defaultHour: 15,
+    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    levels: [
+      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'Low', min: 31, max: 100 },
+      { label: 'Moderate', min: 101, max: 200 },
+      { label: 'High', min: 201, max: 400 },
+      { label: 'Very High', min: 401, max: 1000 },
+    ] as PollenLevel[],
+  },
+  PINACEAE: {
+    apiKey: 'POLLEN_PINACEAE' as const,
+    label: 'Pine' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
       { label: 'Very Low', min: 1, max: 30 },
