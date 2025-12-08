@@ -79,6 +79,6 @@ export type PollenLabel = (typeof POLLENS)[PollenKey]['label'];
 export type PollenConfig = (typeof POLLENS)[PollenKey];
 
 // Defaults
-export const DEFAULT_POLLEN_KEY: PollenKey = 'PINACEAE';
+export const DEFAULT_POLLEN_KEY: PollenKey = 'ALNUS';
 export const DEFAULT_POLLEN = POLLENS[DEFAULT_POLLEN_KEY];
 export const DEFAULT_POLLEN_API_KEY = DEFAULT_POLLEN.apiKey;
