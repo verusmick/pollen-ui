@@ -1,11 +1,11 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useClickOutside } from '@/app/forecast/hooks';
+import { useClickOutside } from '@/app/hooks/useClickOutside';
 
 export function Sidebar({
   collapsed,
