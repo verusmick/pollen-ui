@@ -47,7 +47,8 @@
       "very_high_leg": "Very high allergy risk"
     }
   },
-  "now_castingPage": {
-    "title": "Now Casting"
+  "nowCastingPage": {
+    "title": "Now Casting",
+    "message_loading": "Now Casting Map"
   }
 }
