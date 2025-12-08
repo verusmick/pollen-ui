@@ -122,12 +122,12 @@ export const NowCastingMapContainer = () => {
           )}
         </SearchCardToggle>
 
-        <LocationButton
+        {/* <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
           onLocationRetrieved={(coords) => setUserLocation(coords)}
-        />
+        /> */}
       </span>
 
       <div className="absolute top-8 left-8 z-50 flex flex-col gap-4">
