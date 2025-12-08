@@ -9,18 +9,17 @@ import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
 import {
   ForecastMap,
-  PollenLegend,
-  PollenLegendCard,
   PollenTimeline,
 } from '@/app/forecast/components';
 
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
-  getRegionBounds,
   POLLEN_ENTRIES,
   type PollenConfig,
 } from '@/app/forecast/constants';
+
+import { getRegionBounds } from '@/app/constants';
 
 import {
   useHourlyForecast,
@@ -41,6 +40,8 @@ import {
   LocationSearch,
   SearchCardToggle,
   LocationButton,
+  PollenLegendCard,
+  PollenLegend,
 } from '@/app/components';
 import {
   useCoordinatesStore,

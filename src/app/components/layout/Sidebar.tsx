@@ -79,7 +79,7 @@ export function Sidebar({
 
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="fixed top-1/2 -translate-y-1/2 bg-card hover:bg-card/80 p-2 rounded-full z-50 transition-all duration-300"
+        className="fixed top-1/2 -translate-y-1/2 bg-card hover:bg-card/80 p-2 rounded-full z-50 transition-all duration-300 cursor-pointer"
         style={{ left: sidebarWidth - 16 }}
       >
         {collapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}

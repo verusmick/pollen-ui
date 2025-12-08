@@ -16,13 +16,13 @@ import dayjs from 'dayjs';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import {
   getPollenByApiKey,
-  LEVEL_COLORS,
   PollenApiKey,
 } from '@/app/forecast/constants';
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/app/components';
 import { usePartialLoadingStore } from '@/app/stores';
 import { COLORS } from '@/app/styles/colors';
+import { MAP_LEVEL_COLORS } from '@/app/constants';
 
 interface PollenData {
   timestamp: number;
@@ -102,7 +102,7 @@ export const PollenDetailsChart = ({
       if (d.value === 0) {
         cache[0] = {
           label: 'Very Low',
-          color: LEVEL_COLORS.very_low,
+          color: MAP_LEVEL_COLORS.very_low,
         };
         return;
       }
@@ -115,11 +115,11 @@ export const PollenDetailsChart = ({
 
         const key = level.label
           .toLowerCase()
-          .replace(/\s+/g, '_') as keyof typeof LEVEL_COLORS;
+          .replace(/\s+/g, '_') as keyof typeof MAP_LEVEL_COLORS;
 
         cache[d.value] = {
           ...level,
-          color: LEVEL_COLORS[key] || LEVEL_COLORS.very_low,
+          color: MAP_LEVEL_COLORS[key] || MAP_LEVEL_COLORS.very_low,
         };
       }
     });
