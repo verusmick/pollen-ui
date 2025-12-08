@@ -1,12 +1,14 @@
-import { MAP_LEVEL_COLORS } from '@/app/constants';
-import { PollenLevel } from '@/app/types';
-import { getDefaultBaseDate } from '@/app/utils';
+import { MAP_LEVEL_COLORS } from "@/app/constants";
+import { PollenLevel } from "@/app/types";
+import { getDefaultBaseDate } from "@/app/utils";
+
 
 export const POLLENS = {
-  BIRCH: {
-    apiKey: 'POLLEN_BIRCH' as const,
-    label: 'Birch' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-04-15'),
+  ALNUS: {
+    apiKey: 'POLLEN_ALNUS' as const,
+    label: 'Alnus' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-03-10'),
+    defaultHour: 15,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
       { label: 'Very Low', min: 1, max: 30 },
@@ -16,23 +18,11 @@ export const POLLENS = {
       { label: 'Very High', min: 401, max: 1000 },
     ] as PollenLevel[],
   },
-  GRASS: {
-    apiKey: 'POLLEN_GRASS' as const,
-    label: 'Grass' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-06-02'),
-    apiIntervals: '1,15,2,16,50,4,51,100,6,101,200,8,201,1000,9',
-    levels: [
-      { label: 'Very Low', min: 1, max: 15 },
-      { label: 'Low', min: 16, max: 50 },
-      { label: 'Moderate', min: 51, max: 100 },
-      { label: 'High', min: 101, max: 200 },
-      { label: 'Very High', min: 201, max: 1000 },
-    ] as PollenLevel[],
-  },
-  ALDER: {
-    apiKey: 'POLLEN_ALDER' as const,
-    label: 'Alder' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-02-15'),
+  PINACEAE: {
+    apiKey: 'POLLEN_PINACEAE' as const,
+    label: 'Pine' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
       { label: 'Very Low', min: 1, max: 30 },
@@ -41,7 +31,7 @@ export const POLLENS = {
       { label: 'High', min: 201, max: 400 },
       { label: 'Very High', min: 401, max: 1000 },
     ] as PollenLevel[],
-  },
+  }
 } as const;
 
 // Helper arrays for different use cases
@@ -89,6 +79,6 @@ export type PollenLabel = (typeof POLLENS)[PollenKey]['label'];
 export type PollenConfig = (typeof POLLENS)[PollenKey];
 
 // Defaults
-export const DEFAULT_POLLEN_KEY: PollenKey = 'BIRCH';
+export const DEFAULT_POLLEN_KEY: PollenKey = 'ALNUS';
 export const DEFAULT_POLLEN = POLLENS[DEFAULT_POLLEN_KEY];
 export const DEFAULT_POLLEN_API_KEY = DEFAULT_POLLEN.apiKey;
