@@ -2,21 +2,24 @@
   "HomePage": {
     "title": "Hello world 2"
   },
+  "Components": {
+    "search": {
+      "title_tooltip_search": "Search",
+      "loading": "Loading",
+      "placeholder_input_search": "Search Location, Zip Code",
+      "no_results": "No results found"
+    }
+  },
   "Sidebar": {
     "title": "PollenScience.eu",
-    "maps":"Maps"
+    "maps": "Maps"
   },
   "forecastPage": {
     "title": "Forecast Map",
     "description": "Interactive pollen forecast map",
     "message_loading": "Pollen Forecast Map",
     "pollen": "pollen/m³",
-    "search": {
-      "title_tooltip_search": "Search",
-      "loading": "Loading",
-      "placeholder_input_search": "Search Location, Zip Code",
-      "no_results": "No results found"
-    },
+
     "show_your_location": {
       "title_tooltip_location": "Show your location",
       "name_company": "Zaum",

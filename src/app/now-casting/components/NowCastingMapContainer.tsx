@@ -9,15 +9,16 @@ import {
   DropdownSelector,
   LoadingOverlay,
   LoadingSpinner,
-  LocationButton,
-  LocationSearch,
   PanelHeader,
   PollenLegend,
   PollenLegendCard,
-  SearchCardToggle,
 } from '@/app/components';
 
-import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
+import {
+  useCoordinatesStore,
+  useCurrentLocationStore,
+  usePartialLoadingStore,
+} from '@/app/stores';
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
@@ -28,11 +29,11 @@ import { getRegionBounds } from '@/app/constants';
 import { useNowCasting } from '@/app/now-casting/hooks';
 import { useSidebar } from '@/app/context';
 import { useIsLargeScreen } from '@/app/hooks';
+import { LocationSearchWrapper } from '@/app/components/maps/LocationSearchWrapper';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
   const t = useTranslations('nowCastingPage');
-  const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
 
   const { sidebarWidth } = useSidebar();
@@ -120,20 +121,11 @@ export const NowCastingMapContainer = () => {
       />
 
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        {/* <SearchCardToggle title={tSearch('title_tooltip_search')}>
-          {(open, setOpen) => (
-            <LocationSearch
-              open={open}
-              onSelect={(pos) => {
-                setUserLocation(pos);
-                setOpen(false);
-              }}
-              currentDate={pollenSelected.defaultBaseDate}
-              pollenSelected={pollenSelected.apiKey}
-              boundary={getRegionBounds()}
-            />
-          )}
-        </SearchCardToggle> */}
+        <LocationSearchWrapper
+          pollenSelected={pollenSelected.apiKey}
+          currentDate={pollenSelected.defaultBaseDate}
+          onLocationSelect={(coords) => setUserLocation(coords)}
+        />
 
         {/* <LocationButton
           tooltipText={tLocation('title_tooltip_location')}

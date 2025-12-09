@@ -34,8 +34,6 @@ import {
   PanelHeader,
   LoadingOverlay,
   DropdownSelector,
-  LocationSearch,
-  SearchCardToggle,
   LocationButton,
   PollenLegendCard,
   PollenLegend,
@@ -47,6 +45,7 @@ import {
 } from '@/app/stores';
 import { useSidebar } from '@/app/context';
 import { useIsLargeScreen } from '@/app/hooks';
+import { LocationSearchWrapper } from '@/app/components/maps/LocationSearchWrapper';
 
 const PollenDetailsChart = dynamic(
   () =>
@@ -56,7 +55,6 @@ const PollenDetailsChart = dynamic(
 
 export const ForecastMapContainer = () => {
   const t = useTranslations('forecastPage');
-  const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
 
   const { sidebarWidth } = useSidebar();
@@ -90,7 +88,6 @@ export const ForecastMapContainer = () => {
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
   const [boundaryMapBox, setBoundaryMapBox] = useState(getRegionBounds());
-
   const [gridCellsResolution, setGridCellsResolution] = useState(0.02);
   const [resolution, setResolution] = useState<1 | 2 | 3>(1);
 
@@ -270,20 +267,11 @@ export const ForecastMapContainer = () => {
         gridCellsResolution={gridCellsResolution}
       />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        <SearchCardToggle title={tSearch('title_tooltip_search')}>
-          {(open, setOpen) => (
-            <LocationSearch
-              open={open}
-              onSelect={(pos) => {
-                setUserLocation(pos);
-                setOpen(false);
-              }}
-              currentDate={pollenSelected.defaultBaseDate}
-              pollenSelected={pollenSelected.apiKey}
-              boundary={getRegionBounds()}
-            />
-          )}
-        </SearchCardToggle>
+        <LocationSearchWrapper
+          pollenSelected={pollenSelected.apiKey}
+          currentDate={pollenSelected.defaultBaseDate}
+          onLocationSelect={(coords) => setUserLocation(coords)}
+        />
 
         <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
