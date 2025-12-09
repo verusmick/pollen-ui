@@ -38,7 +38,7 @@ export const NowCastingMapContainer = () => {
   const { sidebarWidth } = useSidebar();
   const isLargeScreen = useIsLargeScreen();
 
-  const [gridCellsResolution, setGridCellsResolution] = useState(0.008);
+  const [gridCellsResolution, setGridCellsResolution] = useState(0.009);
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
   const [userLocation, setUserLocation] = useState<{
