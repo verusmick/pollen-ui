@@ -51,7 +51,7 @@ export default function NowCastingMap({
       const intensity = typeof intensityRaw === 'number' ? intensityRaw : 0;
       // const halfCell = gridCellsResolution / 1.91;
       const halfCell = 0.0042;
-// 0.0042
+      // 0.0042
       const quadrant = [
         [lon - halfCell, lat - halfCell], // bottom-left
         [lon + halfCell, lat - halfCell], // bottom-right
