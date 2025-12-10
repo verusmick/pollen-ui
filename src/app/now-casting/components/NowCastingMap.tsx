@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DeckGL } from '@deck.gl/react';
 import { TileLayer } from '@deck.gl/geo-layers';
 import {
@@ -12,36 +12,77 @@ import {
 import type { Feature, FeatureCollection } from 'geojson';
 
 import { MapZoomControls } from '@/app/components';
-import { useCurrentLocationStore } from '@/app/stores';
+import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
 import { getInitialViewState } from '@/app/now-casting/utils';
 import { getRegionGeo } from '@/app/utils/maps';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import bavariaGeo from '@/data/bavaria.geo.json';
+import { usePollenChart } from '@/app/hooks';
+import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+
+interface NowCastingMapProps {
+  pollenData: any;
+  gridCellsResolution: number;
+  userLocation: { lat: number; lng: number } | null;
+  pollenSelected: string;
+  currentDate: string;
+}
 
 export default function NowCastingMap({
   pollenData,
   gridCellsResolution,
   userLocation,
-}: {
-  pollenData: any;
-  gridCellsResolution: number;
-  userLocation: { lat: number; lng: number } | null;
-}) {
+  pollenSelected,
+  currentDate,
+}: NowCastingMapProps) {
   const [viewMapState, setViewMapState] = useState(getInitialViewState);
+  const { setChartLoading } = usePartialLoadingStore();
+  const { fetchChart } = usePollenChart();
+  const {
+    setShow: setShowPollenDetailsChart,
+    latitude: pollenDetailsChartLatitude,
+    longitude: pollenDetailsChartLongitude,
+  } = usePollenDetailsChartStore();
 
   const {
     lat: currentLocationLat,
     lng: currentLocationLng,
-    clearLocation: clearCurrentLocation,
+    clearLocation,
   } = useCurrentLocationStore();
 
-  const locationToShow = useMemo(() => {
-    if (userLocation) return userLocation;
-    if (currentLocationLat && currentLocationLng)
-      return { lat: currentLocationLat, lng: currentLocationLng };
-    return null;
-  }, [userLocation, currentLocationLat, currentLocationLng]);
+  // -----------------------------
+  // HANDLE GRID CELL CLICK
+  // -----------------------------
+  const handleGridCellClick = useCallback(
+    async (clickLat: number, clickLon: number) => {
+      setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
+      setChartLoading(true);
+      try {
+        await fetchChart({
+          lat: clickLat,
+          lng: clickLon,
+          pollen: pollenSelected,
+          date: currentDate,
+          nowcasting: { hour: 21, nhours: 48 },
+        });
+      } catch (err) {
+        console.error('NowCastingMap handleGridCellClick error:', err);
+      } finally {
+        setChartLoading(false);
+      }
+    },
+    [
+      fetchChart,
+      setChartLoading,
+      pollenSelected,
+      currentDate,
+      setShowPollenDetailsChart,
+    ]
+  );
 
+  // -----------------------------
+  // GRID CELLS
+  // -----------------------------
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
 
@@ -49,21 +90,21 @@ export default function NowCastingMap({
 
     return filteredPoints.map(([lat, lon, intensityRaw]) => {
       const intensity = typeof intensityRaw === 'number' ? intensityRaw : 0;
-      // const halfCell = gridCellsResolution / 1.91;
-      const halfCell = 0.0042;
-      // 0.0042
+      const halfCell = gridCellsResolution / 2; // usa resolución dinámica
       const quadrant = [
-        [lon - halfCell, lat - halfCell], // bottom-left
-        [lon + halfCell, lat - halfCell], // bottom-right
-        [lon + halfCell, lat + halfCell], // top-right
-        [lon - halfCell, lat + halfCell], // top-left
+        [lon - halfCell, lat - halfCell],
+        [lon + halfCell, lat - halfCell],
+        [lon + halfCell, lat + halfCell],
+        [lon - halfCell, lat + halfCell],
         [lon - halfCell, lat - halfCell],
       ];
-
       return { polygon: quadrant, intensity, position: [lon, lat] };
     });
   }, [pollenData, gridCellsResolution]);
 
+  // -----------------------------
+  // POLLEN GRID LAYER
+  // -----------------------------
   const pollenGridCellsLayer = useMemo(
     () =>
       new PolygonLayer({
@@ -95,16 +136,26 @@ export default function NowCastingMap({
         pickable: true,
         autoHighlight: true,
         highlightColor: [255, 255, 255, 100],
+        onClick: (info: any) => {
+          if (!info.object) return;
+          handleGridCellClick(info.coordinate[1], info.coordinate[0]);
+        },
       }),
-    [gridCells]
+    [gridCells, handleGridCellClick]
   );
 
+  // -----------------------------
+  // PIN ICON LAYER
+  // -----------------------------
   const pinIconLayer = useMemo(() => {
-    if (!locationToShow) return null;
+    if (!pollenDetailsChartLatitude || !pollenDetailsChartLongitude)
+      return null;
 
     return new IconLayer({
-      id: `current-location-marker-${locationToShow.lat}-${locationToShow.lng}`,
-      data: [{ position: [locationToShow.lng, locationToShow.lat] }],
+      id: 'search-marker',
+      data: [
+        { position: [pollenDetailsChartLongitude, pollenDetailsChartLatitude] },
+      ],
       getIcon: () => 'marker',
       getColor: () => [33, 33, 33],
       getPosition: (d) => d.position,
@@ -122,8 +173,11 @@ export default function NowCastingMap({
       },
       pickable: true,
     });
-  }, [locationToShow]);
+  }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude]);
 
+  // -----------------------------
+  // BASE MAP
+  // -----------------------------
   const baseMapLayer = useMemo(
     () =>
       new TileLayer({
@@ -144,6 +198,9 @@ export default function NowCastingMap({
     []
   );
 
+  // -----------------------------
+  // BAVARIA & MASK LAYERS
+  // -----------------------------
   const bavariaGeoJsonLayer = useMemo(() => {
     const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
     if (region !== 'BAVARIA') return null;
@@ -183,13 +240,12 @@ export default function NowCastingMap({
     });
   }, []);
 
+  // -----------------------------
+  // MAP CONTROLLERS
+  // -----------------------------
   const handleViewStateChange = (e: any) => setViewMapState(e.viewState);
   const handleCursor = ({ isDragging, isHovering }: any) =>
     isDragging ? 'grabbing' : isHovering ? 'pointer' : 'grab';
-
-  useEffect(() => {
-    clearCurrentLocation();
-  }, []);
 
   return (
     <>
@@ -207,7 +263,6 @@ export default function NowCastingMap({
         onViewStateChange={handleViewStateChange}
         getCursor={handleCursor}
       />
-
       <MapZoomControls
         zoom={viewMapState.zoom}
         minZoom={viewMapState.minZoom}

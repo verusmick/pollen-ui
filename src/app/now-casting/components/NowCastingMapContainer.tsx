@@ -117,6 +117,8 @@ export const NowCastingMapContainer = () => {
         pollenData={pollenData}
         gridCellsResolution={gridCellsResolution}
         userLocation={userLocation}
+        pollenSelected="POLLEN_ALNUS"
+        currentDate="2025-03-05"
       />
 
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">

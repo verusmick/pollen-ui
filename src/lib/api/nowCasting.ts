@@ -34,7 +34,6 @@ export async function getNowCastingByCoords(params: {
   return res.json();
 }
 
-
 export async function getHourlyNowCasting(params: {
   date: string;
   hour: number;
@@ -67,4 +66,30 @@ export async function getHourlyNowCasting(params: {
     throw new Error(`Forecast Hour API error: ${res.statusText}`);
   }
   return res.json();
+}
+
+export async function fetchChartDataNowCasting(params: {
+  date: string;
+  hour: number;
+  pollen: string;
+  lon: number;
+  lat: number;
+  nhours: number;
+}) {
+  const query = new URLSearchParams({
+    date: params.date,
+    hour: params.hour.toString(),
+    pollen: params.pollen,
+    lon: params.lon.toString(),
+    lat: params.lat.toString(),
+    nhours: params.nhours.toString(),
+  });
+
+  const res = await fetch(`/api/nowcasting/series?${query.toString()}`);
+
+  if (!res.ok) {
+    throw new Error(`Chart API error: ${res.statusText}`);
+  }
+
+  return await res.json();
 }
