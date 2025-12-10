@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 
@@ -14,6 +14,7 @@ import {
   PanelHeader,
   PollenLegend,
   PollenLegendCard,
+  PollenTimeline,
   SearchCardToggle,
 } from '@/app/components';
 
@@ -35,26 +36,23 @@ export const NowCastingMapContainer = () => {
   const tSearch = useTranslations('forecastPage.search');
   const tLocation = useTranslations('forecastPage.show_your_location');
 
-  const { sidebarWidth } = useSidebar();
-  const isLargeScreen = useIsLargeScreen();
-
+  const [playing, setPlaying] = useState(false);
+  const [selectedHour, setSelectedHour] = useState(0);
+  const [timelineStartHour, setTimelineStartHour] = useState(0);
+  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
   const [gridCellsResolution, setGridCellsResolution] = useState(0.009);
-  const [pollenSelected, setPollenSelected] =
-    useState<PollenConfig>(DEFAULT_POLLEN);
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [pollenSelected, setPollenSelected] = useState<PollenConfig>(DEFAULT_POLLEN);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [legendOpen, setLegendOpen] = useState(false);
   const [selectorOpen, setSelectorOpen] = useState(false);
-  const [pollenData, setPollenData] = useState<
-    Array<[long: number, lat: number, value: number | null]>
-  >([]);
-
+  const [pollenData, setPollenData] = useState<Array<[long: number, lat: number, value: number | null]>>([]);
+  
   const legendCardRef = useRef<HTMLDivElement>(null);
   const { clearLocation: clearCurrentLocation } = useCurrentLocationStore();
   const { partialLoading, setPartialLoading } = usePartialLoadingStore();
   const { data: mapData, loading, fetchNowCasting } = useNowCasting();
+  const { sidebarWidth } = useSidebar();
+  const isLargeScreen = useIsLargeScreen();
 
   useEffect(() => {
     setPartialLoading(true);
@@ -111,6 +109,21 @@ export const NowCastingMapContainer = () => {
     });
   };
 
+  const handlePlayPause = () => {
+    if (!playing) {
+      setTimelineStartHour(selectedHour);
+      setTimelineHasWrapped(false);
+      setPlaying(true);
+    } else {
+      setPlaying(false);
+    }
+  };
+
+  const handleSliderChange = useCallback((hour: number) => {
+    setPlaying(false);
+    setSelectedHour(hour);
+  }, []);
+
   return (
     <div className="relative h-screen w-screen">
       <NowCastingMap
@@ -164,6 +177,24 @@ export const NowCastingMapContainer = () => {
       </div>
 
       <div
+        className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 z-40 transition-all duration-300"
+        style={{
+          transform: isLargeScreen
+            ? `translateX(calc(-50% + ${sidebarWidth}px))`
+            : 'translateX(-50%)',
+        }}
+      >
+        <PollenTimeline
+          setPlaying={handlePlayPause}
+          playing={playing}
+          activeHour={selectedHour}
+          onHourChange={handleSliderChange}
+          baseDate={pollenSelected.defaultBaseDate}
+          intervalHours={3}
+        />
+      </div>
+
+      <div
         className="absolute z-50 transition-all duration-300"
         style={{
           bottom: isLargeScreen ? 50 : 16,
@@ -181,7 +212,7 @@ export const NowCastingMapContainer = () => {
       </div>
 
       <div
-        className="absolute  transition-all duration-300"
+        className="absolute transition-all duration-300"
         style={{ left: 30 + sidebarWidth, bottom: isLargeScreen ? 100 : 70 }}
       >
         <PollenLegendCard

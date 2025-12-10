@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
-import { ForecastMap, PollenTimeline } from '@/app/forecast/components';
+import { ForecastMap } from '@/app/forecast/components';
 
 import {
   DEFAULT_POLLEN,
@@ -39,6 +39,7 @@ import {
   LocationButton,
   PollenLegendCard,
   PollenLegend,
+  PollenTimeline,
 } from '@/app/components';
 import {
   useCoordinatesStore,

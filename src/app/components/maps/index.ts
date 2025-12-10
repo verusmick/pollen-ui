@@ -5,3 +5,4 @@ export * from './LocationButton';
 export * from './LocationSearch';
 export * from './PollenLegend'
 export * from './PollenLegendCard'
+export { default as PollenTimeline } from './PollenTimeline'
