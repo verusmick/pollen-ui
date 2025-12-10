@@ -190,7 +190,7 @@ export default function NowCastingMap({
   useEffect(() => {
     clearCurrentLocation();
   }, []);
-
+  
   return (
     <>
       <DeckGL

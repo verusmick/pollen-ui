@@ -37,6 +37,7 @@ import {
   LocationButton,
   PollenLegendCard,
   PollenLegend,
+  LocationSearchWrapper,
 } from '@/app/components';
 import {
   useCoordinatesStore,
@@ -45,7 +46,7 @@ import {
 } from '@/app/stores';
 import { useSidebar } from '@/app/context';
 import { useIsLargeScreen } from '@/app/hooks';
-import { LocationSearchWrapper } from '@/app/components/maps/LocationSearchWrapper';
+
 
 const PollenDetailsChart = dynamic(
   () =>

@@ -9,6 +9,7 @@ import {
   DropdownSelector,
   LoadingOverlay,
   LoadingSpinner,
+  LocationSearchWrapper,
   PanelHeader,
   PollenLegend,
   PollenLegendCard,
@@ -25,11 +26,9 @@ import {
   POLLEN_ENTRIES,
   PollenConfig,
 } from '@/app/now-casting/constants';
-import { getRegionBounds } from '@/app/constants';
 import { useNowCasting } from '@/app/now-casting/hooks';
 import { useSidebar } from '@/app/context';
 import { useIsLargeScreen } from '@/app/hooks';
-import { LocationSearchWrapper } from '@/app/components/maps/LocationSearchWrapper';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
