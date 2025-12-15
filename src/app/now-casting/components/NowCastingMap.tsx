@@ -91,19 +91,22 @@ export default function NowCastingMap({
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
 
-    const filtered = filterPointsInRegion(pollenData, getRegionGeo());
+    const filteredPoints = filterPointsInRegion(pollenData, getRegionGeo());
 
-    return filtered.map(([lat, lon, intensityRaw]) => {
-      const intensity = typeof intensityRaw === 'number' ? intensityRaw : null;
-      const halfCell = gridCellsResolution / 2;
-      const polygon = [
-        [lon - halfCell, lat - halfCell],
-        [lon + halfCell, lat - halfCell],
-        [lon + halfCell, lat + halfCell],
-        [lon - halfCell, lat + halfCell],
+    return filteredPoints.map(([lat, lon, intensityRaw]) => {
+      const intensity = typeof intensityRaw === 'number' ? intensityRaw : 0;
+      // const halfCell = gridCellsResolution / 1.91;
+      const halfCell = 0.0042;
+      // 0.0042
+      const quadrant = [
+        [lon - halfCell, lat - halfCell], // bottom-left
+        [lon + halfCell, lat - halfCell], // bottom-right
+        [lon + halfCell, lat + halfCell], // top-right
+        [lon - halfCell, lat + halfCell], // top-left
         [lon - halfCell, lat - halfCell],
       ];
-      return { polygon, intensity, position: [lon, lat] as [number, number] };
+
+      return { polygon: quadrant, intensity, position: [lon, lat] };
     });
   }, [pollenData, gridCellsResolution]);
 
