@@ -93,6 +93,5 @@ export async function fetchChartDataNowCasting(params: {
   if (!res.ok) {
     throw new Error(`Chart API error: ${res.statusText}`);
   }
-
   return res.json();
 }

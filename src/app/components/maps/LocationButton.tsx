@@ -15,8 +15,8 @@ interface LocationButtonProps {
   pollenSelected: string;
   currentDate: string;
   mode: 'forecast' | 'nowcasting';
-  hour?: number; // solo para forecast
-  nhours?: number; // solo para nowcasting
+  hour?: number;
+  nhours?: number;
 }
 
 export const LocationButton = ({
@@ -37,7 +37,6 @@ export const LocationButton = ({
 
   const { setChartLoading } = usePartialLoadingStore();
   const setLocation = useCurrentLocationStore((state) => state.setLocation);
-  const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
   const { fetchChart } = usePollenChart();
   // Check permission once
   useEffect(() => {
