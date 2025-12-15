@@ -34,10 +34,9 @@ export async function getNowCastingByCoords(params: {
   return res.json();
 }
 
-
 export async function getHourlyNowCasting(params: {
   date: string;
-  hour: number;
+  hour: string;
   pollen: string;
   box?: string;
   intervals?: string;
@@ -46,7 +45,7 @@ export async function getHourlyNowCasting(params: {
 }) {
   const queryParams: Record<string, string> = {
     date: params.date,
-    hour: params.hour.toString(),
+    hour: params.hour,
     pollen: params.pollen,
     include_coords: (params.includeCoords || false).toString(),
     res: (params.res ?? 2).toString(),
