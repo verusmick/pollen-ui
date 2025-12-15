@@ -21,7 +21,7 @@ export const POLLENS = {
   PINACEAE: {
     apiKey: 'POLLEN_PINACEAE' as const,
     label: 'Pine (Pinaceae)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultBaseDate: getDefaultBaseDate('2025-05-07'),
     defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
@@ -35,7 +35,7 @@ export const POLLENS = {
   BETULA: {
     apiKey: 'POLLEN_BETULA' as const,
     label: 'Birch (Betula)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultBaseDate: getDefaultBaseDate('2025-04-15'),
     defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
@@ -49,7 +49,7 @@ export const POLLENS = {
   CORYLUS: {
     apiKey: 'POLLEN_CORYLUS' as const,
     label: 'Hazel (Corylus)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultBaseDate: getDefaultBaseDate('2025-03-01'),
     defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
@@ -63,7 +63,7 @@ export const POLLENS = {
   FRAXINUS: {
     apiKey: 'POLLEN_FRAXINUS' as const,
     label: 'Ash (Fraxinus)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultBaseDate: getDefaultBaseDate('2025-04-13'),
     defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
@@ -78,7 +78,7 @@ export const POLLENS = {
   PINUS: {
     apiKey: 'POLLEN_PINUS' as const,
     label: 'Pine (Pinus)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultBaseDate: getDefaultBaseDate('2019-05-23'),
     defaultHour: 12,
     apiIntervals: '0,1500,0',
     levels: [
@@ -88,7 +88,7 @@ export const POLLENS = {
   POACEAE: {
     apiKey: 'POLLEN_POACEAE' as const,
     label: 'Grasses (Poaceae)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultBaseDate: getDefaultBaseDate('2025-06-06'),
     defaultHour: 12,
     apiIntervals: '1,15,2,16,50,4,51,100,6,101,200,8,201,1000,9',
     levels: [
@@ -102,7 +102,7 @@ export const POLLENS = {
   QUERCUS: {
     apiKey: 'POLLEN_QUERCUS' as const,
     label: 'Oak (Quercus)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultBaseDate: getDefaultBaseDate('2025-04-17'),
     defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
@@ -116,7 +116,7 @@ export const POLLENS = {
   URTICA: {
     apiKey: 'POLLEN_URTICA' as const,
     label: 'Nettle (Urtica)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+    defaultBaseDate: getDefaultBaseDate('2025-08-09'),
     defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
