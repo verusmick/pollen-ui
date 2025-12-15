@@ -48,7 +48,7 @@
     }
   },
   "nowCastingPage": {
-    "title": "Now Casting",
-    "message_loading": "Now Casting Map"
+    "title": "Nowcasting",
+    "message_loading": "Nowcasting Map"
   }
 }
