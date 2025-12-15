@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { DeckGL } from '@deck.gl/react';
 import { TileLayer } from '@deck.gl/geo-layers';
 import {
@@ -19,9 +19,10 @@ import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import bavariaGeo from '@/data/bavaria.geo.json';
 import { usePollenChart } from '@/app/hooks';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import dayjs from 'dayjs';
 
 interface NowCastingMapProps {
-  pollenData: any;
+  pollenData: Array<[number, number, number | undefined]>;
   gridCellsResolution: number;
   userLocation: { lat: number; lng: number } | null;
   pollenSelected: string;
@@ -44,26 +45,22 @@ export default function NowCastingMap({
     longitude: pollenDetailsChartLongitude,
   } = usePollenDetailsChartStore();
 
-  const {
-    lat: currentLocationLat,
-    lng: currentLocationLng,
-    clearLocation,
-  } = useCurrentLocationStore();
+  const { clearLocation } = useCurrentLocationStore();
 
-  // -----------------------------
-  // HANDLE GRID CELL CLICK
-  // -----------------------------
   const handleGridCellClick = useCallback(
     async (clickLat: number, clickLon: number) => {
       setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
       setChartLoading(true);
+      const nowRaw = dayjs();
+      const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
+
       try {
         await fetchChart({
           lat: clickLat,
           lng: clickLon,
           pollen: pollenSelected,
           date: currentDate,
-          nowcasting: { hour: 21, nhours: 48 },
+          nowcasting: { hour: alignedHour, nhours: 48 },
         });
       } catch (err) {
         console.error('NowCastingMap handleGridCellClick error:', err);
@@ -80,31 +77,25 @@ export default function NowCastingMap({
     ]
   );
 
-  // -----------------------------
-  // GRID CELLS
-  // -----------------------------
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
 
-    const filteredPoints = filterPointsInRegion(pollenData, getRegionGeo());
+    const filtered = filterPointsInRegion(pollenData, getRegionGeo());
 
-    return filteredPoints.map(([lat, lon, intensityRaw]) => {
-      const intensity = typeof intensityRaw === 'number' ? intensityRaw : 0;
-      const halfCell = gridCellsResolution / 2; // usa resolución dinámica
-      const quadrant = [
+    return filtered.map(([lat, lon, intensityRaw]) => {
+      const intensity = typeof intensityRaw === 'number' ? intensityRaw : null;
+      const halfCell = gridCellsResolution / 2;
+      const polygon = [
         [lon - halfCell, lat - halfCell],
         [lon + halfCell, lat - halfCell],
         [lon + halfCell, lat + halfCell],
         [lon - halfCell, lat + halfCell],
         [lon - halfCell, lat - halfCell],
       ];
-      return { polygon: quadrant, intensity, position: [lon, lat] };
+      return { polygon, intensity, position: [lon, lat] as [number, number] };
     });
   }, [pollenData, gridCellsResolution]);
 
-  // -----------------------------
-  // POLLEN GRID LAYER
-  // -----------------------------
   const pollenGridCellsLayer = useMemo(
     () =>
       new PolygonLayer({
@@ -138,15 +129,15 @@ export default function NowCastingMap({
         highlightColor: [255, 255, 255, 100],
         onClick: (info: any) => {
           if (!info.object) return;
-          handleGridCellClick(info.coordinate[1], info.coordinate[0]);
+          const pos = info.object.position;
+          if (!pos || pos.length < 2) return;
+          const [lon, lat] = pos;
+          handleGridCellClick(lat, lon);
         },
       }),
     [gridCells, handleGridCellClick]
   );
 
-  // -----------------------------
-  // PIN ICON LAYER
-  // -----------------------------
   const pinIconLayer = useMemo(() => {
     if (!pollenDetailsChartLatitude || !pollenDetailsChartLongitude)
       return null;
@@ -158,7 +149,7 @@ export default function NowCastingMap({
       ],
       getIcon: () => 'marker',
       getColor: () => [33, 33, 33],
-      getPosition: (d) => d.position,
+      getPosition: (d: any) => d.position,
       getSize: () => 41,
       iconAtlas: '/map_icon.png',
       iconMapping: {
@@ -175,9 +166,6 @@ export default function NowCastingMap({
     });
   }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude]);
 
-  // -----------------------------
-  // BASE MAP
-  // -----------------------------
   const baseMapLayer = useMemo(
     () =>
       new TileLayer({
@@ -186,7 +174,7 @@ export default function NowCastingMap({
         minZoom: 0,
         maxZoom: 19,
         tileSize: 256,
-        renderSubLayers: (props) => {
+        renderSubLayers: (props: any) => {
           const { bbox, data, id } = props.tile;
           const bounds: [number, number, number, number] =
             'west' in bbox
@@ -198,9 +186,6 @@ export default function NowCastingMap({
     []
   );
 
-  // -----------------------------
-  // BAVARIA & MASK LAYERS
-  // -----------------------------
   const bavariaGeoJsonLayer = useMemo(() => {
     const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
     if (region !== 'BAVARIA') return null;
@@ -240,24 +225,23 @@ export default function NowCastingMap({
     });
   }, []);
 
-  // -----------------------------
-  // MAP CONTROLLERS
-  // -----------------------------
   const handleViewStateChange = (e: any) => setViewMapState(e.viewState);
   const handleCursor = ({ isDragging, isHovering }: any) =>
     isDragging ? 'grabbing' : isHovering ? 'pointer' : 'grab';
+
+  const layers = [
+    baseMapLayer,
+    bavariaGeoJsonLayer,
+    germanyGeoJsonLayer,
+    pollenGridCellsLayer,
+    pinIconLayer,
+  ].filter(Boolean) as any[];
 
   return (
     <>
       <DeckGL
         controller
-        layers={[
-          baseMapLayer,
-          bavariaGeoJsonLayer,
-          germanyGeoJsonLayer,
-          pollenGridCellsLayer,
-          pinIconLayer,
-        ]}
+        layers={layers}
         style={{ width: '100vw', height: '100vh', cursor: 'pointer' }}
         viewState={viewMapState}
         onViewStateChange={handleViewStateChange}

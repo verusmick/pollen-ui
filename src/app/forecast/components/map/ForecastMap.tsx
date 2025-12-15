@@ -24,7 +24,6 @@ import { MapTooltip } from '@/app/forecast/components';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import { debounce, getBoundsFromViewState } from '@/utils';
 import {
-  fetchAndShowPollenChart,
   findClosestCoordinate,
   getInitialViewState,
 } from '@/app/forecast/utils';

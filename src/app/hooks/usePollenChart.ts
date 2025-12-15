@@ -3,9 +3,9 @@ import dayjs from 'dayjs';
 
 import { fetchChartData } from '@/lib/api/forecast';
 import { fetchChartDataNowCasting } from '@/lib/api/nowCasting';
-import { useCoordinatesStore } from '@/app/stores';
+import { useCoordinatesStore, usePartialLoadingStore } from '@/app/stores';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
-import { findClosestCoordinate } from '../forecast/utils';
+import { findClosestCoordinate } from '@/app/forecast/utils';
 
 interface ForecastParams {
   hour: number;
@@ -26,69 +26,97 @@ interface FetchParams {
 }
 
 export const usePollenChart = () => {
-  const { latitudes, longitudes } = useCoordinatesStore();
   const { setShow } = usePollenDetailsChartStore();
+  const { setChartLoading } = usePartialLoadingStore();
 
-  const lastRequestId = useRef<string>('');
+  const lastRequestId = useRef('');
   const lastController = useRef<AbortController | null>(null);
 
   const fetchChart = useCallback(
     async (params: FetchParams) => {
-      const { lat, lng, pollen, date, forecast, nowcasting } = params;
+      const {
+        lat,
+        lng,
+        pollen,
+        date,
+        forecast: forecastParam,
+        nowcasting: nowcastingParam,
+      } = params;
+      const { forecast, nowCasting } = useCoordinatesStore.getState();
+      const forecastLats = forecast.latitudes;
+      const forecastLons = forecast.longitudes;
+      const nowCastingLats = nowCasting.latitudes;
+      const nowCastingLons = nowCasting.longitudes;
+
+      const requestId = `${lat}-${lng}-${Date.now()}`;
+      lastRequestId.current = requestId;
+
+      if (lastController.current) {
+        lastController.current.abort();
+      }
+
+      const controller = new AbortController();
+      lastController.current = controller;
+
+      setChartLoading(true);
 
       try {
-        if (!latitudes.length || !longitudes.length) return;
+        let finalLat = lat;
+        let finalLon = lng;
 
-        // Handle cancellation
-        const requestId = `${lat}-${lng}-${Date.now()}`;
-        lastRequestId.current = requestId;
+        if (forecastParam && forecastLats.length && forecastLons.length) {
+          finalLat = findClosestCoordinate(lat, forecastLats);
+          finalLon = findClosestCoordinate(lng, forecastLons);
+        } else if (
+          nowcastingParam &&
+          nowCastingLats.length &&
+          nowCastingLons.length
+        ) {
+          finalLat = findClosestCoordinate(lat, nowCastingLats);
+          finalLon = findClosestCoordinate(lng, nowCastingLons);
+        }
 
-        if (lastController.current) lastController.current.abort();
-        const controller = new AbortController();
-        lastController.current = controller;
+        let chartResponse = null;
 
-        // Grid coords
-        const closestLat = findClosestCoordinate(lat, latitudes);
-        const closestLon = findClosestCoordinate(lng, longitudes);
-
-        let chartResponse: any = null;
-
-        if (forecast) {
+        if (forecastParam) {
           const futureDate = dayjs(date).add(2, 'day').format('YYYY-MM-DD');
 
           chartResponse = await fetchChartData({
-            lat: closestLat,
-            lon: closestLon,
+            lat: finalLat,
+            lon: finalLon,
             pollen,
             date: futureDate,
-            hour: forecast.hour,
+            hour: forecastParam.hour,
+            signal: controller.signal,
+          });
+        } else if (nowcastingParam) {
+          chartResponse = await fetchChartDataNowCasting({
+            lat: finalLat,
+            lon: finalLon,
+            pollen,
+            date,
+            hour: nowcastingParam.hour,
+            nhours: nowcastingParam.nhours,
             signal: controller.signal,
           });
         }
 
-        if (nowcasting) {
-          chartResponse = await fetchChartDataNowCasting({
-            lat: closestLat,
-            lon: closestLon,
-            pollen,
-            date,
-            hour: nowcasting.hour,
-            nhours: nowcasting.nhours,
-          });
-        }
-
-        // Race condition check
         if (lastRequestId.current !== requestId) return;
 
-        // Show chart modal
-        setShow(true, '', chartResponse.data, closestLat, closestLon);
+        setShow(true, '', chartResponse?.data ?? null, lat, lng);
       } catch (err: any) {
-        if (err.name === 'AbortError') return;
+        if (err?.name === 'AbortError') return;
         console.error('usePollenChart error:', err);
+      } finally {
+        if (lastRequestId.current === requestId) {
+          setChartLoading(false);
+        }
       }
     },
-    [latitudes, longitudes, setShow]
+    [setShow, setChartLoading]
   );
 
   return { fetchChart };
 };
+
+export default usePollenChart;

@@ -6,7 +6,7 @@ export const POLLENS = {
   ALNUS: {
     apiKey: 'POLLEN_ALNUS' as const,
     label: 'Alder (Alnus)' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-03-10'),
+    defaultBaseDate: getDefaultBaseDate('2025-03-05'),
     defaultHour: 15,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [

@@ -75,6 +75,7 @@ export async function fetchChartDataNowCasting(params: {
   lon: number;
   lat: number;
   nhours: number;
+  signal?: AbortSignal;
 }) {
   const query = new URLSearchParams({
     date: params.date,
@@ -85,11 +86,13 @@ export async function fetchChartDataNowCasting(params: {
     nhours: params.nhours.toString(),
   });
 
-  const res = await fetch(`/api/nowcasting/series?${query.toString()}`);
+  const res = await fetch(`/api/nowcasting/series?${query.toString()}`, {
+    signal: params.signal,
+  });
 
   if (!res.ok) {
     throw new Error(`Chart API error: ${res.statusText}`);
   }
 
-  return await res.json();
+  return res.json();
 }
