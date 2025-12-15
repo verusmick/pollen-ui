@@ -40,7 +40,11 @@ import { useSidebar } from '@/app/context';
 import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
 import { PollenDetailsChart } from '@/app/forecast/components';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
-import { buildHourTimeline, type HourPoint } from '@/app/now-casting/utils';
+import {
+  buildHourTimeline,
+  getAdjacentHour,
+  type HourPoint,
+} from '@/app/now-casting/utils';
 import dayjs from 'dayjs';
 
 export const NowCastingMapContainer = () => {
@@ -87,8 +91,8 @@ export const NowCastingMapContainer = () => {
   const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
   const nowCastingParams = useMemo(
     () => ({
-      date: selectedHour?.apiDate,
-      hour: selectedHour?.apiHour,
+      date: selectedHour?.apiDate || '',
+      hour: String(selectedHour?.apiHour || 0),
       pollen: pollenSelected.apiKey,
       box: boundaryMapBox.join(','),
       intervals: pollenSelected.apiIntervals,
@@ -144,8 +148,8 @@ export const NowCastingMapContainer = () => {
 
   const handlePlayPause = () => {
     if (!playing) {
-      setTimelineStartHour(selectedHour);
-      setTimelineHasWrapped(false);
+      // setTimelineStartHour(selectedHour);
+      // setTimelineHasWrapped(false);
       setPlaying(true);
     } else {
       setPlaying(false);
@@ -162,19 +166,13 @@ export const NowCastingMapContainer = () => {
     isFetching,
     isLoading: mapDataIsLoading,
     onNextHour: () => {
-      console.log('onNextHour');
       setSelectedHour((prevHour) => {
-        const nextHour = prevHour + 3;
-        if (!timelineHasWrapped && nextHour > 47) {
-          setTimelineHasWrapped(true);
-          return 0;
-        }
-        if (timelineHasWrapped && nextHour > timelineStartHour) {
-          setPlaying(false);
-          return prevHour;
-        }
-
-        return nextHour;
+        const nextHour = getAdjacentHour(
+          timelineHours,
+          prevHour?.hourIndex ?? 0,
+          'next'
+        );
+        return nextHour || undefined;
       });
     },
     intervalMs: 1000,
