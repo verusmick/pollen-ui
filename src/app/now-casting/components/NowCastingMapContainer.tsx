@@ -85,8 +85,11 @@ export const NowCastingMapContainer = () => {
   const isLargeScreen = useIsLargeScreen();
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
-  const { nowCasting } = useCoordinatesStore();
-  const { setLatitudes, setLongitudes } = nowCasting;
+  const { nowCasting: nowCastingCoordinates } = useCoordinatesStore();
+  const {
+    setLatitudes: setNowCastingLatGrid,
+    setLongitudes: setNowCastingLngGrid,
+  } = nowCastingCoordinates;
   const { fetchChart } = usePollenChart();
   const nowRaw = dayjs();
   const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
@@ -121,8 +124,8 @@ export const NowCastingMapContainer = () => {
     // }
 
     const { data, longitudes = [], latitudes = [] } = mapData;
-    setLatitudes(latitudes);
-    setLongitudes(longitudes);
+    setNowCastingLatGrid(latitudes);
+    setNowCastingLngGrid(longitudes);
 
     const latsCount = latitudes.length;
     const values = data.map(
