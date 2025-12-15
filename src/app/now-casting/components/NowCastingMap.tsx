@@ -13,7 +13,6 @@ import type { Feature, FeatureCollection } from 'geojson';
 
 import { MapZoomControls } from '@/app/components';
 import {
- 
   useCurrentLocationStore,
   usePartialLoadingStore,
   useSearchLocationStore,
@@ -23,7 +22,7 @@ import { getRegionGeo } from '@/app/utils/maps';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import bavariaGeo from '@/data/bavaria.geo.json';
 import { usePollenChart } from '@/app/hooks';
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import dayjs from 'dayjs';
 import { FlyToInterpolator } from 'deck.gl';
 

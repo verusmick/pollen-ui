@@ -5,7 +5,7 @@ import { BiMap, BiX } from 'react-icons/bi';
 import { TbLocationFilled } from 'react-icons/tb';
 
 import { useTranslations } from 'next-intl';
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+
 import { Tooltip } from '@/app/components';
 import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
 import { usePollenChart } from '@/app/hooks';
@@ -27,7 +27,7 @@ export const LocationButton = ({
   hour,
   nhours,
 }: LocationButtonProps) => {
-  const t = useTranslations('forecastPage.show_your_location');
+  const t = useTranslations('Components.show_your_location');
   const [open, setOpen] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<
     'idle' | 'granted' | 'denied' | 'prompt'

@@ -13,7 +13,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import dayjs from 'dayjs';
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import {
   getPollenByApiKey as getForecastPollenByApiKey,
   PollenApiKey as ForecastPollenApiKey,
@@ -50,7 +50,7 @@ export const PollenDetailsChart = ({
   view: string;
 }) => {
   const nominatimApi = process.env.NEXT_PUBLIC_NOMINATIM_API;
-  const t = useTranslations('components');
+  const t = useTranslations('Components');
 
   const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
   const { chartLoading } = usePartialLoadingStore();

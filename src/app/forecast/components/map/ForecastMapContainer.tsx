@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 
 import { ForecastMap } from '@/app/forecast/components';
 
@@ -50,14 +50,16 @@ import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
 
 const PollenDetailsChart = dynamic(
   () =>
-    import('../ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+    import('../../../components/ui/PollenDetailsChart').then(
+      (mod) => mod.PollenDetailsChart
+    ),
   { ssr: false }
 );
 
 export const ForecastMapContainer = () => {
   const t = useTranslations('forecastPage');
-  const tSearch = useTranslations('forecastPage.search');
-  const tLocation = useTranslations('forecastPage.show_your_location');
+  const tSearch = useTranslations('Components.search');
+  const tLocation = useTranslations('Components.show_your_location');
 
   const { sidebarWidth } = useSidebar();
   const isLargeScreen = useIsLargeScreen();
@@ -241,7 +243,6 @@ export const ForecastMapContainer = () => {
     setShowPollenDetailsChart(true, '', null, pos.lat, pos.lng);
     setChartLoading(true);
     try {
-      
       await fetchChart({
         lat: pos.lat,
         lng: pos.lng,

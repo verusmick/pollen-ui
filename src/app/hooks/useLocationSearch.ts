@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useSearchLocationStore } from '@/app/stores/maps/searchLocationStore';
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import { usePartialLoadingStore } from '@/app/stores';
-import usePollenChart from './usePollenChart';
+import { usePollenChart } from '@/app/hooks';
 
 export const useLocationSearch = ({
   currentDate,
@@ -26,7 +26,6 @@ export const useLocationSearch = ({
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
 
   const setLocation = useSearchLocationStore((state) => state.setLocation);
-  const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
   const { setChartLoading } = usePartialLoadingStore();
   const { fetchChart } = usePollenChart();
   const handleSelect = async (item: any) => {

@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { fetchChartData } from '@/lib/api/forecast';
 import { fetchChartDataNowCasting } from '@/lib/api/nowCasting';
 import { useCoordinatesStore, usePartialLoadingStore } from '@/app/stores';
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import { findClosestCoordinate } from '@/app/forecast/utils';
 
 interface ForecastParams {

@@ -12,6 +12,7 @@ import {
   LocationButton,
   LocationSearch,
   PanelHeader,
+  PollenDetailsChart,
   PollenLegend,
   PollenLegendCard,
   SearchCardToggle,
@@ -38,8 +39,8 @@ import {
 } from '@/app/now-casting/hooks';
 import { useSidebar } from '@/app/context';
 import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
-import { PollenDetailsChart } from '@/app/forecast/components';
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import {
   buildHourTimeline,
   getAdjacentHour,
@@ -50,8 +51,8 @@ import dayjs from 'dayjs';
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
   const t = useTranslations('nowCastingPage');
-  const tSearch = useTranslations('forecastPage.search');
-  const tLocation = useTranslations('forecastPage.show_your_location');
+  const tSearch = useTranslations('Components.search');
+  const tLocation = useTranslations('Components.show_your_location');
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState<HourPoint>();
 
