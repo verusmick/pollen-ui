@@ -9,6 +9,7 @@ import {
   DropdownSelector,
   LoadingOverlay,
   LoadingSpinner,
+  LocationSearch,
   PanelHeader,
   PollenLegend,
   PollenLegendCard,
@@ -38,11 +39,12 @@ import { useSidebar } from '@/app/context';
 import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
 import { PollenDetailsChart } from '@/app/forecast/components';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import dayjs from 'dayjs';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
   const t = useTranslations('nowCastingPage');
-
+  const tSearch = useTranslations('forecastPage.search');
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState(0);
   const [selectedApiDate, setSelectedApiDate] = useState('');
@@ -197,7 +199,30 @@ export const NowCastingMapContainer = () => {
     },
     intervalMs: 1000,
   });
-
+  const handleLocationSelect = async (
+    pos: { lat: number; lng: number },
+    setOpen: (v: boolean) => void
+  ) => {
+    setUserLocation(pos);
+    setOpen(false);
+    setShowPollenDetailsChart(true, '', null, pos.lat, pos.lng);
+    setChartLoading(true);
+    const nowRaw = dayjs();
+    const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
+    try {
+      await fetchChart({
+        lat: pos.lat,
+        lng: pos.lng,
+        pollen: pollenSelected.apiKey,
+        date: pollenSelected.defaultBaseDate,
+        nowcasting: { hour: alignedHour, nhours: 48 },
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setChartLoading(false);
+    }
+  };
   useEffect(() => {
     if (!mapDataIsLoading) setLoading(false);
   }, [mapDataIsLoading]);
@@ -232,20 +257,17 @@ export const NowCastingMapContainer = () => {
         currentDate={pollenSelected.defaultBaseDate}
       />
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        {/* <SearchCardToggle title={tSearch('title_tooltip_search')}>
+        <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
-              onSelect={(pos) => {
-                setUserLocation(pos);
-                setOpen(false);
-              }}
+              onSelect={(pos) => handleLocationSelect(pos, setOpen)}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
               boundary={getRegionBounds()}
             />
           )}
-        </SearchCardToggle> */}
+        </SearchCardToggle>
 
         {/* <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
