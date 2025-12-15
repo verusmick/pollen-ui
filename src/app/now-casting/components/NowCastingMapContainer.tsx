@@ -9,6 +9,7 @@ import {
   DropdownSelector,
   LoadingOverlay,
   LoadingSpinner,
+  LocationButton,
   LocationSearch,
   PanelHeader,
   PollenLegend,
@@ -45,6 +46,7 @@ export const NowCastingMapContainer = () => {
   const pathname = usePathname();
   const t = useTranslations('nowCastingPage');
   const tSearch = useTranslations('forecastPage.search');
+  const tLocation = useTranslations('forecastPage.show_your_location');
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState(0);
   const [selectedApiDate, setSelectedApiDate] = useState('');
@@ -81,7 +83,8 @@ export const NowCastingMapContainer = () => {
   const { fetchChart } = usePollenChart();
   const { nowCasting } = useCoordinatesStore();
   const { setLatitudes, setLongitudes } = nowCasting;
-
+  const nowRaw = dayjs();
+  const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
   const nowCastingParams = useMemo(
     () => ({
       date: selectedApiDate,
@@ -207,8 +210,7 @@ export const NowCastingMapContainer = () => {
     setOpen(false);
     setShowPollenDetailsChart(true, '', null, pos.lat, pos.lng);
     setChartLoading(true);
-    const nowRaw = dayjs();
-    const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
+
     try {
       await fetchChart({
         lat: pos.lat,
@@ -269,12 +271,14 @@ export const NowCastingMapContainer = () => {
           )}
         </SearchCardToggle>
 
-        {/* <LocationButton
+        <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
-          onLocationRetrieved={(coords) => setUserLocation(coords)}
-        /> */}
+          mode="nowcasting"
+          hour={alignedHour}
+          nhours={48}
+        />
       </span>
       <div
         className="absolute top-8 z-50 flex flex-col gap-4 transition-all duration-300"
