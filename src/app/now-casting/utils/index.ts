@@ -1,1 +1,2 @@
-export * from './getInitialView'
+export * from './getInitialView';
+export * from './hourTimeline'
