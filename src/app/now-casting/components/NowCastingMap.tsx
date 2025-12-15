@@ -12,7 +12,7 @@ import {
 import type { Feature, FeatureCollection } from 'geojson';
 
 import { MapZoomControls } from '@/app/components';
-import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
+import { usePartialLoadingStore } from '@/app/stores';
 import { getInitialViewState } from '@/app/now-casting/utils';
 import { getRegionGeo } from '@/app/utils/maps';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
@@ -44,8 +44,6 @@ export default function NowCastingMap({
     latitude: pollenDetailsChartLatitude,
     longitude: pollenDetailsChartLongitude,
   } = usePollenDetailsChartStore();
-
-  const { clearLocation } = useCurrentLocationStore();
 
   const handleGridCellClick = useCallback(
     async (clickLat: number, clickLon: number) => {

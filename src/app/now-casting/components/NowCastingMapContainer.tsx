@@ -35,7 +35,7 @@ import {
   usePollenPrefetch,
 } from '@/app/now-casting/hooks';
 import { useSidebar } from '@/app/context';
-import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
+import { useIsLargeScreen } from '@/app/hooks';
 import { PollenDetailsChart } from '@/app/forecast/components';
 import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 
@@ -76,7 +76,6 @@ export const NowCastingMapContainer = () => {
   const isLargeScreen = useIsLargeScreen();
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
-  const { fetchChart } = usePollenChart();
   const { nowCasting } = useCoordinatesStore();
   const { setLatitudes, setLongitudes } = nowCasting;
 
@@ -130,26 +129,6 @@ export const NowCastingMapContainer = () => {
 
     // prefetchNextHours(nowCastingParams, selectedHour, 3);
     setPartialLoading(false);
-  };
-
-  const loadPollenChart = async () => {
-    const { latitude, longitude } = usePollenDetailsChartStore.getState();
-    if (!latitude || !longitude) return;
-
-    setChartLoading(true);
-    try {
-      await fetchChart({
-        lat: latitude,
-        lng: longitude,
-        pollen: pollenSelected.apiKey,
-        date: pollenSelected.defaultBaseDate,
-        nowcasting: { hour: pollenSelected.defaultHour, nhours: 48 },
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setChartLoading(false);
-    }
   };
 
   const handlePollenChange = (newPollen: PollenConfig) => {
