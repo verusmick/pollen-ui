@@ -22,7 +22,7 @@ import { usePollenDetailsChartStore } from '@/app/forecast/stores';
 import dayjs from 'dayjs';
 
 interface NowCastingMapProps {
-  pollenData: Array<[number, number, number | undefined]>;
+  pollenData: Array<[number, number, number | null]>;
   gridCellsResolution: number;
   userLocation: { lat: number; lng: number } | null;
   pollenSelected: string;

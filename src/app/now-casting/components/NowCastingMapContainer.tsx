@@ -216,6 +216,12 @@ export const NowCastingMapContainer = () => {
     if (!mapDataIsLoading) setLoading(false);
   }, [mapDataIsLoading]);
 
+  useEffect(() => {
+    usePollenDetailsChartStore.getState().setShow(false, '', null, null, null);
+    usePollenDetailsChartStore.getState().latitude = null;
+    usePollenDetailsChartStore.getState().longitude = null;
+  }, []);
+
   return (
     <div className="relative h-screen w-screen">
       <NowCastingMap
