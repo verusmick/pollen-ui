@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { useTranslations } from "next-intl";
+import React, { useRef } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface PollenLegendProps {
   width?: number;
@@ -20,18 +20,18 @@ export const PollenLegend = ({
   height = 25,
   onToggle,
 }: PollenLegendProps) => {
-  const t = useTranslations("forecastPage.legend");
+  const t = useTranslations('Components.legend');
   const barRef = useRef<HTMLDivElement>(null);
 
   const levels = [
-    { key: "none", color: "#ffffff" },
-    { key: "very_low", color: "#00e838" },
-    { key: "low", color: "#a5eb02" },
-    { key: "moderate", color: "#ebbb02" },
-    { key: "high", color: "#f27200" },
-    { key: "very_high", color: "#ff0000" },
+    { key: 'none', color: '#ffffff' },
+    { key: 'very_low', color: '#00e838' },
+    { key: 'low', color: '#a5eb02' },
+    { key: 'moderate', color: '#ebbb02' },
+    { key: 'high', color: '#f27200' },
+    { key: 'very_high', color: '#ff0000' },
   ];
-  const visibleLevels = levels.filter((level) => level.key !== "none");
+  const visibleLevels = levels.filter((level) => level.key !== 'none');
 
   return (
     <div className="relative flex flex-col items-center">
@@ -48,7 +48,7 @@ export const PollenLegend = ({
               className="text-[10px] font-bold text-white select-none"
               style={{
                 textShadow:
-                  "1px 1px 2px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)",
+                  '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)',
               }}
             >
               {t(level.key)}

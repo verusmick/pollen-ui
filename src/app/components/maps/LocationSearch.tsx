@@ -19,7 +19,7 @@ export const LocationSearch = ({
   pollenSelected,
   boundary,
 }: LocationSearchProps) => {
-  const t = useTranslations('forecastPage.search');
+  const t = useTranslations('Components.search');
   const nominatimApi = process.env.NEXT_PUBLIC_NOMINATIM_API!;
 
   const {

@@ -12,6 +12,7 @@ import {
   LocationButton,
   LocationSearch,
   PanelHeader,
+  PollenDetailsChart,
   PollenLegend,
   PollenLegendCard,
   SearchCardToggle,
@@ -37,19 +38,21 @@ import {
   usePollenPrefetch,
 } from '@/app/now-casting/hooks';
 import { useSidebar } from '@/app/context';
-import { useIsLargeScreen } from '@/app/hooks';
+import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
+
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import {
   buildHourTimeline,
   getAdjacentHour,
   type HourPoint,
 } from '@/app/now-casting/utils';
+import dayjs from 'dayjs';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
   const t = useTranslations('nowCastingPage');
-  const tSearch = useTranslations('forecastPage.search');
-  const tLocation = useTranslations('forecastPage.show_your_location');
-
+  const tSearch = useTranslations('Components.search');
+  const tLocation = useTranslations('Components.show_your_location');
   const [playing, setPlaying] = useState(false);
   const [selectedHour, setSelectedHour] = useState<HourPoint>();
 
@@ -64,7 +67,8 @@ export const NowCastingMapContainer = () => {
   } | null>(null);
   const [legendOpen, setLegendOpen] = useState(false);
   const [selectorOpen, setSelectorOpen] = useState(false);
-
+  const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
+    usePollenDetailsChartStore();
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number | null]>
   >([]);
@@ -75,13 +79,20 @@ export const NowCastingMapContainer = () => {
 
   const { loading, setLoading } = useLoadingStore();
   const { clearLocation: clearCurrentLocation } = useCurrentLocationStore();
-  const { partialLoading, setPartialLoading } = usePartialLoadingStore();
+  const { partialLoading, setPartialLoading, chartLoading, setChartLoading } =
+    usePartialLoadingStore();
   const { sidebarWidth } = useSidebar();
   const isLargeScreen = useIsLargeScreen();
   const { getCached, saveCache, pruneCache } = usePollenCacheManager();
   const { prefetchNextHours } = usePollenPrefetch();
-  const { setLatitudes, setLongitudes } = useCoordinatesStore();
-
+  const { nowCasting: nowCastingCoordinates } = useCoordinatesStore();
+  const {
+    setLatitudes: setNowCastingLatGrid,
+    setLongitudes: setNowCastingLngGrid,
+  } = nowCastingCoordinates;
+  const { fetchChart } = usePollenChart();
+  const nowRaw = dayjs();
+  const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
   const nowCastingParams = useMemo(
     () => ({
       date: selectedHour?.apiDate || '',
@@ -113,8 +124,8 @@ export const NowCastingMapContainer = () => {
     // }
 
     const { data, longitudes = [], latitudes = [] } = mapData;
-    setLatitudes(latitudes);
-    setLongitudes(longitudes);
+    setNowCastingLatGrid(latitudes);
+    setNowCastingLngGrid(longitudes);
 
     const latsCount = latitudes.length;
     const values = data.map(
@@ -170,6 +181,29 @@ export const NowCastingMapContainer = () => {
     },
     intervalMs: 1000,
   });
+  const handleLocationSelect = async (
+    pos: { lat: number; lng: number },
+    setOpen: (v: boolean) => void
+  ) => {
+    setUserLocation(pos);
+    setOpen(false);
+    setShowPollenDetailsChart(true, '', null, pos.lat, pos.lng);
+    setChartLoading(true);
+
+    try {
+      await fetchChart({
+        lat: pos.lat,
+        lng: pos.lng,
+        pollen: pollenSelected.apiKey,
+        date: pollenSelected.defaultBaseDate,
+        nowcasting: { hour: alignedHour, nhours: 48 },
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setChartLoading(false);
+    }
+  };
 
   const { hours: timelineHours } = useMemo(
     () =>
@@ -203,38 +237,43 @@ export const NowCastingMapContainer = () => {
     handleSliderChange(timelineHours[timelineHours.length - 1]);
   }, []);
 
+  useEffect(() => {
+    usePollenDetailsChartStore.getState().setShow(false, '', null, null, null);
+    usePollenDetailsChartStore.getState().latitude = null;
+    usePollenDetailsChartStore.getState().longitude = null;
+  }, []);
+
   return (
     <div className="relative h-screen w-screen">
       <NowCastingMap
         pollenData={pollenData}
         gridCellsResolution={gridCellsResolution}
         userLocation={userLocation}
+        pollenSelected={pollenSelected.apiKey}
+        currentDate={pollenSelected.defaultBaseDate}
       />
-
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        {/* <SearchCardToggle title={tSearch('title_tooltip_search')}>
+        <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
-              onSelect={(pos) => {
-                setUserLocation(pos);
-                setOpen(false);
-              }}
+              onSelect={(pos) => handleLocationSelect(pos, setOpen)}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
               boundary={getRegionBounds()}
             />
           )}
-        </SearchCardToggle> */}
+        </SearchCardToggle>
 
-        {/* <LocationButton
+        <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
-          onLocationRetrieved={(coords) => setUserLocation(coords)}
-        /> */}
+          mode="nowcasting"
+          hour={alignedHour}
+          nhours={48}
+        />
       </span>
-
       <div
         className="absolute top-8 z-50 flex flex-col gap-4 transition-all duration-300"
         style={{ left: 30 + sidebarWidth }}
@@ -245,6 +284,7 @@ export const NowCastingMapContainer = () => {
             <LoadingSpinner size={40} color="border-white" />
           </div>
         )}
+
         <DropdownSelector
           value={pollenSelected}
           onChange={handlePollenChange}
@@ -253,6 +293,15 @@ export const NowCastingMapContainer = () => {
           getLabel={(item) => item.label}
           getKey={(item) => item.apiKey}
         />
+        {showPollenDetailsChart && !selectorOpen && (
+          <PollenDetailsChart
+            onClose={() => setShowPollenDetailsChart(false)}
+            currentDate={pollenSelected.defaultBaseDate}
+            pollenSelected={pollenSelected.apiKey}
+            loading={chartLoading}
+            view="nowcasting"
+          />
+        )}
       </div>
 
       <div
