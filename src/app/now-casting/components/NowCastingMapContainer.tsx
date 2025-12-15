@@ -294,7 +294,7 @@ export const NowCastingMapContainer = () => {
 
       <div
         className="absolute transition-all duration-300"
-        style={{ left: 30 + sidebarWidth, bottom: isLargeScreen ? 100 : 70 }}
+        style={{ left: 30 + sidebarWidth, bottom: isLargeScreen ? 100 : 170 }}
       >
         <PollenLegendCard
           open={legendOpen}
