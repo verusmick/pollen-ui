@@ -9,7 +9,7 @@ interface HourPoint {
   label: string;
   date: string;
   apiDate: string;
-  apiHour: string;
+  apiHour: number;
   hourIndex: number;
   showDate: boolean;
 }
@@ -18,7 +18,7 @@ interface Props {
   setPlaying: (playing: boolean | ((p: boolean) => boolean)) => void;
   playing: boolean;
   activeHour: number;
-  onHourChange: (hourIndex: number, date: string, apiHour: string) => void;
+  onHourChange: (hourIndex: number, date: string, apiHour: number) => void;
   baseDate: string;
   intervalHours?: number;
   totalHours?: number;
@@ -52,7 +52,7 @@ export default function PollenTimeline({
           label: d.format('HH:mm'),
           date: d.format('MMM D, YYYY'),
           apiDate: d.format('YYYY-MM-DD'),
-          apiHour: String(d.hour()),
+          apiHour: d.hour(),
           hourIndex: i * intervalHours,
           showDate: i % Math.floor(6 / intervalHours) === 0,
         });
@@ -76,7 +76,7 @@ export default function PollenTimeline({
         label: d.format('HH:mm'),
         date: d.format('MMM D, YYYY'),
         apiDate: d.format('YYYY-MM-DD'),
-        apiHour: String(d.hour()),
+        apiHour: d.hour(),
         hourIndex: i * intervalHours,
         showDate: i % Math.floor(6 / intervalHours) === 0,
       });
