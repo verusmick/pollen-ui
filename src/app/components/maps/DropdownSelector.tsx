@@ -56,7 +56,7 @@ export const DropdownSelector = <T,>({
       </button>
 
       {isOpen && (
-        <ul className="w-full bg-card rounded-lg shadow-lg max-h-60 overflow-auto border border-card mt-1 text-base">
+        <ul className="w-full bg-card rounded-lg shadow-lg max-h-60 overflow-auto border border-card mt-1 text-base search-scroll">
           {options.map((item) => (
             <li
               key={getKey(item)}
