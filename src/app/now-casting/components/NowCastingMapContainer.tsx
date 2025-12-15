@@ -263,14 +263,14 @@ export const NowCastingMapContainer = () => {
           )}
         </SearchCardToggle>
 
-        {/* <LocationButton
+        <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
           mode="nowcasting"
           hour={alignedHour}
           nhours={48}
-        /> */}
+        />
       </span>
       <div
         className="absolute top-8 z-50 flex flex-col gap-4 transition-all duration-300"
