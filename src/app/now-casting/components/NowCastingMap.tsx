@@ -72,21 +72,12 @@ export default function NowCastingMap({
         getPolygon: (d: any) => d.polygon,
         getFillColor: (d: any) => {
           const intensity = d.intensity;
-          if (intensity === null) return [0, 0, 0, 0];
-          switch (intensity) {
-            case 2:
-              return [0, 100, 0, 60];
-            case 4:
-              return [154, 205, 50, 60];
-            case 6:
-              return [255, 255, 0, 60];
-            case 8:
-              return [255, 165, 0, 60];
-            case 9:
-              return [255, 0, 0, 60];
-            default:
-              return [0, 0, 0, 0];
-          }
+          // Your color scale based on pollen intensity
+          if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
+          else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
+          else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
+          else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
+          else return [255, 0, 0, 60]; // Red - high
         },
         getLineColor: [0, 0, 0, 10],
         filled: true,
