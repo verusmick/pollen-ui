@@ -38,6 +38,7 @@ import {
 } from '@/app/now-casting/hooks';
 import { useSidebar } from '@/app/context';
 import { useIsLargeScreen } from '@/app/hooks';
+import { buildHourTimeline, type HourPoint } from '@/app/now-casting/utils';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
@@ -46,9 +47,8 @@ export const NowCastingMapContainer = () => {
   const tLocation = useTranslations('forecastPage.show_your_location');
 
   const [playing, setPlaying] = useState(false);
-  const [selectedHour, setSelectedHour] = useState(0);
-  const [selectedApiDate, setSelectedApiDate] = useState('');
-  const [selectedApiHour, setSelectedApiHour] = useState(0);
+  const [selectedHour, setSelectedHour] = useState<HourPoint>();
+
   const [timelineStartHour, setTimelineStartHour] = useState(0);
   const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
   const [gridCellsResolution, setGridCellsResolution] = useState(0.009);
@@ -80,15 +80,15 @@ export const NowCastingMapContainer = () => {
 
   const nowCastingParams = useMemo(
     () => ({
-      date: selectedApiDate,
-      hour: selectedApiHour,
+      date: selectedHour?.apiDate,
+      hour: selectedHour?.apiHour,
       pollen: pollenSelected.apiKey,
       box: boundaryMapBox.join(','),
       intervals: pollenSelected.apiIntervals,
       includeCoords: true,
       res: resolution,
     }),
-    [pollenSelected, selectedHour, boundaryMapBox]
+    [pollenSelected, boundaryMapBox, selectedHour]
   );
 
   const {
@@ -99,14 +99,14 @@ export const NowCastingMapContainer = () => {
 
   const handleMapDataUpdate = () => {
     const pollenKey = pollenSelected.apiKey;
-    const cached = getCached(pollenKey, selectedHour);
+    // const cached = getCached(pollenKey, selectedHour);
 
-    if (cached) {
-      setPollenData(cached);
-      // prefetchNextHours(nowCastingParams, selectedHour, 3);
-      setPartialLoading(false);
-      return;
-    }
+    // if (cached) {
+    //   setPollenData(cached);
+    //   // prefetchNextHours(nowCastingParams, selectedHour, 3);
+    //   setPartialLoading(false);
+    //   return;
+    // }
 
     const { data, longitudes = [], latitudes = [] } = mapData;
     setLatitudes(latitudes);
@@ -122,8 +122,8 @@ export const NowCastingMapContainer = () => {
         ] as [number, number, number]
     );
 
-    saveCache(pollenKey, selectedHour, values);
-    pruneCache(pollenKey, selectedHour, 2);
+    // saveCache(pollenKey, selectedHour, values);
+    // pruneCache(pollenKey, selectedHour, 2);
     setPollenData(values);
 
     // prefetchNextHours(nowCastingParams, selectedHour, 3);
@@ -145,21 +145,17 @@ export const NowCastingMapContainer = () => {
     }
   };
 
-  const handleSliderChange = useCallback(
-    (hour: number, date: string, apiHour: number) => {
-      setPlaying(false);
-      setSelectedHour(hour);
-      setSelectedApiHour(apiHour);
-      setSelectedApiDate(date);
-    },
-    []
-  );
+  const handleSliderChange = useCallback((newHour: HourPoint) => {
+    setPlaying(false);
+    setSelectedHour(newHour);
+  }, []);
 
   usePollenPlayback({
     playing,
     isFetching,
     isLoading: mapDataIsLoading,
     onNextHour: () => {
+      console.log('onNextHour');
       setSelectedHour((prevHour) => {
         const nextHour = prevHour + 3;
         if (!timelineHasWrapped && nextHour > 47) {
@@ -170,11 +166,22 @@ export const NowCastingMapContainer = () => {
           setPlaying(false);
           return prevHour;
         }
+
         return nextHour;
       });
     },
     intervalMs: 1000,
   });
+
+  const { hours: timelineHours } = useMemo(
+    () =>
+      buildHourTimeline({
+        baseDate: pollenSelected.defaultBaseDate,
+        intervalHours: 3,
+        totalHours: 48,
+      }),
+    [pollenSelected.defaultBaseDate]
+  );
 
   useEffect(() => {
     if (!mapDataIsLoading) setLoading(false);
@@ -193,6 +200,10 @@ export const NowCastingMapContainer = () => {
   useEffect(() => {
     if (!mapDataIsLoading) setLoading(false);
   }, [mapDataIsLoading]);
+
+  useEffect(() => {
+    handleSliderChange(timelineHours[timelineHours.length - 1]);
+  }, []);
 
   return (
     <div className="relative h-screen w-screen">
@@ -257,11 +268,12 @@ export const NowCastingMapContainer = () => {
         <PollenTimeline
           setPlaying={handlePlayPause}
           playing={playing}
-          activeHour={selectedHour}
+          activeHour={selectedHour?.hourIndex || 0}
           onHourChange={handleSliderChange}
           baseDate={pollenSelected.defaultBaseDate}
           intervalHours={3}
           alignToCurrentTime={true}
+          hours={timelineHours}
         />
       </div>
 

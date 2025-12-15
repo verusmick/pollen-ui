@@ -1,29 +1,20 @@
 'use client';
 
-import dayjs from 'dayjs';
 import { useEffect, useMemo, useRef } from 'react';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
-
-interface HourPoint {
-  label: string;
-  date: string;
-  apiDate: string;
-  apiHour: string;
-  hourIndex: number;
-  showDate: boolean;
-}
+import { type HourPoint } from '@/app/now-casting/utils';
 
 interface Props {
   setPlaying: (playing: boolean | ((p: boolean) => boolean)) => void;
   playing: boolean;
   activeHour: number;
-  onHourChange: (hourIndex: number, date: string, apiHour: string) => void;
+  onHourChange: (obj: HourPoint) => void;
   baseDate: string;
   intervalHours?: number;
   totalHours?: number;
-
   alignToCurrentTime?: boolean;
+  hours: HourPoint[];
 }
 
 export default function PollenTimeline({
@@ -35,55 +26,9 @@ export default function PollenTimeline({
   intervalHours = 1,
   totalHours = 48,
   alignToCurrentTime,
+  hours = [],
 }: Props) {
   const barRef = useRef<HTMLDivElement>(null);
-
-  const { start, hours } = useMemo(() => {
-    const steps = totalHours / intervalHours;
-
-    if (!alignToCurrentTime) {
-      const startOfDay = dayjs(baseDate).startOf('day');
-      const list: HourPoint[] = [];
-
-      for (let i = 0; i < steps; i++) {
-        const d = startOfDay.add(i * intervalHours, 'hour');
-
-        list.push({
-          label: d.format('HH:mm'),
-          date: d.format('MMM D, YYYY'),
-          apiDate: d.format('YYYY-MM-DD'),
-          apiHour: String(d.hour()),
-          hourIndex: i * intervalHours,
-          showDate: i % Math.floor(6 / intervalHours) === 0,
-        });
-      }
-
-      return { start: startOfDay, hours: list };
-    }
-
-    const now = dayjs();
-    const base = dayjs(baseDate);
-    const currentHour = now.hour();
-    const alignedHour = currentHour - (currentHour % intervalHours);
-    const end = base.hour(alignedHour).minute(0).second(0).millisecond(0);
-    const start = end.subtract(totalHours - intervalHours, 'hour');
-    const list: HourPoint[] = [];
-
-    for (let i = 0; i < steps; i++) {
-      const d = start.add(i * intervalHours, 'hour');
-
-      list.push({
-        label: d.format('HH:mm'),
-        date: d.format('MMM D, YYYY'),
-        apiDate: d.format('YYYY-MM-DD'),
-        apiHour: String(d.hour()),
-        hourIndex: i * intervalHours,
-        showDate: i % Math.floor(6 / intervalHours) === 0,
-      });
-    }
-
-    return { start, hours: list };
-  }, [alignToCurrentTime, baseDate, intervalHours, totalHours]);
 
   const handleHourNavigation = (direction: 'next' | 'prev') => {
     if (!hours.length) return;
@@ -97,8 +42,7 @@ export default function PollenTimeline({
     const delta = direction === 'next' ? 1 : -1;
     const newIndex = (currentIndex + delta + hours.length) % hours.length;
 
-    const { hourIndex, apiDate, apiHour } = hours[newIndex];
-    onHourChange(hourIndex, apiDate, apiHour);
+    onHourChange(hours[newIndex]);
   };
 
   // Auto-scroll to active hour
@@ -109,10 +53,6 @@ export default function PollenTimeline({
       activeEl?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
     }
   }, [activeHour, intervalHours]);
-  useEffect(() => {
-    const { hourIndex, apiDate, apiHour } = hours[hours.length - 1];
-    onHourChange(hourIndex, apiDate, apiHour);
-  }, []);
 
   return (
     <div className="bg-card text-white rounded-lg shadow-md p-3 w-full max-w-2xl mx-auto backdrop-blur-sm search-scroll">
@@ -167,7 +107,7 @@ export default function PollenTimeline({
               {/* Clickable overlay */}
               <button
                 className="absolute inset-0 w-full h-full opacity-0"
-                onClick={() => onHourChange(h.hourIndex, h.apiDate, h.apiHour)}
+                onClick={() => onHourChange(h)}
               />
             </div>
           ))}
