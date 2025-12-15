@@ -21,6 +21,7 @@ import { getInitialViewState } from '@/app/now-casting/utils';
 import { getRegionGeo } from '@/app/utils/maps';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import bavariaGeo from '@/data/bavaria.geo.json';
+import germanyGeo from '@/data/germany.geo.json';
 import { usePollenChart } from '@/app/hooks';
 import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import dayjs from 'dayjs';
@@ -202,7 +203,7 @@ export default function NowCastingMap({
   }, []);
 
   const germanyGeoJsonLayer = useMemo(() => {
-    const bavariaCoords = bavariaGeo.features[0].geometry.coordinates;
+    const bavariaCoords = germanyGeo.features[0].geometry.coordinates;
     const world = [
       [-180, -90],
       [-180, 90],
