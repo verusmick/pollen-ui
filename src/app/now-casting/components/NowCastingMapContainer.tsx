@@ -103,7 +103,7 @@ export const NowCastingMapContainer = () => {
       includeCoords: true,
       res: resolution,
     }),
-    [pollenSelected, boundaryMapBox, selectedHour]
+    [boundaryMapBox, selectedHour]
   );
 
   const {
@@ -236,7 +236,7 @@ export const NowCastingMapContainer = () => {
 
   useEffect(() => {
     handleSliderChange(timelineHours[timelineHours.length - 1]);
-  }, []);
+  }, [timelineHours]);
 
   useEffect(() => {
     usePollenDetailsChartStore.getState().setShow(false, '', null, null, null);
