@@ -18,7 +18,7 @@ export const PollenLegendCard = ({
   levels,
   cardRef,
 }: PollenLegendCardProps) => {
-  const t = useTranslations('forecastPage');
+  const t = useTranslations('Components');
 
   return (
     <div

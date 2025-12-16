@@ -2,13 +2,108 @@ import { MAP_LEVEL_COLORS } from "@/app/constants";
 import { PollenLevel } from "@/app/types";
 import { getDefaultBaseDate } from "@/app/utils";
 
-
 export const POLLENS = {
   ALNUS: {
     apiKey: 'POLLEN_ALNUS' as const,
-    label: 'Alnus' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-03-10'),
+    label: 'Alder (Alnus)' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-03-05'),
     defaultHour: 15,
+    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    levels: [
+      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'Low', min: 31, max: 100 },
+      { label: 'Moderate', min: 101, max: 200 },
+      { label: 'High', min: 201, max: 400 },
+      { label: 'Very High', min: 401, max: 1000 },
+    ] as PollenLevel[]
+  },
+  // todo: take a look with the client
+  PINACEAE: {
+    apiKey: 'POLLEN_PINACEAE' as const,
+    label: 'Pine (Pinaceae)' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-05-07'),
+    defaultHour: 12,
+    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    levels: [
+      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'Low', min: 31, max: 100 },
+      { label: 'Moderate', min: 101, max: 200 },
+      { label: 'High', min: 201, max: 400 },
+      { label: 'Very High', min: 401, max: 1000 },
+    ] as PollenLevel[]
+  },
+  BETULA: {
+    apiKey: 'POLLEN_BETULA' as const,
+    label: 'Birch (Betula)' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-04-15'),
+    defaultHour: 12,
+    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    levels: [
+      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'Low', min: 31, max: 100 },
+      { label: 'Moderate', min: 101, max: 200 },
+      { label: 'High', min: 201, max: 400 },
+      { label: 'Very High', min: 401, max: 1000 },
+    ] as PollenLevel[]
+  },
+  CORYLUS: {
+    apiKey: 'POLLEN_CORYLUS' as const,
+    label: 'Hazel (Corylus)' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-03-01'),
+    defaultHour: 12,
+    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    levels: [
+      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'Low', min: 31, max: 100 },
+      { label: 'Moderate', min: 101, max: 200 },
+      { label: 'High', min: 201, max: 400 },
+      { label: 'Very High', min: 401, max: 1000 },
+    ] as PollenLevel[]
+  },
+  FRAXINUS: {
+    apiKey: 'POLLEN_FRAXINUS' as const,
+    label: 'Ash (Fraxinus)' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-04-13'),
+    defaultHour: 12,
+    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    levels: [
+      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'Low', min: 31, max: 100 },
+      { label: 'Moderate', min: 101, max: 200 },
+      { label: 'High', min: 201, max: 400 },
+      { label: 'Very High', min: 401, max: 1000 },
+    ] as PollenLevel[]
+  },
+  // todo: take a look with the client
+  PINUS: {
+    apiKey: 'POLLEN_PINUS' as const,
+    label: 'Pine (Pinus)' as const,
+    defaultBaseDate: getDefaultBaseDate('2019-05-23'),
+    defaultHour: 12,
+    apiIntervals: '0,1500,0',
+    levels: [
+      { label: 'None', min: 0, max: 1500 },
+    ] as PollenLevel[],
+  },
+  POACEAE: {
+    apiKey: 'POLLEN_POACEAE' as const,
+    label: 'Grasses (Poaceae)' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-06-06'),
+    defaultHour: 12,
+    apiIntervals: '1,15,2,16,50,4,51,100,6,101,200,8,201,1000,9',
+    levels: [
+      { label: 'Very Low', min: 1, max: 15 },
+      { label: 'Low', min: 16, max: 50 },
+      { label: 'Moderate', min: 51, max: 100 },
+      { label: 'High', min: 101, max: 200 },
+      { label: 'Very High', min: 201, max: 1000 },
+    ] as PollenLevel[],
+  },
+  QUERCUS: {
+    apiKey: 'POLLEN_QUERCUS' as const,
+    label: 'Oak (Quercus)' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-04-17'),
+    defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
       { label: 'Very Low', min: 1, max: 30 },
@@ -18,10 +113,10 @@ export const POLLENS = {
       { label: 'Very High', min: 401, max: 1000 },
     ] as PollenLevel[],
   },
-  PINACEAE: {
-    apiKey: 'POLLEN_PINACEAE' as const,
-    label: 'Pine' as const,
-    defaultBaseDate: getDefaultBaseDate('2025-05-11'),
+  URTICA: {
+    apiKey: 'POLLEN_URTICA' as const,
+    label: 'Nettle (Urtica)' as const,
+    defaultBaseDate: getDefaultBaseDate('2025-08-09'),
     defaultHour: 12,
     apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [

@@ -17,25 +17,20 @@ import type { Feature, FeatureCollection } from 'geojson';
 import bavariaGeo from '@/data/bavaria.geo.json';
 import germanyGeo from '@/data/germany.geo.json';
 
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
-
 import { MapTooltip } from '@/app/forecast/components';
 
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import { debounce, getBoundsFromViewState } from '@/utils';
-import {
-  fetchAndShowPollenChart,
-  findClosestCoordinate,
-  getInitialViewState,
-} from '@/app/forecast/utils';
+import { getInitialViewState } from '@/app/forecast/utils';
 import { MapZoomControls } from '@/app/components';
 import {
-  useCoordinatesStore,
   useCurrentLocationStore,
   usePartialLoadingStore,
   useSearchLocationStore,
 } from '@/app/stores';
 import { getRegionGeo } from '@/app/utils/maps';
+import { usePollenChart } from '@/app/hooks';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 
 // Define the grid cell size in degrees
 // const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -75,37 +70,32 @@ export default function ForecastMap({
     latitude: pollenDetailsChartLatitude,
     longitude: pollenDetailsChartLongitude,
   } = usePollenDetailsChartStore();
-  const lastRequestId = useRef<string | null>(null);
-
+  const { fetchChart } = usePollenChart();
   const handleGridCellClick = useCallback(
     async (clickLat: number, clickLon: number) => {
+      setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
       setChartLoading(true);
-      const requestId = `${clickLat}-${clickLon}-${Date.now()}`;
-      lastRequestId.current = requestId;
-
-      const { latitudes, longitudes } = useCoordinatesStore.getState();
-      const closestLat = findClosestCoordinate(clickLat, latitudes);
-      const closestLon = findClosestCoordinate(clickLon, longitudes);
-
       try {
-        setShowPollenDetailsChart(true, '', null, closestLat, closestLon);
-        await fetchAndShowPollenChart({
-          lat: closestLat,
-          lng: closestLon,
+        await fetchChart({
+          lat: clickLat,
+          lng: clickLon,
           pollen: pollenSelected,
           date: currentDate,
-          setShowPollenDetailsChart,
-          requestId,
+          forecast: { hour: 0 },
         });
       } catch (error) {
-        console.error('Error clicking on the map', error);
+        console.error(error);
       } finally {
-        if (lastRequestId.current === requestId) {
-          setChartLoading(false);
-        }
+        setChartLoading(false);
       }
     },
-    [setChartLoading, setShowPollenDetailsChart, pollenSelected, currentDate]
+    [
+      fetchChart,
+      setChartLoading,
+      pollenSelected,
+      currentDate,
+      setShowPollenDetailsChart,
+    ]
   );
 
   // Convert your API data to grid cells

@@ -1,8 +1,7 @@
 import { REGION_BOUNDS } from "@/app/constants";
 
 export const getInitialViewState = () => {
-  // const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
-  const region = 'BAVARIA';
+  const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
   const bbox = REGION_BOUNDS[region] || REGION_BOUNDS.BAVARIA;
 
   const [minLon, minLat, maxLon, maxLat] = bbox;
