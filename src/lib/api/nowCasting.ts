@@ -34,10 +34,9 @@ export async function getNowCastingByCoords(params: {
   return res.json();
 }
 
-
 export async function getHourlyNowCasting(params: {
   date: string;
-  hour: number;
+  hour: string;
   pollen: string;
   box?: string;
   intervals?: string;
@@ -46,10 +45,10 @@ export async function getHourlyNowCasting(params: {
 }) {
   const queryParams: Record<string, string> = {
     date: params.date,
-    hour: params.hour.toString(),
+    hour: params.hour,
     pollen: params.pollen,
     include_coords: (params.includeCoords || false).toString(),
-    // res: (params.res ?? 2).toString(),
+    res: (params.res ?? 2).toString(),
   };
 
   if (params.box !== undefined) {
@@ -65,6 +64,34 @@ export async function getHourlyNowCasting(params: {
   const res = await fetch(`/api/nowcasting/hour?${query.toString()}`);
   if (!res.ok) {
     throw new Error(`Forecast Hour API error: ${res.statusText}`);
+  }
+  return res.json();
+}
+
+export async function fetchChartDataNowCasting(params: {
+  date: string;
+  hour: number;
+  pollen: string;
+  lon: number;
+  lat: number;
+  nhours: number;
+  signal?: AbortSignal;
+}) {
+  const query = new URLSearchParams({
+    date: params.date,
+    hour: params.hour.toString(),
+    pollen: params.pollen,
+    lon: params.lon.toString(),
+    lat: params.lat.toString(),
+    nhours: params.nhours.toString(),
+  });
+
+  const res = await fetch(`/api/nowcasting/series?${query.toString()}`, {
+    signal: params.signal,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Chart API error: ${res.statusText}`);
   }
   return res.json();
 }

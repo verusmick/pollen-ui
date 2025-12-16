@@ -5,23 +5,29 @@ import { BiMap, BiX } from 'react-icons/bi';
 import { TbLocationFilled } from 'react-icons/tb';
 
 import { useTranslations } from 'next-intl';
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
-import { fetchAndShowPollenChart } from '@/app/forecast/utils';
+
 import { Tooltip } from '@/app/components';
 import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
+import { usePollenChart } from '@/app/hooks';
 
 interface LocationButtonProps {
   tooltipText: string;
   pollenSelected: string;
   currentDate: string;
+  mode: 'forecast' | 'nowcasting';
+  hour?: number;
+  nhours?: number;
 }
 
 export const LocationButton = ({
   tooltipText,
   currentDate,
   pollenSelected,
+  mode,
+  hour,
+  nhours,
 }: LocationButtonProps) => {
-  const t = useTranslations('forecastPage.show_your_location');
+  const t = useTranslations('Components.show_your_location');
   const [open, setOpen] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<
     'idle' | 'granted' | 'denied' | 'prompt'
@@ -31,8 +37,7 @@ export const LocationButton = ({
 
   const { setChartLoading } = usePartialLoadingStore();
   const setLocation = useCurrentLocationStore((state) => state.setLocation);
-  const { setShow: setShowPollenDetailsChart } = usePollenDetailsChartStore();
-
+  const { fetchChart } = usePollenChart();
   // Check permission once
   useEffect(() => {
     if (!navigator.permissions) return;
@@ -68,21 +73,22 @@ export const LocationButton = ({
       setPermissionStatus('granted');
       setLocation(coords);
       setChartLoading(true);
-
-      await fetchAndShowPollenChart({
-        lat: coords.lat,
-        lng: coords.lng,
-        pollen: pollenSelected,
-        date: currentDate,
-        setShowPollenDetailsChart,
-      });
-    } catch (err: any) {
-      if (err.code === err.PERMISSION_DENIED) {
-        setPermissionStatus('denied');
-        setError('Permission denied for geolocation.');
-      } else {
-        console.error('Error fetching pollen data:', err);
-        setError('Failed to load pollen data. Please try again.');
+      if (mode === 'forecast') {
+        await fetchChart({
+          lat: coords.lat,
+          lng: coords.lng,
+          pollen: pollenSelected,
+          date: currentDate,
+          forecast: { hour: hour ?? 0 },
+        });
+      } else if (mode === 'nowcasting') {
+        await fetchChart({
+          lat: coords.lat,
+          lng: coords.lng,
+          pollen: pollenSelected,
+          date: currentDate,
+          nowcasting: { hour: hour ?? 0, nhours: nhours ?? 48 },
+        });
       }
     } finally {
       setLoading(false);
@@ -94,7 +100,9 @@ export const LocationButton = ({
     pollenSelected,
     setChartLoading,
     setLocation,
-    setShowPollenDetailsChart,
+    mode,
+    hour,
+    nhours,
   ]);
 
   const renderStatusMessage = () => {

@@ -4,12 +4,9 @@
   },
   "Sidebar": {
     "title": "PollenScience.eu",
-    "maps":"Maps"
+    "maps": "Maps"
   },
-  "forecastPage": {
-    "title": "Forecast Map",
-    "description": "Interactive pollen forecast map",
-    "message_loading": "Pollen Forecast Map",
+  "Components": {
     "pollen": "pollen/m³",
     "search": {
       "title_tooltip_search": "Search",
@@ -47,8 +44,14 @@
       "very_high_leg": "Very high allergy risk"
     }
   },
+  "forecastPage": {
+    "title": "Forecast Map",
+    "description": "Interactive pollen forecast map",
+    "message_loading": "Pollen Forecast Map",
+    "pollen": "pollen/m³"
+  },
   "nowCastingPage": {
-    "title": "Now Casting",
-    "message_loading": "Now Casting Map"
+    "title": "Nowcasting",
+    "message_loading": "Nowcasting Map"
   }
 }

@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 
-import { NowCastingMap } from '@/app/now-casting/components';
+import { NowCastingMap, PollenTimeline } from '@/app/now-casting/components';
 import {
   DropdownSelector,
   LoadingOverlay,
@@ -12,12 +12,18 @@ import {
   LocationButton,
   LocationSearch,
   PanelHeader,
+  PollenDetailsChart,
   PollenLegend,
   PollenLegendCard,
   SearchCardToggle,
 } from '@/app/components';
 
-import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
+import {
+  useCoordinatesStore,
+  useCurrentLocationStore,
+  useLoadingStore,
+  usePartialLoadingStore,
+} from '@/app/stores';
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
@@ -25,20 +31,34 @@ import {
   PollenConfig,
 } from '@/app/now-casting/constants';
 import { getRegionBounds } from '@/app/constants';
-import { useNowCasting } from '@/app/now-casting/hooks';
+import {
+  useHourlyNowCasting,
+  usePollenCacheManager,
+  usePollenPlayback,
+  usePollenPrefetch,
+} from '@/app/now-casting/hooks';
 import { useSidebar } from '@/app/context';
-import { useIsLargeScreen } from '@/app/hooks';
+import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
+
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
+import {
+  buildHourTimeline,
+  getAdjacentHour,
+  type HourPoint,
+} from '@/app/now-casting/utils';
+import dayjs from 'dayjs';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
   const t = useTranslations('nowCastingPage');
-  const tSearch = useTranslations('forecastPage.search');
-  const tLocation = useTranslations('forecastPage.show_your_location');
+  const tSearch = useTranslations('Components.search');
+  const tLocation = useTranslations('Components.show_your_location');
+  const [playing, setPlaying] = useState(false);
+  const [selectedHour, setSelectedHour] = useState<HourPoint>();
 
-  const { sidebarWidth } = useSidebar();
-  const isLargeScreen = useIsLargeScreen();
-
-  const [gridCellsResolution, setGridCellsResolution] = useState(0.008);
+  const [timelineStartHour, setTimelineStartHour] = useState(0);
+  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
+  const [gridCellsResolution, setGridCellsResolution] = useState(0.009);
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
   const [userLocation, setUserLocation] = useState<{
@@ -47,24 +67,157 @@ export const NowCastingMapContainer = () => {
   } | null>(null);
   const [legendOpen, setLegendOpen] = useState(false);
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
+    usePollenDetailsChartStore();
   const [pollenData, setPollenData] = useState<
     Array<[long: number, lat: number, value: number | null]>
   >([]);
+  const [resolution, setResolution] = useState<1 | 2 | 3>(1);
+  const [boundaryMapBox, setBoundaryMapBox] = useState(getRegionBounds());
 
   const legendCardRef = useRef<HTMLDivElement>(null);
+
+  const { loading, setLoading } = useLoadingStore();
   const { clearLocation: clearCurrentLocation } = useCurrentLocationStore();
-  const { partialLoading, setPartialLoading } = usePartialLoadingStore();
-  const { data: mapData, loading, fetchNowCasting } = useNowCasting();
+  const { partialLoading, setPartialLoading, chartLoading, setChartLoading } =
+    usePartialLoadingStore();
+  const { sidebarWidth } = useSidebar();
+  const isLargeScreen = useIsLargeScreen();
+  const { getCached, saveCache, pruneCache } = usePollenCacheManager();
+  const { prefetchNextHours } = usePollenPrefetch();
+  const { nowCasting: nowCastingCoordinates } = useCoordinatesStore();
+  const {
+    setLatitudes: setNowCastingLatGrid,
+    setLongitudes: setNowCastingLngGrid,
+  } = nowCastingCoordinates;
+  const { fetchChart } = usePollenChart();
+  const nowRaw = dayjs();
+  const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
+  const nowCastingParams = useMemo(
+    () => ({
+      date: selectedHour?.apiDate || '',
+      hour: String(selectedHour?.apiHour || 0),
+      pollen: pollenSelected.apiKey,
+      box: boundaryMapBox.join(','),
+      intervals: pollenSelected.apiIntervals,
+      includeCoords: true,
+      res: resolution,
+    }),
+    [pollenSelected, boundaryMapBox, selectedHour]
+  );
+
+  const {
+    data: mapData,
+    isFetching,
+    isLoading: mapDataIsLoading,
+  } = useHourlyNowCasting(nowCastingParams);
+
+  const handleMapDataUpdate = () => {
+    const pollenKey = pollenSelected.apiKey;
+    // const cached = getCached(pollenKey, selectedHour);
+
+    // if (cached) {
+    //   setPollenData(cached);
+    //   // prefetchNextHours(nowCastingParams, selectedHour, 3);
+    //   setPartialLoading(false);
+    //   return;
+    // }
+
+    const { data, longitudes = [], latitudes = [] } = mapData;
+    setNowCastingLatGrid(latitudes);
+    setNowCastingLngGrid(longitudes);
+
+    const latsCount = latitudes.length;
+    const values = data.map(
+      (forecast: number, index: number) =>
+        [
+          latitudes[index % latsCount],
+          longitudes[Math.floor(index / latsCount)],
+          forecast / 10,
+        ] as [number, number, number]
+    );
+
+    // saveCache(pollenKey, selectedHour, values);
+    // pruneCache(pollenKey, selectedHour, 2);
+    setPollenData(values);
+
+    // prefetchNextHours(nowCastingParams, selectedHour, 3);
+    setPartialLoading(false);
+  };
+
+  const handlePollenChange = (newPollen: PollenConfig) => {
+    setPartialLoading(true);
+    setPollenSelected(newPollen);
+  };
+
+  const handlePlayPause = () => {
+    if (!playing) {
+      // setTimelineStartHour(selectedHour);
+      // setTimelineHasWrapped(false);
+      setPlaying(true);
+    } else {
+      setPlaying(false);
+    }
+  };
+
+  const handleSliderChange = useCallback((newHour: HourPoint) => {
+    setPlaying(false);
+    setSelectedHour(newHour);
+  }, []);
+
+  usePollenPlayback({
+    playing,
+    isFetching,
+    isLoading: mapDataIsLoading,
+    onNextHour: () => {
+      setSelectedHour((prevHour) => {
+        const nextHour = getAdjacentHour(
+          timelineHours,
+          prevHour?.hourIndex ?? 0,
+          'next'
+        );
+        return nextHour || undefined;
+      });
+    },
+    intervalMs: 1000,
+  });
+  const handleLocationSelect = async (
+    pos: { lat: number; lng: number },
+    setOpen: (v: boolean) => void
+  ) => {
+    setUserLocation(pos);
+    setOpen(false);
+    setShowPollenDetailsChart(true, '', null, pos.lat, pos.lng);
+    setChartLoading(true);
+
+    try {
+      await fetchChart({
+        lat: pos.lat,
+        lng: pos.lng,
+        pollen: pollenSelected.apiKey,
+        date: pollenSelected.defaultBaseDate,
+        nowcasting: { hour: alignedHour, nhours: 48 },
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setChartLoading(false);
+    }
+  };
+
+  const { hours: timelineHours } = useMemo(
+    () =>
+      buildHourTimeline({
+        baseDate: pollenSelected.defaultBaseDate,
+        intervalHours: 3,
+        totalHours: 48,
+      }),
+    [pollenSelected.defaultBaseDate]
+  );
 
   useEffect(() => {
-    setPartialLoading(true);
-    fetchNowCasting({
-      date: pollenSelected.defaultBaseDate,
-      hour: pollenSelected.defaultHour,
-      pollen: pollenSelected.apiKey,
-      includeCoords: true,
-    });
-  }, []);
+    if (!mapDataIsLoading) setLoading(false);
+  }, [mapDataIsLoading]);
 
   useEffect(() => {
     if (!mapData) return;
@@ -76,40 +229,19 @@ export const NowCastingMapContainer = () => {
     setUserLocation(null);
   }, [pathname]);
 
-  const handleMapDataUpdate = () => {
-    if (!mapData) return;
+  useEffect(() => {
+    if (!mapDataIsLoading) setLoading(false);
+  }, [mapDataIsLoading]);
 
-    const { data, longitudes = [], latitudes = [] } = mapData;
-    const latsCount = latitudes.length;
-    const values = data.map((nowCasting: string | number, index: number) => {
-      let value = nowCasting === '' ? null : Math.round(Number(nowCasting));
-      if (value !== null) {
-        if (value >= 1 && value <= 30) value = 2;
-        else if (value >= 31 && value <= 100) value = 4;
-        else if (value >= 101 && value <= 200) value = 6;
-        else if (value >= 201 && value <= 400) value = 8;
-        else if (value > 400) value = 9;
-      }
-      return [
-        latitudes[index % latsCount],
-        longitudes[Math.floor(index / latsCount)],
-        value,
-      ] as [number, number, number | null];
-    });
+  useEffect(() => {
+    handleSliderChange(timelineHours[timelineHours.length - 1]);
+  }, []);
 
-    setPollenData(values);
-  };
-
-  const handlePollenChange = (newPollen: PollenConfig) => {
-    setPartialLoading(true);
-    setPollenSelected(newPollen);
-    fetchNowCasting({
-      date: newPollen.defaultBaseDate,
-      hour: newPollen.defaultHour,
-      pollen: newPollen.apiKey,
-      includeCoords: true,
-    });
-  };
+  useEffect(() => {
+    usePollenDetailsChartStore.getState().setShow(false, '', null, null, null);
+    usePollenDetailsChartStore.getState().latitude = null;
+    usePollenDetailsChartStore.getState().longitude = null;
+  }, []);
 
   return (
     <div className="relative h-screen w-screen">
@@ -117,42 +249,42 @@ export const NowCastingMapContainer = () => {
         pollenData={pollenData}
         gridCellsResolution={gridCellsResolution}
         userLocation={userLocation}
+        pollenSelected={pollenSelected.apiKey}
+        currentDate={pollenSelected.defaultBaseDate}
       />
-
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
-        {/* <SearchCardToggle title={tSearch('title_tooltip_search')}>
+        <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
-              onSelect={(pos) => {
-                setUserLocation(pos);
-                setOpen(false);
-              }}
+              onSelect={(pos) => handleLocationSelect(pos, setOpen)}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
               boundary={getRegionBounds()}
             />
           )}
-        </SearchCardToggle> */}
+        </SearchCardToggle>
 
-        {/* <LocationButton
+        <LocationButton
           tooltipText={tLocation('title_tooltip_location')}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
-          onLocationRetrieved={(coords) => setUserLocation(coords)}
-        /> */}
+          mode="nowcasting"
+          hour={alignedHour}
+          nhours={48}
+        />
       </span>
-
       <div
         className="absolute top-8 z-50 flex flex-col gap-4 transition-all duration-300"
         style={{ left: 30 + sidebarWidth }}
       >
         <PanelHeader title={t('title')} iconSrc="/zaum.png" />
-        {partialLoading && loading && (
+        {partialLoading && (
           <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
             <LoadingSpinner size={40} color="border-white" />
           </div>
         )}
+
         <DropdownSelector
           value={pollenSelected}
           onChange={handlePollenChange}
@@ -160,6 +292,35 @@ export const NowCastingMapContainer = () => {
           options={POLLEN_ENTRIES.map((entry) => entry as PollenConfig)}
           getLabel={(item) => item.label}
           getKey={(item) => item.apiKey}
+        />
+        {showPollenDetailsChart && !selectorOpen && (
+          <PollenDetailsChart
+            onClose={() => setShowPollenDetailsChart(false)}
+            currentDate={pollenSelected.defaultBaseDate}
+            pollenSelected={pollenSelected.apiKey}
+            loading={chartLoading}
+            view="nowcasting"
+          />
+        )}
+      </div>
+
+      <div
+        className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 z-40 transition-all duration-300"
+        style={{
+          transform: isLargeScreen
+            ? `translateX(calc(-50% + ${sidebarWidth}px))`
+            : 'translateX(-50%)',
+        }}
+      >
+        <PollenTimeline
+          setPlaying={handlePlayPause}
+          playing={playing}
+          activeHour={selectedHour?.hourIndex || 0}
+          onHourChange={handleSliderChange}
+          baseDate={pollenSelected.defaultBaseDate}
+          intervalHours={3}
+          alignToCurrentTime={true}
+          hours={timelineHours}
         />
       </div>
 
@@ -181,8 +342,8 @@ export const NowCastingMapContainer = () => {
       </div>
 
       <div
-        className="absolute  transition-all duration-300"
-        style={{ left: 30 + sidebarWidth, bottom: isLargeScreen ? 100 : 70 }}
+        className="absolute transition-all duration-300"
+        style={{ left: 30 + sidebarWidth, bottom: isLargeScreen ? 100 : 170 }}
       >
         <PollenLegendCard
           open={legendOpen}
@@ -191,9 +352,7 @@ export const NowCastingMapContainer = () => {
         />
       </div>
 
-      {loading && !mapData?.data?.length && (
-        <LoadingOverlay message={t('message_loading')} />
-      )}
+      {loading && <LoadingOverlay message={t('message_loading')} />}
     </div>
   );
 };

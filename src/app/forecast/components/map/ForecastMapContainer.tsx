@@ -5,9 +5,9 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 
-import { ForecastMap, PollenTimeline } from '@/app/forecast/components';
+import { ForecastMap } from '@/app/forecast/components';
 
 import {
   DEFAULT_POLLEN,
@@ -26,7 +26,6 @@ import {
 } from '@/app/forecast/hooks';
 import {
   computeResFromZoom,
-  fetchAndShowPollenChart,
   getGridCellsResolution,
 } from '@/app/forecast/utils';
 import {
@@ -39,6 +38,7 @@ import {
   LocationButton,
   PollenLegendCard,
   PollenLegend,
+  PollenTimeline,
 } from '@/app/components';
 import {
   useCoordinatesStore,
@@ -46,18 +46,20 @@ import {
   usePartialLoadingStore,
 } from '@/app/stores';
 import { useSidebar } from '@/app/context';
-import { useIsLargeScreen } from '@/app/hooks';
+import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
 
 const PollenDetailsChart = dynamic(
   () =>
-    import('../ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+    import('../../../components/ui/PollenDetailsChart').then(
+      (mod) => mod.PollenDetailsChart
+    ),
   { ssr: false }
 );
 
 export const ForecastMapContainer = () => {
   const t = useTranslations('forecastPage');
-  const tSearch = useTranslations('forecastPage.search');
-  const tLocation = useTranslations('forecastPage.show_your_location');
+  const tSearch = useTranslations('Components.search');
+  const tLocation = useTranslations('Components.show_your_location');
 
   const { sidebarWidth } = useSidebar();
   const isLargeScreen = useIsLargeScreen();
@@ -67,8 +69,8 @@ export const ForecastMapContainer = () => {
     usePartialLoadingStore();
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
-  const { setLatitudes, setLongitudes } = useCoordinatesStore();
-
+  const { forecast } = useCoordinatesStore();
+  const { setLatitudes, setLongitudes } = forecast;
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
   const [pollenData, setPollenData] = useState<
@@ -93,7 +95,7 @@ export const ForecastMapContainer = () => {
 
   const [gridCellsResolution, setGridCellsResolution] = useState(0.02);
   const [resolution, setResolution] = useState<1 | 2 | 3>(1);
-
+  const { fetchChart } = usePollenChart();
   const handlePlayPause = () => {
     if (!playing) {
       setTimelineStartHour(selectedHour);
@@ -159,21 +161,19 @@ export const ForecastMapContainer = () => {
     pollenSelected: { apiKey: string; defaultBaseDate: string },
     setChartLoading: (v: boolean) => void
   ) => {
-    const { latitude, longitude, setShow } =
-      usePollenDetailsChartStore.getState();
+    const { latitude, longitude } = usePollenDetailsChartStore.getState();
 
     if (!latitude || !longitude) return;
 
     setChartLoading(true);
-    setShow(true, '', null, latitude, longitude);
 
     try {
-      await fetchAndShowPollenChart({
+      await fetchChart({
         lat: latitude,
         lng: longitude,
         pollen: pollenSelected.apiKey,
         date: pollenSelected.defaultBaseDate,
-        setShowPollenDetailsChart: setShow,
+        forecast: { hour: selectedHour },
       });
     } catch (err) {
       console.error(err);
@@ -234,7 +234,28 @@ export const ForecastMapContainer = () => {
     },
     [selectedHour, pruneCache]
   );
-
+  const handleLocationSelect = async (
+    pos: { lat: number; lng: number },
+    setOpen: (v: boolean) => void
+  ) => {
+    setUserLocation(pos);
+    setOpen(false);
+    setShowPollenDetailsChart(true, '', null, pos.lat, pos.lng);
+    setChartLoading(true);
+    try {
+      await fetchChart({
+        lat: pos.lat,
+        lng: pos.lng,
+        pollen: pollenSelected.apiKey,
+        date: pollenSelected.defaultBaseDate,
+        forecast: { hour: 0 },
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setChartLoading(false);
+    }
+  };
   useEffect(() => {
     if (!mapData) return;
 
@@ -260,6 +281,12 @@ export const ForecastMapContainer = () => {
     pollenKeyRef.current = pollenSelected.apiKey;
   }, [pollenSelected.apiKey]);
 
+  useEffect(() => {
+    usePollenDetailsChartStore.getState().setShow(false, '', null, null, null);
+    usePollenDetailsChartStore.getState().latitude = null;
+    usePollenDetailsChartStore.getState().longitude = null;
+  }, []);
+
   return (
     <>
       <ForecastMap
@@ -274,10 +301,7 @@ export const ForecastMapContainer = () => {
           {(open, setOpen) => (
             <LocationSearch
               open={open}
-              onSelect={(pos) => {
-                setUserLocation(pos);
-                setOpen(false);
-              }}
+              onSelect={(pos) => handleLocationSelect(pos, setOpen)}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
               boundary={getRegionBounds()}
@@ -289,6 +313,8 @@ export const ForecastMapContainer = () => {
           tooltipText={tLocation('title_tooltip_location')}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
+          mode="forecast"
+          hour={0}
         />
       </span>
       <div
@@ -315,6 +341,7 @@ export const ForecastMapContainer = () => {
             currentDate={pollenSelected.defaultBaseDate}
             pollenSelected={pollenSelected.apiKey}
             loading={chartLoading}
+            view="forecast"
           />
         )}
       </div>
