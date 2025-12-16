@@ -127,6 +127,7 @@ export const ForecastMapContainer = () => {
 
   const handlePollenChange = (newPollen: PollenConfig) => {
     setPartialLoading(true);
+    setShowPollenDetailsChart(false);
     setPollenSelected(newPollen);
   };
 
