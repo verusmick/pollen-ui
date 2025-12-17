@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BiChevronDown } from 'react-icons/bi';
 import { useClickOutside } from '@/app/hooks';
 interface DropdownSelectorProps<T> {
@@ -36,6 +36,16 @@ export const DropdownSelector = <T,>({
     onChange?.(item);
     setIsOpen(false);
   };
+  
+  const renderOptions = useMemo(() => {
+    const optionsToRender = options.slice();
+    optionsToRender.sort((optionA, optionB) => {
+      const labelA = getLabel(optionA).toLowerCase();
+      const labelB = getLabel(optionB).toLowerCase();
+      return labelA.localeCompare(labelB);
+    });
+    return optionsToRender;
+  }, [options, getLabel]);
 
   return (
     <div
@@ -57,7 +67,7 @@ export const DropdownSelector = <T,>({
 
       {isOpen && (
         <ul className="w-full bg-card rounded-lg shadow-lg max-h-60 overflow-auto border border-card mt-1 text-base search-scroll">
-          {options.map((item) => (
+          {renderOptions.map((item) => (
             <li
               key={getKey(item)}
               onClick={() => handleOptionClick(item)}
