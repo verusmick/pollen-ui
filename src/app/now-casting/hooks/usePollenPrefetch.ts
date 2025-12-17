@@ -1,14 +1,13 @@
-
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 
-import { getHourlyForecast } from '@/lib/api/forecast';
-import type { PollenApiKey } from '@/app/forecast/constants';
+import { PollenApiKey } from '@/app/now-casting/constants';
+import { getHourlyNowCasting } from '@/lib/api/nowCasting';
+import { getAdjacentHour, type HourPoint } from '@/app/now-casting/utils';
 
 interface ForecastParams {
   date: string;
-  hour: number;
+  hour: string;
   pollen: PollenApiKey;
   box: string;
   includeCoords?: boolean;
@@ -18,25 +17,33 @@ interface ForecastParams {
 export const usePollenPrefetch = () => {
   const queryClient = useQueryClient();
 
+  function getNextApiHours(hours: HourPoint[], baseHourIndex: number, hoursAhead: number): HourPoint[] {
+    const result: HourPoint[] = [];
+    let currentIndex = baseHourIndex;
+
+    for (let i = 0; i < hoursAhead; i++) {
+      const next = getAdjacentHour(hours, currentIndex, 'next');
+      if (!next) break;
+
+      result.push(next);
+      currentIndex = next.hourIndex;
+    }
+
+    return result;
+  }
+
   const prefetchNextHours = useCallback(
-    async (baseParams: ForecastParams, baseHour: number, hoursAhead = 3) => {
-      const { pollen } = baseParams;
-      const hoursToPrefetch = Array.from({ length: hoursAhead }, (_, i) => (baseHour + i + 1) % 48);
+    async (baseParams: ForecastParams, baseHour: number, hoursAhead = 3, timelineHours: HourPoint[]) => {
+      const hoursToPrefetch: HourPoint[] = getNextApiHours(timelineHours, baseHour, hoursAhead);
 
       await Promise.all(
-        hoursToPrefetch.map(async (hour) => {
-          const nextParams = { ...baseParams, hour };
-          const normalized = {
-            ...nextParams,
-            date: dayjs(nextParams.date + 'T00:00:00')
-              .add(nextParams.hour >= 24 ? 1 : 0, 'day')
-              .format('YYYY-MM-DD'),
-            hour: nextParams.hour % 24,
-          };
+        hoursToPrefetch.map(async (hour: HourPoint) => {
+          const nextParams = { ...baseParams, hour: hour.apiHour, date: hour.apiDate };
+          const normalized = { ...nextParams };
 
           await queryClient.prefetchQuery({
             queryKey: ['hourlyNowCasting', normalized],
-            queryFn: () => getHourlyForecast(normalized),
+            queryFn: () => getHourlyNowCasting(normalized),
             staleTime: 1000 * 60 * 10,
           });
         })
