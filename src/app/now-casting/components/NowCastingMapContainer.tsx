@@ -88,6 +88,7 @@ export const NowCastingMapContainer = () => {
     setLongitudes: setNowCastingLngGrid,
   } = nowCastingCoordinates;
   const { fetchChart } = usePollenChart();
+  const playStartHourRef = useRef<number | null>(null);
 
   const nowRaw = dayjs();
   const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
@@ -153,9 +154,11 @@ export const NowCastingMapContainer = () => {
 
   const handlePlayPause = () => {
     if (!playing) {
+      playStartHourRef.current = selectedHour?.hourIndex ?? 0;
       setPlaying(true);
     } else {
       setPlaying(false);
+      playStartHourRef.current = null;
     }
   };
 
@@ -194,12 +197,23 @@ export const NowCastingMapContainer = () => {
     isLoading: mapDataIsLoading,
     onNextHour: () => {
       setSelectedHour((prevHour) => {
+        if (!prevHour) return prevHour;
+
         const nextHour = getAdjacentHour(
           timelineHours,
-          prevHour?.hourIndex ?? 0,
+          prevHour.hourIndex,
           'next'
         );
-        return nextHour || undefined;
+        if (
+          playStartHourRef.current !== null &&
+          nextHour?.hourIndex === playStartHourRef.current
+        ) {
+          setPlaying(false);
+          playStartHourRef.current = null;
+          return nextHour;
+        }
+
+        return nextHour || prevHour;
       });
     },
     intervalMs: 1000,
