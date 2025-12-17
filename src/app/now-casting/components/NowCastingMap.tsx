@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeckGL } from '@deck.gl/react';
 import { TileLayer } from '@deck.gl/geo-layers';
 import {
@@ -9,7 +9,9 @@ import {
   BitmapLayer,
   IconLayer,
 } from '@deck.gl/layers';
+import { FlyToInterpolator } from 'deck.gl';
 import type { Feature, FeatureCollection } from 'geojson';
+import dayjs from 'dayjs';
 
 import { MapZoomControls } from '@/app/components';
 import {
@@ -17,15 +19,14 @@ import {
   usePartialLoadingStore,
   useSearchLocationStore,
 } from '@/app/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import { getInitialViewState } from '@/app/now-casting/utils';
 import { getRegionGeo } from '@/app/utils/maps';
+import { usePollenChart } from '@/app/hooks';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
+import { debounce, getBoundsFromViewState } from '@/utils';
 import bavariaGeo from '@/data/bavaria.geo.json';
 import germanyGeo from '@/data/germany.geo.json';
-import { usePollenChart } from '@/app/hooks';
-import { usePollenDetailsChartStore } from '@/app/stores/pollen';
-import dayjs from 'dayjs';
-import { FlyToInterpolator } from 'deck.gl';
 
 interface NowCastingMapProps {
   pollenData: Array<[number, number, number | null]>;
@@ -33,6 +34,10 @@ interface NowCastingMapProps {
   userLocation: { lat: number; lng: number } | null;
   pollenSelected: string;
   currentDate: string;
+  onRegionChange: (arg: {
+    bBox: [number, number, number, number];
+    zoom: number;
+  }) => void;
 }
 
 export default function NowCastingMap({
@@ -41,8 +46,10 @@ export default function NowCastingMap({
   userLocation,
   pollenSelected,
   currentDate,
+  onRegionChange,
 }: NowCastingMapProps) {
   const [viewMapState, setViewMapState] = useState(getInitialViewState);
+
   const { setChartLoading } = usePartialLoadingStore();
   const { fetchChart } = usePollenChart();
   const { lat: searchLat, lng: searchlong, name } = useSearchLocationStore();
@@ -51,12 +58,20 @@ export default function NowCastingMap({
     latitude: pollenDetailsChartLatitude,
     longitude: pollenDetailsChartLongitude,
   } = usePollenDetailsChartStore();
-
   const {
     lat: currentLocationLat,
     lng: currentLocationLong,
     clearLocation: clearCurrentLocation,
   } = useCurrentLocationStore((state) => state);
+
+  const debouncedRegionUpdate = useRef(
+    debounce((viewState) => {
+      const bBox = getBoundsFromViewState(viewState);
+      const zoom = viewState.zoom;
+
+      onRegionChange?.({ bBox, zoom });
+    }, 80)
+  ).current;
 
   const handleGridCellClick = useCallback(
     async (clickLat: number, clickLon: number) => {
@@ -95,9 +110,8 @@ export default function NowCastingMap({
 
     return filteredPoints.map(([lat, lon, intensityRaw]) => {
       const intensity = typeof intensityRaw === 'number' ? intensityRaw : 0;
-      // const halfCell = gridCellsResolution / 1.91;
       const halfCell = 0.0042;
-      // 0.0042
+
       const quadrant = [
         [lon - halfCell, lat - halfCell], // bottom-left
         [lon + halfCell, lat - halfCell], // bottom-right
@@ -118,7 +132,6 @@ export default function NowCastingMap({
         getPolygon: (d: any) => d.polygon,
         getFillColor: (d: any) => {
           const intensity = d.intensity;
-          // Your color scale based on pollen intensity
           if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
           else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
           else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
@@ -230,9 +243,15 @@ export default function NowCastingMap({
     });
   }, []);
 
-  const handleViewStateChange = (e: any) => setViewMapState(e.viewState);
+  const handleViewStateChange = (e: any) => {
+    const nextViewState = e.viewState;
+    setViewMapState(nextViewState);
+    debouncedRegionUpdate(nextViewState);
+  };
+
   const handleCursor = ({ isDragging, isHovering }: any) =>
     isDragging ? 'grabbing' : isHovering ? 'pointer' : 'grab';
+
   const openChartAtLocation = (lat: number, lng: number) => {
     clearCurrentLocation();
     setViewMapState((prev) => ({
@@ -253,16 +272,19 @@ export default function NowCastingMap({
     pollenGridCellsLayer,
     pinIconLayer,
   ].filter(Boolean) as any[];
+
   useEffect(() => {
     if (searchLat && searchlong) {
       openChartAtLocation(searchLat, searchlong);
     }
   }, [searchLat, searchlong]);
+
   useEffect(() => {
     if (currentLocationLat && currentLocationLong) {
       openChartAtLocation(currentLocationLat, currentLocationLong);
     }
   }, [currentLocationLat, currentLocationLong]);
+
   return (
     <>
       <DeckGL

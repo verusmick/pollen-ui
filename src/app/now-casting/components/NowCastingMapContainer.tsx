@@ -45,6 +45,7 @@ import {
   getAdjacentHour,
   type HourPoint,
 } from '@/app/now-casting/utils';
+import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
@@ -188,6 +189,24 @@ export const NowCastingMapContainer = () => {
     }
   };
 
+  const handleRegionChange = useCallback(
+    ({
+      bBox,
+      zoom,
+    }: {
+      bBox: [number, number, number, number];
+      zoom: number;
+    }) => {
+      const newRes = computeResFromZoom(zoom);
+      const newGridCellsResolution = getGridCellsResolution(newRes);
+
+      setResolution(newRes);
+      setGridCellsResolution(newGridCellsResolution);
+      setBoundaryMapBox(bBox);
+    },
+    [selectedHour]
+  );
+
   usePollenPlayback({
     playing,
     isFetching,
@@ -233,6 +252,7 @@ export const NowCastingMapContainer = () => {
     <div className="relative h-screen w-screen">
       <NowCastingMap
         pollenData={pollenData}
+        onRegionChange={handleRegionChange}
         gridCellsResolution={gridCellsResolution}
         userLocation={userLocation}
         pollenSelected={pollenSelected.apiKey}

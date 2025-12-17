@@ -24,10 +24,7 @@ import {
   usePollenCacheManager,
   usePollenPrefetch,
 } from '@/app/forecast/hooks';
-import {
-  computeResFromZoom,
-  getGridCellsResolution,
-} from '@/app/forecast/utils';
+
 import {
   LoadingSpinner,
   PanelHeader,
@@ -47,6 +44,7 @@ import {
 } from '@/app/stores';
 import { useSidebar } from '@/app/context';
 import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
+import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
 
 const PollenDetailsChart = dynamic(
   () =>

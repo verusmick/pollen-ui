@@ -48,7 +48,8 @@ export async function getHourlyNowCasting(params: {
     hour: params.hour,
     pollen: params.pollen,
     include_coords: (params.includeCoords || false).toString(),
-    res: (params.res ?? 2).toString(),
+    // res: (params.res ?? 2).toString(), //todo: we need a API fix
+    res: '1',
   };
 
   if (params.box !== undefined) {
