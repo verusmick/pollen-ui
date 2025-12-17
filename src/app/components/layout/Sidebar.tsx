@@ -20,7 +20,7 @@ export function Sidebar({
 
   const routes = [
     { label: 'Forecast', href: '/forecast' },
-    { label: 'Now Casting', href: '/now-casting' },
+    { label: 'Nowcasting', href: '/now-casting' },
   ];
 
   const sidebarWidth = collapsed ? 0 : 256;
