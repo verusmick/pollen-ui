@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useSearchLocationStore } from '@/app/stores/maps/searchLocationStore';
-import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import { usePartialLoadingStore } from '@/app/stores';
 import { usePollenChart } from '@/app/hooks';
 
@@ -25,16 +24,31 @@ export const useLocationSearch = ({
   const [loading, setLoading] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
 
-  const setLocation = useSearchLocationStore((state) => state.setLocation);
+  const { location: prevLocation, setLocation } = useSearchLocationStore();
   const { setChartLoading } = usePartialLoadingStore();
   const { fetchChart } = usePollenChart();
+
   const handleSelect = async (item: any) => {
+    const lat = parseFloat(item.lat);
+    const lng = parseFloat(item.lon);
+    const place_id = item.place_id;
+
+    // Si seleccionamos la misma ubicación anterior, usamos la misma coordenada
+    if (prevLocation && prevLocation.place_id === place_id) {
+      onSelect({ lat: prevLocation.lat, lng: prevLocation.lng });
+      setQuery(item.display_name);
+      setSuggestions([]);
+      return;
+    }
+
     const selected = {
-      lat: parseFloat(item.lat),
-      lng: parseFloat(item.lon),
+      lat,
+      lng,
       name: item.display_name,
       boundingbox: item.boundingbox,
+      place_id,
     };
+
     setLocation(selected);
     onSelect(selected);
     setQuery(item.display_name);
@@ -43,14 +57,15 @@ export const useLocationSearch = ({
     try {
       setChartLoading(true);
       await fetchChart({
-        lat: selected.lat,
-        lng: selected.lng,
+        lat,
+        lng,
         pollen: pollenSelected,
         date: currentDate,
       });
-      setChartLoading(false);
     } catch (err) {
       console.error(err);
+    } finally {
+      setChartLoading(false);
     }
   };
 
