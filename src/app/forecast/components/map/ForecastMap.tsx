@@ -58,7 +58,10 @@ export default function ForecastMap({
     x: number;
     y: number;
   } | null>(null);
-  const { lat: searchLat, lng: searchlong, name } = useSearchLocationStore();
+  const { location: searchLocation } = useSearchLocationStore();
+  const searchLat = searchLocation?.lat ?? null;
+  const searchLng = searchLocation?.lng ?? null;
+  const place_id = searchLocation?.place_id;
   const {
     lat: currentLocationLat,
     lng: currentLocationLong,
@@ -177,7 +180,6 @@ export default function ForecastMap({
       data: [
         {
           position: [pollenDetailsChartLongitude, pollenDetailsChartLatitude],
-          name,
         },
       ],
       getIcon: () => 'marker',
@@ -197,7 +199,7 @@ export default function ForecastMap({
       },
       pickable: true,
     });
-  }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude, name]);
+  }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude]);
 
   // Free OpenStreetMap base layer
   const baseMapLayer = useMemo(
@@ -295,11 +297,18 @@ export default function ForecastMap({
     if (isHovering) return 'pointer';
     return 'grab';
   }, []);
-  const openChartAtLocation = (lat: number, lng: number) => {
+  const openChartAtLocation = (
+    lat: number,
+    lng: number,
+    placeId?: string,
+    forceFlyTo: boolean = false
+  ) => {
+    const prevPlaceId = searchLocation?.place_id;
+    if (!forceFlyTo && placeId && prevPlaceId === placeId) return;
     clearCurrentLocation();
     setViewMapState((prev) => ({
       ...prev,
-      longitude: lng,
+      longitude: lng + 0.002,
       latitude: lat,
       zoom: 10,
       transitionDuration: 1000,
@@ -309,14 +318,19 @@ export default function ForecastMap({
   };
   // watcher to check the properties of the map
   useEffect(() => {
-    if (searchLat && searchlong) {
-      openChartAtLocation(searchLat, searchlong);
+    if (searchLat && searchLng) {
+      openChartAtLocation(searchLat, searchLng, place_id, true);
     }
-  }, [searchLat, searchlong]);
+  }, [searchLat, searchLng, place_id]);
 
   useEffect(() => {
     if (currentLocationLat && currentLocationLong) {
-      openChartAtLocation(currentLocationLat, currentLocationLong);
+      openChartAtLocation(
+        currentLocationLat,
+        currentLocationLong,
+        undefined,
+        true
+      );
     }
   }, [currentLocationLat, currentLocationLong]);
 
