@@ -33,7 +33,6 @@ export const useLocationSearch = ({
     const lng = parseFloat(item.lon);
     const place_id = item.place_id;
 
-    // Si seleccionamos la misma ubicación anterior, usamos la misma coordenada
     if (prevLocation && prevLocation.place_id === place_id) {
       onSelect({ lat: prevLocation.lat, lng: prevLocation.lng });
       setQuery(item.display_name);
