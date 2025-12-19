@@ -180,7 +180,6 @@ export default function ForecastMap({
       data: [
         {
           position: [pollenDetailsChartLongitude, pollenDetailsChartLatitude],
-          name,
         },
       ],
       getIcon: () => 'marker',
@@ -200,7 +199,7 @@ export default function ForecastMap({
       },
       pickable: true,
     });
-  }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude, name]);
+  }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude]);
 
   // Free OpenStreetMap base layer
   const baseMapLayer = useMemo(
