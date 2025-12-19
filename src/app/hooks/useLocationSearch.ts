@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchLocationStore } from '@/app/stores/maps/searchLocationStore';
 import { usePartialLoadingStore } from '@/app/stores';
 import { usePollenChart } from '@/app/hooks';
+import { useCoordinatesStore } from '@/app/stores';
+import { findClosestCoordinate } from '@/app/forecast/utils';
 
 export const useLocationSearch = ({
   currentDate,
@@ -33,31 +35,37 @@ export const useLocationSearch = ({
     const lng = parseFloat(item.lon);
     const place_id = item.place_id;
 
-    if (prevLocation && prevLocation.place_id === place_id) {
-      onSelect({ lat: prevLocation.lat, lng: prevLocation.lng });
-      setQuery(item.display_name);
-      setSuggestions([]);
-      return;
-    }
+    const { forecast, nowCasting } = useCoordinatesStore.getState();
+
+    const closestLat = forecast.latitudes.length
+      ? findClosestCoordinate(lat, forecast.latitudes)
+      : lat;
+    const closestLng = forecast.longitudes.length
+      ? findClosestCoordinate(lng, forecast.longitudes)
+      : lng;
 
     const selected = {
       lat,
       lng,
+      closestLat,
+      closestLng,
       name: item.display_name,
       boundingbox: item.boundingbox,
       place_id,
     };
 
     setLocation(selected);
-    onSelect(selected);
+
+    onSelect({ lat, lng });
+
     setQuery(item.display_name);
     setSuggestions([]);
 
     try {
       setChartLoading(true);
       await fetchChart({
-        lat,
-        lng,
+        lat: closestLat,
+        lng: closestLng,
         pollen: pollenSelected,
         date: currentDate,
       });
