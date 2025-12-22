@@ -5,6 +5,7 @@ import { ReactQueryWrapper } from './forecast/provider/providers';
 
 import './globals.css';
 import { ClientLayout } from './components/layout';
+import { Providers } from './providers';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,11 +32,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NextIntlClientProvider>
-          <ReactQueryWrapper>
-            <ClientLayout>{children}</ClientLayout>
-          </ReactQueryWrapper>
-        </NextIntlClientProvider>
+        <Providers>
+          <NextIntlClientProvider>
+            <ReactQueryWrapper>
+              <ClientLayout>{children}</ClientLayout>
+            </ReactQueryWrapper>
+          </NextIntlClientProvider>
+        </Providers>
       </body>
     </html>
   );
