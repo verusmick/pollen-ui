@@ -38,6 +38,7 @@ interface NowCastingMapProps {
     bBox: [number, number, number, number];
     zoom: number;
   }) => void;
+  resolution: 1 | 2 | 3;
 }
 
 export default function NowCastingMap({
@@ -47,6 +48,7 @@ export default function NowCastingMap({
   pollenSelected,
   currentDate,
   onRegionChange,
+  resolution,
 }: NowCastingMapProps) {
   const [viewMapState, setViewMapState] = useState(getInitialViewState);
 
@@ -110,7 +112,9 @@ export default function NowCastingMap({
 
     return filteredPoints.map(([lat, lon, intensityRaw]) => {
       const intensity = typeof intensityRaw === 'number' ? intensityRaw : 0;
-      const halfCell = 0.0042;
+      let halfCell = 0.0042;
+      if (resolution === 2) halfCell = 0.0083;
+      if (resolution === 3) halfCell = 0.0167;
 
       const quadrant = [
         [lon - halfCell, lat - halfCell], // bottom-left
@@ -122,7 +126,7 @@ export default function NowCastingMap({
 
       return { polygon: quadrant, intensity, position: [lon, lat] };
     });
-  }, [pollenData, gridCellsResolution]);
+  }, [pollenData]);
 
   const pollenGridCellsLayer = useMemo(
     () =>
