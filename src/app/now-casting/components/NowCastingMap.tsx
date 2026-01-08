@@ -54,7 +54,11 @@ export default function NowCastingMap({
 
   const { setChartLoading } = usePartialLoadingStore();
   const { fetchChart } = usePollenChart();
-  const { lat: searchLat, lng: searchlong, name } = useSearchLocationStore();
+
+  const { location: searchLocation } = useSearchLocationStore();
+  const searchLat = searchLocation?.lat ?? null;
+  const searchLng = searchLocation?.lng ?? null;
+  const place_id = searchLocation?.place_id;
   const {
     setShow: setShowPollenDetailsChart,
     latitude: pollenDetailsChartLatitude,
@@ -256,12 +260,20 @@ export default function NowCastingMap({
   const handleCursor = ({ isDragging, isHovering }: any) =>
     isDragging ? 'grabbing' : isHovering ? 'pointer' : 'grab';
 
-  const openChartAtLocation = (lat: number, lng: number) => {
+  const openChartAtLocation = (
+    lat: number,
+    lng: number,
+    placeId?: string,
+    forceFlyTo: boolean = false
+  ) => {
+    const prevPlaceId = searchLocation?.place_id;
+    if (!forceFlyTo && placeId && prevPlaceId === placeId) return;
+
     clearCurrentLocation();
     setViewMapState((prev) => ({
       ...prev,
+      latitude: lat + 0.002,
       longitude: lng,
-      latitude: lat,
       zoom: 10,
       transitionDuration: 1000,
       transitionInterpolator: new FlyToInterpolator(),
@@ -278,14 +290,19 @@ export default function NowCastingMap({
   ].filter(Boolean) as any[];
 
   useEffect(() => {
-    if (searchLat && searchlong) {
-      openChartAtLocation(searchLat, searchlong);
+    if (searchLat && searchLng) {
+      openChartAtLocation(searchLat, searchLng, place_id, true);
     }
-  }, [searchLat, searchlong]);
+  }, [searchLat, searchLng, place_id]);
 
   useEffect(() => {
     if (currentLocationLat && currentLocationLong) {
-      openChartAtLocation(currentLocationLat, currentLocationLong);
+      openChartAtLocation(
+        currentLocationLat,
+        currentLocationLong,
+        undefined,
+        true
+      );
     }
   }, [currentLocationLat, currentLocationLong]);
 
