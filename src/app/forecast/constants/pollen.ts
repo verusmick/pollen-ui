@@ -1,34 +1,21 @@
-import dayjs from 'dayjs';
+import { MAP_LEVEL_COLORS } from '@/app/constants';
+import { PollenLevel } from '@/app/types';
+import { getDefaultBaseDate } from '@/app/utils';
 
-type PollenLevel = { label: string; min: number; max: number };
-
-const USE_CURRENT_DATE = process.env.NEXT_PUBLIC_USE_CURRENT_DATE === 'true';
-
-const getDefaultBaseDate = (fallbackDate: string) =>
-  USE_CURRENT_DATE ? dayjs().format('YYYY-MM-DD') : fallbackDate;
-
-export const LEVEL_COLORS = {
-  very_low: '#00e838',
-  low: '#a5eb02',
-  moderate: '#ebbb02',
-  high: '#f27200',
-  very_high: '#ff0000',
-} as const;
-export const BIRCH_CONFIG = {
-  apiKey: 'POLLEN_BIRCH' as const,
-  label: 'Birch' as const,
-  defaultBaseDate: getDefaultBaseDate('2022-04-14'),
-  apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
-  levels: [
-    { label: 'Very Low', min: 1, max: 30 },
-    { label: 'Low', min: 31, max: 100 },
-    { label: 'Moderate', min: 101, max: 200 },
-    { label: 'High', min: 201, max: 400 },
-    { label: 'Very High', min: 401, max: 1000 },
-  ] as PollenLevel[],
-};
 export const POLLENS = {
-  BIRCH: BIRCH_CONFIG,
+  BIRCH: {
+    apiKey: 'POLLEN_BIRCH' as const,
+    label: 'Birch' as const,
+    defaultBaseDate: getDefaultBaseDate('2022-04-14'),
+    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    levels: [
+      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'Low', min: 31, max: 100 },
+      { label: 'Moderate', min: 101, max: 200 },
+      { label: 'High', min: 201, max: 400 },
+      { label: 'Very High', min: 401, max: 1000 },
+    ] as PollenLevel[],
+  },
   GRASS: {
     apiKey: 'POLLEN_GRASS' as const,
     label: 'Grass' as const,
@@ -78,7 +65,7 @@ export const getLevelsForLegend = (pollenApiKey: PollenApiKey) => {
   return pollen.levels.map((level, idx, arr) => {
     const key = level.label
       .toLowerCase()
-      .replace(/\s+/g, '_') as keyof typeof LEVEL_COLORS;
+      .replace(/\s+/g, '_') as keyof typeof MAP_LEVEL_COLORS;
 
     let maxLabel = level.max.toString();
 
@@ -88,7 +75,7 @@ export const getLevelsForLegend = (pollenApiKey: PollenApiKey) => {
 
     return {
       key,
-      color: LEVEL_COLORS[key],
+      color: MAP_LEVEL_COLORS[key],
       min: level.min,
       max: maxLabel,
       label: level.label,

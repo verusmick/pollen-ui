@@ -13,16 +13,21 @@ import {
   ReferenceLine,
 } from 'recharts';
 import dayjs from 'dayjs';
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import {
-  getPollenByApiKey,
-  LEVEL_COLORS,
-  PollenApiKey,
+  getPollenByApiKey as getForecastPollenByApiKey,
+  PollenApiKey as ForecastPollenApiKey,
 } from '@/app/forecast/constants';
+import {
+  getPollenByApiKey as getNowcastingPollenByApiKey,
+  PollenApiKey as NowcastingPollenApiKey,
+} from '@/app/now-casting/constants';
+
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/app/components';
 import { usePartialLoadingStore } from '@/app/stores';
 import { COLORS } from '@/app/styles/colors';
+import { MAP_LEVEL_COLORS } from '@/app/constants';
 
 interface PollenData {
   timestamp: number;
@@ -36,27 +41,68 @@ export const PollenDetailsChart = ({
   currentDate,
   pollenSelected,
   loading,
+  view,
 }: {
   onClose?: () => void;
   currentDate: string;
   pollenSelected: string;
   loading: boolean;
+  view: string;
 }) => {
   const nominatimApi = process.env.NEXT_PUBLIC_NOMINATIM_API;
-  const t = useTranslations('forecastPage');
-  const pollenConfig = getPollenByApiKey(pollenSelected as PollenApiKey);
+  const t = useTranslations('Components');
+
   const { data: chartData, latitude, longitude } = usePollenDetailsChartStore();
   const { chartLoading } = usePartialLoadingStore();
-
   const [data, setData] = useState<PollenData[]>([]);
   const [locationName, setLocationName] = useState<string>();
   const [activeIndex, setActiveIndex] = useState<number>(0);
-
+  const isAutoScrollingRef = useRef(false);
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const pointWidth = 60;
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const pollenConfig = useMemo(() => {
+    if (view === 'forecast') {
+      return getForecastPollenByApiKey(pollenSelected as ForecastPollenApiKey);
+    } else {
+      return getNowcastingPollenByApiKey(
+        pollenSelected as NowcastingPollenApiKey
+      );
+    }
+  }, [pollenSelected, view]);
+
+  const processNowcastingData = (
+    rawData: Array<number | 'NA'>,
+    currentDate: string
+  ): PollenData[] => {
+    if (!rawData?.length) return [];
+    const nowRaw = dayjs();
+    const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
+
+    const now = dayjs(currentDate).hour(alignedHour).minute(0).second(0);
+
+    const grouped: Array<number | null> = [];
+    for (let i = 0; i < rawData.length; i += 3) {
+      const v = rawData[i];
+      grouped.push(typeof v === 'number' && !isNaN(v) ? v : null);
+    }
+    const ordered = grouped.reverse();
+    const totalPoints = ordered.length;
+    return ordered.map((value, index) => {
+      const hoursFromNow = (totalPoints - 1 - index) * 3;
+      const date = now.subtract(hoursFromNow, 'hour');
+
+      return {
+        timestamp: date.valueOf(),
+        value: value !== null ? Math.round(value) : null,
+        hour: date.hour(),
+        dateString: date.format('DD MMM YYYY'),
+      };
+    });
+  };
 
   const processChartData = (
     chartData: Record<string, string | number>,
@@ -84,13 +130,17 @@ export const PollenDetailsChart = ({
       };
     });
   };
-
   const currentHourIndex = useMemo(() => {
     if (!data.length) return 0;
+
+    if (view === 'nowcasting') {
+      return data.length - 1;
+    }
+
     const nowHour = new Date().getHours();
     const index = data.findIndex((d) => d.hour === nowHour);
     return index !== -1 ? index : 0;
-  }, [data]);
+  }, [data, view]);
 
   const levelCache = useMemo(() => {
     const cache: Record<number, { label: string; color: string }> = {};
@@ -102,7 +152,7 @@ export const PollenDetailsChart = ({
       if (d.value === 0) {
         cache[0] = {
           label: 'Very Low',
-          color: LEVEL_COLORS.very_low,
+          color: MAP_LEVEL_COLORS.very_low,
         };
         return;
       }
@@ -115,11 +165,11 @@ export const PollenDetailsChart = ({
 
         const key = level.label
           .toLowerCase()
-          .replace(/\s+/g, '_') as keyof typeof LEVEL_COLORS;
+          .replace(/\s+/g, '_') as keyof typeof MAP_LEVEL_COLORS;
 
         cache[d.value] = {
           ...level,
-          color: LEVEL_COLORS[key] || LEVEL_COLORS.very_low,
+          color: MAP_LEVEL_COLORS[key] || MAP_LEVEL_COLORS.very_low,
         };
       }
     });
@@ -129,21 +179,40 @@ export const PollenDetailsChart = ({
 
   const scrollToCurrentHour = () => {
     if (!chartContainerRef.current || !data.length) return;
+
     const el = chartContainerRef.current;
     const scrollPos =
       currentHourIndex * pointWidth + pointWidth / 2 - el.clientWidth / 2;
-    el.scrollTo({ left: Math.max(scrollPos, 0), behavior: 'smooth' });
+
+    isAutoScrollingRef.current = true;
+
+    el.scrollTo({ left: Math.max(scrollPos, 0) });
     setActiveIndex(currentHourIndex);
+    setActiveIndex(currentHourIndex);
+    setTimeout(() => {
+      isAutoScrollingRef.current = false;
+    }, 350);
   };
 
   const throttledRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updateActiveIndexByScroll = () => {
+    if (isAutoScrollingRef.current) return;
+
     const container = chartContainerRef.current;
     if (!container || !data.length) return;
+
+    const maxScrollLeft = container.scrollWidth - container.clientWidth;
     const centerX = container.scrollLeft + container.clientWidth / 2;
-    const index = Math.round((centerX - pointWidth / 2) / pointWidth);
-    setActiveIndex(Math.max(0, Math.min(data.length - 1, index)));
+
+    let index = Math.round((centerX - pointWidth / 2) / pointWidth);
+    index = Math.max(0, Math.min(data.length - 1, index));
+
+    if (view === 'nowcasting' && container.scrollLeft >= maxScrollLeft - 1) {
+      index = data.length - 1;
+    }
+
+    setActiveIndex(index);
   };
 
   const evaluateScroll = () => {
@@ -271,8 +340,14 @@ export const PollenDetailsChart = ({
   };
 
   useEffect(() => {
-    setData(processChartData(chartData || {}, currentDate));
-  }, [chartData, currentDate]);
+    if (!chartData) return;
+
+    if (view === 'nowcasting') {
+      setData(processNowcastingData(chartData as any[], currentDate));
+    } else {
+      setData(processChartData(chartData as any, currentDate));
+    }
+  }, [chartData, currentDate, view]);
 
   useEffect(() => {
     if (!latitude || !longitude || !nominatimApi) return;
@@ -342,7 +417,7 @@ export const PollenDetailsChart = ({
           </button>
         </div>
 
-        {chartLoading || loading ? (
+        {chartLoading || !chartData ? (
           <div className="flex justify-center items-center h-full">
             <LoadingSpinner size={40} color="border-gray-200" />
           </div>
@@ -458,7 +533,7 @@ export const PollenDetailsChart = ({
                 </ResponsiveContainer>
               </div>
 
-              {activePoint && (
+              {activePoint && activePoint.value !== null && (
                 <div
                   className="absolute transform -translate-x-1/2 bg-transparent text-white rounded-md text-[11px] whitespace-nowrap border border-white/40 px-1 py-0.5 pointer-events-none"
                   style={{
@@ -467,7 +542,7 @@ export const PollenDetailsChart = ({
                   }}
                 >
                   <div className="font-bold text-center text-[10px]">
-                    {activePoint.value ?? 'NA'}
+                    {Math.round(activePoint.value)}
                   </div>
                   <div className="text-[9px] text-gray-300">{t('pollen')}</div>
                 </div>

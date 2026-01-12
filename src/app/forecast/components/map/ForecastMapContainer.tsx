@@ -5,22 +5,18 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import { usePollenDetailsChartStore } from '@/app/forecast/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 
-import {
-  ForecastMap,
-  PollenLegend,
-  PollenLegendCard,
-  PollenTimeline,
-} from '@/app/forecast/components';
+import { ForecastMap } from '@/app/forecast/components';
 
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
-  getRegionBounds,
-  POLLENS,
+  POLLEN_ENTRIES,
   type PollenConfig,
 } from '@/app/forecast/constants';
+
+import { getRegionBounds } from '@/app/constants';
 
 import {
   useHourlyForecast,
@@ -28,11 +24,7 @@ import {
   usePollenCacheManager,
   usePollenPrefetch,
 } from '@/app/forecast/hooks';
-import {
-  computeResFromZoom,
-  fetchAndShowPollenChart,
-  getGridCellsResolution,
-} from '@/app/forecast/utils';
+
 import {
   LoadingSpinner,
   PanelHeader,
@@ -41,34 +33,42 @@ import {
   LocationSearch,
   SearchCardToggle,
   LocationButton,
+  PollenLegendCard,
+  PollenLegend,
+  PollenTimeline,
 } from '@/app/components';
 import {
   useCoordinatesStore,
-  useCurrentLocationStore,
   useLoadingStore,
   usePartialLoadingStore,
 } from '@/app/stores';
-import { usePathname } from 'next/navigation';
+import { useSidebar } from '@/app/context';
+import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
+import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
 
 const PollenDetailsChart = dynamic(
   () =>
-    import('../ui/PollenDetailsChart').then((mod) => mod.PollenDetailsChart),
+    import('../../../components/ui/PollenDetailsChart').then(
+      (mod) => mod.PollenDetailsChart
+    ),
   { ssr: false }
 );
 
 export const ForecastMapContainer = () => {
-  const pathname = usePathname();
   const t = useTranslations('forecastPage');
-  const tSearch = useTranslations('forecastPage.search');
-  const tLocation = useTranslations('forecastPage.show_your_location');
+  const tSearch = useTranslations('Components.search');
+  const tLocation = useTranslations('Components.show_your_location');
+
+  const { sidebarWidth } = useSidebar();
+  const isLargeScreen = useIsLargeScreen();
 
   const { loading, setLoading } = useLoadingStore();
   const { partialLoading, setPartialLoading, chartLoading, setChartLoading } =
     usePartialLoadingStore();
   const { show: showPollenDetailsChart, setShow: setShowPollenDetailsChart } =
     usePollenDetailsChartStore();
-  const { setLatitudes, setLongitudes } = useCoordinatesStore();
-  const { clearLocation: clearCurrentLocation } = useCurrentLocationStore();
+  const { forecast } = useCoordinatesStore();
+  const { setLatitudes, setLongitudes } = forecast;
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
   const [pollenData, setPollenData] = useState<
@@ -93,7 +93,7 @@ export const ForecastMapContainer = () => {
 
   const [gridCellsResolution, setGridCellsResolution] = useState(0.02);
   const [resolution, setResolution] = useState<1 | 2 | 3>(1);
-
+  const { fetchChart } = usePollenChart();
   const handlePlayPause = () => {
     if (!playing) {
       setTimelineStartHour(selectedHour);
@@ -125,6 +125,7 @@ export const ForecastMapContainer = () => {
 
   const handlePollenChange = (newPollen: PollenConfig) => {
     setPartialLoading(true);
+    setShowPollenDetailsChart(false);
     setPollenSelected(newPollen);
   };
 
@@ -159,21 +160,19 @@ export const ForecastMapContainer = () => {
     pollenSelected: { apiKey: string; defaultBaseDate: string },
     setChartLoading: (v: boolean) => void
   ) => {
-    const { latitude, longitude, setShow } =
-      usePollenDetailsChartStore.getState();
+    const { latitude, longitude } = usePollenDetailsChartStore.getState();
 
     if (!latitude || !longitude) return;
 
     setChartLoading(true);
-    setShow(true, '', null, latitude, longitude);
 
     try {
-      await fetchAndShowPollenChart({
+      await fetchChart({
         lat: latitude,
         lng: longitude,
         pollen: pollenSelected.apiKey,
         date: pollenSelected.defaultBaseDate,
-        setShowPollenDetailsChart: setShow,
+        forecast: { hour: selectedHour },
       });
     } catch (err) {
       console.error(err);
@@ -234,7 +233,28 @@ export const ForecastMapContainer = () => {
     },
     [selectedHour, pruneCache]
   );
-
+  const handleLocationSelect = async (
+    pos: { lat: number; lng: number },
+    setOpen: (v: boolean) => void
+  ) => {
+    setUserLocation(pos);
+    setOpen(false);
+    setShowPollenDetailsChart(true, '', null, pos.lat, pos.lng);
+    setChartLoading(true);
+    try {
+      await fetchChart({
+        lat: pos.lat,
+        lng: pos.lng,
+        pollen: pollenSelected.apiKey,
+        date: pollenSelected.defaultBaseDate,
+        forecast: { hour: 0 },
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setChartLoading(false);
+    }
+  };
   useEffect(() => {
     if (!mapData) return;
 
@@ -259,12 +279,15 @@ export const ForecastMapContainer = () => {
   useEffect(() => {
     pollenKeyRef.current = pollenSelected.apiKey;
   }, [pollenSelected.apiKey]);
+
   useEffect(() => {
-    clearCurrentLocation();
-    setUserLocation(null);
-  }, [pathname]);
+    usePollenDetailsChartStore.getState().setShow(false, '', null, null, null);
+    usePollenDetailsChartStore.getState().latitude = null;
+    usePollenDetailsChartStore.getState().longitude = null;
+  }, []);
+
   return (
-    <div className="relative h-screen w-screen">
+    <>
       <ForecastMap
         pollenData={pollenData}
         onRegionChange={handleRegionChange}
@@ -272,16 +295,12 @@ export const ForecastMapContainer = () => {
         currentDate={pollenSelected.defaultBaseDate}
         gridCellsResolution={gridCellsResolution}
       />
-
       <span className="absolute top-8 right-6 z-50 flex flex-col items-start gap-2">
         <SearchCardToggle title={tSearch('title_tooltip_search')}>
           {(open, setOpen) => (
             <LocationSearch
               open={open}
-              onSelect={(pos) => {
-                setUserLocation(pos);
-                setOpen(false);
-              }}
+              onSelect={(pos) => handleLocationSelect(pos, setOpen)}
               currentDate={pollenSelected.defaultBaseDate}
               pollenSelected={pollenSelected.apiKey}
               boundary={getRegionBounds()}
@@ -293,9 +312,14 @@ export const ForecastMapContainer = () => {
           tooltipText={tLocation('title_tooltip_location')}
           currentDate={pollenSelected.defaultBaseDate}
           pollenSelected={pollenSelected.apiKey}
+          mode="forecast"
+          hour={0}
         />
       </span>
-      <div className="absolute top-8 left-8 z-50 flex flex-col gap-4">
+      <div
+        className="absolute top-8 z-50 flex flex-col gap-4 transition-all duration-300"
+        style={{ left: 30 + sidebarWidth }}
+      >
         <PanelHeader title={t('title')} iconSrc="/zaum.png" />
         {partialLoading && (
           <div className="fixed inset-0 flex justify-center items-center bg-card/70 z-100">
@@ -306,7 +330,9 @@ export const ForecastMapContainer = () => {
           value={pollenSelected}
           onChange={handlePollenChange}
           onToggle={(open) => setSelectorOpen(open)}
-          options={Object.values(POLLENS)}
+          options={POLLEN_ENTRIES.map((entry) => entry as PollenConfig)}
+          getLabel={(item) => item.label}
+          getKey={(item) => item.apiKey}
         />
         {showPollenDetailsChart && !selectorOpen && (
           <PollenDetailsChart
@@ -314,11 +340,19 @@ export const ForecastMapContainer = () => {
             currentDate={pollenSelected.defaultBaseDate}
             pollenSelected={pollenSelected.apiKey}
             loading={chartLoading}
+            view="forecast"
           />
         )}
       </div>
 
-      <div className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 -translate-x-1/2 z-50">
+      <div
+        className="absolute bottom-16 sm:bottom-16 md:bottom-13 left-1/2 z-40 transition-all duration-300"
+        style={{
+          transform: isLargeScreen
+            ? `translateX(calc(-50% + ${sidebarWidth}px))`
+            : 'translateX(-50%)',
+        }}
+      >
         <PollenTimeline
           setPlaying={handlePlayPause}
           playing={playing}
@@ -329,14 +363,26 @@ export const ForecastMapContainer = () => {
       </div>
 
       <div
-        className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 2xl:left-8 2xl:translate-x-0 2xl:bottom-14"
+        className="absolute z-50 transition-all duration-300"
+        style={{
+          bottom: isLargeScreen ? 50 : 16,
+          left: isLargeScreen
+            ? sidebarWidth > 0
+              ? `${sidebarWidth + 30}px`
+              : '30px'
+            : '50%',
+          transform: isLargeScreen ? 'translateX(0)' : 'translateX(-50%)',
+        }}
         onMouseEnter={() => setLegendOpen(true)}
         onMouseLeave={() => setLegendOpen(false)}
       >
-        <PollenLegend width={350} height={25} />
+        <PollenLegend width={300} height={25} />
       </div>
 
-      <div className="fixed left-10 bottom-40 2xl:bottom-24">
+      <div
+        className="absolute bottom-45 2xl:bottom-24 transition-all duration-300"
+        style={{ left: 30 + sidebarWidth }}
+      >
         <PollenLegendCard
           open={legendOpen}
           levels={getLevelsForLegend(pollenSelected.apiKey)}
@@ -345,7 +391,7 @@ export const ForecastMapContainer = () => {
       </div>
 
       {loading && <LoadingOverlay message={t('message_loading')} />}
-    </div>
+    </>
   );
 };
 

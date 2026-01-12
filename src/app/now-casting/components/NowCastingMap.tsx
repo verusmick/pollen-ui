@@ -1,7 +1,7 @@
 'use client';
-import { getInitialViewState, getRegionGeo } from '@/app/forecast/utils';
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeckGL } from '@deck.gl/react';
-import { useEffect, useMemo, useState } from 'react';
 import { TileLayer } from '@deck.gl/geo-layers';
 import {
   GeoJsonLayer,
@@ -9,45 +9,102 @@ import {
   BitmapLayer,
   IconLayer,
 } from '@deck.gl/layers';
-
+import { FlyToInterpolator } from 'deck.gl';
 import type { Feature, FeatureCollection } from 'geojson';
-import bavariaGeo from '@/data/bavaria.geo.json';
+import dayjs from 'dayjs';
+
 import { MapZoomControls } from '@/app/components';
-import { MapTooltip } from '@/app/forecast/components';
-import { useCurrentLocationStore } from '@/app/stores';
+import {
+  useCurrentLocationStore,
+  usePartialLoadingStore,
+  useSearchLocationStore,
+} from '@/app/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
+import { getInitialViewState } from '@/app/now-casting/utils';
+import { getRegionGeo } from '@/app/utils/maps';
+import { usePollenChart } from '@/app/hooks';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
+import { debounce, getBoundsFromViewState } from '@/utils';
+import bavariaGeo from '@/data/bavaria.geo.json';
+import germanyGeo from '@/data/germany.geo.json';
+
+interface NowCastingMapProps {
+  pollenData: Array<[number, number, number | null]>;
+  gridCellsResolution: number;
+  userLocation: { lat: number; lng: number } | null;
+  pollenSelected: string;
+  currentDate: string;
+  onRegionChange: (arg: {
+    bBox: [number, number, number, number];
+    zoom: number;
+  }) => void;
+  resolution: 1 | 2 | 3;
+}
 
 export default function NowCastingMap({
   pollenData,
   gridCellsResolution,
   userLocation,
-}: {
-  pollenData: any;
-  gridCellsResolution: number;
-  userLocation: { lat: number; lng: number } | null;
-}) {
+  pollenSelected,
+  currentDate,
+  onRegionChange,
+  resolution,
+}: NowCastingMapProps) {
   const [viewMapState, setViewMapState] = useState(getInitialViewState);
-  const [tooltipInfo, setTooltipInfo] = useState<{
-    object: any;
-    x: number;
-    y: number;
-  } | null>(null);
 
+  const { setChartLoading } = usePartialLoadingStore();
+  const { fetchChart } = usePollenChart();
+  const { lat: searchLat, lng: searchlong, name } = useSearchLocationStore();
+  const {
+    setShow: setShowPollenDetailsChart,
+    latitude: pollenDetailsChartLatitude,
+    longitude: pollenDetailsChartLongitude,
+  } = usePollenDetailsChartStore();
   const {
     lat: currentLocationLat,
-    lng: currentLocationLng,
+    lng: currentLocationLong,
     clearLocation: clearCurrentLocation,
-  } = useCurrentLocationStore();
+  } = useCurrentLocationStore((state) => state);
 
-  // Calcula la ubicación a mostrar
-  const locationToShow = useMemo(() => {
-    if (userLocation) return userLocation;
-    if (currentLocationLat && currentLocationLng)
-      return { lat: currentLocationLat, lng: currentLocationLng };
-    return null;
-  }, [userLocation, currentLocationLat, currentLocationLng]);
+  const debouncedRegionUpdate = useRef(
+    debounce((viewState) => {
+      const bBox = getBoundsFromViewState(viewState);
+      const zoom = viewState.zoom;
 
-  // GridCells
+      onRegionChange?.({ bBox, zoom });
+    }, 80)
+  ).current;
+
+  const handleGridCellClick = useCallback(
+    async (clickLat: number, clickLon: number) => {
+      setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
+      setChartLoading(true);
+      const nowRaw = dayjs();
+      const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
+
+      try {
+        await fetchChart({
+          lat: clickLat,
+          lng: clickLon,
+          pollen: pollenSelected,
+          date: currentDate,
+          nowcasting: { hour: alignedHour, nhours: 48 },
+        });
+      } catch (err) {
+        console.error('NowCastingMap handleGridCellClick error:', err);
+      } finally {
+        setChartLoading(false);
+      }
+    },
+    [
+      fetchChart,
+      setChartLoading,
+      pollenSelected,
+      currentDate,
+      setShowPollenDetailsChart,
+    ]
+  );
+
   const gridCells = useMemo(() => {
     if (!pollenData || pollenData.length === 0) return [];
 
@@ -55,21 +112,22 @@ export default function NowCastingMap({
 
     return filteredPoints.map(([lat, lon, intensityRaw]) => {
       const intensity = typeof intensityRaw === 'number' ? intensityRaw : 0;
-      const halfCell = gridCellsResolution / 2;
+      let halfCell = 0.0042;
+      if (resolution === 2) halfCell = 0.0083;
+      if (resolution === 3) halfCell = 0.0167;
 
       const quadrant = [
         [lon - halfCell, lat - halfCell], // bottom-left
         [lon + halfCell, lat - halfCell], // bottom-right
         [lon + halfCell, lat + halfCell], // top-right
         [lon - halfCell, lat + halfCell], // top-left
-        [lon - halfCell, lat - halfCell], // cerrar polígono
+        [lon - halfCell, lat - halfCell],
       ];
 
       return { polygon: quadrant, intensity, position: [lon, lat] };
     });
-  }, [pollenData, gridCellsResolution]);
+  }, [pollenData]);
 
-  // Capa de polen
   const pollenGridCellsLayer = useMemo(
     () =>
       new PolygonLayer({
@@ -78,21 +136,11 @@ export default function NowCastingMap({
         getPolygon: (d: any) => d.polygon,
         getFillColor: (d: any) => {
           const intensity = d.intensity;
-          if (intensity === null) return [0, 0, 0, 0];
-          switch (intensity) {
-            case 2:
-              return [0, 100, 0, 60];
-            case 4:
-              return [154, 205, 50, 60];
-            case 6:
-              return [255, 255, 0, 60];
-            case 8:
-              return [255, 165, 0, 60];
-            case 9:
-              return [255, 0, 0, 60];
-            default:
-              return [0, 0, 0, 0];
-          }
+          if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
+          else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
+          else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
+          else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
+          else return [255, 0, 0, 60]; // Red - high
         },
         getLineColor: [0, 0, 0, 10],
         filled: true,
@@ -101,20 +149,29 @@ export default function NowCastingMap({
         pickable: true,
         autoHighlight: true,
         highlightColor: [255, 255, 255, 100],
+        onClick: (info: any) => {
+          if (!info.object) return;
+          const pos = info.object.position;
+          if (!pos || pos.length < 2) return;
+          const [lon, lat] = pos;
+          handleGridCellClick(lat, lon);
+        },
       }),
-    [gridCells]
+    [gridCells, handleGridCellClick]
   );
 
-  // Capa de pin del usuario
   const pinIconLayer = useMemo(() => {
-    if (!locationToShow) return null;
+    if (!pollenDetailsChartLatitude || !pollenDetailsChartLongitude)
+      return null;
 
     return new IconLayer({
-      id: `current-location-marker-${locationToShow.lat}-${locationToShow.lng}`,
-      data: [{ position: [locationToShow.lng, locationToShow.lat] }],
+      id: 'search-marker',
+      data: [
+        { position: [pollenDetailsChartLongitude, pollenDetailsChartLatitude] },
+      ],
       getIcon: () => 'marker',
       getColor: () => [33, 33, 33],
-      getPosition: (d) => d.position,
+      getPosition: (d: any) => d.position,
       getSize: () => 41,
       iconAtlas: '/map_icon.png',
       iconMapping: {
@@ -129,9 +186,8 @@ export default function NowCastingMap({
       },
       pickable: true,
     });
-  }, [locationToShow]);
+  }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude]);
 
-  // Capa base
   const baseMapLayer = useMemo(
     () =>
       new TileLayer({
@@ -140,7 +196,7 @@ export default function NowCastingMap({
         minZoom: 0,
         maxZoom: 19,
         tileSize: 256,
-        renderSubLayers: (props) => {
+        renderSubLayers: (props: any) => {
           const { bbox, data, id } = props.tile;
           const bounds: [number, number, number, number] =
             'west' in bbox
@@ -152,7 +208,6 @@ export default function NowCastingMap({
     []
   );
 
-  // Bavaria
   const bavariaGeoJsonLayer = useMemo(() => {
     const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
     if (region !== 'BAVARIA') return null;
@@ -167,9 +222,8 @@ export default function NowCastingMap({
     });
   }, []);
 
-  // Máscara fuera de Alemania
   const germanyGeoJsonLayer = useMemo(() => {
-    const bavariaCoords = bavariaGeo.features[0].geometry.coordinates;
+    const bavariaCoords = germanyGeo.features[0].geometry.coordinates;
     const world = [
       [-180, -90],
       [-180, 90],
@@ -193,31 +247,58 @@ export default function NowCastingMap({
     });
   }, []);
 
-  const handleViewStateChange = (e: any) => setViewMapState(e.viewState);
+  const handleViewStateChange = (e: any) => {
+    const nextViewState = e.viewState;
+    setViewMapState(nextViewState);
+    debouncedRegionUpdate(nextViewState);
+  };
+
   const handleCursor = ({ isDragging, isHovering }: any) =>
     isDragging ? 'grabbing' : isHovering ? 'pointer' : 'grab';
 
-  useEffect(() => {
+  const openChartAtLocation = (lat: number, lng: number) => {
     clearCurrentLocation();
-  }, []);
+    setViewMapState((prev) => ({
+      ...prev,
+      longitude: lng,
+      latitude: lat,
+      zoom: 10,
+      transitionDuration: 1000,
+      transitionInterpolator: new FlyToInterpolator(),
+    }));
+    setShowPollenDetailsChart(true, '', null, lat, lng);
+  };
+
+  const layers = [
+    baseMapLayer,
+    bavariaGeoJsonLayer,
+    germanyGeoJsonLayer,
+    pollenGridCellsLayer,
+    pinIconLayer,
+  ].filter(Boolean) as any[];
+
+  useEffect(() => {
+    if (searchLat && searchlong) {
+      openChartAtLocation(searchLat, searchlong);
+    }
+  }, [searchLat, searchlong]);
+
+  useEffect(() => {
+    if (currentLocationLat && currentLocationLong) {
+      openChartAtLocation(currentLocationLat, currentLocationLong);
+    }
+  }, [currentLocationLat, currentLocationLong]);
 
   return (
     <>
       <DeckGL
         controller
-        layers={[
-          baseMapLayer,
-          bavariaGeoJsonLayer,
-          germanyGeoJsonLayer,
-          pollenGridCellsLayer,
-          pinIconLayer,
-        ]}
+        layers={layers}
         style={{ width: '100vw', height: '100vh', cursor: 'pointer' }}
         viewState={viewMapState}
         onViewStateChange={handleViewStateChange}
         getCursor={handleCursor}
       />
-      <MapTooltip hoverInfo={tooltipInfo} />
       <MapZoomControls
         zoom={viewMapState.zoom}
         minZoom={viewMapState.minZoom}

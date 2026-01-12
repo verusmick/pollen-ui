@@ -1,5 +1,5 @@
 'use client';
-import { useLocationSearch } from '@/app/hooks/useLocationSearch';
+import { useLocationSearch } from '@/app/hooks';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { BiSearch, BiX } from 'react-icons/bi';
@@ -19,7 +19,7 @@ export const LocationSearch = ({
   pollenSelected,
   boundary,
 }: LocationSearchProps) => {
-  const t = useTranslations('forecastPage.search');
+  const t = useTranslations('Components.search');
   const nominatimApi = process.env.NEXT_PUBLIC_NOMINATIM_API!;
 
   const {

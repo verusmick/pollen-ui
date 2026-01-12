@@ -1,4 +1,4 @@
-import { REGION_BOUNDS } from '@/app/forecast/constants';
+import { REGION_BOUNDS } from "@/app/constants/maps/regionBounds";
 // const viewMapInitialState = {
 //   longitude: 11.5,
 //   latitude: 48.8,
