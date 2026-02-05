@@ -21,7 +21,7 @@ import {
 } from '@/app/stores';
 import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import { getInitialViewState } from '@/app/now-casting/utils';
-import { getRegionGeo } from '@/app/utils/maps';
+import { getRegionGeo } from '@/utils/maps';
 import { usePollenChart } from '@/app/hooks';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import { debounce, getBoundsFromViewState } from '@/utils';

@@ -1,6 +1,6 @@
 import { MAP_LEVEL_COLORS } from "@/app/constants";
 import { PollenLevel } from "@/app/types";
-import { getDefaultBaseDate } from "@/app/utils";
+import { getDefaultBaseDate } from "@/utils";
 
 export const POLLENS = {
   ALNUS: {

@@ -28,7 +28,7 @@ import {
   usePartialLoadingStore,
   useSearchLocationStore,
 } from '@/app/stores';
-import { getRegionGeo } from '@/app/utils/maps';
+import { getRegionGeo } from '@/utils/maps';
 import { usePollenChart } from '@/app/hooks';
 import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 

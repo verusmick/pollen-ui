@@ -44,11 +44,11 @@ import {
 } from '@/app/stores';
 import { useSidebar } from '@/app/context';
 import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
-import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
+import { computeResFromZoom, getGridCellsResolution } from '@/utils/maps';
 
 const PollenDetailsChart = dynamic(
   () =>
-    import('../../../../components/ui/PollenDetailsChart').then(
+    import('@/components/ui/PollenDetailsChart').then(
       (mod) => mod.PollenDetailsChart
     ),
   { ssr: false }

@@ -45,7 +45,7 @@ import {
   getAdjacentHour,
   type HourPoint,
 } from '@/app/now-casting/utils';
-import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
+import { computeResFromZoom, getGridCellsResolution } from '@/utils/maps';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
