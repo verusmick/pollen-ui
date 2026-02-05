@@ -7,7 +7,7 @@ import { TbLocationFilled } from 'react-icons/tb';
 import { useTranslations } from 'next-intl';
 
 import { Tooltip } from '@/components';
-import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
+import { useCurrentLocationStore, usePartialLoadingStore } from '@/stores';
 import { usePollenChart } from '@/hooks';
 
 interface LocationButtonProps {

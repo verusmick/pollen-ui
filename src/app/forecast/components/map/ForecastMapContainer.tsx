@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import { usePollenDetailsChartStore } from '@/app/stores/pollen';
+import { usePollenDetailsChartStore } from '@/stores/pollen';
 
 import { ForecastMap } from '@/app/forecast/components';
 
@@ -41,7 +41,7 @@ import {
   useCoordinatesStore,
   useLoadingStore,
   usePartialLoadingStore,
-} from '@/app/stores';
+} from '@/stores';
 import { useSidebar } from '@/context';
 import { useIsLargeScreen, usePollenChart } from '@/hooks';
 import { computeResFromZoom, getGridCellsResolution } from '@/utils/maps';

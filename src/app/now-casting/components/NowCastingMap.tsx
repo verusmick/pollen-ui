@@ -18,8 +18,8 @@ import {
   useCurrentLocationStore,
   usePartialLoadingStore,
   useSearchLocationStore,
-} from '@/app/stores';
-import { usePollenDetailsChartStore } from '@/app/stores/pollen';
+} from '@/stores';
+import { usePollenDetailsChartStore } from '@/stores/pollen';
 import { getInitialViewState } from '@/app/now-casting/utils';
 import { getRegionGeo } from '@/utils/maps';
 import { usePollenChart } from '@/hooks';

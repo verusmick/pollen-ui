@@ -27,10 +27,10 @@ import {
   useCurrentLocationStore,
   usePartialLoadingStore,
   useSearchLocationStore,
-} from '@/app/stores';
+} from '@/stores';
 import { getRegionGeo } from '@/utils/maps';
 import { usePollenChart } from '@/hooks';
-import { usePollenDetailsChartStore } from '@/app/stores/pollen';
+import { usePollenDetailsChartStore } from '@/stores/pollen';
 
 // Define the grid cell size in degrees
 // const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
