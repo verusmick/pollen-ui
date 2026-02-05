@@ -29,7 +29,7 @@ import {
   useSearchLocationStore,
 } from '@/app/stores';
 import { getRegionGeo } from '@/utils/maps';
-import { usePollenChart } from '@/app/hooks';
+import { usePollenChart } from '@/hooks';
 import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 
 // Define the grid cell size in degrees

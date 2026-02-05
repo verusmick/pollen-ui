@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchLocationStore } from '@/app/stores/maps/searchLocationStore';
 import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import { usePartialLoadingStore } from '@/app/stores';
-import { usePollenChart } from '@/app/hooks';
+import { usePollenChart } from '@/hooks';
 
 export const useLocationSearch = ({
   currentDate,

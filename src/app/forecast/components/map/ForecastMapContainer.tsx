@@ -43,7 +43,7 @@ import {
   usePartialLoadingStore,
 } from '@/app/stores';
 import { useSidebar } from '@/context';
-import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
+import { useIsLargeScreen, usePollenChart } from '@/hooks';
 import { computeResFromZoom, getGridCellsResolution } from '@/utils/maps';
 
 const PollenDetailsChart = dynamic(

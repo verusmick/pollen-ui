@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 
 import { Tooltip } from '@/components';
 import { useCurrentLocationStore, usePartialLoadingStore } from '@/app/stores';
-import { usePollenChart } from '@/app/hooks';
+import { usePollenChart } from '@/hooks';
 
 interface LocationButtonProps {
   tooltipText: string;

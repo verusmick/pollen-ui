@@ -39,7 +39,7 @@ import {
   usePollenPrefetch,
 } from '@/app/now-casting/hooks';
 import { useSidebar } from '@/context';
-import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
+import { useIsLargeScreen, usePollenChart } from '@/hooks';
 import {
   buildHourTimeline,
   getAdjacentHour,

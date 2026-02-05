@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BiChevronDown } from 'react-icons/bi';
-import { useClickOutside } from '@/app/hooks';
+import { useClickOutside } from '@/hooks';
 interface DropdownSelectorProps<T> {
   value?: T;
   onChange?: (value: T) => void;
