@@ -1,5 +1,5 @@
 import { MAP_LEVEL_COLORS } from '@/constants';
-import { PollenLevel } from '@/app/types';
+import { PollenLevel } from '@/types';
 import { getDefaultBaseDate } from '@/utils';
 
 export const POLLENS = {
