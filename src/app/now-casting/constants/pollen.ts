@@ -1,4 +1,4 @@
-import { MAP_LEVEL_COLORS } from "@/app/constants";
+import { MAP_LEVEL_COLORS } from "@/constants";
 import { PollenLevel } from "@/app/types";
 import { getDefaultBaseDate } from "@/utils";
 

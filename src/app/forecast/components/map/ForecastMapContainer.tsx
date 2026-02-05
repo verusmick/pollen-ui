@@ -16,7 +16,7 @@ import {
   type PollenConfig,
 } from '@/app/forecast/constants';
 
-import { getRegionBounds } from '@/app/constants';
+import { getRegionBounds } from '@/constants';
 
 import {
   useHourlyForecast,

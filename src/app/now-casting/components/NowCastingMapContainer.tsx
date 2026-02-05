@@ -32,7 +32,7 @@ import {
   POLLEN_ENTRIES,
   PollenConfig,
 } from '@/app/now-casting/constants';
-import { getRegionBounds } from '@/app/constants';
+import { getRegionBounds } from '@/constants';
 import {
   useHourlyNowCasting,
   usePollenPlayback,
