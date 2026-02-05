@@ -26,7 +26,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/components';
 import { usePartialLoadingStore } from '@/stores';
-import { COLORS } from '@/app/styles/colors';
+import { COLORS } from '@/styles/colors';
 import { MAP_LEVEL_COLORS } from '@/constants';
 
 interface PollenData {
