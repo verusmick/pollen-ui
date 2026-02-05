@@ -13,7 +13,7 @@ import { FlyToInterpolator } from 'deck.gl';
 import type { Feature, FeatureCollection } from 'geojson';
 import dayjs from 'dayjs';
 
-import { MapZoomControls } from '@/app/components';
+import { MapZoomControls } from '@/components';
 import {
   useCurrentLocationStore,
   usePartialLoadingStore,

@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { ReactQueryWrapper } from './forecast/provider/providers';
 
 import './globals.css';
-import { ClientLayout } from './components/layout';
+import { ClientLayout } from '../components/layout';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

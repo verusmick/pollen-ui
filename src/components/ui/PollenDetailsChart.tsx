@@ -24,7 +24,7 @@ import {
 } from '@/app/now-casting/constants';
 
 import { useTranslations } from 'next-intl';
-import { LoadingSpinner } from '@/app/components';
+import { LoadingSpinner } from '@/components';
 import { usePartialLoadingStore } from '@/app/stores';
 import { COLORS } from '@/app/styles/colors';
 import { MAP_LEVEL_COLORS } from '@/app/constants';

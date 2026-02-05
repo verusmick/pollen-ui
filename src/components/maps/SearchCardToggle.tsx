@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef } from 'react';
 import { BiSearch, BiX } from 'react-icons/bi';
-import { Tooltip } from '@/app/components';
+import { Tooltip } from '@/components';
 import { useClickOutside } from '@/app/hooks';
 
 interface SearchCardToggleProps {

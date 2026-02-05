@@ -17,7 +17,7 @@ import {
   PollenLegend,
   PollenLegendCard,
   SearchCardToggle,
-} from '@/app/components';
+} from '@/components';
 
 import {
   useCoordinatesStore,

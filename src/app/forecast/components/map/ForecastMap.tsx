@@ -22,7 +22,7 @@ import { MapTooltip } from '@/app/forecast/components';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import { debounce, getBoundsFromViewState } from '@/utils';
 import { getInitialViewState } from '@/app/forecast/utils';
-import { MapZoomControls } from '@/app/components';
+import { MapZoomControls } from '@/components';
 import {
   useCurrentLocationStore,
   usePartialLoadingStore,

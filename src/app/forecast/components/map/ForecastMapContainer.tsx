@@ -36,7 +36,7 @@ import {
   PollenLegendCard,
   PollenLegend,
   PollenTimeline,
-} from '@/app/components';
+} from '@/components';
 import {
   useCoordinatesStore,
   useLoadingStore,
@@ -48,7 +48,7 @@ import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
 
 const PollenDetailsChart = dynamic(
   () =>
-    import('../../../components/ui/PollenDetailsChart').then(
+    import('../../../../components/ui/PollenDetailsChart').then(
       (mod) => mod.PollenDetailsChart
     ),
   { ssr: false }
