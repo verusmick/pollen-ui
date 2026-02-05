@@ -42,7 +42,7 @@ import {
   useLoadingStore,
   usePartialLoadingStore,
 } from '@/app/stores';
-import { useSidebar } from '@/app/context';
+import { useSidebar } from '@/context';
 import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
 import { computeResFromZoom, getGridCellsResolution } from '@/utils/maps';
 

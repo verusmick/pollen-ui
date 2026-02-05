@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Sidebar } from './Sidebar';
-import { SidebarContext } from '@/app/context';
+import { SidebarContext } from '@/context';
 
 export default function ClientLayout({
   children,

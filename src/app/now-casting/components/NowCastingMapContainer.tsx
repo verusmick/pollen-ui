@@ -38,7 +38,7 @@ import {
   usePollenPlayback,
   usePollenPrefetch,
 } from '@/app/now-casting/hooks';
-import { useSidebar } from '@/app/context';
+import { useSidebar } from '@/context';
 import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
 import {
   buildHourTimeline,
