@@ -21,6 +21,8 @@ export function Sidebar({
   const routes = [
     { label: 'Forecast', href: '/forecast' },
     { label: 'Nowcasting', href: '/now-casting' },
+    { label: 'Rules And Notifications', href: '/rules-and-notifications' },
+    { label: 'Alerts And Correction Factors', href: '/alerts-and-correction-factors' },
   ];
 
   const sidebarWidth = collapsed ? 0 : 256;
@@ -73,6 +75,7 @@ export function Sidebar({
                 })}
               </ul>
             </nav>
+            
           </>
         )}
       </aside>
