@@ -29,14 +29,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // 🔹 En Next 16 esto es async
   const cookieStore = await cookies();
   const themeCookie = cookieStore.get('theme')?.value;
 
   // const themeClass = themeCookie === 'dark' ? 'dark' : '';
   const themeClass = themeCookie === 'dark' ? 'dark' : 'dark';
-
-  
 
   return (
     <html lang="en" className={themeClass}>
