@@ -1,6 +1,6 @@
 'use client';
 
-import { useThemeStore } from '@/stores';
+import { useThemeStore } from '@/store';
 import { useEffect } from 'react';
 
 

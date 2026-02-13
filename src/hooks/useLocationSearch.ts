@@ -1,8 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { useSearchLocationStore } from '@/stores/maps/searchLocationStore';
-import { usePollenDetailsChartStore } from '@/stores/pollen';
-import { usePartialLoadingStore } from '@/stores';
+
+import { usePartialLoadingStore, useSearchLocationStore } from '@/store';
 import { usePollenChart } from '@/hooks';
 
 export const useLocationSearch = ({

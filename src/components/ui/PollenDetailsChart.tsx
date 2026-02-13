@@ -13,7 +13,6 @@ import {
   ReferenceLine,
 } from 'recharts';
 import dayjs from 'dayjs';
-import { usePollenDetailsChartStore } from '@/stores/pollen';
 import {
   getPollenByApiKey as getForecastPollenByApiKey,
   PollenApiKey as ForecastPollenApiKey,
@@ -25,7 +24,7 @@ import {
 
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/components';
-import { usePartialLoadingStore } from '@/stores';
+import { usePartialLoadingStore, usePollenDetailsChartStore } from '@/store';
 import { COLORS } from '@/styles/colors';
 import { MAP_LEVEL_COLORS } from '@/constants';
 

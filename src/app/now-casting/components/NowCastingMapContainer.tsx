@@ -24,8 +24,8 @@ import {
   useCurrentLocationStore,
   useLoadingStore,
   usePartialLoadingStore,
-} from '@/stores';
-import { usePollenDetailsChartStore } from '@/stores/pollen';
+  usePollenDetailsChartStore,
+} from '@/store';
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,

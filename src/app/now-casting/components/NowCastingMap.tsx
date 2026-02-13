@@ -17,9 +17,9 @@ import { MapZoomControls } from '@/components';
 import {
   useCurrentLocationStore,
   usePartialLoadingStore,
+  usePollenDetailsChartStore,
   useSearchLocationStore,
-} from '@/stores';
-import { usePollenDetailsChartStore } from '@/stores/pollen';
+} from '@/store';
 import { getInitialViewState } from '@/app/now-casting/utils';
 import { getRegionGeo } from '@/utils/maps';
 import { usePollenChart } from '@/hooks';
