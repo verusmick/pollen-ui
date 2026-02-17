@@ -1,4 +1,4 @@
-import { REGION_BOUNDS } from "@/constants";
+import { REGION_BOUNDS } from "@/app/constants";
 
 export const getInitialViewState = () => {
   const region = process.env.NEXT_PUBLIC_REGION?.toUpperCase() || 'BAVARIA';
