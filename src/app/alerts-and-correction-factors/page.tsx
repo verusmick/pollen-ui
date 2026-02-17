@@ -1,6 +1,9 @@
 'use client';
 import { useThemeStore } from '@/store';
 import { useEffect } from 'react';
+import { AlertsList, FiltersBar, Tabs } from './components';
+
+
 
 export default function AlertsAndCorrectionFactorsPage() {
   const setTheme = useThemeStore((s) => s.setTheme);
@@ -10,8 +13,12 @@ export default function AlertsAndCorrectionFactorsPage() {
   }, []);
   return (
     <main>
-      <div className="w-screen h-screen">
-        <h2> Alerts and correction Factors Page</h2>
+      <div className="flex flex-col h-full bg-background text-foreground">
+        <Tabs />
+        <div className="p-4 space-y-4 overflow-hidden">
+          <FiltersBar />
+          <AlertsList />
+        </div>
       </div>
     </main>
   );
