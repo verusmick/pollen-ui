@@ -22,15 +22,15 @@ import { MapTooltip } from '@/app/forecast/components';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import { debounce, getBoundsFromViewState } from '@/utils';
 import { getInitialViewState } from '@/app/forecast/utils';
-import { MapZoomControls } from '@/app/components';
+import { MapZoomControls } from '@/components';
 import {
   useCurrentLocationStore,
   usePartialLoadingStore,
   useSearchLocationStore,
-} from '@/app/stores';
-import { getRegionGeo } from '@/app/utils/maps';
-import { usePollenChart } from '@/app/hooks';
-import { usePollenDetailsChartStore } from '@/app/stores/pollen';
+  usePollenDetailsChartStore,
+} from '@/store';
+import { getRegionGeo } from '@/utils/maps';
+import { usePollenChart } from '@/hooks';
 
 // Define the grid cell size in degrees
 // const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -95,7 +95,7 @@ export default function ForecastMap({
       pollenSelected,
       currentDate,
       setShowPollenDetailsChart,
-    ]
+    ],
   );
 
   // Convert your API data to grid cells
@@ -133,10 +133,14 @@ export default function ForecastMap({
         getFillColor: (d: any) => {
           const intensity = d.intensity;
           // Your color scale based on pollen intensity
-          if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
-          else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
-          else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
-          else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
+          if (intensity <= 0.2)
+            return [0, 100, 0, 60]; // Dark Green - low
+          else if (intensity <= 0.4)
+            return [154, 205, 50, 60]; // Yellow Green
+          else if (intensity <= 0.6)
+            return [255, 255, 0, 60]; // Yellow
+          else if (intensity <= 0.8)
+            return [255, 165, 0, 60]; // Orange
           else return [255, 0, 0, 60]; // Red - high
         },
         getLineColor: [0, 0, 0, 10],
@@ -165,7 +169,7 @@ export default function ForecastMap({
           handleGridCellClick(info.coordinate[1], info.coordinate[0]);
         },
       }),
-    [gridCells, handleGridCellClick]
+    [gridCells, handleGridCellClick],
   );
 
   const pinIconLayer = useMemo(() => {
@@ -224,7 +228,7 @@ export default function ForecastMap({
           });
         },
       }),
-    []
+    [],
   );
 
   // Bavaria boundary
@@ -281,7 +285,7 @@ export default function ForecastMap({
       const zoom = viewState.zoom;
 
       onRegionChange?.({ bBox, zoom });
-    }, 80)
+    }, 80),
   ).current;
 
   const handleViewStateChange = useCallback((e: any) => {

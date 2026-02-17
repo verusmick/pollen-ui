@@ -1,0 +1,57 @@
+{
+  "HomePage": {
+    "title": "Bonjour le monde 2"
+  },
+  "Sidebar": {
+    "title": "PollenScience.eu",
+    "maps": "Cartes"
+  },
+  "Components": {
+    "pollen": "pollen/m³",
+    "search": {
+      "title_tooltip_search": "Rechercher",
+      "loading": "Chargement",
+      "placeholder_input_search": "Rechercher un lieu ou un code postal",
+      "no_results": "Aucun résultat trouvé"
+    },
+    "show_your_location": {
+      "title_tooltip_location": "Afficher votre position",
+      "name_company": "Zaum",
+      "description_card_location": "Cliquez ci-dessous pour autoriser l'accès à votre position.",
+      "description_permission_granted": "Autorisation accordée ! Vous pouvez maintenant accéder aux données de localisation.",
+      "description_permission_denied": "Autorisation refusée. Veuillez l'activer dans les paramètres du navigateur.",
+      "title_button_location": "Votre position",
+      "loading": "Obtention de la position"
+    },
+    "chart_location": {
+      "getting_location": "Obtention de la position...",
+      "loading_name": "Chargement du nom du lieu...",
+      "msg_chart_no_data": "Aucune donnée disponible pour ces coordonnées"
+    },
+    "legend": {
+      "legend_title": "Plage de niveau d’allergie",
+      "none": "Aucun",
+      "very_low": "Très faible",
+      "low": "Faible",
+      "moderate": "Modéré",
+      "high": "Élevé",
+      "very_high": "Très élevé",
+      "none_leg": "Aucun risque d’allergie",
+      "very_low_leg": "Risque d’allergie très faible",
+      "low_leg": "Risque d’allergie faible",
+      "moderate_leg": "Risque d’allergie modéré",
+      "high_leg": "Risque d’allergie élevé",
+      "very_high_leg": "Risque d’allergie très élevé"
+    }
+  },
+  "forecastPage": {
+    "title": "Carte des prévisions",
+    "description": "Carte interactive des prévisions de pollen",
+    "message_loading": "Carte des prévisions de pollen",
+    "pollen": "pollen/m³"
+  },
+  "nowCastingPage": {
+    "title": "Nowcasting",
+    "message_loading": "Carte de nowcasting"
+  }
+}

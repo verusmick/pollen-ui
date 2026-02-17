@@ -1,0 +1,57 @@
+{
+  "HomePage": {
+    "title": "Hallo wereld 2"
+  },
+  "Sidebar": {
+    "title": "PollenScience.eu",
+    "maps": "Kaarten"
+  },
+  "Components": {
+    "pollen": "pollen/m³",
+    "search": {
+      "title_tooltip_search": "Zoeken",
+      "loading": "Laden",
+      "placeholder_input_search": "Zoek locatie of postcode",
+      "no_results": "Geen resultaten gevonden"
+    },
+    "show_your_location": {
+      "title_tooltip_location": "Toon uw locatie",
+      "name_company": "Zaum",
+      "description_card_location": "Klik hieronder om toestemming te geven voor toegang tot uw locatie.",
+      "description_permission_granted": "Toestemming verleend! U kunt nu locatiegegevens bekijken.",
+      "description_permission_denied": "Toestemming geweigerd. Schakel dit in via de browserinstellingen.",
+      "title_button_location": "Uw locatie",
+      "loading": "Locatie wordt opgehaald"
+    },
+    "chart_location": {
+      "getting_location": "Locatie wordt opgehaald...",
+      "loading_name": "Naam van locatie wordt geladen...",
+      "msg_chart_no_data": "Er zijn geen gegevens beschikbaar voor deze coördinaten"
+    },
+    "legend": {
+      "legend_title": "Allergieniveau bereik",
+      "none": "Geen",
+      "very_low": "Zeer laag",
+      "low": "Laag",
+      "moderate": "Matig",
+      "high": "Hoog",
+      "very_high": "Zeer hoog",
+      "none_leg": "Geen allergierisico",
+      "very_low_leg": "Zeer laag allergierisico",
+      "low_leg": "Laag allergierisico",
+      "moderate_leg": "Matig allergierisico",
+      "high_leg": "Hoog allergierisico",
+      "very_high_leg": "Zeer hoog allergierisico"
+    }
+  },
+  "forecastPage": {
+    "title": "Voorspellingskaart",
+    "description": "Interactieve pollenvoorspellingskaart",
+    "message_loading": "Pollenvoorspellingskaart",
+    "pollen": "pollen/m³"
+  },
+  "nowCastingPage": {
+    "title": "Nowcasting",
+    "message_loading": "Nowcastingkaart"
+  }
+}

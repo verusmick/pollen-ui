@@ -1,0 +1,57 @@
+{
+  "HomePage": {
+    "title": "مرحباً بالعالم 2"
+  },
+  "Sidebar": {
+    "title": "PollenScience.eu",
+    "maps": "الخرائط"
+  },
+  "Components": {
+    "pollen": "pollen/m³",
+    "search": {
+      "title_tooltip_search": "بحث",
+      "loading": "جارٍ التحميل",
+      "placeholder_input_search": "ابحث عن موقع أو رمز بريدي",
+      "no_results": "لم يتم العثور على نتائج"
+    },
+    "show_your_location": {
+      "title_tooltip_location": "إظهار موقعك",
+      "name_company": "Zaum",
+      "description_card_location": "انقر أدناه لطلب الإذن للوصول إلى موقعك.",
+      "description_permission_granted": "تم منح الإذن! يمكنك الآن الوصول إلى بيانات الموقع.",
+      "description_permission_denied": "تم رفض الإذن. يرجى تفعيله في إعدادات المتصفح.",
+      "title_button_location": "موقعك",
+      "loading": "جارٍ تحديد الموقع"
+    },
+    "chart_location": {
+      "getting_location": "جارٍ تحديد الموقع...",
+      "loading_name": "جارٍ تحميل اسم الموقع...",
+      "msg_chart_no_data": "لا توجد بيانات متاحة لهذه الإحداثيات"
+    },
+    "legend": {
+      "legend_title": "نطاق مستوى الحساسية",
+      "none": "لا يوجد",
+      "very_low": "منخفض جداً",
+      "low": "منخفض",
+      "moderate": "متوسط",
+      "high": "مرتفع",
+      "very_high": "مرتفع جداً",
+      "none_leg": "لا يوجد خطر للحساسية",
+      "very_low_leg": "خطر حساسية منخفض جداً",
+      "low_leg": "خطر حساسية منخفض",
+      "moderate_leg": "خطر حساسية متوسط",
+      "high_leg": "خطر حساسية مرتفع",
+      "very_high_leg": "خطر حساسية مرتفع جداً"
+    }
+  },
+  "forecastPage": {
+    "title": "خريطة التوقعات",
+    "description": "خريطة تفاعلية لتوقعات حبوب اللقاح",
+    "message_loading": "خريطة توقعات حبوب اللقاح",
+    "pollen": "pollen/m³"
+  },
+  "nowCastingPage": {
+    "title": "التنبؤ الفوري",
+    "message_loading": "خريطة التنبؤ الفوري"
+  }
+}

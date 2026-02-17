@@ -1,0 +1,57 @@
+{
+  "HomePage": {
+    "title": "Hola mundo 2"
+  },
+  "Sidebar": {
+    "title": "PollenScience.eu",
+    "maps": "Mapas"
+  },
+  "Components": {
+    "pollen": "pollen/m³",
+    "search": {
+      "title_tooltip_search": "Buscar",
+      "loading": "Cargando",
+      "placeholder_input_search": "Buscar ubicación o código postal",
+      "no_results": "No se encontraron resultados"
+    },
+    "show_your_location": {
+      "title_tooltip_location": "Mostrar tu ubicación",
+      "name_company": "Zaum",
+      "description_card_location": "Haz clic abajo para solicitar permiso para acceder a tu ubicación.",
+      "description_permission_granted": "¡Permiso concedido! Ahora puedes acceder a los datos de ubicación.",
+      "description_permission_denied": "Permiso denegado. Actívalo en la configuración del navegador.",
+      "title_button_location": "Tu ubicación",
+      "loading": "Obteniendo ubicación"
+    },
+    "chart_location": {
+      "getting_location": "Obteniendo ubicación...",
+      "loading_name": "Cargando nombre de ubicación...",
+      "msg_chart_no_data": "No hay datos disponibles para estas coordenadas"
+    },
+    "legend": {
+      "legend_title": "Rango del nivel de alergia",
+      "none": "Ninguno",
+      "very_low": "Muy bajo",
+      "low": "Bajo",
+      "moderate": "Moderado",
+      "high": "Alto",
+      "very_high": "Muy alto",
+      "none_leg": "Sin riesgo de alergia",
+      "very_low_leg": "Riesgo de alergia muy bajo",
+      "low_leg": "Riesgo de alergia bajo",
+      "moderate_leg": "Riesgo de alergia moderado",
+      "high_leg": "Riesgo de alergia alto",
+      "very_high_leg": "Riesgo de alergia muy alto"
+    }
+  },
+  "forecastPage": {
+    "title": "Mapa de previsión",
+    "description": "Mapa interactivo de previsión de polen",
+    "message_loading": "Mapa de previsión de polen",
+    "pollen": "pollen/m³"
+  },
+  "nowCastingPage": {
+    "title": "Nowcasting",
+    "message_loading": "Mapa de nowcasting"
+  }
+}

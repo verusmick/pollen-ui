@@ -5,8 +5,6 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import { usePollenDetailsChartStore } from '@/app/stores/pollen';
-
 import { ForecastMap } from '@/app/forecast/components';
 
 import {
@@ -16,7 +14,7 @@ import {
   type PollenConfig,
 } from '@/app/forecast/constants';
 
-import { getRegionBounds } from '@/app/constants';
+import { getRegionBounds } from '@/constants';
 
 import {
   useHourlyForecast,
@@ -36,19 +34,20 @@ import {
   PollenLegendCard,
   PollenLegend,
   PollenTimeline,
-} from '@/app/components';
+} from '@/components';
 import {
   useCoordinatesStore,
   useLoadingStore,
   usePartialLoadingStore,
-} from '@/app/stores';
-import { useSidebar } from '@/app/context';
-import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
-import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
+  usePollenDetailsChartStore,
+} from '@/store';
+import { useSidebar } from '@/context';
+import { useIsLargeScreen, usePollenChart } from '@/hooks';
+import { computeResFromZoom, getGridCellsResolution } from '@/utils/maps';
 
 const PollenDetailsChart = dynamic(
   () =>
-    import('../../../components/ui/PollenDetailsChart').then(
+    import('@/components/ui/PollenDetailsChart').then(
       (mod) => mod.PollenDetailsChart
     ),
   { ssr: false }
