@@ -13,16 +13,16 @@ import { FlyToInterpolator } from 'deck.gl';
 import type { Feature, FeatureCollection } from 'geojson';
 import dayjs from 'dayjs';
 
-import { MapZoomControls } from '@/components';
+import { MapZoomControls } from '@/app/components';
 import {
   useCurrentLocationStore,
   usePartialLoadingStore,
-  usePollenDetailsChartStore,
   useSearchLocationStore,
-} from '@/store';
+} from '@/app/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import { getInitialViewState } from '@/app/now-casting/utils';
-import { getRegionGeo } from '@/utils/maps';
-import { usePollenChart } from '@/hooks';
+import { getRegionGeo } from '@/app/utils/maps';
+import { usePollenChart } from '@/app/hooks';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import { debounce, getBoundsFromViewState } from '@/utils';
 import bavariaGeo from '@/data/bavaria.geo.json';

@@ -1,6 +1,6 @@
-import { MAP_LEVEL_COLORS } from '@/constants';
-import { PollenLevel } from '@/types';
-import { getDefaultBaseDate } from '@/utils';
+import { MAP_LEVEL_COLORS } from '@/app/constants';
+import { PollenLevel } from '@/app/types';
+import { getDefaultBaseDate } from '@/app/utils';
 
 export const POLLENS = {
   BIRCH: {

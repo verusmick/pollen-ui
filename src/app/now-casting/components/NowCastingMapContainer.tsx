@@ -17,35 +17,35 @@ import {
   PollenLegend,
   PollenLegendCard,
   SearchCardToggle,
-} from '@/components';
+} from '@/app/components';
 
 import {
   useCoordinatesStore,
   useCurrentLocationStore,
   useLoadingStore,
   usePartialLoadingStore,
-  usePollenDetailsChartStore,
-} from '@/store';
+} from '@/app/stores';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
   POLLEN_ENTRIES,
   PollenConfig,
 } from '@/app/now-casting/constants';
-import { getRegionBounds } from '@/constants';
+import { getRegionBounds } from '@/app/constants';
 import {
   useHourlyNowCasting,
   usePollenPlayback,
   usePollenPrefetch,
 } from '@/app/now-casting/hooks';
-import { useSidebar } from '@/context';
-import { useIsLargeScreen, usePollenChart } from '@/hooks';
+import { useSidebar } from '@/app/context';
+import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
 import {
   buildHourTimeline,
   getAdjacentHour,
   type HourPoint,
 } from '@/app/now-casting/utils';
-import { computeResFromZoom, getGridCellsResolution } from '@/utils/maps';
+import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
 
 export const NowCastingMapContainer = () => {
   const pathname = usePathname();
