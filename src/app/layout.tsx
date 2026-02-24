@@ -20,9 +20,8 @@ export default function AppRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <head>
-        {/* anti-flicker theme script */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -44,9 +43,11 @@ export default function AppRootLayout({
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeSync />
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <ReactQueryWrapper>
+          <ThemeSync />
           {children}
         </ReactQueryWrapper>
       </body>
