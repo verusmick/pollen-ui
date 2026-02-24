@@ -20,7 +20,7 @@ import {
   usePollenDetailsChartStore,
   useSearchLocationStore,
 } from '@/store';
-import { getInitialViewState } from '@/app/now-casting/utils';
+import { getInitialViewState } from '../utils';
 import { getRegionGeo } from '@/utils/maps';
 import { usePollenChart } from '@/hooks';
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';

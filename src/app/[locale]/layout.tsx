@@ -4,10 +4,10 @@ import { NextIntlClientProvider } from 'next-intl';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import { ReactQueryWrapper } from './forecast/provider/providers';
-import { ClientLayout } from '../components/layout';
+import { ClientLayout } from '../../components/layout';
 import { ThemeSync } from '@/providers';
 
-import './globals.css';
+import '../globals.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

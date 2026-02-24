@@ -19,10 +19,10 @@ export function Sidebar({
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const routes = [
-    { label: 'Forecast', href: '/forecast' },
-    { label: 'Nowcasting', href: '/now-casting' },
-    { label: 'Rules And Notifications', href: '/rules-and-notifications' },
-    { label: 'Alerts And Correction Factors', href: '/alerts-and-correction-factors' },
+    { label: 'Forecast', href: 'forecast' },
+    { label: 'Nowcasting', href: 'now-casting' },
+    { label: 'Rules And Notifications', href: 'rules-and-notifications' },
+    { label: 'Alerts And Correction Factors', href: 'alerts-and-correction-factors' },
   ];
 
   const sidebarWidth = collapsed ? 0 : 256;

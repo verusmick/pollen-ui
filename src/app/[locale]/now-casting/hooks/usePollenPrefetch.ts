@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { PollenApiKey } from '@/app/now-casting/constants';
+import { PollenApiKey } from '../constants';
 import { getHourlyNowCasting } from '@/lib/api/nowCasting';
-import { getAdjacentHour, type HourPoint } from '@/app/now-casting/utils';
+import { getAdjacentHour, type HourPoint } from '../utils';
 
 interface ForecastParams {
   date: string;

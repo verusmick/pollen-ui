@@ -1,4 +1,5 @@
-import { ForecastMapContainer } from '@/app/forecast/components';
+import { ForecastMapContainer } from "./components";
+
 
 export default function ForecastPage() {
   return <ForecastMapContainer />;

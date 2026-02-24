@@ -17,11 +17,11 @@ import type { Feature, FeatureCollection } from 'geojson';
 import bavariaGeo from '@/data/bavaria.geo.json';
 import germanyGeo from '@/data/germany.geo.json';
 
-import { MapTooltip } from '@/app/forecast/components';
+import { MapTooltip } from '../../components';
 
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import { debounce, getBoundsFromViewState } from '@/utils';
-import { getInitialViewState } from '@/app/forecast/utils';
+import { getInitialViewState } from '../../utils';
 import { MapZoomControls } from '@/components';
 import {
   useCurrentLocationStore,

@@ -1,4 +1,4 @@
-import { NowCastingMapContainer } from '@/app/now-casting/components';
+import { NowCastingMapContainer } from "./components";
 
 export default function NowCastingPage() {
   return (

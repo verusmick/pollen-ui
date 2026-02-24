@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
 
 import { getHourlyForecast } from '@/lib/api/forecast';
-import type { PollenApiKey } from '@/app/forecast/constants';
+import type { PollenApiKey } from '../constants';
 
 export function useHourlyForecast(params: {
   date: string;

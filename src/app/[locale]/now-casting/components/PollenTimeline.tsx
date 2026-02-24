@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
-import { type HourPoint } from '@/app/now-casting/utils';
+import { type HourPoint } from '../utils';
 
 interface Props {
   setPlaying: (playing: boolean | ((p: boolean) => boolean)) => void;

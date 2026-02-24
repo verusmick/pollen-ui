@@ -16,11 +16,11 @@ import dayjs from 'dayjs';
 import {
   getPollenByApiKey as getForecastPollenByApiKey,
   PollenApiKey as ForecastPollenApiKey,
-} from '@/app/forecast/constants';
+} from '@/app/[locale]/forecast/constants'; //todo refactor
 import {
   getPollenByApiKey as getNowcastingPollenByApiKey,
   PollenApiKey as NowcastingPollenApiKey,
-} from '@/app/now-casting/constants';
+} from '@/app/[locale]/now-casting/constants'; //todo refactor
 
 import { useTranslations } from 'next-intl';
 import { LoadingSpinner } from '@/components';

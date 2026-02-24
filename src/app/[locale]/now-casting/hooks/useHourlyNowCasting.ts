@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { type PollenApiKey } from '@/app/now-casting/constants'
+import { type PollenApiKey } from '../constants'
 import { getHourlyNowCasting } from '@/lib/api/nowCasting';
 
 export function useHourlyNowCasting(params: {

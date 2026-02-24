@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 
 import { getHourlyForecast } from '@/lib/api/forecast';
-import type { PollenApiKey } from '@/app/forecast/constants';
+import type { PollenApiKey } from '../constants';
 
 interface ForecastParams {
   date: string;
