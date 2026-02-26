@@ -1,8 +1,9 @@
 import './globals.css';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import { ThemeSync } from '@/providers';
-import { ReactQueryWrapper } from '@/providers/react-query-wrapper/providers';
+import { ThemeBridge } from '@/runtime';
+import { ReactQueryProvider } from '@/providers';
+import { IntegrationProvider } from '@/integration/react';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -46,10 +47,12 @@ export default function AppRootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReactQueryWrapper>
-          <ThemeSync />
-          {children}
-        </ReactQueryWrapper>
+        <ReactQueryProvider>
+          <IntegrationProvider>
+            <ThemeBridge />
+            {children}
+          </IntegrationProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

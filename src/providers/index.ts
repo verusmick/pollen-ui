@@ -1,1 +1,1 @@
-export * from './theme/theme-sync'
+export { ReactQueryProvider } from './react-query';
