@@ -53,5 +53,22 @@
   "nowCastingPage": {
     "title": "Nowcasting",
     "message_loading": "Nowcasting-Karte"
+  },
+  "correctionFactorsPage": {
+    "description": "Passen Sie Korrekturen an und verwalten Sie diese, die auf erkannte Pollenspitzen angewendet werden.",
+    "filter": {
+      "placeholderNumber": "001",
+      "pollenType": "Pollenart",
+      "station": "Station",
+      "status": "Status",
+      "reset": "Filter zurücksetzen"
+    },
+    "card": {
+      "title": "⚙ Korrekturfaktor #{number}",
+      "location": "Ort:",
+      "pollens": "Pollen:",
+      "dateRange": "Zeitraum:",
+      "edit": "Bearbeiten"
+    }
   }
 }

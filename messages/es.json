@@ -53,5 +53,22 @@
   "nowCastingPage": {
     "title": "Nowcasting",
     "message_loading": "Mapa de nowcasting"
+  },
+  "correctionFactorsPage": {
+    "description": "Ajuste y gestione las correcciones aplicadas a los picos de polen detectados.",
+    "filter": {
+      "placeholderNumber": "001",
+      "pollenType": "Tipo de polen",
+      "station": "Estación",
+      "status": "Estado",
+      "reset": "Restablecer filtros"
+    },
+    "card": {
+      "title": "⚙ Factor de corrección #{number}",
+      "location": "Ubicación:",
+      "pollens": "Polen:",
+      "dateRange": "Rango de fechas:",
+      "edit": "Editar"
+    }
   }
 }

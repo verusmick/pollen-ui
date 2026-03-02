@@ -53,5 +53,22 @@
   "nowCastingPage": {
     "title": "Nowcasting",
     "message_loading": "Carte de nowcasting"
+  },
+  "correctionFactorsPage": {
+    "description": "Ajustez et gérez les corrections appliquées aux pics de pollen détectés.",
+    "filter": {
+      "placeholderNumber": "001",
+      "pollenType": "Type de pollen",
+      "station": "Station",
+      "status": "Statut",
+      "reset": "Réinitialiser les filtres"
+    },
+    "card": {
+      "title": "⚙ Facteur de correction #{number}",
+      "location": "Emplacement:",
+      "pollens": "Pollen:",
+      "dateRange": "Plage de dates:",
+      "edit": "Modifier"
+    }
   }
 }

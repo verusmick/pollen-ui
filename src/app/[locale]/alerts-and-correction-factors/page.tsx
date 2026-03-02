@@ -1,13 +1,14 @@
-'use client';
+// 'use client';
 
-import { useThemeStore } from '@/store';
-import { useEffect } from 'react';
+// import { useThemeStore } from '@/store';
+// import { useEffect } from 'react';
 import { AlertsList, FiltersBar, Tabs } from './components';
+import { redirect } from 'next/navigation';
 // import { useTranslations } from 'next-intl';
 // import { useRouter, usePathname } from 'next/navigation';
 
 export default function AlertsAndCorrectionFactorsPage() {
-  const setTheme = useThemeStore((s) => s.setTheme);
+  // const setTheme = useThemeStore((s) => s.setTheme);
   // const t = useTranslations('nowCastingPage');
   // const pathname = usePathname();
   // const router = useRouter();
@@ -18,12 +19,13 @@ export default function AlertsAndCorrectionFactorsPage() {
   //   router.push(segments.join('/'));
   // };
 
-  useEffect(() => {
-    setTheme('light');
-    return () => {
-      setTheme('dark');
-    };
-  }, []);
+  // useEffect(() => {
+  //   setTheme('light');
+  //   return () => {
+  //     setTheme('dark');
+  //   };
+  // }, []);
+  return redirect('/alerts-and-correction-factors/correction-factors');
 
   return (
     <main>

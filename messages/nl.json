@@ -53,5 +53,22 @@
   "nowCastingPage": {
     "title": "Nowcasting",
     "message_loading": "Nowcastingkaart"
+  },
+  "correctionFactorsPage": {
+    "description": "Pas correcties aan en beheer ze die worden toegepast op gedetecteerde pollenpieken.",
+    "filter": {
+      "placeholderNumber": "001",
+      "pollenType": "Pollentype",
+      "station": "Station",
+      "status": "Status",
+      "reset": "Filters opnieuw instellen"
+    },
+    "card": {
+      "title": "⚙ Correctiefactor #{number}",
+      "location": "Locatie:",
+      "pollens": "Pollen:",
+      "dateRange": "Datumbereik:",
+      "edit": "Bewerken"
+    }
   }
 }

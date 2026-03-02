@@ -53,5 +53,22 @@
   "nowCastingPage": {
     "title": "التنبؤ الفوري",
     "message_loading": "خريطة التنبؤ الفوري"
+  },
+  "correctionFactorsPage": {
+    "description": "Adjust and manage corrections applied to detected pollen peaks.",
+    "filter": {
+      "placeholderNumber": "001",
+      "pollenType": "Pollen type",
+      "station": "Station",
+      "status": "Status",
+      "reset": "Reset Filters"
+    },
+    "card": {
+      "title": "⚙ Correction Factor #{number}",
+      "location": "Location:",
+      "pollens": "Pollens:",
+      "dateRange": "Date range:",
+      "edit": "Edit"
+    }
   }
 }
