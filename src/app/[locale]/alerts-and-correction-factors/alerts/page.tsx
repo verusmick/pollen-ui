@@ -1,6 +1,9 @@
-import { Tabs, FiltersBar, AlertsList } from "../components";
+'use client';
+import { useTranslations } from 'next-intl';
+import { FiltersBar, AlertsList } from '../components';
 
 export default function AlertsPage() {
+  const t = useTranslations('alertsPage');
   return (
     <main>
       {/* <div style={{ marginTop: 12 }}>
@@ -12,7 +15,6 @@ export default function AlertsPage() {
       <h2>{t('message_loading')}</h2> */}
 
       <div className="flex flex-col h-full bg-background text-foreground">
-        {/* <Tabs /> */}
         <div className="p-4 space-y-4 overflow-hidden">
           <FiltersBar />
           <AlertsList />

@@ -70,5 +70,28 @@
       "dateRange": "Datumbereik:",
       "edit": "Bewerken"
     }
+  },
+  "alertsPage": {
+    "filters": {
+      "placeholderRuleName": "Regelnaam",
+      "pollenType": "Pollentype",
+      "station": "Station",
+      "status": "Status",
+      "reset": "Filters opnieuw instellen"
+    },
+    "alertsList": {
+      "noResults": "Geen meldingen gevonden"
+    },
+    "alertCard": {
+      "titleTemplate": "{level} melding · {pollen}",
+      "valueTemplate": "{count} pollen/m³ · {location}",
+      "triggeredBy": "Geactiveerd door regel: {rule}",
+      "timeAgo": "{time}",
+      "correctionApplied": "Correctie toegepast",
+      "statusLabel": "Status: {status}",
+      "statusOpen": "Open",
+      "statusResolved": "Opgelost",
+      "viewDetails": "Bekijk details"
+    }
   }
 }

@@ -70,5 +70,28 @@
       "dateRange": "Date range:",
       "edit": "Edit"
     }
+  },
+  "alertsPage": {
+    "filters": {
+      "placeholderRuleName": "Rule Name",
+      "pollenType": "Pollen type",
+      "station": "Station",
+      "status": "Status",
+      "reset": "Reset Filters"
+    },
+    "alertsList": {
+      "noResults": "No alerts found"
+    },
+    "alertCard": {
+      "titleTemplate": "{level} alert · {pollen}",
+      "valueTemplate": "{count} pollen/m³ · {location}",
+      "triggeredBy": "Triggered by rule: {rule}",
+      "timeAgo": "{time}",
+      "correctionApplied": "Correction Applied",
+      "statusLabel": "Status: {status}",
+      "statusOpen": "Open",
+      "statusResolved": "Resolved",
+      "viewDetails": "View Details"
+    }
   }
 }

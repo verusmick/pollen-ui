@@ -70,5 +70,28 @@
       "dateRange": "Date range:",
       "edit": "Edit"
     }
+  },
+  "alertsPage": {
+    "filters": {
+      "placeholderRuleName": "اسم القاعدة",
+      "pollenType": "نوع حبوب اللقاح",
+      "station": "المحطة",
+      "status": "الحالة",
+      "reset": "إعادة تعيين الفلاتر"
+    },
+    "alertsList": {
+      "noResults": "لم يتم العثور على تنبيهات"
+    },
+    "alertCard": {
+      "titleTemplate": "تنبيه {level} · {pollen}",
+      "valueTemplate": "{count} حبات لقاح/م³ · {location}",
+      "triggeredBy": "تم تشغيله بواسطة القاعدة: {rule}",
+      "timeAgo": "{time}",
+      "correctionApplied": "تم تطبيق التصحيح",
+      "statusLabel": "الحالة: {status}",
+      "statusOpen": "مفتوح",
+      "statusResolved": "تم حلها",
+      "viewDetails": "عرض التفاصيل"
+    }
   }
 }
