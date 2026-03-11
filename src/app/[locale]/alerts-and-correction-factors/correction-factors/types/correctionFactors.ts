@@ -1,0 +1,145 @@
+export type CorrectionFactorApiId = string | number;
+
+export interface ApiCorrectionFactorDetail {
+  id?: CorrectionFactorApiId;
+  pollen: string | null;
+  factor_percentage: number;
+  published: boolean;
+}
+
+export interface ApiCorrectionFactorRecord {
+  id: CorrectionFactorApiId;
+  start_date: string;
+  end_date: string;
+  pollen: string;
+  location: string;
+  correction_factor_details: ApiCorrectionFactorDetail[];
+}
+
+export type ApiCorrectionFactorsListResponse = ApiCorrectionFactorRecord[];
+
+export interface CorrectionFactorListRequest {
+  from?: string;
+  pollen?: string;
+  locations?: string;
+}
+
+export interface ApiCorrectionFactorWriteRequest {
+  start_date: string;
+  end_date: string;
+  pollen: string;
+  location: string;
+  correction_factor_details: ApiCorrectionFactorDetail[];
+}
+
+export interface ApiCorrectionFactorWriteSuccessResponse {
+  status: string;
+  data: {
+    id: CorrectionFactorApiId;
+    details_count: number;
+  };
+}
+
+export interface ApiCorrectionFactorDeleteResponse {
+  status: string;
+  id: CorrectionFactorApiId;
+}
+
+export type CorrectionFactorId = string;
+export type CorrectionFactorStatus = 'draft' | 'published';
+export type CorrectionFactorPollenCode = string;
+export type CorrectionFactorUnknownCode = 'UNKNOWN';
+export type CorrectionFactorSelectablePollen =
+  | CorrectionFactorPollenCode
+  | CorrectionFactorUnknownCode;
+export type CorrectionFactorPercentageScale = 'ratio' | 'percentage';
+
+export interface CorrectionFactorDetail {
+  id?: string;
+  pollen: CorrectionFactorSelectablePollen;
+  factorPercentage: number;
+  published: boolean;
+}
+
+export interface CorrectionFactorRecord {
+  id: CorrectionFactorId;
+  location: string;
+  basePollen: CorrectionFactorPollenCode;
+  startDate: string;
+  endDate: string;
+  status: CorrectionFactorStatus;
+  details: CorrectionFactorDetail[];
+}
+
+export interface CorrectionFactorListFilters {
+  from: string;
+  location: string;
+  pollen: string;
+}
+
+export type CorrectionFactorFormMode = 'create' | 'edit';
+
+export interface CorrectionFactorDistributionRowForm {
+  clientId: string;
+  pollen: CorrectionFactorSelectablePollen | '';
+  reviewedEvents: string;
+  isBasePollen: boolean;
+}
+
+export interface CorrectionFactorFormValues {
+  location: string;
+  basePollen: CorrectionFactorPollenCode | '';
+  startDate: string;
+  endDate: string;
+  detectedEvents: number | null;
+  publishOnSave: boolean;
+  rows: CorrectionFactorDistributionRowForm[];
+}
+
+export interface CorrectionFactorFormErrors {
+  location?: string;
+  basePollen?: string;
+  startDate?: string;
+  endDate?: string;
+  detectedEvents?: string;
+  rows?: string;
+  rowErrorsById: Record<
+    string,
+    {
+      pollen?: string;
+      reviewedEvents?: string;
+    }
+  >;
+}
+
+export interface CorrectionFactorFormDerivedRow {
+  clientId: string;
+  pollen: CorrectionFactorSelectablePollen | '';
+  reviewedEventsNumber: number;
+  multiplier: number;
+}
+
+export interface CorrectionFactorFormDerivedState {
+  rows: CorrectionFactorFormDerivedRow[];
+  totalReviewedEvents: number;
+  remainingEvents: number;
+  isBalanced: boolean;
+  hasDuplicatePollens: boolean;
+  unknownCount: number;
+  multipliersByRowId: Record<string, number>;
+}
+
+export interface CorrectionFactorPayloadBuildOptions {
+  factorPercentageScale: CorrectionFactorPercentageScale;
+  unknownPollenApiValue?: string | null;
+}
+
+export interface CorrectionFactorPreviewPoint {
+  label: string;
+  originalValue: number;
+  correctedValue: number;
+}
+
+export interface CorrectionFactorPreviewSeries {
+  points: CorrectionFactorPreviewPoint[];
+}

@@ -1,4 +1,5 @@
 ## Correction Factors - active backend dependencies
+Foundation/data scaffolding is implemented. The following backend points still block edit and preview behavior:
 - Need confirmation whether GET /api/correctionFactors/:id exists
 - Need confirmation how edit mode reconstructs reviewedEvents
 - Need confirmation how Unknown is encoded in payloads
