@@ -88,6 +88,55 @@
         "empty": "Für die aktuellen Filter wurden keine Korrekturfaktoren gefunden."
       }
     },
+    "form": {
+      "title": "Korrekturfaktor",
+      "description": "Legen Sie fest, wie dieser Korrekturfaktor die Ereigniszahlen in einem bestimmten Zeitraum auf Pollen verteilt.",
+      "submitErrorFallback": "Der Korrekturfaktor konnte nicht gespeichert werden.",
+      "meta": {
+        "title": "Ort und Zeitraum",
+        "location": "Ort",
+        "allLocations": "Ort auswählen",
+        "basePollen": "Basispollen",
+        "allPollens": "Pollen auswählen",
+        "detectedEvents": "Erkannte Ereignisse",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "publishOnSave": "Beim Speichern veröffentlichen",
+        "loading": "Wird geladen..."
+      },
+      "distribution": {
+        "title": "Korrekturfaktoren",
+        "description": "Weisen Sie die erkannten Ereignisse für den ausgewählten Basispollen nach der Expertenprüfung neu zu.",
+        "detectedEventsLabel": "Erkannte Ereignisse",
+        "addRow": "Pollenklassifikation hinzufügen",
+        "selectPollen": "Pollen auswählen",
+        "remove": "Entfernen",
+        "baseRow": "Basiszeile",
+        "automatic": "Automatisch",
+        "unknown": "Unbekannt",
+        "table": {
+          "pollen": "Pollenverteilung",
+          "reviewedEvents": "Überprüfte Ereignisse",
+          "multiplier": "Faktormultiplikator",
+          "actions": "Aktionen"
+        }
+      },
+      "totals": {
+        "assignedEvents": "Zugewiesene Ereignisse",
+        "unknownEvents": "Unbekannte Ereignisse",
+        "totalReviewedEvents": "Summe überprüfter Ereignisse",
+        "difference": "Zu viel zugewiesen"
+      },
+      "preview": {
+        "title": "Diagramm (Original vs. Korrigiert)",
+        "placeholder": "Die Vorschau-Integration wartet auf die Bestätigung der Backend-/Quelldaten."
+      },
+      "actions": {
+        "cancel": "Zurück",
+        "save": "Korrekturfaktor speichern",
+        "saving": "Speichern..."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Pollenart",

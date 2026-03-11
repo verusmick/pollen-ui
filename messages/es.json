@@ -88,6 +88,55 @@
         "empty": "No se encontraron factores de corrección para los filtros actuales."
       }
     },
+    "form": {
+      "title": "Factor de corrección",
+      "description": "Defina cómo este factor de corrección redistribuirá los conteos de eventos entre pólenes durante un intervalo de tiempo específico.",
+      "submitErrorFallback": "No se pudo guardar el factor de corrección.",
+      "meta": {
+        "title": "Ubicación y fechas",
+        "location": "Ubicación",
+        "allLocations": "Seleccione una ubicación",
+        "basePollen": "Polen base",
+        "allPollens": "Seleccione un polen",
+        "detectedEvents": "Eventos detectados",
+        "startDate": "Fecha de inicio",
+        "endDate": "Fecha de fin",
+        "publishOnSave": "Publicar al guardar",
+        "loading": "Cargando..."
+      },
+      "distribution": {
+        "title": "Factores de corrección",
+        "description": "Reasigne los eventos detectados para el polen base seleccionado después de la revisión experta.",
+        "detectedEventsLabel": "Eventos detectados",
+        "addRow": "Agregar clasificación de polen",
+        "selectPollen": "Seleccione polen",
+        "remove": "Quitar",
+        "baseRow": "Fila base",
+        "automatic": "Automático",
+        "unknown": "Desconocido",
+        "table": {
+          "pollen": "Distribución de polen",
+          "reviewedEvents": "Eventos revisados",
+          "multiplier": "Factor multiplicador",
+          "actions": "Acciones"
+        }
+      },
+      "totals": {
+        "assignedEvents": "Eventos asignados",
+        "unknownEvents": "Eventos desconocidos",
+        "totalReviewedEvents": "Eventos revisados totales",
+        "difference": "Exceso asignado"
+      },
+      "preview": {
+        "title": "Gráfico (Original vs Corregido)",
+        "placeholder": "La integración de la vista previa está pendiente de la confirmación del backend/fuente."
+      },
+      "actions": {
+        "cancel": "Volver",
+        "save": "Guardar factor de corrección",
+        "saving": "Guardando..."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Tipo de polen",

@@ -7,22 +7,6 @@ import type {
 import { UNKNOWN_POLLEN_CODE } from '../constants';
 import { buildCorrectionFactorDerivedState } from './correctionFactorMath';
 
-function mapRowPollenToApiValue(
-  pollen: string,
-  unknownPollenApiValue?: string | null
-): string | null {
-  if (pollen !== UNKNOWN_POLLEN_CODE) {
-    return pollen;
-  }
-
-  if (unknownPollenApiValue === undefined) {
-    // TODO: Backend must confirm how Unknown is encoded in correction factor payloads.
-    throw new Error('Unknown pollen API encoding is not configured.');
-  }
-
-  return unknownPollenApiValue;
-}
-
 export function buildCorrectionFactorWritePayload(
   values: CorrectionFactorFormValues,
   options: CorrectionFactorPayloadBuildOptions
@@ -32,22 +16,28 @@ export function buildCorrectionFactorWritePayload(
     options.factorPercentageScale
   );
 
-  const correctionFactorDetails: ApiCorrectionFactorDetail[] = derived.rows.map(
-    (row) => {
+  const correctionFactorDetails = derived.rows
+    .map<ApiCorrectionFactorDetail | null>((row) => {
       if (!row.pollen) {
         throw new Error('Cannot build payload with an empty pollen row.');
       }
 
+      if (row.isSyntheticUnknown || row.pollen === UNKNOWN_POLLEN_CODE) {
+        return null;
+      }
+
       return {
-        pollen: mapRowPollenToApiValue(
-          row.pollen,
-          options.unknownPollenApiValue
-        ),
+        pollen: row.pollen,
         factor_percentage: row.multiplier,
         published: values.publishOnSave,
       };
-    }
-  );
+    })
+    .filter((detail): detail is ApiCorrectionFactorDetail => detail !== null);
+
+  if (options.unknownPollenApiValue === undefined) {
+    // TODO: Backend has not confirmed whether Unknown should be sent explicitly.
+    // Current UI behavior keeps Unknown as an implicit remainder and omits it from payloads.
+  }
 
   return {
     start_date: values.startDate,

@@ -88,6 +88,55 @@
         "empty": "No correction factors found for the current filters."
       }
     },
+    "form": {
+      "title": "Correction Factor",
+      "description": "Define how this correction factor will redistribute the event counts across pollens during a specific time interval.",
+      "submitErrorFallback": "Failed to save the correction factor.",
+      "meta": {
+        "title": "Location and dates",
+        "location": "Location",
+        "allLocations": "Select a location",
+        "basePollen": "Base pollen",
+        "allPollens": "Select a pollen",
+        "detectedEvents": "Detected events",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "publishOnSave": "Publish on save",
+        "loading": "Loading..."
+      },
+      "distribution": {
+        "title": "Correction Factors",
+        "description": "Reassign the detected events for the selected base pollen after expert review.",
+        "detectedEventsLabel": "Detected events",
+        "addRow": "Add pollen classification",
+        "selectPollen": "Select pollen",
+        "remove": "Remove",
+        "baseRow": "Base row",
+        "automatic": "Automatic",
+        "unknown": "Unknown",
+        "table": {
+          "pollen": "Pollen distribution",
+          "reviewedEvents": "Reviewed events",
+          "multiplier": "Factor multiplier",
+          "actions": "Actions"
+        }
+      },
+      "totals": {
+        "assignedEvents": "Assigned events",
+        "unknownEvents": "Unknown events",
+        "totalReviewedEvents": "Total reviewed events",
+        "difference": "Over assigned"
+      },
+      "preview": {
+        "title": "Chart (Original vs Corrected)",
+        "placeholder": "Preview integration is pending backend/source confirmation."
+      },
+      "actions": {
+        "cancel": "Back",
+        "save": "Save Correction Factor",
+        "saving": "Saving..."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Pollen type",

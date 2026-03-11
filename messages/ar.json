@@ -88,6 +88,55 @@
         "empty": "لم يتم العثور على عوامل تصحيح للفلاتر الحالية."
       }
     },
+    "form": {
+      "title": "عامل التصحيح",
+      "description": "حدد كيف سيعيد عامل التصحيح هذا توزيع أعداد الأحداث عبر أنواع حبوب اللقاح ضمن فترة زمنية محددة.",
+      "submitErrorFallback": "تعذر حفظ عامل التصحيح.",
+      "meta": {
+        "title": "الموقع والتواريخ",
+        "location": "الموقع",
+        "allLocations": "اختر موقعاً",
+        "basePollen": "حبوب اللقاح الأساسية",
+        "allPollens": "اختر نوع حبوب اللقاح",
+        "detectedEvents": "الأحداث المكتشفة",
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "publishOnSave": "النشر عند الحفظ",
+        "loading": "جارٍ التحميل..."
+      },
+      "distribution": {
+        "title": "عوامل التصحيح",
+        "description": "أعد توزيع الأحداث المكتشفة لنوع حبوب اللقاح الأساسي المحدد بعد مراجعة الخبير.",
+        "detectedEventsLabel": "الأحداث المكتشفة",
+        "addRow": "إضافة تصنيف حبوب لقاح",
+        "selectPollen": "اختر نوع حبوب اللقاح",
+        "remove": "إزالة",
+        "baseRow": "الصف الأساسي",
+        "automatic": "تلقائي",
+        "unknown": "غير معروف",
+        "table": {
+          "pollen": "توزيع حبوب اللقاح",
+          "reviewedEvents": "الأحداث المُراجعة",
+          "multiplier": "معامل التصحيح",
+          "actions": "الإجراءات"
+        }
+      },
+      "totals": {
+        "assignedEvents": "الأحداث المخصصة",
+        "unknownEvents": "الأحداث غير المعروفة",
+        "totalReviewedEvents": "إجمالي الأحداث المُراجعة",
+        "difference": "تخصيص زائد"
+      },
+      "preview": {
+        "title": "المخطط (الأصلي مقابل المصحح)",
+        "placeholder": "تكامل المعاينة بانتظار تأكيد المصدر/الخلفية."
+      },
+      "actions": {
+        "cancel": "رجوع",
+        "save": "حفظ عامل التصحيح",
+        "saving": "جارٍ الحفظ..."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Pollen type",

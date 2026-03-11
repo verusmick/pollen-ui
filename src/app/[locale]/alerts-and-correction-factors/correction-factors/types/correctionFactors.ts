@@ -117,15 +117,19 @@ export interface CorrectionFactorFormDerivedRow {
   pollen: CorrectionFactorSelectablePollen | '';
   reviewedEventsNumber: number;
   multiplier: number;
+  isBasePollen: boolean;
+  isSyntheticUnknown: boolean;
 }
 
 export interface CorrectionFactorFormDerivedState {
   rows: CorrectionFactorFormDerivedRow[];
+  assignedReviewedEvents: number;
+  unknownReviewedEvents: number;
   totalReviewedEvents: number;
   remainingEvents: number;
   isBalanced: boolean;
   hasDuplicatePollens: boolean;
-  unknownCount: number;
+  hasOverAllocatedEvents: boolean;
   multipliersByRowId: Record<string, number>;
 }
 

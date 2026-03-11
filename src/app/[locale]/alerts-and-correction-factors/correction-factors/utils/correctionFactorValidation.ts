@@ -2,7 +2,6 @@ import type {
   CorrectionFactorFormErrors,
   CorrectionFactorFormValues,
 } from '../types';
-import { UNKNOWN_POLLEN_CODE } from '../constants';
 
 function isValidNonNegativeNumber(value: string): boolean {
   const parsed = Number(value);
@@ -61,7 +60,6 @@ export function validateCorrectionFactorForm(
 
   const pollenCounts = new Map<string, number>();
   let totalReviewedEvents = 0;
-  let unknownCount = 0;
 
   for (const row of values.rows) {
     if (!row.pollen) {
@@ -82,25 +80,17 @@ export function validateCorrectionFactorForm(
     }
 
     totalReviewedEvents += Number(row.reviewedEvents);
-
-    if (row.pollen === UNKNOWN_POLLEN_CODE) {
-      unknownCount += 1;
-    }
   }
 
   if (Array.from(pollenCounts.values()).some((count) => count > 1)) {
     errors.rows = 'Duplicate pollens are not allowed.';
   }
 
-  if (unknownCount > 1) {
-    errors.rows = 'Unknown can only appear once.';
-  }
-
   if (
     values.detectedEvents !== null &&
-    totalReviewedEvents !== values.detectedEvents
+    totalReviewedEvents > values.detectedEvents
   ) {
-    errors.rows = 'Reviewed events must exactly match detected events.';
+    errors.rows = 'Reviewed events cannot exceed detected events.';
   }
 
   return errors;

@@ -43,6 +43,8 @@ export function buildCorrectionFactorDerivedRows(
       pollen: row.pollen,
       reviewedEventsNumber,
       multiplier: scaleFactor(ratio, factorPercentageScale),
+      isBasePollen: row.isBasePollen,
+      isSyntheticUnknown: false,
     };
   });
 }
@@ -56,40 +58,58 @@ export function buildCorrectionFactorDerivedState(
     factorPercentageScale
   );
   const detectedEvents = values.detectedEvents ?? 0;
-  const totalReviewedEvents = rows.reduce(
+  const assignedReviewedEvents = rows.reduce(
     (sum, row) => sum + row.reviewedEventsNumber,
     0
   );
-  const remainingEvents = detectedEvents - totalReviewedEvents;
+  const remainingEvents = detectedEvents - assignedReviewedEvents;
+  const unknownReviewedEvents = Math.max(remainingEvents, 0);
+  const totalReviewedEvents = assignedReviewedEvents + unknownReviewedEvents;
+  const hasOverAllocatedEvents = remainingEvents < 0;
   const pollenCounts = new Map<string, number>();
-  let unknownCount = 0;
 
   for (const row of values.rows) {
     if (!row.pollen) {
       continue;
     }
 
-    if (row.pollen === UNKNOWN_POLLEN_CODE) {
-      unknownCount += 1;
-    }
-
     pollenCounts.set(row.pollen, (pollenCounts.get(row.pollen) ?? 0) + 1);
   }
 
-  const multipliersByRowId = rows.reduce<Record<string, number>>((acc, row) => {
+  const displayRows =
+    unknownReviewedEvents > 0
+      ? [
+          ...rows,
+          {
+            clientId: 'synthetic-unknown',
+            pollen: UNKNOWN_POLLEN_CODE,
+            reviewedEventsNumber: unknownReviewedEvents,
+            multiplier: scaleFactor(
+              detectedEvents > 0 ? unknownReviewedEvents / detectedEvents : 0,
+              factorPercentageScale
+            ),
+            isBasePollen: false,
+            isSyntheticUnknown: true,
+          },
+        ]
+      : rows;
+
+  const multipliersByRowId = displayRows.reduce<Record<string, number>>((acc, row) => {
     acc[row.clientId] = row.multiplier;
     return acc;
   }, {});
 
   return {
-    rows,
+    rows: displayRows,
+    assignedReviewedEvents,
+    unknownReviewedEvents,
     totalReviewedEvents,
     remainingEvents,
-    isBalanced: detectedEvents > 0 && remainingEvents === 0,
+    isBalanced: detectedEvents >= 0 && !hasOverAllocatedEvents,
     hasDuplicatePollens: Array.from(pollenCounts.values()).some(
       (count) => count > 1
     ),
-    unknownCount,
+    hasOverAllocatedEvents,
     multipliersByRowId,
   };
 }

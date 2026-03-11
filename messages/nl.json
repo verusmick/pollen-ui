@@ -88,6 +88,55 @@
         "empty": "Geen correctiefactoren gevonden voor de huidige filters."
       }
     },
+    "form": {
+      "title": "Correctiefactor",
+      "description": "Bepaal hoe deze correctiefactor gebeurtenisaantallen over pollen verdeelt binnen een specifiek tijdsinterval.",
+      "submitErrorFallback": "De correctiefactor kon niet worden opgeslagen.",
+      "meta": {
+        "title": "Locatie en datums",
+        "location": "Locatie",
+        "allLocations": "Selecteer een locatie",
+        "basePollen": "Basispollen",
+        "allPollens": "Selecteer een pollen",
+        "detectedEvents": "Gedetecteerde gebeurtenissen",
+        "startDate": "Startdatum",
+        "endDate": "Einddatum",
+        "publishOnSave": "Publiceren bij opslaan",
+        "loading": "Laden..."
+      },
+      "distribution": {
+        "title": "Correctiefactoren",
+        "description": "Herverdeel de gedetecteerde gebeurtenissen voor het geselecteerde basispollen na expertbeoordeling.",
+        "detectedEventsLabel": "Gedetecteerde gebeurtenissen",
+        "addRow": "Pollenclassificatie toevoegen",
+        "selectPollen": "Selecteer pollen",
+        "remove": "Verwijderen",
+        "baseRow": "Basisrij",
+        "automatic": "Automatisch",
+        "unknown": "Onbekend",
+        "table": {
+          "pollen": "Pollenverdeling",
+          "reviewedEvents": "Beoordeelde gebeurtenissen",
+          "multiplier": "Factormultiplicator",
+          "actions": "Acties"
+        }
+      },
+      "totals": {
+        "assignedEvents": "Toegewezen gebeurtenissen",
+        "unknownEvents": "Onbekende gebeurtenissen",
+        "totalReviewedEvents": "Totaal beoordeelde gebeurtenissen",
+        "difference": "Te veel toegewezen"
+      },
+      "preview": {
+        "title": "Grafiek (Origineel vs Gecorrigeerd)",
+        "placeholder": "Preview-integratie wacht nog op bevestiging van backend/bron."
+      },
+      "actions": {
+        "cancel": "Terug",
+        "save": "Correctiefactor opslaan",
+        "saving": "Opslaan..."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Pollentype",

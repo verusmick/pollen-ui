@@ -88,6 +88,55 @@
         "empty": "Aucun facteur de correction trouvé pour les filtres actuels."
       }
     },
+    "form": {
+      "title": "Facteur de correction",
+      "description": "Définissez comment ce facteur de correction redistribuera les comptes d’événements entre pollens sur une période donnée.",
+      "submitErrorFallback": "Impossible d’enregistrer le facteur de correction.",
+      "meta": {
+        "title": "Emplacement et dates",
+        "location": "Emplacement",
+        "allLocations": "Sélectionnez un emplacement",
+        "basePollen": "Pollen de base",
+        "allPollens": "Sélectionnez un pollen",
+        "detectedEvents": "Événements détectés",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "publishOnSave": "Publier lors de l’enregistrement",
+        "loading": "Chargement..."
+      },
+      "distribution": {
+        "title": "Facteurs de correction",
+        "description": "Réattribuez les événements détectés pour le pollen de base sélectionné après revue experte.",
+        "detectedEventsLabel": "Événements détectés",
+        "addRow": "Ajouter une classification de pollen",
+        "selectPollen": "Sélectionnez un pollen",
+        "remove": "Supprimer",
+        "baseRow": "Ligne de base",
+        "automatic": "Automatique",
+        "unknown": "Inconnu",
+        "table": {
+          "pollen": "Répartition du pollen",
+          "reviewedEvents": "Événements révisés",
+          "multiplier": "Facteur multiplicateur",
+          "actions": "Actions"
+        }
+      },
+      "totals": {
+        "assignedEvents": "Événements attribués",
+        "unknownEvents": "Événements inconnus",
+        "totalReviewedEvents": "Total des événements révisés",
+        "difference": "Sur-attribué"
+      },
+      "preview": {
+        "title": "Graphique (Original vs Corrigé)",
+        "placeholder": "L’intégration de l’aperçu reste en attente de confirmation du backend/de la source."
+      },
+      "actions": {
+        "cancel": "Retour",
+        "save": "Enregistrer le facteur de correction",
+        "saving": "Enregistrement..."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Type de pollen",
