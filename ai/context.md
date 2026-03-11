@@ -363,3 +363,18 @@ src/app/api/my-feature/route.ts
 ```
 
 This is the most consistent fit with the current repository.
+
+
+## Internationalization (i18n)
+
+This project is multilingual and all user-facing UI must be implemented with i18n from the start.
+
+Rules:
+- Do not hardcode user-facing strings in components.
+- Use the existing `next-intl` project pattern for all labels, buttons, table headers, empty states, error states, and form text.
+- When a feature introduces new UI text, update the corresponding keys in all supported message files under `/messages`.
+- New translation keys should follow the feature namespace convention, for example:
+  - `correctionFactorsPage.list.*`
+  - `correctionFactorsPage.form.*`
+- Prefer feature-grouped keys over scattered generic keys.
+- If a translation is temporarily unknown, add the key in all locales with a clear placeholder rather than leaving the UI hardcoded.
