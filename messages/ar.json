@@ -56,6 +56,38 @@
   },
   "correctionFactorsPage": {
     "description": "Adjust and manage corrections applied to detected pollen peaks.",
+    "list": {
+      "title": "عوامل التصحيح",
+      "description": "إدارة وتعديل التصحيحات المطبقة على قمم حبوب اللقاح المكتشفة.",
+      "newButton": "عامل تصحيح جديد",
+      "filters": {
+        "fromDate": "من تاريخ",
+        "location": "الموقع",
+        "allLocations": "كل المواقع",
+        "pollen": "حبوب اللقاح الأساسية",
+        "allPollens": "كل أنواع حبوب اللقاح",
+        "reset": "إعادة تعيين",
+        "loading": "جارٍ التحميل..."
+      },
+      "table": {
+        "id": "المعرف",
+        "location": "الموقع",
+        "basePollen": "حبوب اللقاح الأساسية",
+        "dateRange": "النطاق الزمني",
+        "status": "الحالة",
+        "actions": "الإجراءات",
+        "edit": "تعديل"
+      },
+      "status": {
+        "draft": "مسودة",
+        "published": "منشور"
+      },
+      "states": {
+        "loading": "جارٍ تحميل عوامل التصحيح...",
+        "error": "تعذر تحميل عوامل التصحيح.",
+        "empty": "لم يتم العثور على عوامل تصحيح للفلاتر الحالية."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Pollen type",

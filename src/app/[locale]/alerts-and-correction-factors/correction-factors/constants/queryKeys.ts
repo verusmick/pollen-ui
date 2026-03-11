@@ -2,6 +2,9 @@ import type { CorrectionFactorListFilters } from '../types';
 
 export const correctionFactorKeys = {
   all: ['correctionFactors'] as const,
+  options: () => [...correctionFactorKeys.all, 'options'] as const,
+  locations: () => [...correctionFactorKeys.options(), 'locations'] as const,
+  pollens: () => [...correctionFactorKeys.options(), 'pollens'] as const,
   lists: () => [...correctionFactorKeys.all, 'list'] as const,
   list: (filters: CorrectionFactorListFilters) =>
     [...correctionFactorKeys.lists(), filters] as const,

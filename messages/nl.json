@@ -56,6 +56,38 @@
   },
   "correctionFactorsPage": {
     "description": "Pas correcties aan en beheer ze die worden toegepast op gedetecteerde pollenpieken.",
+    "list": {
+      "title": "Correctiefactoren",
+      "description": "Pas correcties aan en beheer ze die worden toegepast op gedetecteerde pollenpieken.",
+      "newButton": "Nieuwe correctiefactor",
+      "filters": {
+        "fromDate": "Vanaf datum",
+        "location": "Locatie",
+        "allLocations": "Alle locaties",
+        "pollen": "Basispollen",
+        "allPollens": "Alle pollen",
+        "reset": "Resetten",
+        "loading": "Laden..."
+      },
+      "table": {
+        "id": "ID",
+        "location": "Locatie",
+        "basePollen": "Basispollen",
+        "dateRange": "Datumbereik",
+        "status": "Status",
+        "actions": "Acties",
+        "edit": "Bewerken"
+      },
+      "status": {
+        "draft": "Concept",
+        "published": "Gepubliceerd"
+      },
+      "states": {
+        "loading": "Correctiefactoren laden...",
+        "error": "Correctiefactoren konden niet worden geladen.",
+        "empty": "Geen correctiefactoren gevonden voor de huidige filters."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Pollentype",

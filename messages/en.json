@@ -56,6 +56,38 @@
   },
   "correctionFactorsPage": {
     "description": "Adjust and manage corrections applied to detected pollen peaks.",
+    "list": {
+      "title": "Correction Factors",
+      "description": "Adjust and manage corrections applied to detected pollen peaks.",
+      "newButton": "New Correction Factor",
+      "filters": {
+        "fromDate": "From date",
+        "location": "Location",
+        "allLocations": "All locations",
+        "pollen": "Base pollen",
+        "allPollens": "All pollens",
+        "reset": "Reset",
+        "loading": "Loading..."
+      },
+      "table": {
+        "id": "ID",
+        "location": "Location",
+        "basePollen": "Base pollen",
+        "dateRange": "Date range",
+        "status": "Status",
+        "actions": "Actions",
+        "edit": "Edit"
+      },
+      "status": {
+        "draft": "Draft",
+        "published": "Published"
+      },
+      "states": {
+        "loading": "Loading correction factors...",
+        "error": "Failed to load correction factors.",
+        "empty": "No correction factors found for the current filters."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Pollen type",

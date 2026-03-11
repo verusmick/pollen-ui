@@ -56,6 +56,38 @@
   },
   "correctionFactorsPage": {
     "description": "Passen Sie Korrekturen an und verwalten Sie diese, die auf erkannte Pollenspitzen angewendet werden.",
+    "list": {
+      "title": "Korrekturfaktoren",
+      "description": "Passen Sie Korrekturen an und verwalten Sie diese, die auf erkannte Pollenspitzen angewendet werden.",
+      "newButton": "Neuer Korrekturfaktor",
+      "filters": {
+        "fromDate": "Ab Datum",
+        "location": "Ort",
+        "allLocations": "Alle Orte",
+        "pollen": "Basispollen",
+        "allPollens": "Alle Pollen",
+        "reset": "Zurücksetzen",
+        "loading": "Wird geladen..."
+      },
+      "table": {
+        "id": "ID",
+        "location": "Ort",
+        "basePollen": "Basispollen",
+        "dateRange": "Zeitraum",
+        "status": "Status",
+        "actions": "Aktionen",
+        "edit": "Bearbeiten"
+      },
+      "status": {
+        "draft": "Entwurf",
+        "published": "Veröffentlicht"
+      },
+      "states": {
+        "loading": "Korrekturfaktoren werden geladen...",
+        "error": "Korrekturfaktoren konnten nicht geladen werden.",
+        "empty": "Für die aktuellen Filter wurden keine Korrekturfaktoren gefunden."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Pollenart",

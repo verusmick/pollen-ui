@@ -56,6 +56,38 @@
   },
   "correctionFactorsPage": {
     "description": "Ajuste y gestione las correcciones aplicadas a los picos de polen detectados.",
+    "list": {
+      "title": "Factores de corrección",
+      "description": "Ajuste y gestione las correcciones aplicadas a los picos de polen detectados.",
+      "newButton": "Nuevo factor de corrección",
+      "filters": {
+        "fromDate": "Desde",
+        "location": "Ubicación",
+        "allLocations": "Todas las ubicaciones",
+        "pollen": "Polen base",
+        "allPollens": "Todos los pólenes",
+        "reset": "Restablecer",
+        "loading": "Cargando..."
+      },
+      "table": {
+        "id": "ID",
+        "location": "Ubicación",
+        "basePollen": "Polen base",
+        "dateRange": "Rango de fechas",
+        "status": "Estado",
+        "actions": "Acciones",
+        "edit": "Editar"
+      },
+      "status": {
+        "draft": "Borrador",
+        "published": "Publicado"
+      },
+      "states": {
+        "loading": "Cargando factores de corrección...",
+        "error": "No se pudieron cargar los factores de corrección.",
+        "empty": "No se encontraron factores de corrección para los filtros actuales."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Tipo de polen",

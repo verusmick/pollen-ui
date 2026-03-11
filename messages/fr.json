@@ -56,6 +56,38 @@
   },
   "correctionFactorsPage": {
     "description": "Ajustez et gérez les corrections appliquées aux pics de pollen détectés.",
+    "list": {
+      "title": "Facteurs de correction",
+      "description": "Ajustez et gérez les corrections appliquées aux pics de pollen détectés.",
+      "newButton": "Nouveau facteur de correction",
+      "filters": {
+        "fromDate": "À partir du",
+        "location": "Emplacement",
+        "allLocations": "Tous les emplacements",
+        "pollen": "Pollen de base",
+        "allPollens": "Tous les pollens",
+        "reset": "Réinitialiser",
+        "loading": "Chargement..."
+      },
+      "table": {
+        "id": "ID",
+        "location": "Emplacement",
+        "basePollen": "Pollen de base",
+        "dateRange": "Plage de dates",
+        "status": "Statut",
+        "actions": "Actions",
+        "edit": "Modifier"
+      },
+      "status": {
+        "draft": "Brouillon",
+        "published": "Publié"
+      },
+      "states": {
+        "loading": "Chargement des facteurs de correction...",
+        "error": "Impossible de charger les facteurs de correction.",
+        "empty": "Aucun facteur de correction trouvé pour les filtres actuels."
+      }
+    },
     "filter": {
       "placeholderNumber": "001",
       "pollenType": "Type de pollen",
