@@ -275,11 +275,12 @@ export interface CorrectionFactorFormDerivedRow {
 }
 
 export interface CorrectionFactorFormDerivedState {
+  assignedReviewedEvents: number;
+  unknownReviewedEvents: number;
   totalReviewedEvents: number;
   remainingEvents: number;
   isBalanced: boolean;
   hasDuplicatePollens: boolean;
-  unknownCount: number;
   multipliersByRowId: Record<string, number>;
 }
 ```
@@ -482,8 +483,9 @@ Validation rules:
 10. `reviewedEvents` must be numeric.
 11. `reviewedEvents` must be `>= 0`.
 12. duplicate pollens are not allowed.
-13. `UNKNOWN` can appear at most once.
-14. total reviewed events must equal detected events.
+13. `UNKNOWN` is treated as an implicit remainder in the UI, not as a normal editable row.
+14. any difference between `detectedEvents` and the sum of explicit `reviewedEvents` is automatically treated as `UNKNOWN`.
+15. explicit reviewed events cannot exceed `detectedEvents`.
 
 Recommended validation timing:
 
@@ -511,9 +513,16 @@ Rules:
 Special handling:
 
 - base pollen row is included in the table and gets a derived multiplier
-- `UNKNOWN` participates in the reviewed-event total
-- `UNKNOWN` represents removed events, but its API encoding is not yet confirmed
-- isolate the API representation behind a single constant or mapper helper
+- users distribute reviewed events across explicit pollen classifications only
+- `UNKNOWN` is derived as the remainder between `detectedEvents` and the explicit reviewed-event total
+- `UNKNOWN` is shown in the UI but is not edited as a normal row
+- `UNKNOWN` is omitted from the API payload
+
+Why this shape:
+
+- experts edit reviewed events only
+- the system derives both multipliers and `UNKNOWN` automatically
+- this keeps the UI simpler and avoids redundant payload data
 
 Recommended payload builder:
 
