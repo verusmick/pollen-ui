@@ -90,8 +90,34 @@
     },
     "form": {
       "title": "Korrekturfaktor",
+      "editTitle": "Korrekturfaktor bearbeiten",
       "description": "Legen Sie fest, wie dieser Korrekturfaktor die Ereigniszahlen in einem bestimmten Zeitraum auf Pollen verteilt.",
+      "editDescription": "Prüfen Sie den gespeicherten Korrekturfaktor und aktualisieren Sie ihn nur, wenn das Backend genügend Daten liefert, um die überprüften Ereignisse sicher zu rekonstruieren.",
       "submitErrorFallback": "Der Korrekturfaktor konnte nicht gespeichert werden.",
+      "updateErrorFallback": "Der Korrekturfaktor konnte nicht aktualisiert werden.",
+      "deleteErrorFallback": "Der Korrekturfaktor konnte nicht gelöscht werden.",
+      "states": {
+        "loadingDetail": "Korrekturfaktor wird geladen...",
+        "loadError": "Der Korrekturfaktor konnte nicht geladen werden."
+      },
+      "editUnavailable": {
+        "title": "Bearbeitung ist für diesen Datensatz nicht verfügbar",
+        "description": "Der Backend-Datensatz enthält nicht genügend Informationen, um die für dieses Formular erforderlichen Werte der überprüften Ereignisse zu rekonstruieren. Die gespeicherten Daten werden unten zur Referenz angezeigt, und das Löschen bleibt verfügbar.",
+        "reasonLabel": "Grund",
+        "reason": "Die Werte der überprüften Ereignisse können aus der aktuellen Backend-Detailantwort nicht rekonstruiert werden.",
+        "summaryTitle": "Gespeicherter Datensatz",
+        "location": "Ort",
+        "basePollen": "Basispollen",
+        "dateRange": "Zeitraum",
+        "status": "Status",
+        "detailsTitle": "Gespeicherte Faktoren",
+        "pollen": "Pollen",
+        "multiplier": "Gespeicherter Multiplikator",
+        "published": "Veröffentlicht",
+        "yes": "Ja",
+        "no": "Nein",
+        "empty": "Für diesen Datensatz sind keine gespeicherten Faktordetails verfügbar."
+      },
       "meta": {
         "title": "Ort und Zeitraum",
         "location": "Ort",
@@ -134,7 +160,12 @@
       "actions": {
         "cancel": "Zurück",
         "save": "Korrekturfaktor speichern",
-        "saving": "Speichern..."
+        "saving": "Speichern...",
+        "update": "Korrekturfaktor aktualisieren",
+        "updating": "Wird aktualisiert...",
+        "delete": "Korrekturfaktor löschen",
+        "deleting": "Wird gelöscht...",
+        "deleteConfirm": "Möchten Sie diesen Korrekturfaktor wirklich löschen?"
       }
     },
     "filter": {

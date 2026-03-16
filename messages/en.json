@@ -90,8 +90,34 @@
     },
     "form": {
       "title": "Correction Factor",
+      "editTitle": "Edit Correction Factor",
       "description": "Define how this correction factor will redistribute the event counts across pollens during a specific time interval.",
+      "editDescription": "Review the stored correction factor and update it only when the backend provides enough data to reconstruct reviewed events safely.",
       "submitErrorFallback": "Failed to save the correction factor.",
+      "updateErrorFallback": "Failed to update the correction factor.",
+      "deleteErrorFallback": "Failed to delete the correction factor.",
+      "states": {
+        "loadingDetail": "Loading correction factor...",
+        "loadError": "Failed to load the correction factor."
+      },
+      "editUnavailable": {
+        "title": "Editing is not available for this record",
+        "description": "The backend record does not provide enough information to reconstruct the reviewed-event inputs required by this form. The stored data is shown below for reference, and delete remains available.",
+        "reasonLabel": "Reason",
+        "reason": "Reviewed-event values cannot be reconstructed from the current backend detail payload.",
+        "summaryTitle": "Stored record",
+        "location": "Location",
+        "basePollen": "Base pollen",
+        "dateRange": "Date range",
+        "status": "Status",
+        "detailsTitle": "Stored factors",
+        "pollen": "Pollen",
+        "multiplier": "Stored multiplier",
+        "published": "Published",
+        "yes": "Yes",
+        "no": "No",
+        "empty": "No stored factor details are available for this record."
+      },
       "meta": {
         "title": "Location and dates",
         "location": "Location",
@@ -134,7 +160,12 @@
       "actions": {
         "cancel": "Back",
         "save": "Save Correction Factor",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "update": "Update Correction Factor",
+        "updating": "Updating...",
+        "delete": "Delete Correction Factor",
+        "deleting": "Deleting...",
+        "deleteConfirm": "Are you sure you want to delete this correction factor?"
       }
     },
     "filter": {

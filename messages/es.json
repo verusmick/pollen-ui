@@ -90,8 +90,34 @@
     },
     "form": {
       "title": "Factor de corrección",
+      "editTitle": "Editar factor de corrección",
       "description": "Defina cómo este factor de corrección redistribuirá los conteos de eventos entre pólenes durante un intervalo de tiempo específico.",
+      "editDescription": "Revise el factor de corrección almacenado y actualícelo solo cuando el backend proporcione datos suficientes para reconstruir con seguridad los eventos revisados.",
       "submitErrorFallback": "No se pudo guardar el factor de corrección.",
+      "updateErrorFallback": "No se pudo actualizar el factor de corrección.",
+      "deleteErrorFallback": "No se pudo eliminar el factor de corrección.",
+      "states": {
+        "loadingDetail": "Cargando factor de corrección...",
+        "loadError": "No se pudo cargar el factor de corrección."
+      },
+      "editUnavailable": {
+        "title": "La edición no está disponible para este registro",
+        "description": "El registro del backend no proporciona suficiente información para reconstruir las entradas de eventos revisados que requiere este formulario. Los datos almacenados se muestran abajo como referencia y la eliminación sigue disponible.",
+        "reasonLabel": "Motivo",
+        "reason": "Los valores de eventos revisados no se pueden reconstruir a partir del payload de detalle actual del backend.",
+        "summaryTitle": "Registro almacenado",
+        "location": "Ubicación",
+        "basePollen": "Polen base",
+        "dateRange": "Rango de fechas",
+        "status": "Estado",
+        "detailsTitle": "Factores almacenados",
+        "pollen": "Polen",
+        "multiplier": "Multiplicador almacenado",
+        "published": "Publicado",
+        "yes": "Sí",
+        "no": "No",
+        "empty": "No hay detalles de factores almacenados para este registro."
+      },
       "meta": {
         "title": "Ubicación y fechas",
         "location": "Ubicación",
@@ -134,7 +160,12 @@
       "actions": {
         "cancel": "Volver",
         "save": "Guardar factor de corrección",
-        "saving": "Guardando..."
+        "saving": "Guardando...",
+        "update": "Actualizar factor de corrección",
+        "updating": "Actualizando...",
+        "delete": "Eliminar factor de corrección",
+        "deleting": "Eliminando...",
+        "deleteConfirm": "¿Seguro que desea eliminar este factor de corrección?"
       }
     },
     "filter": {

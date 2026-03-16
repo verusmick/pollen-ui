@@ -54,11 +54,37 @@ export function mapApiCorrectionFactorsList(
 }
 
 export function mapCorrectionFactorRecordToFormValues(
-  _record: CorrectionFactorRecord
+  record: CorrectionFactorRecord
 ): CorrectionFactorFormValues {
-  // TODO: Edit hydration is blocked until backend confirms GET by id support
-  // and provides enough data to reconstruct reviewedEvents from stored factors.
-  throw new Error(
-    'Correction factor edit hydration is not supported by the current backend contract.'
-  );
+  const normalizedRows = record.details.map((detail, index) => ({
+    clientId: detail.id ?? `cf-detail-${record.id}-${index}`,
+    pollen: detail.pollen,
+    reviewedEvents: String(detail.factorPercentage),
+    isBasePollen: detail.pollen === record.basePollen,
+  }));
+  const baseRow = normalizedRows.find((row) => row.isBasePollen);
+  const otherRows = normalizedRows.filter((row) => !row.isBasePollen);
+
+  return {
+    location: record.location,
+    basePollen: record.basePollen,
+    startDate: record.startDate.slice(0, 10),
+    endDate: record.endDate.slice(0, 10),
+    // The backend stores only factor_percentage values.
+    // Normalize edit hydration to a detected-events total of 1 so the
+    // existing form math continues to derive the same multipliers.
+    detectedEvents: 1,
+    publishOnSave: record.status === 'published',
+    rows: baseRow
+      ? [baseRow, ...otherRows]
+      : [
+          {
+            clientId: `cf-base-${record.id}`,
+            pollen: record.basePollen,
+            reviewedEvents: '0',
+            isBasePollen: true,
+          },
+          ...otherRows,
+        ],
+  };
 }

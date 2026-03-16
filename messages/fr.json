@@ -90,8 +90,34 @@
     },
     "form": {
       "title": "Facteur de correction",
+      "editTitle": "Modifier le facteur de correction",
       "description": "Définissez comment ce facteur de correction redistribuera les comptes d’événements entre pollens sur une période donnée.",
+      "editDescription": "Consultez le facteur de correction enregistré et mettez-le à jour uniquement lorsque le backend fournit assez de données pour reconstruire en toute sécurité les événements révisés.",
       "submitErrorFallback": "Impossible d’enregistrer le facteur de correction.",
+      "updateErrorFallback": "Impossible de mettre à jour le facteur de correction.",
+      "deleteErrorFallback": "Impossible de supprimer le facteur de correction.",
+      "states": {
+        "loadingDetail": "Chargement du facteur de correction...",
+        "loadError": "Impossible de charger le facteur de correction."
+      },
+      "editUnavailable": {
+        "title": "La modification n’est pas disponible pour cet enregistrement",
+        "description": "L’enregistrement backend ne fournit pas assez d’informations pour reconstruire les valeurs d’événements révisés requises par ce formulaire. Les données enregistrées sont affichées ci-dessous à titre de référence et la suppression reste disponible.",
+        "reasonLabel": "Raison",
+        "reason": "Les valeurs d’événements révisés ne peuvent pas être reconstruites à partir de la charge utile de détail backend actuelle.",
+        "summaryTitle": "Enregistrement stocké",
+        "location": "Emplacement",
+        "basePollen": "Pollen de base",
+        "dateRange": "Plage de dates",
+        "status": "Statut",
+        "detailsTitle": "Facteurs enregistrés",
+        "pollen": "Pollen",
+        "multiplier": "Multiplicateur enregistré",
+        "published": "Publié",
+        "yes": "Oui",
+        "no": "Non",
+        "empty": "Aucun détail de facteur enregistré n’est disponible pour cet enregistrement."
+      },
       "meta": {
         "title": "Emplacement et dates",
         "location": "Emplacement",
@@ -134,7 +160,12 @@
       "actions": {
         "cancel": "Retour",
         "save": "Enregistrer le facteur de correction",
-        "saving": "Enregistrement..."
+        "saving": "Enregistrement...",
+        "update": "Mettre à jour le facteur de correction",
+        "updating": "Mise à jour...",
+        "delete": "Supprimer le facteur de correction",
+        "deleting": "Suppression...",
+        "deleteConfirm": "Voulez-vous vraiment supprimer ce facteur de correction ?"
       }
     },
     "filter": {

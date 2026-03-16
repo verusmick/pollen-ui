@@ -174,6 +174,11 @@ export function useCorrectionFactorForm() {
     setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
   }
 
+  function replaceValues(nextValues: CorrectionFactorFormValues) {
+    setValues(nextValues);
+    setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
+  }
+
   function validate() {
     const nextErrors = validateCorrectionFactorForm(values);
     setErrors(nextErrors);
@@ -209,6 +214,7 @@ export function useCorrectionFactorForm() {
     updateRowPollen,
     updateRowReviewedEvents,
     resetForm,
+    replaceValues,
     validate,
     getPollenOptions,
   };

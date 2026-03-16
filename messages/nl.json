@@ -90,8 +90,34 @@
     },
     "form": {
       "title": "Correctiefactor",
+      "editTitle": "Correctiefactor bewerken",
       "description": "Bepaal hoe deze correctiefactor gebeurtenisaantallen over pollen verdeelt binnen een specifiek tijdsinterval.",
+      "editDescription": "Bekijk de opgeslagen correctiefactor en werk deze alleen bij wanneer de backend voldoende gegevens levert om beoordeelde gebeurtenissen veilig te reconstrueren.",
       "submitErrorFallback": "De correctiefactor kon niet worden opgeslagen.",
+      "updateErrorFallback": "De correctiefactor kon niet worden bijgewerkt.",
+      "deleteErrorFallback": "De correctiefactor kon niet worden verwijderd.",
+      "states": {
+        "loadingDetail": "Correctiefactor wordt geladen...",
+        "loadError": "De correctiefactor kon niet worden geladen."
+      },
+      "editUnavailable": {
+        "title": "Bewerken is niet beschikbaar voor dit record",
+        "description": "Het backend-record bevat niet genoeg informatie om de invoer voor beoordeelde gebeurtenissen te reconstrueren die dit formulier vereist. De opgeslagen gegevens worden hieronder ter referentie getoond en verwijderen blijft beschikbaar.",
+        "reasonLabel": "Reden",
+        "reason": "Waarden voor beoordeelde gebeurtenissen kunnen niet worden gereconstrueerd uit de huidige backend-detailpayload.",
+        "summaryTitle": "Opgeslagen record",
+        "location": "Locatie",
+        "basePollen": "Basispollen",
+        "dateRange": "Datumbereik",
+        "status": "Status",
+        "detailsTitle": "Opgeslagen factoren",
+        "pollen": "Pollen",
+        "multiplier": "Opgeslagen vermenigvuldiger",
+        "published": "Gepubliceerd",
+        "yes": "Ja",
+        "no": "Nee",
+        "empty": "Er zijn geen opgeslagen factordetails beschikbaar voor dit record."
+      },
       "meta": {
         "title": "Locatie en datums",
         "location": "Locatie",
@@ -134,7 +160,12 @@
       "actions": {
         "cancel": "Terug",
         "save": "Correctiefactor opslaan",
-        "saving": "Opslaan..."
+        "saving": "Opslaan...",
+        "update": "Correctiefactor bijwerken",
+        "updating": "Bijwerken...",
+        "delete": "Correctiefactor verwijderen",
+        "deleting": "Verwijderen...",
+        "deleteConfirm": "Weet u zeker dat u deze correctiefactor wilt verwijderen?"
       }
     },
     "filter": {

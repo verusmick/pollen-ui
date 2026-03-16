@@ -39,7 +39,17 @@ async function requestJson<T>(input: string, init?: RequestInit): Promise<T> {
     throw new Error(`Correction Factors API error: ${response.statusText}`);
   }
 
-  return response.json() as Promise<T>;
+  if (response.status === 204) {
+    return {} as T;
+  }
+
+  const text = await response.text();
+
+  if (!text.trim()) {
+    return {} as T;
+  }
+
+  return JSON.parse(text) as T;
 }
 
 function normalizeStringArrayResponse(
