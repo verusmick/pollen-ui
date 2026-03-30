@@ -36,7 +36,14 @@ async function requestJson<T>(input: string, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);
 
   if (!response.ok) {
-    throw new Error(`Correction Factors API error: ${response.statusText}`);
+    const errorText = await response.text();
+    const trimmedErrorText = errorText.trim();
+
+    throw new Error(
+      trimmedErrorText
+        ? `Correction Factors API error (${response.status}): ${trimmedErrorText}`
+        : `Correction Factors API error (${response.status}): ${response.statusText}`
+    );
   }
 
   if (response.status === 204) {

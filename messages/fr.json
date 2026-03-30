@@ -67,7 +67,8 @@
         "pollen": "Pollen de base",
         "allPollens": "Tous les pollens",
         "reset": "Réinitialiser",
-        "loading": "Chargement..."
+        "loading": "Chargement...",
+        "optionsError": "Les options d'emplacement ou de pollen n'ont pas pu être chargées."
       },
       "table": {
         "id": "ID",
@@ -85,7 +86,9 @@
       "states": {
         "loading": "Chargement des facteurs de correction...",
         "error": "Impossible de charger les facteurs de correction.",
-        "empty": "Aucun facteur de correction trouvé pour les filtres actuels."
+        "empty": "Aucun facteur de correction n'a encore été créé.",
+        "emptyFiltered": "Aucun facteur de correction trouvé pour les filtres actuels.",
+        "updating": "Mise à jour des facteurs de correction..."
       }
     },
     "form": {
@@ -128,7 +131,25 @@
         "startDate": "Date de début",
         "endDate": "Date de fin",
         "publishOnSave": "Publier lors de l’enregistrement",
-        "loading": "Chargement..."
+        "loading": "Chargement...",
+        "loadError": "Options indisponibles",
+        "optionsLoadError": "Ce champ n'a pas pu charger ses options."
+      },
+      "validation": {
+        "locationRequired": "L'emplacement est requis.",
+        "basePollenRequired": "Le pollen de base est requis.",
+        "startDateRequired": "La date de début est requise.",
+        "endDateRequired": "La date de fin est requise.",
+        "endDateOrder": "La date de fin doit être postérieure ou égale à la date de début.",
+        "detectedEventsRequired": "Les événements détectés sont requis.",
+        "atLeastOneRow": "Au moins une ligne de correction est requise.",
+        "exactlyOneBaseRow": "Une seule ligne de pollen de base est requise.",
+        "baseRowFirst": "La ligne de pollen de base doit être la première.",
+        "baseRowMatch": "La ligne de pollen de base doit correspondre au pollen de base sélectionné.",
+        "pollenRequired": "Le pollen est requis.",
+        "reviewedEventsNonNegative": "Les événements révisés doivent être un nombre non négatif.",
+        "duplicatePollens": "Les doublons de pollen ne sont pas autorisés.",
+        "overAllocated": "Les événements révisés ne peuvent pas dépasser les événements détectés."
       },
       "distribution": {
         "title": "Facteurs de correction",
@@ -151,7 +172,16 @@
         "assignedEvents": "Événements attribués",
         "unknownEvents": "Événements inconnus",
         "totalReviewedEvents": "Total des événements révisés",
-        "difference": "Sur-attribué"
+        "difference": "Sur-attribué",
+        "remainingEvents": "Événements restants",
+        "overAssigned": "Sur-attribué",
+        "balancedMessage": "Les événements révisés sont entièrement équilibrés.",
+        "unknownRemainderMessage": "Les événements restants seront attribués à Inconnu : {count}.",
+        "overAllocatedMessage": "Les événements révisés dépassent les événements détectés de {count}."
+      },
+      "editHydration": {
+        "title": "Valeurs d'édition normalisées",
+        "description": "Le mode édition hydrate les multiplicateurs enregistrés en entrées d'événements révisés en utilisant un total d'événements détectés de 1. Cela préserve les facteurs enregistrés, mais ne restaure pas les nombres d'événements révisés d'origine."
       },
       "preview": {
         "title": "Graphique (Original vs Corrigé)",

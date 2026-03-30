@@ -105,7 +105,11 @@ export function buildCorrectionFactorDerivedState(
     unknownReviewedEvents,
     totalReviewedEvents,
     remainingEvents,
-    isBalanced: detectedEvents >= 0 && !hasOverAllocatedEvents,
+    isBalanced:
+      values.detectedEvents !== null &&
+      detectedEvents >= 0 &&
+      !hasOverAllocatedEvents &&
+      unknownReviewedEvents === 0,
     hasDuplicatePollens: Array.from(pollenCounts.values()).some(
       (count) => count > 1
     ),

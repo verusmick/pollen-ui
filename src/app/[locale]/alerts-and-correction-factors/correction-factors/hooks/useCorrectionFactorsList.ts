@@ -30,6 +30,7 @@ export function useCorrectionFactorsList(filters: CorrectionFactorListFilters) {
       const response = await getCorrectionFactors(mapListFiltersToRequest(filters));
       return mapApiCorrectionFactorsList(response);
     },
+    placeholderData: (previousData) => previousData,
     staleTime: 1000 * 60 * 10,
   });
 }

@@ -414,7 +414,8 @@ Responsibilities:
   - list query for table page
 - `useCorrectionFactorDetail`
   - edit bootstrap query
-  - only safe if backend provides a detail fetch path or an equivalent fallback
+  - current implementation hydrates edit form values from stored multipliers with a normalized detected-events total of `1`
+  - this preserves stored factors for round-tripping, but it does not recreate original reviewed-event counts
 - `useCorrectionFactorPreview`
   - fetches the original chart source only
   - corrected series is derived locally from current form state
@@ -427,7 +428,9 @@ To stay close to current project conventions:
 - call write helpers imperatively inside container submit handlers
 - after success, invalidate:
   - `correctionFactorKeys.lists()`
+  - `correctionFactorKeys.details()`
   - `correctionFactorKeys.detail(id)` when relevant
+ - navigate back to the locale-scoped list route after create, update, and delete
 
 This is the smallest React Query extension necessary for CRUD.
 
@@ -618,24 +621,22 @@ Bootstrap:
 - map to form values
 - show delete button
 
-### Important Edit Gap
+### Edit Hydration Behavior
 
 The UI edits `reviewedEvents`, but the contract stores `factor_percentage`.
 
-That means edit hydration needs at least one of:
+Current implemented behavior:
 
-1. backend detail response includes `reviewed_events` and `detected_events`, or
-2. backend detail response includes enough data to reconstruct reviewed events losslessly
+- fetch existing correction factor detail
+- map stored `factor_percentage` values into `reviewedEvents`
+- normalize `detectedEvents` to `1`
+- keep base row ordering and publish state intact
 
-Without that, the edit form cannot faithfully restore the editable table from the current contract alone.
+Implication:
 
-Recommendation:
-
-- treat `GET /api/correctionFactors/:id` support plus edit bootstrap data as a backend dependency for edit mode
-- do not hide this gap inside frontend assumptions
-- phase-gate edit mode behind backend confirmation of:
-  - `GET /api/correctionFactors/:id`
-  - enough data to reconstruct `reviewedEvents`
+- edit mode can round-trip stored multipliers with the current contract
+- edit mode does not restore the original reviewed-event totals that produced those multipliers
+- this normalization should stay documented in the UI and state docs until the backend returns lossless edit inputs
 
 ## Status Strategy
 

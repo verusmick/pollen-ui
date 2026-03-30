@@ -67,7 +67,8 @@
         "pollen": "Polen base",
         "allPollens": "Todos los pólenes",
         "reset": "Restablecer",
-        "loading": "Cargando..."
+        "loading": "Cargando...",
+        "optionsError": "No se pudieron cargar las opciones de ubicación o polen."
       },
       "table": {
         "id": "ID",
@@ -85,7 +86,9 @@
       "states": {
         "loading": "Cargando factores de corrección...",
         "error": "No se pudieron cargar los factores de corrección.",
-        "empty": "No se encontraron factores de corrección para los filtros actuales."
+        "empty": "Todavía no se han creado factores de corrección.",
+        "emptyFiltered": "No se encontraron factores de corrección para los filtros actuales.",
+        "updating": "Actualizando factores de corrección..."
       }
     },
     "form": {
@@ -128,7 +131,25 @@
         "startDate": "Fecha de inicio",
         "endDate": "Fecha de fin",
         "publishOnSave": "Publicar al guardar",
-        "loading": "Cargando..."
+        "loading": "Cargando...",
+        "loadError": "Opciones no disponibles",
+        "optionsLoadError": "Este campo no pudo cargar sus opciones."
+      },
+      "validation": {
+        "locationRequired": "La ubicación es obligatoria.",
+        "basePollenRequired": "El polen base es obligatorio.",
+        "startDateRequired": "La fecha de inicio es obligatoria.",
+        "endDateRequired": "La fecha de fin es obligatoria.",
+        "endDateOrder": "La fecha de fin debe ser posterior o igual a la fecha de inicio.",
+        "detectedEventsRequired": "Los eventos detectados son obligatorios.",
+        "atLeastOneRow": "Se requiere al menos una fila de corrección.",
+        "exactlyOneBaseRow": "Se requiere exactamente una fila de polen base.",
+        "baseRowFirst": "La fila de polen base debe ser la primera.",
+        "baseRowMatch": "La fila de polen base debe coincidir con el polen base seleccionado.",
+        "pollenRequired": "El polen es obligatorio.",
+        "reviewedEventsNonNegative": "Los eventos revisados deben ser un número no negativo.",
+        "duplicatePollens": "No se permiten pólenes duplicados.",
+        "overAllocated": "Los eventos revisados no pueden exceder los eventos detectados."
       },
       "distribution": {
         "title": "Factores de corrección",
@@ -151,7 +172,16 @@
         "assignedEvents": "Eventos asignados",
         "unknownEvents": "Eventos desconocidos",
         "totalReviewedEvents": "Eventos revisados totales",
-        "difference": "Exceso asignado"
+        "difference": "Exceso asignado",
+        "remainingEvents": "Eventos restantes",
+        "overAssigned": "Exceso asignado",
+        "balancedMessage": "Los eventos revisados están completamente balanceados.",
+        "unknownRemainderMessage": "Los eventos restantes se asignarán a Desconocido: {count}.",
+        "overAllocatedMessage": "Los eventos revisados exceden los eventos detectados por {count}."
+      },
+      "editHydration": {
+        "title": "Valores de edición normalizados",
+        "description": "El modo de edición hidrata los multiplicadores almacenados en entradas de eventos revisados usando un total de eventos detectados de 1. Esto preserva los factores guardados, pero no restaura los conteos originales de eventos revisados."
       },
       "preview": {
         "title": "Gráfico (Original vs Corregido)",

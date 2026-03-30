@@ -3,58 +3,76 @@ import type {
   CorrectionFactorFormValues,
 } from '../types';
 
+interface CorrectionFactorValidationMessages {
+  locationRequired: string;
+  basePollenRequired: string;
+  startDateRequired: string;
+  endDateRequired: string;
+  endDateOrder: string;
+  detectedEventsRequired: string;
+  atLeastOneRow: string;
+  exactlyOneBaseRow: string;
+  baseRowFirst: string;
+  baseRowMatch: string;
+  pollenRequired: string;
+  reviewedEventsNonNegative: string;
+  duplicatePollens: string;
+  overAllocated: string;
+}
+
 function isValidNonNegativeNumber(value: string): boolean {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0;
 }
 
 export function validateCorrectionFactorForm(
-  values: CorrectionFactorFormValues
+  values: CorrectionFactorFormValues,
+  messages: CorrectionFactorValidationMessages
 ): CorrectionFactorFormErrors {
   const errors: CorrectionFactorFormErrors = {
     rowErrorsById: {},
   };
 
   if (!values.location) {
-    errors.location = 'Location is required.';
+    errors.location = messages.locationRequired;
   }
 
   if (!values.basePollen) {
-    errors.basePollen = 'Base pollen is required.';
+    errors.basePollen = messages.basePollenRequired;
   }
 
   if (!values.startDate) {
-    errors.startDate = 'Start date is required.';
+    errors.startDate = messages.startDateRequired;
   }
 
   if (!values.endDate) {
-    errors.endDate = 'End date is required.';
+    errors.endDate = messages.endDateRequired;
   }
 
   if (values.startDate && values.endDate && values.endDate < values.startDate) {
-    errors.endDate = 'End date must be after or equal to start date.';
+    errors.endDate = messages.endDateOrder;
   }
 
   if (values.detectedEvents === null) {
-    errors.detectedEvents = 'Detected events are required.';
+    errors.detectedEvents = messages.detectedEventsRequired;
   }
 
   if (values.rows.length === 0) {
-    errors.rows = 'At least one correction row is required.';
+    errors.rows = messages.atLeastOneRow;
     return errors;
   }
 
   const baseRows = values.rows.filter((row) => row.isBasePollen);
   if (baseRows.length !== 1) {
-    errors.rows = 'Exactly one base pollen row is required.';
+    errors.rows = messages.exactlyOneBaseRow;
   } else {
     const [baseRow] = baseRows;
     if (values.rows[0]?.clientId !== baseRow.clientId) {
-      errors.rows = 'The base pollen row must be the first row.';
+      errors.rows = messages.baseRowFirst;
     }
 
     if (values.basePollen && baseRow.pollen !== values.basePollen) {
-      errors.rows = 'The base pollen row must match the selected base pollen.';
+      errors.rows = messages.baseRowMatch;
     }
   }
 
@@ -65,7 +83,7 @@ export function validateCorrectionFactorForm(
     if (!row.pollen) {
       errors.rowErrorsById[row.clientId] = {
         ...errors.rowErrorsById[row.clientId],
-        pollen: 'Pollen is required.',
+        pollen: messages.pollenRequired,
       };
     } else {
       pollenCounts.set(row.pollen, (pollenCounts.get(row.pollen) ?? 0) + 1);
@@ -74,7 +92,7 @@ export function validateCorrectionFactorForm(
     if (!isValidNonNegativeNumber(row.reviewedEvents)) {
       errors.rowErrorsById[row.clientId] = {
         ...errors.rowErrorsById[row.clientId],
-        reviewedEvents: 'Reviewed events must be a non-negative number.',
+        reviewedEvents: messages.reviewedEventsNonNegative,
       };
       continue;
     }
@@ -83,14 +101,14 @@ export function validateCorrectionFactorForm(
   }
 
   if (Array.from(pollenCounts.values()).some((count) => count > 1)) {
-    errors.rows = 'Duplicate pollens are not allowed.';
+    errors.rows = messages.duplicatePollens;
   }
 
   if (
     values.detectedEvents !== null &&
     totalReviewedEvents > values.detectedEvents
   ) {
-    errors.rows = 'Reviewed events cannot exceed detected events.';
+    errors.rows = messages.overAllocated;
   }
 
   return errors;

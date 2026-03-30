@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
+import { useRouter } from '@/features/i18n/routing';
 import {
   createCorrectionFactor,
   deleteCorrectionFactor,
@@ -33,6 +33,7 @@ export function CorrectionFactorFormContainer({
   const router = useRouter();
   const queryClient = useQueryClient();
   const t = useTranslations('correctionFactorsPage.form');
+  const listHref = '/alerts-and-correction-factors/correction-factors';
   const isEditMode = mode === 'edit';
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -49,6 +50,8 @@ export function CorrectionFactorFormContainer({
   const {
     data: locationOptions = [],
     isLoading: locationsLoading,
+    isError: locationsError,
+    error: locationsQueryError,
   } = useQuery({
     queryKey: correctionFactorKeys.locations(),
     queryFn: getCorrectionFactorLocations,
@@ -58,6 +61,8 @@ export function CorrectionFactorFormContainer({
   const {
     data: pollenOptions = [],
     isLoading: pollensLoading,
+    isError: pollensError,
+    error: pollensQueryError,
   } = useQuery({
     queryKey: correctionFactorKeys.pollens(),
     queryFn: getCorrectionFactorPollens,
@@ -108,17 +113,31 @@ export function CorrectionFactorFormContainer({
     !correctionFactorId ||
     detailQuery.isLoading ||
     Boolean(detailError);
+  const locationOptionsError = locationsError
+    ? locationsQueryError instanceof Error
+      ? locationsQueryError.message
+      : t('meta.optionsLoadError')
+    : null;
+  const pollenOptionsError = pollensError
+    ? pollensQueryError instanceof Error
+      ? pollensQueryError.message
+      : t('meta.optionsLoadError')
+    : null;
 
   async function invalidateCorrectionFactorQueries(id?: string) {
-    await queryClient.invalidateQueries({
-      queryKey: correctionFactorKeys.lists(),
-    });
-
-    if (id) {
-      await queryClient.invalidateQueries({
-        queryKey: correctionFactorKeys.detail(id),
-      });
-    }
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: correctionFactorKeys.lists(),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: correctionFactorKeys.details(),
+      }),
+      id
+        ? queryClient.invalidateQueries({
+            queryKey: correctionFactorKeys.detail(id),
+          })
+        : Promise.resolve(),
+    ]);
   }
 
   async function handleSubmit() {
@@ -141,13 +160,18 @@ export function CorrectionFactorFormContainer({
       });
 
       if (isEditMode && correctionFactorId) {
-        await updateCorrectionFactor(correctionFactorId, payload);
+        const response = await updateCorrectionFactor(correctionFactorId, payload);
+        const nextId = String(response.data.id);
+
+        await invalidateCorrectionFactorQueries(nextId);
       } else {
-        await createCorrectionFactor(payload);
+        const response = await createCorrectionFactor(payload);
+        const nextId = String(response.data.id);
+
+        await invalidateCorrectionFactorQueries(nextId);
       }
 
-      await invalidateCorrectionFactorQueries(correctionFactorId);
-      router.push('/alerts-and-correction-factors/correction-factors');
+      router.replace(listHref);
     } catch (error) {
       setActionError(
         error instanceof Error
@@ -176,7 +200,10 @@ export function CorrectionFactorFormContainer({
       setDeleting(true);
       await deleteCorrectionFactor(correctionFactorId);
       await invalidateCorrectionFactorQueries(correctionFactorId);
-      router.push('/alerts-and-correction-factors/correction-factors');
+      queryClient.removeQueries({
+        queryKey: correctionFactorKeys.detail(correctionFactorId),
+      });
+      router.replace(listHref);
     } catch (error) {
       setActionError(
         error instanceof Error ? error.message : t('deleteErrorFallback')
@@ -196,6 +223,8 @@ export function CorrectionFactorFormContainer({
       pollenOptions={pollenOptions}
       locationsLoading={locationsLoading}
       pollensLoading={pollensLoading}
+      locationsError={locationOptionsError}
+      pollensError={pollenOptionsError}
       saving={saving}
       deleting={deleting}
       actionError={actionError}
@@ -221,7 +250,7 @@ export function CorrectionFactorFormContainer({
       onPollenChange={form.updateRowPollen}
       onReviewedEventsChange={form.updateRowReviewedEvents}
       onRemoveRow={form.removeRow}
-      onCancel={() => router.push('/alerts-and-correction-factors/correction-factors')}
+      onCancel={() => router.replace(listHref)}
       onSubmit={handleSubmit}
       onDelete={handleDelete}
     />

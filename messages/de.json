@@ -67,7 +67,8 @@
         "pollen": "Basispollen",
         "allPollens": "Alle Pollen",
         "reset": "Zurücksetzen",
-        "loading": "Wird geladen..."
+        "loading": "Wird geladen...",
+        "optionsError": "Orts- oder Pollenoptionen konnten nicht geladen werden."
       },
       "table": {
         "id": "ID",
@@ -85,7 +86,9 @@
       "states": {
         "loading": "Korrekturfaktoren werden geladen...",
         "error": "Korrekturfaktoren konnten nicht geladen werden.",
-        "empty": "Für die aktuellen Filter wurden keine Korrekturfaktoren gefunden."
+        "empty": "Es wurden noch keine Korrekturfaktoren erstellt.",
+        "emptyFiltered": "Für die aktuellen Filter wurden keine Korrekturfaktoren gefunden.",
+        "updating": "Korrekturfaktoren werden aktualisiert..."
       }
     },
     "form": {
@@ -128,7 +131,25 @@
         "startDate": "Startdatum",
         "endDate": "Enddatum",
         "publishOnSave": "Beim Speichern veröffentlichen",
-        "loading": "Wird geladen..."
+        "loading": "Wird geladen...",
+        "loadError": "Optionen nicht verfügbar",
+        "optionsLoadError": "Für dieses Feld konnten die Optionen nicht geladen werden."
+      },
+      "validation": {
+        "locationRequired": "Ort ist erforderlich.",
+        "basePollenRequired": "Basispollen ist erforderlich.",
+        "startDateRequired": "Startdatum ist erforderlich.",
+        "endDateRequired": "Enddatum ist erforderlich.",
+        "endDateOrder": "Das Enddatum muss nach oder gleich dem Startdatum liegen.",
+        "detectedEventsRequired": "Erkannte Ereignisse sind erforderlich.",
+        "atLeastOneRow": "Mindestens eine Korrekturzeile ist erforderlich.",
+        "exactlyOneBaseRow": "Genau eine Basispollen-Zeile ist erforderlich.",
+        "baseRowFirst": "Die Basispollen-Zeile muss die erste Zeile sein.",
+        "baseRowMatch": "Die Basispollen-Zeile muss mit dem ausgewählten Basispollen übereinstimmen.",
+        "pollenRequired": "Pollen ist erforderlich.",
+        "reviewedEventsNonNegative": "Überprüfte Ereignisse müssen eine nicht negative Zahl sein.",
+        "duplicatePollens": "Doppelte Pollen sind nicht erlaubt.",
+        "overAllocated": "Überprüfte Ereignisse dürfen die erkannten Ereignisse nicht überschreiten."
       },
       "distribution": {
         "title": "Korrekturfaktoren",
@@ -151,7 +172,16 @@
         "assignedEvents": "Zugewiesene Ereignisse",
         "unknownEvents": "Unbekannte Ereignisse",
         "totalReviewedEvents": "Summe überprüfter Ereignisse",
-        "difference": "Zu viel zugewiesen"
+        "difference": "Zu viel zugewiesen",
+        "remainingEvents": "Verbleibende Ereignisse",
+        "overAssigned": "Zu viel zugewiesen",
+        "balancedMessage": "Überprüfte Ereignisse sind vollständig ausgeglichen.",
+        "unknownRemainderMessage": "Verbleibende Ereignisse werden Unbekannt zugewiesen: {count}.",
+        "overAllocatedMessage": "Überprüfte Ereignisse überschreiten die erkannten Ereignisse um {count}."
+      },
+      "editHydration": {
+        "title": "Normalisierte Bearbeitungswerte",
+        "description": "Der Bearbeitungsmodus hydriert gespeicherte Multiplikatoren in Eingaben für überprüfte Ereignisse mit einer Gesamtzahl erkannter Ereignisse von 1. Dadurch bleiben die gespeicherten Faktoren erhalten, aber die ursprünglichen überprüften Ereigniszahlen werden nicht wiederhergestellt."
       },
       "preview": {
         "title": "Diagramm (Original vs. Korrigiert)",

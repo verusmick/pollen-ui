@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/features/i18n/routing';
 
 export function CorrectionFactorsHeader() {
   const t = useTranslations('correctionFactorsPage.list');

@@ -22,6 +22,8 @@ interface CorrectionFactorFormProps {
   pollenOptions: string[];
   locationsLoading?: boolean;
   pollensLoading?: boolean;
+  locationsError?: string | null;
+  pollensError?: string | null;
   saving: boolean;
   deleting?: boolean;
   actionError?: string | null;
@@ -63,6 +65,8 @@ export function CorrectionFactorForm({
   pollenOptions,
   locationsLoading = false,
   pollensLoading = false,
+  locationsError = null,
+  pollensError = null,
   saving,
   deleting = false,
   actionError,
@@ -247,6 +251,8 @@ export function CorrectionFactorForm({
               pollenOptions={pollenOptions}
               locationsLoading={locationsLoading}
               pollensLoading={pollensLoading}
+              locationsError={locationsError}
+              pollensError={pollensError}
               onLocationChange={onLocationChange}
               onBasePollenChange={onBasePollenChange}
               onStartDateChange={onStartDateChange}
@@ -266,6 +272,13 @@ export function CorrectionFactorForm({
               onReviewedEventsChange={onReviewedEventsChange}
               onRemoveRow={onRemoveRow}
             />
+
+            {mode === 'edit' ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <p className="font-medium">{formT('editHydration.title')}</p>
+                <p className="mt-1">{formT('editHydration.description')}</p>
+              </div>
+            ) : null}
           </div>
 
           <section className="rounded-lg border border-border bg-card p-4">

@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/features/i18n/routing';
 
 import type { CorrectionFactorRecord } from '../../types';
 import { CorrectionFactorStatusBadge } from './CorrectionFactorStatusBadge';

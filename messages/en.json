@@ -67,7 +67,8 @@
         "pollen": "Base pollen",
         "allPollens": "All pollens",
         "reset": "Reset",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "optionsError": "Location or pollen options could not be loaded."
       },
       "table": {
         "id": "ID",
@@ -85,7 +86,9 @@
       "states": {
         "loading": "Loading correction factors...",
         "error": "Failed to load correction factors.",
-        "empty": "No correction factors found for the current filters."
+        "empty": "No correction factors have been created yet.",
+        "emptyFiltered": "No correction factors found for the current filters.",
+        "updating": "Updating correction factors..."
       }
     },
     "form": {
@@ -128,7 +131,25 @@
         "startDate": "Start date",
         "endDate": "End date",
         "publishOnSave": "Publish on save",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "loadError": "Options unavailable",
+        "optionsLoadError": "This field could not load its options."
+      },
+      "validation": {
+        "locationRequired": "Location is required.",
+        "basePollenRequired": "Base pollen is required.",
+        "startDateRequired": "Start date is required.",
+        "endDateRequired": "End date is required.",
+        "endDateOrder": "End date must be after or equal to start date.",
+        "detectedEventsRequired": "Detected events are required.",
+        "atLeastOneRow": "At least one correction row is required.",
+        "exactlyOneBaseRow": "Exactly one base pollen row is required.",
+        "baseRowFirst": "The base pollen row must be the first row.",
+        "baseRowMatch": "The base pollen row must match the selected base pollen.",
+        "pollenRequired": "Pollen is required.",
+        "reviewedEventsNonNegative": "Reviewed events must be a non-negative number.",
+        "duplicatePollens": "Duplicate pollens are not allowed.",
+        "overAllocated": "Reviewed events cannot exceed detected events."
       },
       "distribution": {
         "title": "Correction Factors",
@@ -151,7 +172,16 @@
         "assignedEvents": "Assigned events",
         "unknownEvents": "Unknown events",
         "totalReviewedEvents": "Total reviewed events",
-        "difference": "Over assigned"
+        "difference": "Over assigned",
+        "remainingEvents": "Remaining events",
+        "overAssigned": "Over assigned",
+        "balancedMessage": "Reviewed events are fully balanced.",
+        "unknownRemainderMessage": "Remaining events will be assigned to Unknown: {count}.",
+        "overAllocatedMessage": "Reviewed events exceed detected events by {count}."
+      },
+      "editHydration": {
+        "title": "Normalized edit values",
+        "description": "Edit mode hydrates stored multipliers into reviewed-event inputs using a detected-events total of 1. This preserves the saved factors but does not restore the original reviewed-event counts."
       },
       "preview": {
         "title": "Chart (Original vs Corrected)",

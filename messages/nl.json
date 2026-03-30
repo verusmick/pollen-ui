@@ -67,7 +67,8 @@
         "pollen": "Basispollen",
         "allPollens": "Alle pollen",
         "reset": "Resetten",
-        "loading": "Laden..."
+        "loading": "Laden...",
+        "optionsError": "Locatie- of pollenopties konden niet worden geladen."
       },
       "table": {
         "id": "ID",
@@ -85,7 +86,9 @@
       "states": {
         "loading": "Correctiefactoren laden...",
         "error": "Correctiefactoren konden niet worden geladen.",
-        "empty": "Geen correctiefactoren gevonden voor de huidige filters."
+        "empty": "Er zijn nog geen correctiefactoren aangemaakt.",
+        "emptyFiltered": "Geen correctiefactoren gevonden voor de huidige filters.",
+        "updating": "Correctiefactoren worden bijgewerkt..."
       }
     },
     "form": {
@@ -128,7 +131,25 @@
         "startDate": "Startdatum",
         "endDate": "Einddatum",
         "publishOnSave": "Publiceren bij opslaan",
-        "loading": "Laden..."
+        "loading": "Laden...",
+        "loadError": "Opties niet beschikbaar",
+        "optionsLoadError": "Dit veld kon de opties niet laden."
+      },
+      "validation": {
+        "locationRequired": "Locatie is verplicht.",
+        "basePollenRequired": "Basispollen is verplicht.",
+        "startDateRequired": "Startdatum is verplicht.",
+        "endDateRequired": "Einddatum is verplicht.",
+        "endDateOrder": "De einddatum moet na of gelijk aan de startdatum zijn.",
+        "detectedEventsRequired": "Gedetecteerde gebeurtenissen zijn verplicht.",
+        "atLeastOneRow": "Minimaal één correctierij is verplicht.",
+        "exactlyOneBaseRow": "Precies één basispollenrij is verplicht.",
+        "baseRowFirst": "De basispollenrij moet de eerste rij zijn.",
+        "baseRowMatch": "De basispollenrij moet overeenkomen met het geselecteerde basispollen.",
+        "pollenRequired": "Pollen is verplicht.",
+        "reviewedEventsNonNegative": "Beoordeelde gebeurtenissen moeten een niet-negatief getal zijn.",
+        "duplicatePollens": "Dubbele pollen zijn niet toegestaan.",
+        "overAllocated": "Beoordeelde gebeurtenissen mogen niet hoger zijn dan gedetecteerde gebeurtenissen."
       },
       "distribution": {
         "title": "Correctiefactoren",
@@ -151,7 +172,16 @@
         "assignedEvents": "Toegewezen gebeurtenissen",
         "unknownEvents": "Onbekende gebeurtenissen",
         "totalReviewedEvents": "Totaal beoordeelde gebeurtenissen",
-        "difference": "Te veel toegewezen"
+        "difference": "Te veel toegewezen",
+        "remainingEvents": "Resterende gebeurtenissen",
+        "overAssigned": "Te veel toegewezen",
+        "balancedMessage": "Beoordeelde gebeurtenissen zijn volledig in balans.",
+        "unknownRemainderMessage": "Resterende gebeurtenissen worden toegewezen aan Onbekend: {count}.",
+        "overAllocatedMessage": "Beoordeelde gebeurtenissen overschrijden gedetecteerde gebeurtenissen met {count}."
+      },
+      "editHydration": {
+        "title": "Genormaliseerde bewerkingswaarden",
+        "description": "De bewerkingsmodus hydrateert opgeslagen multipliers naar invoer voor beoordeelde gebeurtenissen met een totaal van 1 gedetecteerde gebeurtenis. Dit behoudt de opgeslagen factoren, maar herstelt de oorspronkelijke aantallen beoordeelde gebeurtenissen niet."
       },
       "preview": {
         "title": "Grafiek (Origineel vs Gecorrigeerd)",

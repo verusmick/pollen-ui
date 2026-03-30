@@ -72,7 +72,7 @@ export function CorrectionFactorsFilters({
         <select
           value={value.location}
           onChange={buildChangeHandler(value, onChange, 'location')}
-          disabled={disabled || locationOptionsLoading}
+          disabled={disabled || locationOptionsLoading || locationOptionsError}
           className="h-9 rounded-md border border-border bg-background px-3 text-foreground disabled:cursor-not-allowed disabled:opacity-60"
         >
           <option value="">
@@ -91,7 +91,7 @@ export function CorrectionFactorsFilters({
         <select
           value={value.pollen}
           onChange={buildChangeHandler(value, onChange, 'pollen')}
-          disabled={disabled || pollenOptionsLoading}
+          disabled={disabled || pollenOptionsLoading || pollenOptionsError}
           className="h-9 rounded-md border border-border bg-background px-3 text-foreground disabled:cursor-not-allowed disabled:opacity-60"
         >
           <option value="">
@@ -113,6 +113,12 @@ export function CorrectionFactorsFilters({
       >
         {t('filters.reset')}
       </button>
+
+      {locationOptionsError || pollenOptionsError ? (
+        <div className="basis-full rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          {t('filters.optionsError')}
+        </div>
+      ) : null}
     </div>
   );
 }

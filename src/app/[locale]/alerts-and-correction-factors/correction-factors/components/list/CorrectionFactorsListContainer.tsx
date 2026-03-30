@@ -23,9 +23,8 @@ export function CorrectionFactorsListContainer() {
   const [filters, setFilters] = useState<CorrectionFactorListFilters>(
     DEFAULT_CORRECTION_FACTOR_LIST_FILTERS
   );
-  const { data = [], isLoading, isError, error } = useCorrectionFactorsList(
-    filters
-  );
+  const { data = [], isLoading, isFetching, isError, error } =
+    useCorrectionFactorsList(filters);
   const {
     data: locationOptions = [],
     isLoading: isLocationOptionsLoading,
@@ -80,12 +79,17 @@ export function CorrectionFactorsListContainer() {
         pollenOptionsLoading={isPollenOptionsLoading}
         locationOptionsError={isLocationOptionsError}
         pollenOptionsError={isPollenOptionsError}
-        disabled={isLoading}
       />
 
-      {isLoading ? (
+      {isLoading && data.length === 0 ? (
         <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
           {t('loading')}
+        </div>
+      ) : null}
+
+      {!isLoading && isFetching && !isError ? (
+        <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+          {t('updating')}
         </div>
       ) : null}
 
@@ -98,7 +102,9 @@ export function CorrectionFactorsListContainer() {
 
       {!isLoading && !isError && filteredData.length === 0 ? (
         <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
-          {t('empty')}
+          {filters.location || filters.pollen || filters.from
+            ? t('emptyFiltered')
+            : t('empty')}
         </div>
       ) : null}
 

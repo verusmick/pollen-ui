@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import {
   DEFAULT_CORRECTION_FACTOR_FORM_VALUES,
@@ -24,6 +25,8 @@ type TopLevelField =
   | 'endDate'
   | 'detectedEvents'
   | 'publishOnSave';
+
+type ErrorField = Exclude<keyof CorrectionFactorFormErrors, 'rows' | 'rowErrorsById'>;
 
 function createRowId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -67,6 +70,7 @@ function syncBaseRow(values: CorrectionFactorFormValues): CorrectionFactorFormVa
 }
 
 export function useCorrectionFactorForm() {
+  const t = useTranslations('correctionFactorsPage.form.validation');
   const [values, setValues] = useState<CorrectionFactorFormValues>(
     DEFAULT_CORRECTION_FACTOR_FORM_VALUES
   );
@@ -78,6 +82,76 @@ export function useCorrectionFactorForm() {
     () => buildCorrectionFactorDerivedState(values, 'ratio'),
     [values]
   );
+
+  function clearTopLevelError(field: ErrorField) {
+    setErrors((current) => {
+      if (!current[field]) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [field]: undefined,
+      };
+    });
+  }
+
+  function clearRowsError() {
+    setErrors((current) => {
+      if (!current.rows) {
+        return current;
+      }
+
+      return {
+        ...current,
+        rows: undefined,
+      };
+    });
+  }
+
+  function clearRowError(
+    clientId: string,
+    field?: 'pollen' | 'reviewedEvents'
+  ) {
+    setErrors((current) => {
+      const existingRowErrors = current.rowErrorsById[clientId];
+
+      if (!existingRowErrors) {
+        return current;
+      }
+
+      if (!field) {
+        const nextRowErrorsById = { ...current.rowErrorsById };
+        delete nextRowErrorsById[clientId];
+
+        return {
+          ...current,
+          rowErrorsById: nextRowErrorsById,
+        };
+      }
+
+      if (!existingRowErrors[field]) {
+        return current;
+      }
+
+      const nextRowErrors = {
+        ...existingRowErrors,
+        [field]: undefined,
+      };
+      const nextRowErrorsById = { ...current.rowErrorsById };
+
+      if (!nextRowErrors.pollen && !nextRowErrors.reviewedEvents) {
+        delete nextRowErrorsById[clientId];
+      } else {
+        nextRowErrorsById[clientId] = nextRowErrors;
+      }
+
+      return {
+        ...current,
+        rowErrorsById: nextRowErrorsById,
+      };
+    });
+  }
 
   function setField<K extends TopLevelField>(
     field: K,
@@ -95,6 +169,20 @@ export function useCorrectionFactorForm() {
 
       return next;
     });
+
+    if (
+      field === 'location' ||
+      field === 'basePollen' ||
+      field === 'startDate' ||
+      field === 'endDate' ||
+      field === 'detectedEvents'
+    ) {
+      clearTopLevelError(field);
+    }
+
+    if (field === 'basePollen' || field === 'detectedEvents') {
+      clearRowsError();
+    }
   }
 
   function setDetectedEventsInput(nextValue: string) {
@@ -127,6 +215,7 @@ export function useCorrectionFactorForm() {
         ],
       };
     });
+    clearRowsError();
   }
 
   function removeRow(clientId: string) {
@@ -136,6 +225,8 @@ export function useCorrectionFactorForm() {
         (row) => row.clientId !== clientId || row.isBasePollen
       ),
     }));
+    clearRowsError();
+    clearRowError(clientId);
   }
 
   function updateRowPollen(
@@ -153,6 +244,8 @@ export function useCorrectionFactorForm() {
           : row
       ),
     }));
+    clearRowsError();
+    clearRowError(clientId, 'pollen');
   }
 
   function updateRowReviewedEvents(clientId: string, reviewedEvents: string) {
@@ -167,6 +260,8 @@ export function useCorrectionFactorForm() {
           : row
       ),
     }));
+    clearRowsError();
+    clearRowError(clientId, 'reviewedEvents');
   }
 
   function resetForm() {
@@ -180,7 +275,22 @@ export function useCorrectionFactorForm() {
   }
 
   function validate() {
-    const nextErrors = validateCorrectionFactorForm(values);
+    const nextErrors = validateCorrectionFactorForm(values, {
+      locationRequired: t('locationRequired'),
+      basePollenRequired: t('basePollenRequired'),
+      startDateRequired: t('startDateRequired'),
+      endDateRequired: t('endDateRequired'),
+      endDateOrder: t('endDateOrder'),
+      detectedEventsRequired: t('detectedEventsRequired'),
+      atLeastOneRow: t('atLeastOneRow'),
+      exactlyOneBaseRow: t('exactlyOneBaseRow'),
+      baseRowFirst: t('baseRowFirst'),
+      baseRowMatch: t('baseRowMatch'),
+      pollenRequired: t('pollenRequired'),
+      reviewedEventsNonNegative: t('reviewedEventsNonNegative'),
+      duplicatePollens: t('duplicatePollens'),
+      overAllocated: t('overAllocated'),
+    });
     setErrors(nextErrors);
 
     const hasTopLevelErrors = Object.entries(nextErrors).some(([key, value]) => {

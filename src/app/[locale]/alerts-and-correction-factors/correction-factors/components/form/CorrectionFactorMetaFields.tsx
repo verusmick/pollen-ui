@@ -12,6 +12,8 @@ interface CorrectionFactorMetaFieldsProps {
   pollenOptions: string[];
   locationsLoading?: boolean;
   pollensLoading?: boolean;
+  locationsError?: string | null;
+  pollensError?: string | null;
   onLocationChange: (value: string) => void;
   onBasePollenChange: (value: string) => void;
   onStartDateChange: (value: string) => void;
@@ -27,6 +29,8 @@ export function CorrectionFactorMetaFields({
   pollenOptions,
   locationsLoading = false,
   pollensLoading = false,
+  locationsError = null,
+  pollensError = null,
   onLocationChange,
   onBasePollenChange,
   onStartDateChange,
@@ -48,10 +52,15 @@ export function CorrectionFactorMetaFields({
         <select
           value={values.location}
           onChange={(event) => onLocationChange(event.target.value)}
+          disabled={locationsLoading || Boolean(locationsError)}
           className="h-10 rounded-md border border-border bg-card px-3 text-foreground"
         >
           <option value="">
-            {locationsLoading ? t('loading') : t('allLocations')}
+            {locationsLoading
+              ? t('loading')
+              : locationsError
+                ? t('loadError')
+                : t('allLocations')}
           </option>
           {locationOptions.map((option) => (
             <option key={option.id} value={option.id}>
@@ -59,6 +68,9 @@ export function CorrectionFactorMetaFields({
             </option>
           ))}
         </select>
+        {locationsError ? (
+          <span className="text-xs text-amber-700">{locationsError}</span>
+        ) : null}
         {errors.location ? (
           <span className="text-xs text-red-600">{errors.location}</span>
         ) : null}
@@ -69,10 +81,15 @@ export function CorrectionFactorMetaFields({
         <select
           value={values.basePollen}
           onChange={(event) => onBasePollenChange(event.target.value)}
+          disabled={pollensLoading || Boolean(pollensError)}
           className="h-10 rounded-md border border-border bg-card px-3 text-foreground"
         >
           <option value="">
-            {pollensLoading ? t('loading') : t('allPollens')}
+            {pollensLoading
+              ? t('loading')
+              : pollensError
+                ? t('loadError')
+                : t('allPollens')}
           </option>
           {pollenOptions.map((option) => (
             <option key={option} value={option}>
@@ -80,6 +97,9 @@ export function CorrectionFactorMetaFields({
             </option>
           ))}
         </select>
+        {pollensError ? (
+          <span className="text-xs text-amber-700">{pollensError}</span>
+        ) : null}
         {errors.basePollen ? (
           <span className="text-xs text-red-600">{errors.basePollen}</span>
         ) : null}
