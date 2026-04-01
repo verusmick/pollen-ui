@@ -14,7 +14,11 @@ import {
 } from '@/lib/api/correctionFactors';
 import { correctionFactorKeys } from '../../constants';
 import type { CorrectionFactorFormMode } from '../../types';
-import { useCorrectionFactorDetail, useCorrectionFactorForm } from '../../hooks';
+import {
+  useCorrectionFactorDetail,
+  useCorrectionFactorForm,
+  useCorrectionFactorPreview,
+} from '../../hooks';
 import {
   buildCorrectionFactorWritePayload,
   mapCorrectionFactorRecordToFormValues,
@@ -46,6 +50,10 @@ export function CorrectionFactorFormContainer({
   const detailQuery = useCorrectionFactorDetail(
     isEditMode ? correctionFactorId : undefined
   );
+  const preview = useCorrectionFactorPreview({
+    values: form.values,
+    derived: form.derived,
+  });
 
   const {
     data: locationOptions = [],
@@ -237,6 +245,9 @@ export function CorrectionFactorFormContainer({
       deleteDisabled={deleteDisabled}
       canDelete={isEditMode}
       canAddRow={Boolean(form.values.basePollen)}
+      previewStatus={preview.status}
+      previewSeries={preview.series}
+      previewError={preview.error?.message ?? null}
       getPollenOptions={(currentRowPollen) =>
         form.getPollenOptions(currentRowPollen, pollenOptions)
       }

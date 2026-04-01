@@ -6,9 +6,12 @@ import type {
   CorrectionFactorFormMode,
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormErrors,
+  CorrectionFactorPreviewSeries,
+  CorrectionFactorPreviewStatus,
   CorrectionFactorFormValues,
   CorrectionFactorRecord,
 } from '../../types';
+import { CorrectionFactorChartPreview } from './CorrectionFactorChartPreview';
 import { CorrectionFactorDistributionSection } from './CorrectionFactorDistributionSection';
 import { CorrectionFactorFormHeader } from './CorrectionFactorFormHeader';
 import { CorrectionFactorMetaFields } from './CorrectionFactorMetaFields';
@@ -36,6 +39,9 @@ interface CorrectionFactorFormProps {
   deleteDisabled?: boolean;
   canDelete?: boolean;
   canAddRow: boolean;
+  previewStatus: CorrectionFactorPreviewStatus;
+  previewSeries: CorrectionFactorPreviewSeries | null;
+  previewError?: string | null;
   getPollenOptions: (currentRowPollen: string) => string[];
   onLocationChange: (value: string) => void;
   onBasePollenChange: (value: string) => void;
@@ -79,6 +85,9 @@ export function CorrectionFactorForm({
   deleteDisabled = false,
   canDelete = false,
   canAddRow,
+  previewStatus,
+  previewSeries,
+  previewError = null,
   getPollenOptions,
   onLocationChange,
   onBasePollenChange,
@@ -94,7 +103,6 @@ export function CorrectionFactorForm({
   onSubmit,
   onDelete,
 }: CorrectionFactorFormProps) {
-  const t = useTranslations('correctionFactorsPage.form.preview');
   const formT = useTranslations('correctionFactorsPage.form');
   const listStatusT = useTranslations('correctionFactorsPage.list.status');
 
@@ -281,12 +289,11 @@ export function CorrectionFactorForm({
             ) : null}
           </div>
 
-          <section className="rounded-lg border border-border bg-card p-4">
-            <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
-            <div className="mt-4 flex min-h-[340px] items-center justify-center rounded-lg border border-dashed border-border bg-background px-6 text-center text-sm text-muted-foreground">
-              {t('placeholder')}
-            </div>
-          </section>
+          <CorrectionFactorChartPreview
+            status={previewStatus}
+            series={previewSeries}
+            errorMessage={previewError}
+          />
         </div>
       ) : null}
     </div>

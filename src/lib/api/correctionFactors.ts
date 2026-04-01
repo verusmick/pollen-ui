@@ -1,8 +1,10 @@
 import type {
   ApiCorrectionFactorDeleteResponse,
   ApiCorrectionFactorRecord,
+  ApiMeasurementsResponse,
   ApiCorrectionFactorWriteRequest,
   ApiCorrectionFactorWriteSuccessResponse,
+  CorrectionFactorMeasurementsRequest,
   CorrectionFactorListRequest,
 } from '@/app/[locale]/alerts-and-correction-factors/correction-factors/types';
 
@@ -30,6 +32,19 @@ function buildListQuery(params: CorrectionFactorListRequest): string {
 
   const queryString = query.toString();
   return queryString ? `?${queryString}` : '';
+}
+
+function buildMeasurementsQuery(
+  params: CorrectionFactorMeasurementsRequest
+): string {
+  const query = new URLSearchParams({
+    from: String(params.from),
+    to: String(params.to),
+    locations: params.locations,
+    pollen: params.pollen,
+  });
+
+  return `?${query.toString()}`;
 }
 
 async function requestJson<T>(input: string, init?: RequestInit): Promise<T> {
@@ -239,4 +254,12 @@ export async function getCorrectionFactorLocations(): Promise<
 export async function getCorrectionFactorPollens(): Promise<string[]> {
   const response = await requestJson<unknown>('/api/pollen');
   return normalizeStringArrayResponse(response, 'Pollen');
+}
+
+export async function getCorrectionFactorMeasurements(
+  params: CorrectionFactorMeasurementsRequest
+): Promise<ApiMeasurementsResponse> {
+  return requestJson<ApiMeasurementsResponse>(
+    `/api/measurements${buildMeasurementsQuery(params)}`
+  );
 }

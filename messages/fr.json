@@ -185,7 +185,15 @@
       },
       "preview": {
         "title": "Graphique (Original vs Corrigé)",
-        "placeholder": "L’intégration de l’aperçu reste en attente de confirmation du backend/de la source."
+        "description": "Le graphique utilise les mesures d’origine du pollen de base sélectionné et applique localement le facteur de correction actuel.",
+        "loading": "Chargement des mesures d’aperçu...",
+        "idle": "Sélectionnez un emplacement, un pollen de base, une date de début et une date de fin pour charger l’aperçu.",
+        "empty": "Aucune donnée de mesure n’est disponible pour la période sélectionnée.",
+        "error": "Impossible de charger les mesures d’aperçu.",
+        "series": {
+          "original": "Série d’origine",
+          "corrected": "Série corrigée"
+        }
       },
       "actions": {
         "cancel": "Retour",

@@ -185,7 +185,15 @@
       },
       "preview": {
         "title": "Gráfico (Original vs Corregido)",
-        "placeholder": "La integración de la vista previa está pendiente de la confirmación del backend/fuente."
+        "description": "El gráfico usa las mediciones originales del polen base seleccionado y aplica localmente el factor de corrección actual.",
+        "loading": "Cargando mediciones de vista previa...",
+        "idle": "Seleccione una ubicación, polen base, fecha de inicio y fecha de fin para cargar la vista previa.",
+        "empty": "No hay datos de medición disponibles para el rango seleccionado.",
+        "error": "No se pudieron cargar las mediciones de vista previa.",
+        "series": {
+          "original": "Serie original",
+          "corrected": "Serie corregida"
+        }
       },
       "actions": {
         "cancel": "Volver",

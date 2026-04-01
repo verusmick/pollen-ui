@@ -5,6 +5,7 @@ export * from './list/CorrectionFactorsListContainer';
 export * from './list/CorrectionFactorsTable';
 export * from './list/CorrectionFactorsTableRow';
 export * from './form/CorrectionFactorActions';
+export * from './form/CorrectionFactorChartPreview';
 export * from './form/CorrectionFactorDistributionRow';
 export * from './form/CorrectionFactorDistributionSection';
 export * from './form/CorrectionFactorDistributionTable';

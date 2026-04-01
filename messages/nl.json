@@ -185,7 +185,15 @@
       },
       "preview": {
         "title": "Grafiek (Origineel vs Gecorrigeerd)",
-        "placeholder": "Preview-integratie wacht nog op bevestiging van backend/bron."
+        "description": "De grafiek gebruikt de oorspronkelijke metingen voor het geselecteerde basispollen en past de huidige correctiefactor lokaal toe.",
+        "loading": "Previewmetingen laden...",
+        "idle": "Selecteer een locatie, basispollen, startdatum en einddatum om de preview te laden.",
+        "empty": "Er zijn geen meetgegevens beschikbaar voor het geselecteerde bereik.",
+        "error": "De previewmetingen konden niet worden geladen.",
+        "series": {
+          "original": "Originele reeks",
+          "corrected": "Gecorrigeerde reeks"
+        }
       },
       "actions": {
         "cancel": "Terug",

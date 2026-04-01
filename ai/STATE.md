@@ -5,4 +5,5 @@ Foundation/data scaffolding is implemented. Remaining backend dependencies are c
 - This preserves stored multipliers for editing but does not restore the original reviewed-event counts
 - Need confirmation how Unknown is encoded in payloads
 - factor_percentage appears to be ratio-based (0..1) from current GET samples
-- Need confirmation preview data endpoint/source
+- Measurements preview source is now available at GET /api/measurements
+- Current measurements samples may return `polle` instead of `pollen`; UI code should treat this as an adapter-layer normalization concern

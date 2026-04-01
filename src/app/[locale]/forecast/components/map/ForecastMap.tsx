@@ -208,7 +208,8 @@ export default function ForecastMap({
     () =>
       new TileLayer({
         id: 'base-map',
-        data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        data: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png',
+
         minZoom: 0,
         maxZoom: 19,
         tileSize: 256,

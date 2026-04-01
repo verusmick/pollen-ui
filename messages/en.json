@@ -185,7 +185,15 @@
       },
       "preview": {
         "title": "Chart (Original vs Corrected)",
-        "placeholder": "Preview integration is pending backend/source confirmation."
+        "description": "The chart uses the original measurements for the selected base pollen and applies the current correction factor locally.",
+        "loading": "Loading preview measurements...",
+        "idle": "Select a location, base pollen, start date, and end date to load the preview.",
+        "empty": "No measurement data is available for the selected range.",
+        "error": "Failed to load preview measurements.",
+        "series": {
+          "original": "Original series",
+          "corrected": "Corrected series"
+        }
       },
       "actions": {
         "cancel": "Back",

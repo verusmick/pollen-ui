@@ -185,7 +185,15 @@
       },
       "preview": {
         "title": "Diagramm (Original vs. Korrigiert)",
-        "placeholder": "Die Vorschau-Integration wartet auf die Bestätigung der Backend-/Quelldaten."
+        "description": "Das Diagramm verwendet die Originalmessungen des ausgewählten Basispollens und wendet den aktuellen Korrekturfaktor lokal an.",
+        "loading": "Vorschaumessungen werden geladen...",
+        "idle": "Wählen Sie einen Ort, einen Basispollen sowie ein Start- und Enddatum aus, um die Vorschau zu laden.",
+        "empty": "Für den ausgewählten Zeitraum sind keine Messdaten verfügbar.",
+        "error": "Die Vorschaumessungen konnten nicht geladen werden.",
+        "series": {
+          "original": "Originalreihe",
+          "corrected": "Korrigierte Reihe"
+        }
       },
       "actions": {
         "cancel": "Zurück",

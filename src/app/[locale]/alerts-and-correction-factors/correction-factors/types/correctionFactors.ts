@@ -45,6 +45,32 @@ export interface ApiCorrectionFactorDeleteResponse {
   id: CorrectionFactorApiId;
 }
 
+export interface CorrectionFactorMeasurementsRequest {
+  from: number;
+  to: number;
+  locations: string;
+  pollen: string;
+}
+
+export interface ApiMeasurementRangeRecord {
+  from: unknown;
+  to: unknown;
+  value: unknown;
+}
+
+export interface ApiMeasurementRecord {
+  location?: unknown;
+  pollen?: unknown;
+  polle?: unknown;
+  data?: unknown;
+}
+
+export interface ApiMeasurementsResponse {
+  from?: unknown;
+  to?: unknown;
+  measurements?: unknown;
+}
+
 export type CorrectionFactorId = string;
 export type CorrectionFactorStatus = 'draft' | 'published';
 export type CorrectionFactorPollenCode = string;
@@ -139,6 +165,7 @@ export interface CorrectionFactorPayloadBuildOptions {
 }
 
 export interface CorrectionFactorPreviewPoint {
+  timestamp: number;
   label: string;
   originalValue: number;
   correctedValue: number;
@@ -147,3 +174,16 @@ export interface CorrectionFactorPreviewPoint {
 export interface CorrectionFactorPreviewSeries {
   points: CorrectionFactorPreviewPoint[];
 }
+
+export interface CorrectionFactorPreviewSourcePoint {
+  timestamp: number;
+  endTimestamp: number;
+  value: number;
+}
+
+export type CorrectionFactorPreviewStatus =
+  | 'idle'
+  | 'loading'
+  | 'error'
+  | 'empty'
+  | 'ready';
