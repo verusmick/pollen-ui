@@ -18,6 +18,7 @@ import {
   useCorrectionFactorDetail,
   useCorrectionFactorForm,
   useCorrectionFactorPreview,
+  useCorrectionFactorValidationEvents,
 } from '../../hooks';
 import {
   buildCorrectionFactorWritePayload,
@@ -50,10 +51,8 @@ export function CorrectionFactorFormContainer({
   const detailQuery = useCorrectionFactorDetail(
     isEditMode ? correctionFactorId : undefined
   );
-  const preview = useCorrectionFactorPreview({
-    values: form.values,
-    derived: form.derived,
-  });
+  const [activeValidationEventIndex, setActiveValidationEventIndex] = useState(0);
+  const appliedValidationDetectedEventsRef = useRef<string | null>(null);
 
   const {
     data: locationOptions = [],
@@ -76,6 +75,28 @@ export function CorrectionFactorFormContainer({
     queryFn: getCorrectionFactorPollens,
     staleTime: 1000 * 60 * 10,
   });
+  const validationLocationOption =
+    locationOptions.find((option) => option.id === form.values.location) ?? null;
+  const validationLocation = validationLocationOption?.validationName ?? '';
+  const validationLocationMappingError =
+    form.values.location &&
+    !locationsLoading &&
+    !locationsError &&
+    !validationLocationOption
+      ? t('meta.detectedEventsLocationMappingError', {
+          location: form.values.location,
+        })
+      : null;
+  const validationEvents = useCorrectionFactorValidationEvents({
+    location: validationLocation,
+    basePollen: form.values.basePollen,
+    startDate: form.values.startDate,
+    endDate: form.values.endDate,
+  });
+  const preview = useCorrectionFactorPreview({
+    values: form.values,
+    derived: form.derived,
+  });
 
   useEffect(() => {
     if (!isEditMode || !detailQuery.data) {
@@ -87,6 +108,7 @@ export function CorrectionFactorFormContainer({
     }
 
     try {
+      appliedValidationDetectedEventsRef.current = null;
       form.replaceValues(mapCorrectionFactorRecordToFormValues(detailQuery.data));
       setEditHydrationMessage(null);
       hydratedRecordIdRef.current = detailQuery.data.id;
@@ -95,6 +117,70 @@ export function CorrectionFactorFormContainer({
       hydratedRecordIdRef.current = detailQuery.data.id;
     }
   }, [detailQuery.data, form, isEditMode, t]);
+
+  useEffect(() => {
+    setActiveValidationEventIndex(0);
+  }, [
+    validationEvents.events.length,
+    form.values.location,
+    form.values.basePollen,
+    form.values.startDate,
+    form.values.endDate,
+  ]);
+
+  useEffect(() => {
+    if (
+      validationEvents.status === 'ready' ||
+      validationEvents.status === 'empty'
+    ) {
+      if (form.values.detectedEvents !== validationEvents.detectedEvents) {
+        form.setField('detectedEvents', validationEvents.detectedEvents);
+      }
+
+      return;
+    }
+
+    if (form.values.detectedEvents !== null) {
+      form.setField('detectedEvents', null);
+    }
+  }, [form, validationEvents.detectedEvents, validationEvents.status]);
+
+  useEffect(() => {
+    if (
+      !isEditMode ||
+      !detailQuery.data ||
+      (validationEvents.status !== 'ready' && validationEvents.status !== 'empty')
+    ) {
+      return;
+    }
+
+    const detectedEvents = validationEvents.detectedEvents;
+
+    if (detectedEvents === null) {
+      return;
+    }
+
+    if (appliedValidationDetectedEventsRef.current === detailQuery.data.id) {
+      return;
+    }
+
+    if (detectedEvents <= 0) {
+      return;
+    }
+
+    form.replaceValues(
+      mapCorrectionFactorRecordToFormValues(detailQuery.data, {
+        detectedEvents,
+      })
+    );
+    appliedValidationDetectedEventsRef.current = detailQuery.data.id;
+  }, [
+    detailQuery.data,
+    form,
+    isEditMode,
+    validationEvents.status,
+    validationEvents.detectedEvents,
+  ]);
 
   const detailError =
     isEditMode && detailQuery.isError
@@ -131,6 +217,20 @@ export function CorrectionFactorFormContainer({
       ? pollensQueryError.message
       : t('meta.optionsLoadError')
     : null;
+  const validationEventsStatusText = !validationEvents.isReady
+    ? validationLocationMappingError
+      ? null
+      : t('meta.detectedEventsHint')
+    : validationEvents.status === 'loading'
+      ? t('meta.detectedEventsLoading')
+      : validationEvents.status === 'ready' || validationEvents.status === 'empty'
+        ? t('meta.detectedEventsLoaded')
+        : null;
+  const validationEventsError =
+    validationLocationMappingError ??
+    (validationEvents.status === 'error'
+      ? validationEvents.error?.message ?? t('meta.detectedEventsError')
+      : null);
 
   async function invalidateCorrectionFactorQueries(id?: string) {
     await Promise.all([
@@ -233,6 +333,23 @@ export function CorrectionFactorFormContainer({
       pollensLoading={pollensLoading}
       locationsError={locationOptionsError}
       pollensError={pollenOptionsError}
+      validationEventsStatus={validationEvents.status}
+      validationEvents={validationEvents.events}
+      validationEventsError={validationEvents.error?.message ?? null}
+      activeValidationEventIndex={activeValidationEventIndex}
+      validationEventsStatusText={validationEventsStatusText}
+      validationEventsFieldError={validationEventsError}
+      onSelectValidationEvent={setActiveValidationEventIndex}
+      onPreviousValidationEvent={() =>
+        setActiveValidationEventIndex((current) => Math.max(current - 1, 0))
+      }
+      onNextValidationEvent={() =>
+        setActiveValidationEventIndex((current) =>
+          validationEvents.events.length > 0
+            ? Math.min(current + 1, validationEvents.events.length - 1)
+            : 0
+        )
+      }
       saving={saving}
       deleting={deleting}
       actionError={actionError}
@@ -255,7 +372,6 @@ export function CorrectionFactorFormContainer({
       onBasePollenChange={(value) => form.setField('basePollen', value)}
       onStartDateChange={(value) => form.setField('startDate', value)}
       onEndDateChange={(value) => form.setField('endDate', value)}
-      onDetectedEventsChange={form.setDetectedEventsInput}
       onPublishChange={(value) => form.setField('publishOnSave', value)}
       onAddRow={form.addRow}
       onPollenChange={form.updateRowPollen}

@@ -185,16 +185,6 @@ export function useCorrectionFactorForm() {
     }
   }
 
-  function setDetectedEventsInput(nextValue: string) {
-    if (nextValue === '') {
-      setField('detectedEvents', null);
-      return;
-    }
-
-    const parsed = Number(nextValue);
-    setField('detectedEvents', Number.isFinite(parsed) ? parsed : null);
-  }
-
   function addRow() {
     setValues((current) => {
       if (!current.basePollen) {
@@ -318,7 +308,6 @@ export function useCorrectionFactorForm() {
     errors,
     derived,
     setField,
-    setDetectedEventsInput,
     addRow,
     removeRow,
     updateRowPollen,

@@ -128,6 +128,11 @@
         "basePollen": "Basispollen",
         "allPollens": "Selecteer een pollen",
         "detectedEvents": "Gedetecteerde gebeurtenissen",
+        "detectedEventsHint": "Gedetecteerde gebeurtenissen worden automatisch geladen zodra locatie, basispollen en het volledige datumbereik zijn geselecteerd.",
+        "detectedEventsLoading": "Gedetecteerde gebeurtenissen worden geladen vanuit de validatie-API...",
+        "detectedEventsLoaded": "Gedetecteerde gebeurtenissen worden automatisch afgeleid uit het aantal resultaten van de validatie-API.",
+        "detectedEventsError": "Gedetecteerde gebeurtenissen konden niet worden geladen vanuit de validatie-API.",
+        "detectedEventsLocationMappingError": "De geselecteerde correctiefactorlocatie \"{location}\" kon niet worden gekoppeld aan een locatienaam van de validatie-API.",
         "startDate": "Startdatum",
         "endDate": "Einddatum",
         "publishOnSave": "Publiceren bij opslaan",
@@ -181,7 +186,7 @@
       },
       "editHydration": {
         "title": "Genormaliseerde bewerkingswaarden",
-        "description": "De bewerkingsmodus hydrateert opgeslagen multipliers naar invoer voor beoordeelde gebeurtenissen met een totaal van 1 gedetecteerde gebeurtenis. Dit behoudt de opgeslagen factoren, maar herstelt de oorspronkelijke aantallen beoordeelde gebeurtenissen niet."
+        "description": "De bewerkingsmodus schaalt opgeslagen multipliers naar invoer voor beoordeelde gebeurtenissen met het totaal aan gedetecteerde gebeurtenissen dat door de validatie-API wordt teruggegeven zodra dat beschikbaar is. Dit behoudt de opgeslagen factoren, maar herstelt de oorspronkelijke aantallen beoordeelde gebeurtenissen niet."
       },
       "preview": {
         "title": "Grafiek (Origineel vs Gecorrigeerd)",
@@ -194,6 +199,21 @@
           "original": "Originele reeks",
           "corrected": "Gecorrigeerde reeks"
         }
+      },
+      "eventsCarousel": {
+        "title": "Gedetecteerde gebeurtenissen",
+        "description": "Afbeeldingen uit de validatie-API voor de huidige locatie, basispollen en datumbereik.",
+        "count": "{count, plural, =0 {0 gebeurtenissen} one {# gebeurtenis} other {# gebeurtenissen}}",
+        "idle": "Selecteer een locatie, basispollen, startdatum en einddatum om gedetecteerde gebeurtenissen te laden.",
+        "empty": "Er zijn geen gedetecteerde gebeurtenissen gevonden voor de geselecteerde filters.",
+        "error": "Gedetecteerde gebeurtenissen konden niet worden geladen.",
+        "classification": "Classificatie",
+        "location": "Locatie",
+        "capturedAt": "Vastgelegd op",
+        "previous": "Vorige",
+        "next": "Volgende",
+        "imageAlt": "Gedetecteerde gebeurtenis {index}: {classification}",
+        "thumbnailLabel": "Toon gedetecteerde gebeurtenis {index}: {classification}"
       },
       "actions": {
         "cancel": "Terug",

@@ -14,11 +14,12 @@ interface CorrectionFactorMetaFieldsProps {
   pollensLoading?: boolean;
   locationsError?: string | null;
   pollensError?: string | null;
+  validationEventsStatusText?: string | null;
+  validationEventsError?: string | null;
   onLocationChange: (value: string) => void;
   onBasePollenChange: (value: string) => void;
   onStartDateChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
-  onDetectedEventsChange: (value: string) => void;
   onPublishChange: (value: boolean) => void;
 }
 
@@ -31,11 +32,12 @@ export function CorrectionFactorMetaFields({
   pollensLoading = false,
   locationsError = null,
   pollensError = null,
+  validationEventsStatusText = null,
+  validationEventsError = null,
   onLocationChange,
   onBasePollenChange,
   onStartDateChange,
   onEndDateChange,
-  onDetectedEventsChange,
   onPublishChange,
 }: CorrectionFactorMetaFieldsProps) {
   const t = useTranslations('correctionFactorsPage.form.meta');
@@ -108,12 +110,20 @@ export function CorrectionFactorMetaFields({
       <label className="flex flex-col gap-1 text-sm">
         <span className="text-muted-foreground">{t('detectedEvents')}</span>
         <input
-          type="number"
-          min="0"
+          type="text"
           value={values.detectedEvents ?? ''}
-          onChange={(event) => onDetectedEventsChange(event.target.value)}
-          className="h-10 rounded-md border border-border bg-card px-3 text-foreground"
+          readOnly
+          disabled
+          className="h-10 rounded-md border border-border bg-muted px-3 text-foreground disabled:cursor-not-allowed disabled:opacity-100"
         />
+        {validationEventsStatusText ? (
+          <span className="text-xs text-muted-foreground">
+            {validationEventsStatusText}
+          </span>
+        ) : null}
+        {validationEventsError ? (
+          <span className="text-xs text-amber-700">{validationEventsError}</span>
+        ) : null}
         {errors.detectedEvents ? (
           <span className="text-xs text-red-600">{errors.detectedEvents}</span>
         ) : null}

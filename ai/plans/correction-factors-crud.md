@@ -285,6 +285,14 @@ export interface CorrectionFactorFormDerivedState {
 }
 ```
 
+Detected events are API-derived rather than manually entered:
+
+- load validation events only after `location`, `basePollen`, `startDate`, and `endDate` are all present
+- convert the selected date range into Unix timestamps for the validation query
+- set `detectedEvents` from the normalized validation-event result count
+- keep the detected-events field read-only in the form UI
+- render the fetched event images in a presentational right-column carousel
+
 ### Preview Types
 
 ```ts

@@ -10,9 +10,12 @@ import type {
   CorrectionFactorPreviewStatus,
   CorrectionFactorFormValues,
   CorrectionFactorRecord,
+  CorrectionFactorValidationEvent,
+  CorrectionFactorValidationEventsStatus,
 } from '../../types';
 import { CorrectionFactorChartPreview } from './CorrectionFactorChartPreview';
 import { CorrectionFactorDistributionSection } from './CorrectionFactorDistributionSection';
+import { CorrectionFactorEventCarousel } from './CorrectionFactorEventCarousel';
 import { CorrectionFactorFormHeader } from './CorrectionFactorFormHeader';
 import { CorrectionFactorMetaFields } from './CorrectionFactorMetaFields';
 
@@ -27,6 +30,15 @@ interface CorrectionFactorFormProps {
   pollensLoading?: boolean;
   locationsError?: string | null;
   pollensError?: string | null;
+  validationEventsStatus: CorrectionFactorValidationEventsStatus;
+  validationEvents: CorrectionFactorValidationEvent[];
+  validationEventsError?: string | null;
+  activeValidationEventIndex: number;
+  validationEventsStatusText?: string | null;
+  validationEventsFieldError?: string | null;
+  onSelectValidationEvent: (index: number) => void;
+  onPreviousValidationEvent: () => void;
+  onNextValidationEvent: () => void;
   saving: boolean;
   deleting?: boolean;
   actionError?: string | null;
@@ -47,7 +59,6 @@ interface CorrectionFactorFormProps {
   onBasePollenChange: (value: string) => void;
   onStartDateChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
-  onDetectedEventsChange: (value: string) => void;
   onPublishChange: (value: boolean) => void;
   onAddRow: () => void;
   onPollenChange: (clientId: string, pollen: string) => void;
@@ -73,6 +84,15 @@ export function CorrectionFactorForm({
   pollensLoading = false,
   locationsError = null,
   pollensError = null,
+  validationEventsStatus,
+  validationEvents,
+  validationEventsError = null,
+  activeValidationEventIndex,
+  validationEventsStatusText = null,
+  validationEventsFieldError = null,
+  onSelectValidationEvent,
+  onPreviousValidationEvent,
+  onNextValidationEvent,
   saving,
   deleting = false,
   actionError,
@@ -93,7 +113,6 @@ export function CorrectionFactorForm({
   onBasePollenChange,
   onStartDateChange,
   onEndDateChange,
-  onDetectedEventsChange,
   onPublishChange,
   onAddRow,
   onPollenChange,
@@ -105,6 +124,9 @@ export function CorrectionFactorForm({
 }: CorrectionFactorFormProps) {
   const formT = useTranslations('correctionFactorsPage.form');
   const listStatusT = useTranslations('correctionFactorsPage.list.status');
+  const canGoToPreviousValidationEvent = activeValidationEventIndex > 0;
+  const canGoToNextValidationEvent =
+    activeValidationEventIndex < validationEvents.length - 1;
 
   return (
     <div className="flex h-full flex-col gap-4 p-4">
@@ -261,11 +283,12 @@ export function CorrectionFactorForm({
               pollensLoading={pollensLoading}
               locationsError={locationsError}
               pollensError={pollensError}
+              validationEventsStatusText={validationEventsStatusText}
+              validationEventsError={validationEventsFieldError}
               onLocationChange={onLocationChange}
               onBasePollenChange={onBasePollenChange}
               onStartDateChange={onStartDateChange}
               onEndDateChange={onEndDateChange}
-              onDetectedEventsChange={onDetectedEventsChange}
               onPublishChange={onPublishChange}
             />
 
@@ -289,11 +312,25 @@ export function CorrectionFactorForm({
             ) : null}
           </div>
 
-          <CorrectionFactorChartPreview
-            status={previewStatus}
-            series={previewSeries}
-            errorMessage={previewError}
-          />
+          <div className="space-y-4">
+            <CorrectionFactorEventCarousel
+              status={validationEventsStatus}
+              events={validationEvents}
+              errorMessage={validationEventsError}
+              activeEventIndex={activeValidationEventIndex}
+              canGoPrevious={canGoToPreviousValidationEvent}
+              canGoNext={canGoToNextValidationEvent}
+              onPrevious={onPreviousValidationEvent}
+              onNext={onNextValidationEvent}
+              onSelectEvent={onSelectValidationEvent}
+            />
+
+            <CorrectionFactorChartPreview
+              status={previewStatus}
+              series={previewSeries}
+              errorMessage={previewError}
+            />
+          </div>
         </div>
       ) : null}
     </div>

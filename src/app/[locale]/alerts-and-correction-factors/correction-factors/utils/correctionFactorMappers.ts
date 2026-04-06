@@ -1,12 +1,34 @@
 import type {
   ApiCorrectionFactorDetail,
   ApiCorrectionFactorRecord,
+  ApiValidationEventRecord,
   CorrectionFactorDetail,
   CorrectionFactorFormValues,
   CorrectionFactorRecord,
   CorrectionFactorStatus,
+  CorrectionFactorValidationEvent,
 } from '../types';
 import { UNKNOWN_POLLEN_CODE } from '../constants';
+
+const VALIDATION_EVENT_IMAGE_BASE_URL =
+  'https://validation.pollenscience.eu/resources/classifications';
+
+function normalizeString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
+}
+
+function normalizeFiniteNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+}
 
 function deriveCorrectionFactorStatus(
   details: CorrectionFactorDetail[]
@@ -54,12 +76,20 @@ export function mapApiCorrectionFactorsList(
 }
 
 export function mapCorrectionFactorRecordToFormValues(
-  record: CorrectionFactorRecord
+  record: CorrectionFactorRecord,
+  options?: {
+    detectedEvents?: number | null;
+  }
 ): CorrectionFactorFormValues {
+  const detectedEvents =
+    options?.detectedEvents !== undefined ? options.detectedEvents : null;
   const normalizedRows = record.details.map((detail, index) => ({
     clientId: detail.id ?? `cf-detail-${record.id}-${index}`,
     pollen: detail.pollen,
-    reviewedEvents: String(detail.factorPercentage),
+    reviewedEvents:
+      detectedEvents !== null
+        ? String(detail.factorPercentage * detectedEvents)
+        : String(detail.factorPercentage),
     isBasePollen: detail.pollen === record.basePollen,
   }));
   const baseRow = normalizedRows.find((row) => row.isBasePollen);
@@ -70,10 +100,7 @@ export function mapCorrectionFactorRecordToFormValues(
     basePollen: record.basePollen,
     startDate: record.startDate.slice(0, 10),
     endDate: record.endDate.slice(0, 10),
-    // The backend stores only factor_percentage values.
-    // Normalize edit hydration to a detected-events total of 1 so the
-    // existing form math continues to derive the same multipliers.
-    detectedEvents: 1,
+    detectedEvents,
     publishOnSave: record.status === 'published',
     rows: baseRow
       ? [baseRow, ...otherRows]
@@ -87,4 +114,44 @@ export function mapCorrectionFactorRecordToFormValues(
           ...otherRows,
         ],
   };
+}
+
+export function mapApiValidationEvent(
+  record: ApiValidationEventRecord
+): CorrectionFactorValidationEvent | null {
+  const id = normalizeString(record._id);
+  const classification = normalizeString(record.classification);
+  const datetime = normalizeFiniteNumber(record.datetime);
+  const device = normalizeString(record.device);
+  const index = normalizeFiniteNumber(record.index);
+
+  if (!id || !classification || datetime === null || !device) {
+    return null;
+  }
+
+  return {
+    id,
+    classification,
+    datetime,
+    device,
+    imageUrl: `${VALIDATION_EVENT_IMAGE_BASE_URL}/${id}/image.png`,
+    index,
+  };
+}
+
+export function normalizeValidationEventsResponse(
+  payload: ApiValidationEventRecord[]
+): CorrectionFactorValidationEvent[] {
+  if (!Array.isArray(payload)) {
+    return [];
+  }
+
+  return payload
+    .map(mapApiValidationEvent)
+    .filter(
+      (
+        event: CorrectionFactorValidationEvent | null
+      ): event is CorrectionFactorValidationEvent => event !== null
+    )
+    .sort((left, right) => left.datetime - right.datetime);
 }

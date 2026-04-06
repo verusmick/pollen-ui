@@ -128,6 +128,11 @@
         "basePollen": "Pollen de base",
         "allPollens": "Sélectionnez un pollen",
         "detectedEvents": "Événements détectés",
+        "detectedEventsHint": "Les événements détectés se chargeront automatiquement après la sélection de l’emplacement, du pollen de base et de l’intervalle complet.",
+        "detectedEventsLoading": "Chargement des événements détectés depuis l’API de validation...",
+        "detectedEventsLoaded": "Les événements détectés sont dérivés automatiquement du nombre de résultats de l’API de validation.",
+        "detectedEventsError": "Les événements détectés n’ont pas pu être chargés depuis l’API de validation.",
+        "detectedEventsLocationMappingError": "L’emplacement du facteur de correction \"{location}\" n’a pas pu être associé à un nom d’emplacement de l’API de validation.",
         "startDate": "Date de début",
         "endDate": "Date de fin",
         "publishOnSave": "Publier lors de l’enregistrement",
@@ -181,7 +186,7 @@
       },
       "editHydration": {
         "title": "Valeurs d'édition normalisées",
-        "description": "Le mode édition hydrate les multiplicateurs enregistrés en entrées d'événements révisés en utilisant un total d'événements détectés de 1. Cela préserve les facteurs enregistrés, mais ne restaure pas les nombres d'événements révisés d'origine."
+        "description": "Le mode édition convertit les multiplicateurs enregistrés en entrées d’événements révisés en utilisant le total d’événements détectés renvoyé par l’API de validation lorsqu’il est disponible. Cela préserve les facteurs enregistrés, mais ne restaure pas les nombres d’événements révisés d’origine."
       },
       "preview": {
         "title": "Graphique (Original vs Corrigé)",
@@ -194,6 +199,21 @@
           "original": "Série d’origine",
           "corrected": "Série corrigée"
         }
+      },
+      "eventsCarousel": {
+        "title": "Événements détectés",
+        "description": "Images d’événements de l’API de validation pour l’emplacement, le pollen de base et l’intervalle actuels.",
+        "count": "{count, plural, =0 {0 événement} one {# événement} other {# événements}}",
+        "idle": "Sélectionnez un emplacement, un pollen de base, une date de début et une date de fin pour charger les événements détectés.",
+        "empty": "Aucun événement détecté n’a été trouvé pour les filtres sélectionnés.",
+        "error": "Les événements détectés n’ont pas pu être chargés.",
+        "classification": "Classification",
+        "location": "Emplacement",
+        "capturedAt": "Capturé à",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "imageAlt": "Événement détecté {index} : {classification}",
+        "thumbnailLabel": "Afficher l’événement détecté {index} : {classification}"
       },
       "actions": {
         "cancel": "Retour",

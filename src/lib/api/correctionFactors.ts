@@ -1,11 +1,14 @@
 import type {
   ApiCorrectionFactorDeleteResponse,
   ApiCorrectionFactorRecord,
+  ApiValidationEventRecord,
+  ApiValidationLocationRecord,
   ApiMeasurementsResponse,
   ApiCorrectionFactorWriteRequest,
   ApiCorrectionFactorWriteSuccessResponse,
   CorrectionFactorMeasurementsRequest,
   CorrectionFactorListRequest,
+  CorrectionFactorValidationEventsRequest,
 } from '@/app/[locale]/alerts-and-correction-factors/correction-factors/types';
 
 const BASE_URL = '/api/correction-factors';
@@ -13,6 +16,13 @@ const BASE_URL = '/api/correction-factors';
 export interface CorrectionFactorLocationOption {
   id: string;
   name: string;
+  validationName?: string | null;
+}
+
+interface CorrectionFactorValidationLocationOption {
+  id: string;
+  name: string;
+  devices: string[];
 }
 
 function buildListQuery(params: CorrectionFactorListRequest): string {
@@ -45,6 +55,20 @@ function buildMeasurementsQuery(
   });
 
   return `?${query.toString()}`;
+}
+
+function buildValidationEventsQuery(
+  params: CorrectionFactorValidationEventsRequest
+): string {
+  const query = JSON.stringify({
+    $and: [
+      { datetime: [params.from, params.to] },
+      { $or: [{ location: params.location }] },
+      { $or: [{ classification: params.classification }] },
+    ],
+  });
+
+  return `?q=${encodeURIComponent(query)}`;
 }
 
 async function requestJson<T>(input: string, init?: RequestInit): Promise<T> {
@@ -194,6 +218,111 @@ function normalizeLocationOptionsResponse(
   );
 }
 
+function normalizeValidationLocationOptionsResponse(
+  payload: unknown
+): CorrectionFactorValidationLocationOption[] {
+  if (!Array.isArray(payload)) {
+    throw new Error('Validation locations response must be an array.');
+  }
+
+  return payload
+    .map((item: unknown) => {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) {
+        return null;
+      }
+
+      const record = item as ApiValidationLocationRecord;
+      const id = record._id;
+      const name = record.name;
+      const devices = record.devices;
+
+      if (typeof id !== 'string' || typeof name !== 'string') {
+        return null;
+      }
+
+      return {
+        id,
+        name,
+        devices: Array.isArray(devices)
+          ? devices.filter(
+              (device: unknown): device is string => typeof device === 'string'
+            )
+          : [],
+      };
+    })
+    .filter(
+      (
+        value: CorrectionFactorValidationLocationOption | null
+      ): value is CorrectionFactorValidationLocationOption => Boolean(value)
+    )
+    .sort((left, right) => left.name.localeCompare(right.name));
+}
+
+function normalizeLocationMatchKey(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[()]/g, ' ')
+    .replace(/[^a-zA-Z0-9]+/g, ' ')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
+function resolveValidationLocationName(
+  location: CorrectionFactorLocationOption,
+  validationLocations: CorrectionFactorValidationLocationOption[]
+): string | null {
+  const candidates = [location.name, location.id].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const exactNameMatch = validationLocations.find(
+      (validationLocation) => validationLocation.name === candidate
+    );
+
+    if (exactNameMatch) {
+      return exactNameMatch.name;
+    }
+
+    const exactDeviceMatch = validationLocations.find((validationLocation) =>
+      validationLocation.devices.includes(candidate)
+    );
+
+    if (exactDeviceMatch) {
+      return exactDeviceMatch.name;
+    }
+  }
+
+  const normalizedCandidates = candidates.map(normalizeLocationMatchKey);
+
+  for (const validationLocation of validationLocations) {
+    const normalizedValidationNames = [
+      validationLocation.name,
+      ...validationLocation.devices,
+    ].map(normalizeLocationMatchKey);
+
+    if (
+      normalizedCandidates.some((candidate) =>
+        normalizedValidationNames.includes(candidate)
+      )
+    ) {
+      return validationLocation.name;
+    }
+  }
+
+  return null;
+}
+
+function mergeLocationOptionsWithValidationLocations(
+  locations: CorrectionFactorLocationOption[],
+  validationLocations: CorrectionFactorValidationLocationOption[]
+): CorrectionFactorLocationOption[] {
+  return locations.map((location) => ({
+    ...location,
+    validationName: resolveValidationLocationName(location, validationLocations),
+  }));
+}
+
 export async function getCorrectionFactors(
   params: CorrectionFactorListRequest
 ): Promise<ApiCorrectionFactorRecord[]> {
@@ -247,8 +376,29 @@ export async function deleteCorrectionFactor(
 export async function getCorrectionFactorLocations(): Promise<
   CorrectionFactorLocationOption[]
 > {
-  const response = await requestJson<unknown>('/api/locations');
-  return normalizeLocationOptionsResponse(response);
+  const [locationsResult, validationLocationsResult] = await Promise.allSettled([
+    requestJson<unknown>('/api/locations'),
+    requestJson<unknown>('/api/validation-locations'),
+  ]);
+
+  if (locationsResult.status !== 'fulfilled') {
+    throw locationsResult.reason;
+  }
+
+  const locations = normalizeLocationOptionsResponse(locationsResult.value);
+
+  if (validationLocationsResult.status !== 'fulfilled') {
+    return locations;
+  }
+
+  const validationLocations = normalizeValidationLocationOptionsResponse(
+    validationLocationsResult.value
+  );
+
+  return mergeLocationOptionsWithValidationLocations(
+    locations,
+    validationLocations
+  );
 }
 
 export async function getCorrectionFactorPollens(): Promise<string[]> {
@@ -261,5 +411,13 @@ export async function getCorrectionFactorMeasurements(
 ): Promise<ApiMeasurementsResponse> {
   return requestJson<ApiMeasurementsResponse>(
     `/api/measurements${buildMeasurementsQuery(params)}`
+  );
+}
+
+export async function getCorrectionFactorValidationEvents(
+  params: CorrectionFactorValidationEventsRequest
+): Promise<ApiValidationEventRecord[]> {
+  return requestJson<ApiValidationEventRecord[]>(
+    `/api/validation-events${buildValidationEventsQuery(params)}`
   );
 }

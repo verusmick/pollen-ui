@@ -128,6 +128,11 @@
         "basePollen": "Basispollen",
         "allPollens": "Pollen auswählen",
         "detectedEvents": "Erkannte Ereignisse",
+        "detectedEventsHint": "Erkannte Ereignisse werden automatisch geladen, sobald Ort, Basispollen und der vollständige Datumsbereich ausgewählt sind.",
+        "detectedEventsLoading": "Erkannte Ereignisse werden aus der Validierungs-API geladen...",
+        "detectedEventsLoaded": "Erkannte Ereignisse werden automatisch aus der Anzahl der Ergebnisse der Validierungs-API abgeleitet.",
+        "detectedEventsError": "Erkannte Ereignisse konnten nicht aus der Validierungs-API geladen werden.",
+        "detectedEventsLocationMappingError": "Der ausgewählte Korrekturfaktor-Ort \"{location}\" konnte keinem Ortsnamen der Validierungs-API zugeordnet werden.",
         "startDate": "Startdatum",
         "endDate": "Enddatum",
         "publishOnSave": "Beim Speichern veröffentlichen",
@@ -181,7 +186,7 @@
       },
       "editHydration": {
         "title": "Normalisierte Bearbeitungswerte",
-        "description": "Der Bearbeitungsmodus hydriert gespeicherte Multiplikatoren in Eingaben für überprüfte Ereignisse mit einer Gesamtzahl erkannter Ereignisse von 1. Dadurch bleiben die gespeicherten Faktoren erhalten, aber die ursprünglichen überprüften Ereigniszahlen werden nicht wiederhergestellt."
+        "description": "Der Bearbeitungsmodus skaliert gespeicherte Multiplikatoren in Eingaben für überprüfte Ereignisse mit der von der Validierungs-API zurückgegebenen Gesamtzahl erkannter Ereignisse, sobald diese verfügbar ist. Dadurch bleiben die gespeicherten Faktoren erhalten, aber die ursprünglichen überprüften Ereigniszahlen werden nicht wiederhergestellt."
       },
       "preview": {
         "title": "Diagramm (Original vs. Korrigiert)",
@@ -194,6 +199,21 @@
           "original": "Originalreihe",
           "corrected": "Korrigierte Reihe"
         }
+      },
+      "eventsCarousel": {
+        "title": "Erkannte Ereignisse",
+        "description": "Bilder der Validierungs-API für den aktuellen Ort, Basispollen und Datumsbereich.",
+        "count": "{count, plural, =0 {0 Ereignisse} one {# Ereignis} other {# Ereignisse}}",
+        "idle": "Wählen Sie Ort, Basispollen, Startdatum und Enddatum aus, um erkannte Ereignisse zu laden.",
+        "empty": "Für die ausgewählten Filter wurden keine erkannten Ereignisse gefunden.",
+        "error": "Erkannte Ereignisse konnten nicht geladen werden.",
+        "classification": "Klassifikation",
+        "location": "Ort",
+        "capturedAt": "Erfasst am",
+        "previous": "Zurück",
+        "next": "Weiter",
+        "imageAlt": "Erkanntes Ereignis {index}: {classification}",
+        "thumbnailLabel": "Erkanntes Ereignis {index} anzeigen: {classification}"
       },
       "actions": {
         "cancel": "Zurück",

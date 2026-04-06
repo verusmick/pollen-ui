@@ -128,6 +128,11 @@
         "basePollen": "Polen base",
         "allPollens": "Seleccione un polen",
         "detectedEvents": "Eventos detectados",
+        "detectedEventsHint": "Los eventos detectados se cargarán automáticamente después de seleccionar ubicación, polen base y el rango completo de fechas.",
+        "detectedEventsLoading": "Cargando eventos detectados desde la API de validación...",
+        "detectedEventsLoaded": "Los eventos detectados se derivan automáticamente del conteo de resultados de la API de validación.",
+        "detectedEventsError": "No se pudieron cargar los eventos detectados desde la API de validación.",
+        "detectedEventsLocationMappingError": "No se pudo mapear la ubicación del factor de corrección \"{location}\" a un nombre de ubicación de la API de validación.",
         "startDate": "Fecha de inicio",
         "endDate": "Fecha de fin",
         "publishOnSave": "Publicar al guardar",
@@ -181,7 +186,7 @@
       },
       "editHydration": {
         "title": "Valores de edición normalizados",
-        "description": "El modo de edición hidrata los multiplicadores almacenados en entradas de eventos revisados usando un total de eventos detectados de 1. Esto preserva los factores guardados, pero no restaura los conteos originales de eventos revisados."
+        "description": "El modo de edición escala los multiplicadores almacenados en entradas de eventos revisados usando el total de eventos detectados devuelto por la API de validación cuando está disponible. Esto preserva los factores guardados, pero no restaura los conteos originales de eventos revisados."
       },
       "preview": {
         "title": "Gráfico (Original vs Corregido)",
@@ -194,6 +199,21 @@
           "original": "Serie original",
           "corrected": "Serie corregida"
         }
+      },
+      "eventsCarousel": {
+        "title": "Eventos detectados",
+        "description": "Imágenes de eventos de la API de validación para la ubicación, el polen base y el rango de fechas actuales.",
+        "count": "{count, plural, =0 {0 eventos} one {# evento} other {# eventos}}",
+        "idle": "Seleccione una ubicación, polen base, fecha de inicio y fecha de fin para cargar los eventos detectados.",
+        "empty": "No se encontraron eventos detectados para los filtros seleccionados.",
+        "error": "No se pudieron cargar los eventos detectados.",
+        "classification": "Clasificación",
+        "location": "Ubicación",
+        "capturedAt": "Capturado en",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "imageAlt": "Evento detectado {index}: {classification}",
+        "thumbnailLabel": "Mostrar evento detectado {index}: {classification}"
       },
       "actions": {
         "cancel": "Volver",

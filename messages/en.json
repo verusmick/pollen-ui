@@ -128,6 +128,11 @@
         "basePollen": "Base pollen",
         "allPollens": "Select a pollen",
         "detectedEvents": "Detected events",
+        "detectedEventsHint": "Detected events will load automatically after you select location, base pollen, and the full date range.",
+        "detectedEventsLoading": "Loading detected events from the validation API...",
+        "detectedEventsLoaded": "Detected events are derived automatically from the validation API result count.",
+        "detectedEventsError": "Detected events could not be loaded from the validation API.",
+        "detectedEventsLocationMappingError": "The selected correction-factor location \"{location}\" could not be mapped to a validation API location name.",
         "startDate": "Start date",
         "endDate": "End date",
         "publishOnSave": "Publish on save",
@@ -181,7 +186,7 @@
       },
       "editHydration": {
         "title": "Normalized edit values",
-        "description": "Edit mode hydrates stored multipliers into reviewed-event inputs using a detected-events total of 1. This preserves the saved factors but does not restore the original reviewed-event counts."
+        "description": "Edit mode scales stored multipliers into reviewed-event inputs using the detected-events total returned by the validation API when available. This preserves the saved factors but does not restore the original reviewed-event counts."
       },
       "preview": {
         "title": "Chart (Original vs Corrected)",
@@ -194,6 +199,21 @@
           "original": "Original series",
           "corrected": "Corrected series"
         }
+      },
+      "eventsCarousel": {
+        "title": "Detected Events",
+        "description": "Validation API event images for the current location, base pollen, and date range.",
+        "count": "{count, plural, =0 {0 events} one {# event} other {# events}}",
+        "idle": "Select a location, base pollen, start date, and end date to load detected events.",
+        "empty": "No detected events were found for the selected filters.",
+        "error": "Detected events could not be loaded.",
+        "classification": "Classification",
+        "location": "Location",
+        "capturedAt": "Captured at",
+        "previous": "Previous",
+        "next": "Next",
+        "imageAlt": "Detected event {index}: {classification}",
+        "thumbnailLabel": "Show detected event {index}: {classification}"
       },
       "actions": {
         "cancel": "Back",

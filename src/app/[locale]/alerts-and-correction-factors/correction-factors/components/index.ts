@@ -9,6 +9,7 @@ export * from './form/CorrectionFactorChartPreview';
 export * from './form/CorrectionFactorDistributionRow';
 export * from './form/CorrectionFactorDistributionSection';
 export * from './form/CorrectionFactorDistributionTable';
+export * from './form/CorrectionFactorEventCarousel';
 export * from './form/CorrectionFactorForm';
 export * from './form/CorrectionFactorFormContainer';
 export * from './form/CorrectionFactorFormHeader';

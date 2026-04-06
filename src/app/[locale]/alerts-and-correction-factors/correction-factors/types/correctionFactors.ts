@@ -52,6 +52,13 @@ export interface CorrectionFactorMeasurementsRequest {
   pollen: string;
 }
 
+export interface CorrectionFactorValidationEventsRequest {
+  from: number;
+  to: number;
+  location: string;
+  classification: string;
+}
+
 export interface ApiMeasurementRangeRecord {
   from: unknown;
   to: unknown;
@@ -69,6 +76,21 @@ export interface ApiMeasurementsResponse {
   from?: unknown;
   to?: unknown;
   measurements?: unknown;
+}
+
+export interface ApiValidationEventRecord {
+  _id?: unknown;
+  classification?: unknown;
+  datetime?: unknown;
+  device?: unknown;
+  coordinates?: unknown;
+  index?: unknown;
+}
+
+export interface ApiValidationLocationRecord {
+  _id?: unknown;
+  name?: unknown;
+  devices?: unknown;
 }
 
 export type CorrectionFactorId = string;
@@ -181,7 +203,23 @@ export interface CorrectionFactorPreviewSourcePoint {
   value: number;
 }
 
+export interface CorrectionFactorValidationEvent {
+  id: string;
+  classification: string;
+  datetime: number;
+  device: string;
+  imageUrl: string;
+  index: number | null;
+}
+
 export type CorrectionFactorPreviewStatus =
+  | 'idle'
+  | 'loading'
+  | 'error'
+  | 'empty'
+  | 'ready';
+
+export type CorrectionFactorValidationEventsStatus =
   | 'idle'
   | 'loading'
   | 'error'
