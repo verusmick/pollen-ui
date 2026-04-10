@@ -14,6 +14,7 @@ interface CorrectionFactorDistributionSectionProps {
   values: CorrectionFactorFormValues;
   derived: CorrectionFactorFormDerivedState;
   errors: CorrectionFactorFormErrors;
+  validationErrors: CorrectionFactorFormErrors;
   canAddRow: boolean;
   getPollenOptions: (currentRowPollen: string) => string[];
   onAddRow: () => void;
@@ -26,6 +27,7 @@ export function CorrectionFactorDistributionSection({
   values,
   derived,
   errors,
+  validationErrors,
   canAddRow,
   getPollenOptions,
   onAddRow,
@@ -59,8 +61,10 @@ export function CorrectionFactorDistributionSection({
       </div>
 
       <CorrectionFactorDistributionTable
+        rows={values.rows}
         derived={derived}
         errors={errors}
+        validationErrors={validationErrors}
         getPollenOptions={getPollenOptions}
         onPollenChange={onPollenChange}
         onReviewedEventsChange={onReviewedEventsChange}
@@ -69,7 +73,7 @@ export function CorrectionFactorDistributionSection({
 
       <CorrectionFactorTotals
         derived={derived}
-        tableError={errors.rows}
+        tableError={errors.rows ?? validationErrors.rows}
       />
     </section>
   );

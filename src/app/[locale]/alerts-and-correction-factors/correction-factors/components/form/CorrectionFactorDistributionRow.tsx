@@ -46,7 +46,9 @@ export function CorrectionFactorDistributionRow({
             value={pollen}
             onChange={(event) => onPollenChange(clientId, event.target.value)}
             disabled={isBasePollen}
-            className="h-9 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground disabled:opacity-70"
+            className={`h-9 w-full rounded-md border bg-card px-3 text-sm text-foreground disabled:opacity-70 ${
+              errors?.pollen ? 'border-red-300' : 'border-border'
+            }`}
           >
             <option value="">{t('selectPollen')}</option>
             {pollenOptions.map((option) => (
@@ -69,7 +71,9 @@ export function CorrectionFactorDistributionRow({
             onReviewedEventsChange(clientId, event.target.value)
           }
           disabled={isSyntheticUnknown}
-          className="h-9 w-full rounded-md border border-border bg-card px-3 text-sm text-foreground disabled:bg-muted disabled:text-muted-foreground"
+          className={`h-9 w-full rounded-md border bg-card px-3 text-sm text-foreground disabled:bg-muted disabled:text-muted-foreground ${
+            errors?.reviewedEvents ? 'border-red-300' : 'border-border'
+          }`}
         />
         {errors?.reviewedEvents ? (
           <div className="pt-1 text-xs text-red-600">{errors.reviewedEvents}</div>

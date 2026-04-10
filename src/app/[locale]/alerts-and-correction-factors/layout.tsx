@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       : 'text-muted-foreground hover:text-foreground');
 
   return (
-    <div className="flex flex-col h-full bg-background text-foreground">
+    <div className="flex h-full min-h-0 flex-col bg-background text-foreground">
       <nav className="flex border-b border-border px-4 pt-4">
         {tabs.map(({ href, label }) => {
           const active = pathname?.endsWith(href);
@@ -41,7 +41,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
-      <div className=" overflow-hidden">{children}</div>
+      <div className="flex min-h-0 flex-1 overflow-hidden">{children}</div>
     </div>
   );
 }

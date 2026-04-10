@@ -13,6 +13,7 @@ export default async function EditCorrectionFactorPage({
 
   return (
     <CorrectionFactorFormContainer
+      key={correctionFactorId}
       mode="edit"
       correctionFactorId={correctionFactorId}
     />

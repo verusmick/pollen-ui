@@ -6,11 +6,19 @@ import type {
 } from '../types';
 import { UNKNOWN_POLLEN_CODE } from '../constants';
 import { buildCorrectionFactorDerivedState } from './correctionFactorMath';
+import { toCorrectionFactorApiDateTime } from './correctionFactorDateTime';
 
 export function buildCorrectionFactorWritePayload(
   values: CorrectionFactorFormValues,
   options: CorrectionFactorPayloadBuildOptions
 ): ApiCorrectionFactorWriteRequest {
+  const startDate = toCorrectionFactorApiDateTime(values.startDate);
+  const endDate = toCorrectionFactorApiDateTime(values.endDate);
+
+  if (!startDate || !endDate) {
+    throw new Error('Correction factor payload requires valid start and end datetimes.');
+  }
+
   const derived = buildCorrectionFactorDerivedState(
     values,
     options.factorPercentageScale
@@ -40,8 +48,8 @@ export function buildCorrectionFactorWritePayload(
   }
 
   return {
-    start_date: values.startDate,
-    end_date: values.endDate,
+    start_date: startDate,
+    end_date: endDate,
     pollen: values.basePollen,
     location: values.location,
     correction_factor_details: correctionFactorDetails,

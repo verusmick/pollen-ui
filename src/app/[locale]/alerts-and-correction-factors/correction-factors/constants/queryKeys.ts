@@ -10,10 +10,19 @@ export const correctionFactorKeys = {
     [...correctionFactorKeys.lists(), filters] as const,
   details: () => [...correctionFactorKeys.all, 'detail'] as const,
   detail: (id: string) => [...correctionFactorKeys.details(), id] as const,
+  previews: () => [...correctionFactorKeys.all, 'preview'] as const,
   preview: (params: {
     location: string;
     basePollen: string;
     startDate: string;
     endDate: string;
-  }) => [...correctionFactorKeys.all, 'preview', params] as const,
+  }) => [...correctionFactorKeys.previews(), params] as const,
+  validationEvents: () =>
+    [...correctionFactorKeys.all, 'validationEvents'] as const,
+  validationEvent: (params: {
+    location: string;
+    basePollen: string;
+    startDate: string;
+    endDate: string;
+  }) => [...correctionFactorKeys.validationEvents(), params] as const,
 };

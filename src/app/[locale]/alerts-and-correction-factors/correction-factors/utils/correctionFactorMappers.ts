@@ -9,6 +9,7 @@ import type {
   CorrectionFactorValidationEvent,
 } from '../types';
 import { UNKNOWN_POLLEN_CODE } from '../constants';
+import { normalizeCorrectionFactorDateTime } from './correctionFactorDateTime';
 
 const VALIDATION_EVENT_IMAGE_BASE_URL =
   'https://validation.pollenscience.eu/resources/classifications';
@@ -98,8 +99,8 @@ export function mapCorrectionFactorRecordToFormValues(
   return {
     location: record.location,
     basePollen: record.basePollen,
-    startDate: record.startDate.slice(0, 10),
-    endDate: record.endDate.slice(0, 10),
+    startDate: normalizeCorrectionFactorDateTime(record.startDate),
+    endDate: normalizeCorrectionFactorDateTime(record.endDate),
     detectedEvents,
     publishOnSave: record.status === 'published',
     rows: baseRow

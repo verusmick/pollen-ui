@@ -10,6 +10,7 @@ import {
 } from '../../constants';
 import type { CorrectionFactorListFilters } from '../../types';
 import { useCorrectionFactorsList } from '../../hooks';
+import { toCorrectionFactorUserFacingError } from '../../utils';
 import { CorrectionFactorsFilters } from './CorrectionFactorsFilters';
 import { CorrectionFactorsHeader } from './CorrectionFactorsHeader';
 import { CorrectionFactorsTable } from './CorrectionFactorsTable';
@@ -67,7 +68,7 @@ export function CorrectionFactorsListContainer() {
   }, [data, filters]);
 
   return (
-    <main className="flex h-full flex-col gap-4 p-4">
+    <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
       <CorrectionFactorsHeader />
       <CorrectionFactorsFilters
         value={filters}
@@ -95,8 +96,9 @@ export function CorrectionFactorsListContainer() {
 
       {isError ? (
         <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-700">
-          {t('error')}
-          {error instanceof Error ? ` ${error.message}` : null}
+          {toCorrectionFactorUserFacingError(error, {
+            fallbackMessage: t('error'),
+          })}
         </div>
       ) : null}
 

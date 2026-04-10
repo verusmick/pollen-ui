@@ -23,6 +23,7 @@ import {
 import {
   buildCorrectionFactorWritePayload,
   mapCorrectionFactorRecordToFormValues,
+  toCorrectionFactorUserFacingError,
 } from '../../utils';
 import { CorrectionFactorForm } from './CorrectionFactorForm';
 
@@ -97,6 +98,15 @@ export function CorrectionFactorFormContainer({
     values: form.values,
     derived: form.derived,
   });
+
+  useEffect(() => {
+    form.resetForm();
+    setActionError(null);
+    setEditHydrationMessage(null);
+    setActiveValidationEventIndex(0);
+    hydratedRecordIdRef.current = null;
+    appliedValidationDetectedEventsRef.current = null;
+  }, [correctionFactorId, mode]);
 
   useEffect(() => {
     if (!isEditMode || !detailQuery.data) {
@@ -183,11 +193,7 @@ export function CorrectionFactorFormContainer({
   ]);
 
   const detailError =
-    isEditMode && detailQuery.isError
-      ? detailQuery.error instanceof Error
-        ? `${t('states.loadError')} ${detailQuery.error.message}`
-        : t('states.loadError')
-      : null;
+    isEditMode && detailQuery.isError ? t('states.loadError') : null;
   const editHydrationBlocked =
     isEditMode &&
     !detailQuery.isLoading &&
@@ -196,6 +202,7 @@ export function CorrectionFactorFormContainer({
   const submitDisabled =
     saving ||
     deleting ||
+    !form.isValid ||
     (isEditMode &&
       (!correctionFactorId ||
         detailQuery.isLoading ||
@@ -208,14 +215,14 @@ export function CorrectionFactorFormContainer({
     detailQuery.isLoading ||
     Boolean(detailError);
   const locationOptionsError = locationsError
-    ? locationsQueryError instanceof Error
-      ? locationsQueryError.message
-      : t('meta.optionsLoadError')
+    ? toCorrectionFactorUserFacingError(locationsQueryError, {
+        fallbackMessage: t('meta.optionsLoadError'),
+      })
     : null;
   const pollenOptionsError = pollensError
-    ? pollensQueryError instanceof Error
-      ? pollensQueryError.message
-      : t('meta.optionsLoadError')
+    ? toCorrectionFactorUserFacingError(pollensQueryError, {
+        fallbackMessage: t('meta.optionsLoadError'),
+      })
     : null;
   const validationEventsStatusText = !validationEvents.isReady
     ? validationLocationMappingError
@@ -226,13 +233,33 @@ export function CorrectionFactorFormContainer({
       : validationEvents.status === 'ready' || validationEvents.status === 'empty'
         ? t('meta.detectedEventsLoaded')
         : null;
-  const validationEventsError =
-    validationLocationMappingError ??
-    (validationEvents.status === 'error'
-      ? validationEvents.error?.message ?? t('meta.detectedEventsError')
-      : null);
+  const validationEventsError = validationLocationMappingError
+    ? validationLocationMappingError
+    : validationEvents.status === 'error'
+      ? toCorrectionFactorUserFacingError(validationEvents.error, {
+          fallbackMessage: t('meta.detectedEventsError'),
+          mismatchMessage: t('meta.detectedEventsMismatchError'),
+        })
+      : null;
+  const carouselValidationStatus = validationLocationMappingError
+    ? 'error'
+    : validationEvents.status;
+  const carouselValidationError = validationLocationMappingError
+    ? validationLocationMappingError
+    : validationEvents.status === 'error'
+      ? toCorrectionFactorUserFacingError(validationEvents.error, {
+          fallbackMessage: t('eventsCarousel.error'),
+          mismatchMessage: t('eventsCarousel.errorMismatch'),
+        })
+      : null;
+  const previewError =
+    preview.status === 'error'
+      ? toCorrectionFactorUserFacingError(preview.error, {
+          fallbackMessage: t('preview.error'),
+        })
+      : null;
 
-  async function invalidateCorrectionFactorQueries(id?: string) {
+  async function refreshCorrectionFactorQueries(id?: string) {
     await Promise.all([
       queryClient.invalidateQueries({
         queryKey: correctionFactorKeys.lists(),
@@ -246,6 +273,25 @@ export function CorrectionFactorFormContainer({
           })
         : Promise.resolve(),
     ]);
+
+    queryClient.removeQueries({
+      queryKey: correctionFactorKeys.lists(),
+      type: 'inactive',
+    });
+    queryClient.removeQueries({
+      queryKey: correctionFactorKeys.previews(),
+      type: 'inactive',
+    });
+    queryClient.removeQueries({
+      queryKey: correctionFactorKeys.validationEvents(),
+      type: 'inactive',
+    });
+    if (id) {
+      queryClient.removeQueries({
+        queryKey: correctionFactorKeys.detail(id),
+        type: 'inactive',
+      });
+    }
   }
 
   async function handleSubmit() {
@@ -271,22 +317,22 @@ export function CorrectionFactorFormContainer({
         const response = await updateCorrectionFactor(correctionFactorId, payload);
         const nextId = String(response.data.id);
 
-        await invalidateCorrectionFactorQueries(nextId);
+        await refreshCorrectionFactorQueries(nextId);
       } else {
         const response = await createCorrectionFactor(payload);
         const nextId = String(response.data.id);
 
-        await invalidateCorrectionFactorQueries(nextId);
+        await refreshCorrectionFactorQueries(nextId);
       }
 
       router.replace(listHref);
     } catch (error) {
       setActionError(
-        error instanceof Error
-          ? error.message
-          : isEditMode
+        toCorrectionFactorUserFacingError(error, {
+          fallbackMessage: isEditMode
             ? t('updateErrorFallback')
-            : t('submitErrorFallback')
+            : t('submitErrorFallback'),
+        })
       );
     } finally {
       setSaving(false);
@@ -307,14 +353,16 @@ export function CorrectionFactorFormContainer({
     try {
       setDeleting(true);
       await deleteCorrectionFactor(correctionFactorId);
-      await invalidateCorrectionFactorQueries(correctionFactorId);
+      await refreshCorrectionFactorQueries(correctionFactorId);
       queryClient.removeQueries({
         queryKey: correctionFactorKeys.detail(correctionFactorId),
       });
       router.replace(listHref);
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : t('deleteErrorFallback')
+        toCorrectionFactorUserFacingError(error, {
+          fallbackMessage: t('deleteErrorFallback'),
+        })
       );
     } finally {
       setDeleting(false);
@@ -326,6 +374,9 @@ export function CorrectionFactorFormContainer({
       mode={mode}
       values={form.values}
       errors={form.errors}
+      validationErrors={form.validationErrors}
+      validationSummary={form.validationSummary}
+      isFormValid={form.isValid}
       derived={form.derived}
       locationOptions={locationOptions}
       pollenOptions={pollenOptions}
@@ -333,9 +384,9 @@ export function CorrectionFactorFormContainer({
       pollensLoading={pollensLoading}
       locationsError={locationOptionsError}
       pollensError={pollenOptionsError}
-      validationEventsStatus={validationEvents.status}
+      validationEventsStatus={carouselValidationStatus}
       validationEvents={validationEvents.events}
-      validationEventsError={validationEvents.error?.message ?? null}
+      validationEventsError={carouselValidationError}
       activeValidationEventIndex={activeValidationEventIndex}
       validationEventsStatusText={validationEventsStatusText}
       validationEventsFieldError={validationEventsError}
@@ -364,7 +415,7 @@ export function CorrectionFactorFormContainer({
       canAddRow={Boolean(form.values.basePollen)}
       previewStatus={preview.status}
       previewSeries={preview.series}
-      previewError={preview.error?.message ?? null}
+      previewError={previewError}
       getPollenOptions={(currentRowPollen) =>
         form.getPollenOptions(currentRowPollen, pollenOptions)
       }

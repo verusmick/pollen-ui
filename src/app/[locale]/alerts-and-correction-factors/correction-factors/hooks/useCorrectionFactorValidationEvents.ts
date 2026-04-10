@@ -9,9 +9,11 @@ import type {
   CorrectionFactorValidationEventsStatus,
 } from '../types';
 import {
+  VALIDATION_EVENTS_RESPONSE_MISMATCH,
   normalizeValidationEventsResponse,
   toMeasurementPreviewRange,
 } from '../utils';
+import { correctionFactorKeys } from '../constants';
 
 interface UseCorrectionFactorValidationEventsOptions {
   location: string;
@@ -41,16 +43,12 @@ export function useCorrectionFactorValidationEvents({
   const isReady = Boolean(location) && Boolean(basePollen) && range !== null;
 
   const validationEventsQuery = useQuery({
-    queryKey: [
-      'correctionFactors',
-      'validationEvents',
-      {
-        location,
-        basePollen,
-        startDate,
-        endDate,
-      },
-    ] as const,
+    queryKey: correctionFactorKeys.validationEvent({
+      location,
+      basePollen,
+      startDate,
+      endDate,
+    }),
     queryFn: async () => {
       if (!range || !location || !basePollen) {
         return [];
@@ -63,7 +61,13 @@ export function useCorrectionFactorValidationEvents({
         classification: basePollen,
       });
 
-      return normalizeValidationEventsResponse(response);
+      const normalized = normalizeValidationEventsResponse(response);
+
+      if (response.length > 0 && normalized.length === 0) {
+        throw new Error(VALIDATION_EVENTS_RESPONSE_MISMATCH);
+      }
+
+      return normalized;
     },
     enabled: isReady,
     staleTime: 1000 * 60 * 5,

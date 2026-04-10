@@ -5,12 +5,15 @@ import { useTranslations } from 'next-intl';
 import type {
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormErrors,
+  CorrectionFactorDistributionRowForm,
 } from '../../types';
 import { CorrectionFactorDistributionRow } from './CorrectionFactorDistributionRow';
 
 interface CorrectionFactorDistributionTableProps {
+  rows: CorrectionFactorDistributionRowForm[];
   derived: CorrectionFactorFormDerivedState;
   errors: CorrectionFactorFormErrors;
+  validationErrors: CorrectionFactorFormErrors;
   getPollenOptions: (currentRowPollen: string) => string[];
   onPollenChange: (clientId: string, pollen: string) => void;
   onReviewedEventsChange: (clientId: string, reviewedEvents: string) => void;
@@ -18,8 +21,10 @@ interface CorrectionFactorDistributionTableProps {
 }
 
 export function CorrectionFactorDistributionTable({
+  rows,
   derived,
   errors,
+  validationErrors,
   getPollenOptions,
   onPollenChange,
   onReviewedEventsChange,
@@ -48,24 +53,45 @@ export function CorrectionFactorDistributionTable({
             </tr>
           </thead>
           <tbody>
-            {derived.rows.map((row) => {
+            {rows.map((row) => {
+              const multiplier = derived.multipliersByRowId[row.clientId] ?? 0;
+
               return (
                 <CorrectionFactorDistributionRow
                   key={row.clientId}
                   clientId={row.clientId}
                   pollen={row.pollen}
-                  reviewedEvents={String(row.reviewedEventsNumber)}
-                  multiplier={row.multiplier}
-                  pollenOptions={row.isSyntheticUnknown ? [] : getPollenOptions(row.pollen)}
+                  reviewedEvents={row.reviewedEvents}
+                  multiplier={multiplier}
+                  pollenOptions={getPollenOptions(row.pollen)}
                   isBasePollen={row.isBasePollen}
-                  isSyntheticUnknown={row.isSyntheticUnknown}
-                  errors={errors.rowErrorsById[row.clientId]}
+                  errors={
+                    errors.rowErrorsById[row.clientId] ??
+                    validationErrors.rowErrorsById[row.clientId]
+                  }
                   onPollenChange={onPollenChange}
                   onReviewedEventsChange={onReviewedEventsChange}
                   onRemove={onRemove}
                 />
               );
             })}
+            {derived.rows
+              .filter((row) => row.isSyntheticUnknown)
+              .map((row) => (
+                <CorrectionFactorDistributionRow
+                  key={row.clientId}
+                  clientId={row.clientId}
+                  pollen={row.pollen}
+                  reviewedEvents={String(row.reviewedEventsNumber)}
+                  multiplier={row.multiplier}
+                  pollenOptions={[]}
+                  isBasePollen={false}
+                  isSyntheticUnknown
+                  onPollenChange={onPollenChange}
+                  onReviewedEventsChange={onReviewedEventsChange}
+                  onRemove={onRemove}
+                />
+              ))}
           </tbody>
         </table>
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import {
@@ -15,6 +15,8 @@ import type {
 } from '../types';
 import {
   buildCorrectionFactorDerivedState,
+  hasCorrectionFactorFormErrors,
+  listCorrectionFactorFormErrors,
   validateCorrectionFactorForm,
 } from '../utils';
 
@@ -77,11 +79,50 @@ export function useCorrectionFactorForm() {
   const [errors, setErrors] = useState<CorrectionFactorFormErrors>(
     EMPTY_CORRECTION_FACTOR_FORM_ERRORS
   );
+  const [hasValidated, setHasValidated] = useState(false);
 
   const derived = useMemo<CorrectionFactorFormDerivedState>(
     () => buildCorrectionFactorDerivedState(values, 'ratio'),
     [values]
   );
+  const validationMessages = useMemo(
+    () => ({
+      locationRequired: t('locationRequired'),
+      basePollenRequired: t('basePollenRequired'),
+      startDateRequired: t('startDateRequired'),
+      endDateRequired: t('endDateRequired'),
+      startDateInvalid: t('startDateInvalid'),
+      endDateInvalid: t('endDateInvalid'),
+      endDateOrder: t('endDateOrder'),
+      detectedEventsRequired: t('detectedEventsRequired'),
+      atLeastOneRow: t('atLeastOneRow'),
+      exactlyOneBaseRow: t('exactlyOneBaseRow'),
+      baseRowFirst: t('baseRowFirst'),
+      baseRowMatch: t('baseRowMatch'),
+      pollenRequired: t('pollenRequired'),
+      reviewedEventsNonNegative: t('reviewedEventsNonNegative'),
+      duplicatePollens: t('duplicatePollens'),
+      overAllocated: t('overAllocated'),
+    }),
+    [t]
+  );
+  const validationErrors = useMemo(
+    () => validateCorrectionFactorForm(values, validationMessages),
+    [validationMessages, values]
+  );
+  const isValid = !hasCorrectionFactorFormErrors(validationErrors);
+  const validationSummary = useMemo(
+    () => listCorrectionFactorFormErrors(validationErrors),
+    [validationErrors]
+  );
+
+  useEffect(() => {
+    if (!hasValidated) {
+      return;
+    }
+
+    setErrors(validationErrors);
+  }, [hasValidated, validationErrors]);
 
   function clearTopLevelError(field: ErrorField) {
     setErrors((current) => {
@@ -256,42 +297,21 @@ export function useCorrectionFactorForm() {
 
   function resetForm() {
     setValues(DEFAULT_CORRECTION_FACTOR_FORM_VALUES);
+    setHasValidated(false);
     setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
   }
 
   function replaceValues(nextValues: CorrectionFactorFormValues) {
     setValues(nextValues);
+    setHasValidated(false);
     setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
   }
 
   function validate() {
-    const nextErrors = validateCorrectionFactorForm(values, {
-      locationRequired: t('locationRequired'),
-      basePollenRequired: t('basePollenRequired'),
-      startDateRequired: t('startDateRequired'),
-      endDateRequired: t('endDateRequired'),
-      endDateOrder: t('endDateOrder'),
-      detectedEventsRequired: t('detectedEventsRequired'),
-      atLeastOneRow: t('atLeastOneRow'),
-      exactlyOneBaseRow: t('exactlyOneBaseRow'),
-      baseRowFirst: t('baseRowFirst'),
-      baseRowMatch: t('baseRowMatch'),
-      pollenRequired: t('pollenRequired'),
-      reviewedEventsNonNegative: t('reviewedEventsNonNegative'),
-      duplicatePollens: t('duplicatePollens'),
-      overAllocated: t('overAllocated'),
-    });
-    setErrors(nextErrors);
+    setHasValidated(true);
+    setErrors(validationErrors);
 
-    const hasTopLevelErrors = Object.entries(nextErrors).some(([key, value]) => {
-      if (key === 'rowErrorsById') {
-        return Object.keys(nextErrors.rowErrorsById).length > 0;
-      }
-
-      return Boolean(value);
-    });
-
-    return !hasTopLevelErrors;
+    return isValid;
   }
 
   function getPollenOptions(currentRowPollen: string, availablePollens: string[]): string[] {
@@ -307,6 +327,9 @@ export function useCorrectionFactorForm() {
     values,
     errors,
     derived,
+    isValid,
+    validationErrors,
+    validationSummary,
     setField,
     addRow,
     removeRow,

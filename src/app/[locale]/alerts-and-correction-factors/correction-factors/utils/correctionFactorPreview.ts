@@ -6,6 +6,7 @@ import type {
   CorrectionFactorPreviewSeries,
   CorrectionFactorPreviewSourcePoint,
 } from '../types';
+import { toCorrectionFactorUnixTimestamp } from './correctionFactorDateTime';
 
 function normalizeFiniteNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) {
@@ -53,6 +54,7 @@ function formatPreviewLabel(timestamp: number): string {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'UTC',
   }).format(new Date(timestamp * 1000));
 }
 
@@ -60,16 +62,14 @@ export function toMeasurementPreviewRange(
   startDate: string,
   endDate: string
 ): { from: number; to: number } | null {
-  if (!startDate || !endDate) {
+  const from = toCorrectionFactorUnixTimestamp(startDate);
+  const to = toCorrectionFactorUnixTimestamp(endDate);
+
+  if (from === null || to === null) {
     return null;
   }
 
-  const start = new Date(`${startDate}T00:00:00Z`);
-  const end = new Date(`${endDate}T23:59:59Z`);
-  const from = Math.floor(start.getTime() / 1000);
-  const to = Math.floor(end.getTime() / 1000);
-
-  if (!Number.isFinite(from) || !Number.isFinite(to) || to < from) {
+  if (to < from) {
     return null;
   }
 

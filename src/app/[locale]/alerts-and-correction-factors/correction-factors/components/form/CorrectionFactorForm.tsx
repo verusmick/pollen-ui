@@ -13,6 +13,7 @@ import type {
   CorrectionFactorValidationEvent,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
+import { formatCorrectionFactorDateTimeRange } from '../../utils';
 import { CorrectionFactorChartPreview } from './CorrectionFactorChartPreview';
 import { CorrectionFactorDistributionSection } from './CorrectionFactorDistributionSection';
 import { CorrectionFactorEventCarousel } from './CorrectionFactorEventCarousel';
@@ -23,6 +24,9 @@ interface CorrectionFactorFormProps {
   mode: CorrectionFactorFormMode;
   values: CorrectionFactorFormValues;
   errors: CorrectionFactorFormErrors;
+  validationErrors: CorrectionFactorFormErrors;
+  validationSummary: string[];
+  isFormValid: boolean;
   derived: CorrectionFactorFormDerivedState;
   locationOptions: CorrectionFactorLocationOption[];
   pollenOptions: string[];
@@ -70,13 +74,16 @@ interface CorrectionFactorFormProps {
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
-  return `${startDate.slice(0, 10)} - ${endDate.slice(0, 10)}`;
+  return formatCorrectionFactorDateTimeRange(startDate, endDate);
 }
 
 export function CorrectionFactorForm({
   mode,
   values,
   errors,
+  validationErrors,
+  validationSummary,
+  isFormValid,
   derived,
   locationOptions,
   pollenOptions,
@@ -129,7 +136,7 @@ export function CorrectionFactorForm({
     activeValidationEventIndex < validationEvents.length - 1;
 
   return (
-    <div className="flex h-full flex-col gap-4 p-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
       <CorrectionFactorFormHeader
         mode={mode}
         saving={saving}
@@ -142,6 +149,22 @@ export function CorrectionFactorForm({
         onSubmit={onSubmit}
         onDelete={onDelete}
       />
+
+      {!isFormValid ? (
+        <section className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <h2 className="text-sm font-semibold text-amber-900">
+            {formT('validationSummary.title')}
+          </h2>
+          <p className="mt-1 text-sm text-amber-800">
+            {formT('validationSummary.description')}
+          </p>
+          <ul className="mt-3 space-y-1 text-sm text-amber-900">
+            {validationSummary.map((message) => (
+              <li key={message}>- {message}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {mode === 'edit' && detailLoading ? (
         <section className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
@@ -156,7 +179,7 @@ export function CorrectionFactorForm({
       ) : null}
 
       {mode === 'edit' && !detailLoading && !detailError && editHydrationBlocked ? (
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+        <div className="grid min-h-0 gap-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
           <section className="space-y-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
             <div>
               <h2 className="text-base font-semibold text-amber-900">
@@ -272,15 +295,17 @@ export function CorrectionFactorForm({
       ) : null}
 
       {!(mode === 'edit' && (detailLoading || detailError || editHydrationBlocked)) ? (
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-          <div className="space-y-4">
+        <div className="grid min-h-0 items-start gap-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+          <div className="min-w-0 space-y-4">
             <CorrectionFactorMetaFields
               values={values}
               errors={errors}
+              validationErrors={validationErrors}
               locationOptions={locationOptions}
               pollenOptions={pollenOptions}
               locationsLoading={locationsLoading}
               pollensLoading={pollensLoading}
+              validationEventsStatus={validationEventsStatus}
               locationsError={locationsError}
               pollensError={pollensError}
               validationEventsStatusText={validationEventsStatusText}
@@ -296,6 +321,7 @@ export function CorrectionFactorForm({
               values={values}
               derived={derived}
               errors={errors}
+              validationErrors={validationErrors}
               canAddRow={canAddRow}
               getPollenOptions={getPollenOptions}
               onAddRow={onAddRow}
@@ -312,7 +338,7 @@ export function CorrectionFactorForm({
             ) : null}
           </div>
 
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             <CorrectionFactorEventCarousel
               status={validationEventsStatus}
               events={validationEvents}

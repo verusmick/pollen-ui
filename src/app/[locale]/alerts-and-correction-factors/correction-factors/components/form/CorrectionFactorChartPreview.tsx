@@ -35,7 +35,7 @@ export function CorrectionFactorChartPreview({
   const t = useTranslations('correctionFactorsPage.form.preview');
 
   return (
-    <section className="rounded-lg border border-border bg-card p-4">
+    <section className="min-w-0 rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
@@ -70,7 +70,7 @@ export function CorrectionFactorChartPreview({
       ) : null}
 
       {status === 'ready' && series ? (
-        <div className="mt-4 h-[340px] rounded-lg border border-border bg-background p-4">
+        <div className="mt-4 h-[340px] min-w-0 rounded-lg border border-border bg-background p-4">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={series.points}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />

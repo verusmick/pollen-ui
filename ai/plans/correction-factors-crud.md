@@ -37,6 +37,8 @@ This document defines architecture and skeletons only, not full implementation.
 5. Use local React state via a feature-local form hook for the form.
 6. Do not introduce a form library.
 7. Do not introduce a feature store in phase 1. No Zustand is needed unless draft state must be shared across distant components later.
+8. Treat form start/end values as date-plus-hour selections aligned to the measurements API 3-hour granularity.
+9. Treat per-event reviewed classification as the form source of truth; the correction table is a derived summary.
 
 ## Route Integration
 
@@ -107,6 +109,7 @@ src/app/[locale]/alerts-and-correction-factors/correction-factors/
       CorrectionFactorForm.tsx
       CorrectionFactorFormHeader.tsx
       CorrectionFactorMetaFields.tsx
+      CorrectionFactorEventReviewCarousel.tsx
       CorrectionFactorDistributionSection.tsx
       CorrectionFactorDistributionTable.tsx
       CorrectionFactorDistributionRow.tsx
@@ -173,11 +176,11 @@ CorrectionFactorFormContainer
   CorrectionFactorFormHeader
   CorrectionFactorForm
     CorrectionFactorMetaFields
+    CorrectionFactorEventReviewCarousel
     CorrectionFactorDistributionSection
       CorrectionFactorDistributionTable
         CorrectionFactorDistributionRow
       CorrectionFactorTotals
-      AddDistributionRowButton
     CorrectionFactorChartPreview
     CorrectionFactorActions
       SaveButton
@@ -188,7 +191,8 @@ Responsibilities:
 
 - container owns bootstrap, submit, delete, navigation, error handling
 - form component stays presentational and receives state + callbacks
-- distribution section is a focused subtree because it contains most business rules
+- event review carousel is the main review surface for assigning pollen classifications to detected images
+- distribution section renders a derived summary of reviewed event assignments
 - chart preview receives already-derived series, not raw mutable form logic
 
 ## TypeScript Domain Types
@@ -230,26 +234,33 @@ export interface CorrectionFactorListFilters {
 
 ### UI Form Types
 
-The UI edits reviewed event counts, not multipliers. Keep raw input values as strings to avoid fighting user typing.
+The UI edits per-event reviewed classification, not reviewed counts or multipliers. Counts are derived from event assignments.
 
 ```ts
 export type CorrectionFactorFormMode = 'create' | 'edit';
 
-export interface CorrectionFactorDistributionRowForm {
+export interface CorrectionFactorDetectedEventForm {
+  eventId: string;
+  imageUrl: string;
+  reviewedPollen: CorrectionFactorSelectablePollen;
+}
+
+export interface CorrectionFactorDistributionSummaryRow {
   clientId: string;
-  pollen: CorrectionFactorSelectablePollen | '';
-  reviewedEvents: string;
+  pollen: CorrectionFactorSelectablePollen;
+  reviewedEventsNumber: number;
+  multiplier: number;
   isBasePollen: boolean;
 }
 
 export interface CorrectionFactorFormValues {
   location: string;
   basePollen: CorrectionFactorPollenCode | '';
-  startDate: string;
-  endDate: string;
+  startDate: string; // datetime string with 3-hour granularity
+  endDate: string; // datetime string with 3-hour granularity
   detectedEvents: number | null;
   publishOnSave: boolean;
-  rows: CorrectionFactorDistributionRowForm[];
+  events: CorrectionFactorDetectedEventForm[];
 }
 
 export interface CorrectionFactorFormErrors {
@@ -258,30 +269,25 @@ export interface CorrectionFactorFormErrors {
   startDate?: string;
   endDate?: string;
   detectedEvents?: string;
-  rows?: string;
-  rowErrorsById: Record<
+  eventReview?: string;
+  eventErrorsById: Record<
     string,
     {
-      pollen?: string;
-      reviewedEvents?: string;
+      reviewedPollen?: string;
     }
   >;
 }
 
-export interface CorrectionFactorFormDerivedRow {
-  clientId: string;
-  multiplier: number;
-  reviewedEventsNumber: number;
-}
-
 export interface CorrectionFactorFormDerivedState {
+  rows: CorrectionFactorDistributionSummaryRow[];
   assignedReviewedEvents: number;
   unknownReviewedEvents: number;
   totalReviewedEvents: number;
   remainingEvents: number;
   isBalanced: boolean;
   hasDuplicatePollens: boolean;
-  multipliersByRowId: Record<string, number>;
+  reviewedCountsByPollen: Record<CorrectionFactorSelectablePollen, number>;
+  multipliersByPollen: Record<CorrectionFactorSelectablePollen, number>;
 }
 ```
 
@@ -291,7 +297,17 @@ Detected events are API-derived rather than manually entered:
 - convert the selected date range into Unix timestamps for the validation query
 - set `detectedEvents` from the normalized validation-event result count
 - keep the detected-events field read-only in the form UI
-- render the fetched event images in a presentational right-column carousel
+- initialize each event image with `reviewedPollen = UNKNOWN`
+- use the right-side carousel as the main event review surface, not only as a viewer
+- let the scientist assign a pollen classification per event image from the carousel
+- derive correction-table reviewed counts from event assignments instead of typed inputs
+- treat empty validation responses and unusable validation payloads as distinct UX states
+
+Validation-location integration is adapter-driven:
+
+- correction-factor location options are enriched with validation location names
+- matching is attempted by exact validation name, device alias, and normalized canonical-name comparison
+- unresolved locations block validation-event loading and surface a user-facing field error
 
 ### Preview Types
 
@@ -380,7 +396,8 @@ Use feature-local mappers in `utils/correctionFactorMappers.ts`:
 
 Important mapping rule:
 
-- UI owns `reviewedEvents`
+- UI owns per-event `reviewedPollen`
+- reviewed event counts are derived from event assignments
 - API owns `factor_percentage`
 - conversion happens only in derived state and payload builder
 - `factor_percentage` scale must be confirmed with backend:
@@ -399,12 +416,21 @@ export const correctionFactorKeys = {
     [...correctionFactorKeys.lists(), filters] as const,
   details: () => [...correctionFactorKeys.all, 'detail'] as const,
   detail: (id: string) => [...correctionFactorKeys.details(), id] as const,
+  previews: () => [...correctionFactorKeys.all, 'preview'] as const,
   preview: (params: {
     location: string;
     basePollen: string;
     startDate: string;
     endDate: string;
-  }) => [...correctionFactorKeys.all, 'preview', params] as const,
+  }) => [...correctionFactorKeys.previews(), params] as const,
+  validationEvents: () =>
+    [...correctionFactorKeys.all, 'validationEvents'] as const,
+  validationEvent: (params: {
+    location: string;
+    basePollen: string;
+    startDate: string;
+    endDate: string;
+  }) => [...correctionFactorKeys.validationEvents(), params] as const,
 };
 ```
 
@@ -422,11 +448,16 @@ Responsibilities:
   - list query for table page
 - `useCorrectionFactorDetail`
   - edit bootstrap query
-  - current implementation hydrates edit form values from stored multipliers with a normalized detected-events total of `1`
-  - this preserves stored factors for round-tripping, but it does not recreate original reviewed-event counts
+  - current API detail hydrates stored multipliers only
+  - do not convert stored multipliers into manual reviewed-count inputs
+  - per-event reviewed classification requires event-level persistence or defaults back to `UNKNOWN`
 - `useCorrectionFactorPreview`
   - fetches the original chart source only
-  - corrected series is derived locally from current form state
+  - corrected series is derived locally from current event assignments
+- `useCorrectionFactorValidationEvents`
+  - fetches validation-event images and detected-event totals
+  - initializes event assignments with `reviewedPollen = UNKNOWN`
+  - distinguishes idle/loading/empty/error/mismatch states for form UX
 
 ### Write Strategy
 
@@ -438,7 +469,8 @@ To stay close to current project conventions:
   - `correctionFactorKeys.lists()`
   - `correctionFactorKeys.details()`
   - `correctionFactorKeys.detail(id)` when relevant
- - navigate back to the locale-scoped list route after create, update, and delete
+- clear inactive list/detail/preview/validation-event queries before navigating so stale form data does not flash after route changes
+- navigate back to the locale-scoped list route after create, update, and delete
 
 This is the smallest React Query extension necessary for CRUD.
 
@@ -459,7 +491,7 @@ The hook should own:
 - `errors`
 - derived state
 - field setters
-- row add/remove/update actions
+- event classification update actions
 - submit payload builder
 - validation trigger
 
@@ -488,21 +520,20 @@ Validation rules:
 4. `endDate` is required.
 5. `endDate >= startDate`.
 6. `detectedEvents` must exist before submit.
-7. the table must always contain exactly one base pollen row.
-8. the base pollen row must always be first.
-9. the base pollen row is not removable.
-10. `reviewedEvents` must be numeric.
-11. `reviewedEvents` must be `>= 0`.
-12. duplicate pollens are not allowed.
-13. `UNKNOWN` is treated as an implicit remainder in the UI, not as a normal editable row.
-14. any difference between `detectedEvents` and the sum of explicit `reviewedEvents` is automatically treated as `UNKNOWN`.
-15. explicit reviewed events cannot exceed `detectedEvents`.
+7. validation events must be loaded before submit.
+8. every validation event must have a reviewed classification.
+9. default reviewed classification is `UNKNOWN`.
+10. `UNKNOWN` is valid and represents an unassigned/default-unknown event.
+11. correction-table rows are derived from event assignments and are not manual count inputs.
+12. the summary table should include the base pollen row and any pollen assigned at least once.
+13. duplicate summary rows are not allowed.
 
 Recommended validation timing:
 
-- field-level validation on blur for top-level fields
-- row-level validation on change for pollen selection and reviewed events
+- field-level validation after the first submit attempt and during subsequent edits
+- event-level validation after the first submit attempt and during subsequent edits
 - full-form validation on submit
+- keep save disabled while the form remains invalid, and surface a visible validation summary so the disabled state is explainable
 
 ## Derived Multiplier Calculation Strategy
 
@@ -516,24 +547,25 @@ export function buildCorrectionFactorDerivedState(
 
 Rules:
 
-- `multiplier = reviewedEvents / detectedEvents`
+- `reviewedCount = count(events where reviewedPollen matches pollen)`
+- `multiplier = reviewedCount / detectedEvents`
 - multipliers are read-only UI values
 - multipliers are not stored as editable form state
 - derived state is recalculated with `useMemo`
 
 Special handling:
 
-- base pollen row is included in the table and gets a derived multiplier
-- users distribute reviewed events across explicit pollen classifications only
-- `UNKNOWN` is derived as the remainder between `detectedEvents` and the explicit reviewed-event total
-- `UNKNOWN` is shown in the UI but is not edited as a normal row
+- base pollen row is included in the summary table and gets a derived multiplier
+- users classify event images; they do not type reviewed counts
+- `UNKNOWN` count is derived from events still classified as `UNKNOWN`
+- `UNKNOWN` is shown in the UI as a derived count
 - `UNKNOWN` is omitted from the API payload
 
 Why this shape:
 
-- experts edit reviewed events only
-- the system derives both multipliers and `UNKNOWN` automatically
-- this keeps the UI simpler and avoids redundant payload data
+- experts review each detected event image directly
+- the system derives reviewed counts, multipliers, and `UNKNOWN` automatically
+- this avoids two competing editable sources of truth
 
 Recommended payload builder:
 
@@ -556,12 +588,12 @@ Recommended flow:
    - start date
    - end date
 2. Store that query result as immutable source data.
-3. Recalculate corrected series locally every time reviewed-event rows change.
+3. Recalculate corrected series locally every time event assignments change.
 4. Re-render chart from:
    - `originalSeries`
    - `correctedSeries`
 
-This avoids refetching on every reviewed-event keystroke.
+This avoids refetching on every event classification change.
 
 Suggested hook shape:
 
@@ -571,7 +603,7 @@ export function useCorrectionFactorPreview(params: {
   basePollen: string;
   startDate: string;
   endDate: string;
-  rows: CorrectionFactorDistributionRowForm[];
+  events: CorrectionFactorDetectedEventForm[];
   detectedEvents: number | null;
 }) {}
 ```
@@ -613,12 +645,14 @@ Initialization:
 - empty base pollen
 - empty dates
 - `publishOnSave = false`
-- no distribution rows until base pollen is selected
+- no validation events or summary rows until top-level selections are complete
 
 Behavior:
 
-- selecting base pollen auto-inserts the base row
-- base row pollen stays locked to the selected base pollen
+- completing the top-level selections loads validation events
+- each loaded event defaults to `UNKNOWN`
+- the right-side carousel is used to assign pollen per event image
+- the correction table updates as a derived summary of event assignments
 
 ### Edit Mode
 
@@ -631,20 +665,21 @@ Bootstrap:
 
 ### Edit Hydration Behavior
 
-The UI edits `reviewedEvents`, but the contract stores `factor_percentage`.
+The UI edits per-event reviewed classification, but the contract stores `factor_percentage`.
 
 Current implemented behavior:
 
 - fetch existing correction factor detail
-- map stored `factor_percentage` values into `reviewedEvents`
-- normalize `detectedEvents` to `1`
-- keep base row ordering and publish state intact
+- load validation events for the correction factor range
+- initialize event classifications to `UNKNOWN` unless event-level assignments are available
+- keep publish state intact
+- treat stored `factor_percentage` values as legacy summary data, not editable event assignments
 
 Implication:
 
-- edit mode can round-trip stored multipliers with the current contract
-- edit mode does not restore the original reviewed-event totals that produced those multipliers
-- this normalization should stay documented in the UI and state docs until the backend returns lossless edit inputs
+- edit mode cannot reconstruct reviewed per-image classifications from stored multipliers
+- do not add manual reviewed-count inputs to compensate for missing event-level edit data
+- this constraint should stay documented in the UI and state docs until the backend returns lossless event assignments
 
 ## Status Strategy
 
@@ -703,8 +738,10 @@ Important note:
 
 - implement shared form component tree
 - implement local form hook
-- implement distribution table rules
-- implement derived multipliers
+- implement validation-event loading and default `UNKNOWN` assignments
+- implement event review carousel classification controls
+- implement derived summary table rules
+- implement reviewed-count and multiplier derivation
 - implement submit payload builder
 - wire create request
 
@@ -720,13 +757,13 @@ Create flow should be completed before edit/delete work begins.
 Dependency:
 
 - backend must support `GET /api/correctionFactors/:id`
-- backend must support edit bootstrap data well enough to reconstruct reviewed-event rows
+- backend must support edit bootstrap data well enough to reconstruct per-event reviewed classifications, or edit must fall back to `UNKNOWN` assignments
 
 ### Phase 5. Chart Preview
 
 - add chart preview component boundary
 - wire preview query adapter once source endpoint is confirmed
-- compute corrected series locally from form state
+- compute corrected series locally from derived event assignments
 
 ### Phase 6. UX Polish
 
@@ -773,7 +810,7 @@ export function CorrectionFactorFormContainer(props: {
     basePollen: form.values.basePollen,
     startDate: form.values.startDate,
     endDate: form.values.endDate,
-    rows: form.values.rows,
+    events: form.values.events,
     detectedEvents: form.values.detectedEvents,
   });
 
@@ -792,28 +829,37 @@ export function CorrectionFactorFormContainer(props: {
 }
 ```
 
+### Event Review Carousel Skeleton
+
+```ts
+export interface CorrectionFactorEventReviewCarouselProps {
+  events: CorrectionFactorDetectedEventForm[];
+  pollenOptions: CorrectionFactorSelectablePollen[];
+  onEventClassificationChange: (
+    eventId: string,
+    reviewedPollen: CorrectionFactorSelectablePollen
+  ) => void;
+}
+```
+
 ### Distribution Table Skeleton
 
 ```ts
 export interface CorrectionFactorDistributionTableProps {
   detectedEvents: number | null;
-  rows: CorrectionFactorDistributionRowForm[];
   derived: CorrectionFactorFormDerivedState;
-  errors: CorrectionFactorFormErrors;
-  onRowChange: (clientId: string, patch: Partial<CorrectionFactorDistributionRowForm>) => void;
-  onAddRow: () => void;
-  onRemoveRow: (clientId: string) => void;
 }
 ```
 
 ## Open Dependencies / Risks
 
 1. The current contract does not specify a `GET by id` endpoint.
-2. The current contract does not specify how to hydrate `reviewedEvents` for edit mode.
+2. The current contract does not specify how to hydrate per-event reviewed classifications for edit mode.
 3. The current contract does not specify a chart preview endpoint.
 4. The current contract does not define how `Unknown` should be encoded in API payloads.
 5. The current contract does not define where location and pollen option lists come from.
 6. The backend must confirm whether `factor_percentage` is a fractional ratio or a percentage value.
+7. The backend must confirm whether reviewed event assignments are persisted separately from factor multipliers.
 
 These are not reasons to change the frontend architecture, but they do affect implementation sequencing.
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import type {
@@ -42,9 +43,41 @@ export function CorrectionFactorEventCarousel({
 }: CorrectionFactorEventCarouselProps) {
   const t = useTranslations('correctionFactorsPage.form.eventsCarousel');
   const activeEvent = events[activeEventIndex] ?? null;
+  const [brokenImageIds, setBrokenImageIds] = useState<Record<string, true>>({});
+  const thumbnailRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  useEffect(() => {
+    setBrokenImageIds({});
+  }, [events]);
+
+  useEffect(() => {
+    const activeThumbnail = thumbnailRefs.current[activeEventIndex];
+
+    if (!activeThumbnail) {
+      return;
+    }
+
+    activeThumbnail.scrollIntoView({
+      block: 'nearest',
+      behavior: 'smooth',
+    });
+  }, [activeEventIndex]);
+
+  function handleImageError(eventId: string) {
+    setBrokenImageIds((current) => {
+      if (current[eventId]) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [eventId]: true,
+      };
+    });
+  }
 
   return (
-    <section className="rounded-lg border border-border bg-card p-4">
+    <section className="min-h-0 rounded-lg border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
@@ -64,6 +97,14 @@ export function CorrectionFactorEventCarousel({
       {status === 'loading' ? (
         <div className="mt-4 space-y-3">
           <div className="aspect-square w-full animate-pulse rounded-lg bg-muted" />
+          <div className="grid grid-cols-4 gap-2">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={`carousel-skeleton-${index}`}
+                className="aspect-square animate-pulse rounded-lg bg-muted"
+              />
+            ))}
+          </div>
           <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
           <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
         </div>
@@ -86,14 +127,21 @@ export function CorrectionFactorEventCarousel({
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_88px]">
           <div className="space-y-4">
             <div className="overflow-hidden rounded-lg border border-border bg-background">
-              <img
-                src={activeEvent.imageUrl}
-                alt={t('imageAlt', {
-                  classification: activeEvent.classification,
-                  index: activeEventIndex + 1,
-                })}
-                className="aspect-square w-full object-cover"
-              />
+              {brokenImageIds[activeEvent.id] ? (
+                <div className="flex aspect-square items-center justify-center bg-muted px-6 text-center text-sm text-muted-foreground">
+                  {t('imageUnavailable')}
+                </div>
+              ) : (
+                <img
+                  src={activeEvent.imageUrl}
+                  alt={t('imageAlt', {
+                    classification: activeEvent.classification,
+                    index: activeEventIndex + 1,
+                  })}
+                  className="aspect-square w-full object-cover"
+                  onError={() => handleImageError(activeEvent.id)}
+                />
+              )}
             </div>
 
             <div className="space-y-2 rounded-lg border border-border bg-background p-4 text-sm">
@@ -135,13 +183,16 @@ export function CorrectionFactorEventCarousel({
             </div>
           </div>
 
-          <div className="flex max-h-[32rem] flex-col gap-2 overflow-y-auto">
+          <div className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto overscroll-contain pr-1">
             {events.map((event, index) => {
               const isActive = index === activeEventIndex;
 
               return (
                 <button
                   key={event.id}
+                  ref={(element) => {
+                    thumbnailRefs.current[index] = element;
+                  }}
                   type="button"
                   onClick={() => onSelectEvent(index)}
                   className={`overflow-hidden rounded-lg border bg-background text-left transition ${
@@ -154,11 +205,18 @@ export function CorrectionFactorEventCarousel({
                     index: index + 1,
                   })}
                 >
-                  <img
-                    src={event.imageUrl}
-                    alt=""
-                    className="aspect-square w-full object-cover"
-                  />
+                  {brokenImageIds[event.id] ? (
+                    <div className="flex aspect-square items-center justify-center bg-muted px-2 text-center text-[11px] text-muted-foreground">
+                      {t('imageUnavailableShort')}
+                    </div>
+                  ) : (
+                    <img
+                      src={event.imageUrl}
+                      alt=""
+                      className="aspect-square w-full object-cover"
+                      onError={() => handleImageError(event.id)}
+                    />
+                  )}
                 </button>
               );
             })}
