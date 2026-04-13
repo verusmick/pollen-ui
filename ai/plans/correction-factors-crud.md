@@ -103,7 +103,6 @@ src/app/[locale]/alerts-and-correction-factors/correction-factors/
       CorrectionFactorsFilters.tsx
       CorrectionFactorsTable.tsx
       CorrectionFactorsTableRow.tsx
-      CorrectionFactorStatusBadge.tsx
     form/
       CorrectionFactorFormContainer.tsx
       CorrectionFactorForm.tsx
@@ -158,7 +157,6 @@ CorrectionFactorsListContainer
   CorrectionFactorsFilters
   CorrectionFactorsTable
     CorrectionFactorsTableRow
-      CorrectionFactorStatusBadge
       EditLink
 ```
 
@@ -201,7 +199,6 @@ Responsibilities:
 
 ```ts
 export type CorrectionFactorId = string;
-export type CorrectionFactorStatus = 'draft' | 'published';
 export type CorrectionFactorPollenCode = string;
 export type CorrectionFactorUnknownCode = 'UNKNOWN';
 export type CorrectionFactorSelectablePollen =
@@ -221,7 +218,6 @@ export interface CorrectionFactorRecord {
   basePollen: CorrectionFactorPollenCode;
   startDate: string;
   endDate: string;
-  status: CorrectionFactorStatus;
   details: CorrectionFactorDetail[];
 }
 
@@ -259,7 +255,6 @@ export interface CorrectionFactorFormValues {
   startDate: string; // datetime string with 3-hour granularity
   endDate: string; // datetime string with 3-hour granularity
   detectedEvents: number | null;
-  publishOnSave: boolean;
   events: CorrectionFactorDetectedEventForm[];
 }
 
@@ -644,7 +639,6 @@ Initialization:
 - empty location
 - empty base pollen
 - empty dates
-- `publishOnSave = false`
 - no validation events or summary rows until top-level selections are complete
 
 Behavior:
@@ -672,7 +666,6 @@ Current implemented behavior:
 - fetch existing correction factor detail
 - load validation events for the correction factor range
 - initialize event classifications to `UNKNOWN` unless event-level assignments are available
-- keep publish state intact
 - treat stored `factor_percentage` values as legacy summary data, not editable event assignments
 
 Implication:
@@ -681,21 +674,20 @@ Implication:
 - do not add manual reviewed-count inputs to compensate for missing event-level edit data
 - this constraint should stay documented in the UI and state docs until the backend returns lossless event assignments
 
-## Status Strategy
+## First-Version Publish Strategy
 
-The mockup shows `Draft` and `Published`.
+The mockup originally showed `Draft` and `Published`, but first-version behavior removes user control of publish state.
 
 The contract exposes `published` at detail level, not clearly at record level.
 
 Recommended frontend mapping:
 
-- form has a single `publishOnSave` boolean
-- on submit, write the same `published` value to every detail row
-- list status derives as:
-  - `published` if all detail rows are published
-  - `draft` otherwise
+- do not render a form-level publish control
+- do not render a list-level status column or status badge
+- when building `correction_factor_details`, preserve deterministic feature ordering and send the first non-`UNKNOWN` detail with `published: true`
+- send all remaining non-`UNKNOWN` details with `published: false`
 
-This keeps the UI aligned with the mockup while staying compatible with the contract shape.
+This keeps the initial publish behavior compatible with the contract shape without exposing status decisions in the UI.
 
 ## Pollen and Location Options Strategy
 

@@ -75,13 +75,8 @@
         "location": "Ubicación",
         "basePollen": "Polen base",
         "dateRange": "Rango de fechas",
-        "status": "Estado",
         "actions": "Acciones",
         "edit": "Editar"
-      },
-      "status": {
-        "draft": "Borrador",
-        "published": "Publicado"
       },
       "states": {
         "loading": "Cargando factores de corrección...",
@@ -112,7 +107,6 @@
         "location": "Ubicación",
         "basePollen": "Polen base",
         "dateRange": "Rango de fechas",
-        "status": "Estado",
         "detailsTitle": "Factores almacenados",
         "pollen": "Polen",
         "multiplier": "Multiplicador almacenado",
@@ -156,7 +150,6 @@
         "clear": "Limpiar",
         "apply": "Aplicar",
         "dateTimeHelp": "Las horas se pueden seleccionar en intervalos de 1 hora desde las 00:00 hasta las 23:00.",
-        "publishOnSave": "Publicar al guardar",
         "loading": "Cargando...",
         "loadError": "Opciones no disponibles",
         "optionsLoadError": "Este campo no pudo cargar sus opciones."
@@ -187,6 +180,7 @@
         "title": "Factores de corrección",
         "description": "Reasigne los eventos detectados para el polen base seleccionado después de la revisión experta.",
         "detectedEventsLabel": "Eventos detectados",
+        "derivedFromEvents": "Administre aquí las clasificaciones de polen permitidas. Los conteos revisados se derivan de las asignaciones de eventos en el carrusel.",
         "addRow": "Agregar clasificación de polen",
         "selectPollen": "Seleccione polen",
         "remove": "Quitar",
@@ -235,7 +229,9 @@
         "empty": "No se encontraron eventos detectados para los filtros seleccionados.",
         "error": "No se pudieron cargar los eventos detectados.",
         "errorMismatch": "Se devolvieron eventos detectados, pero la respuesta no contenía registros utilizables para esta selección.",
-        "classification": "Clasificación",
+        "classification": "Clasificación detectada",
+        "reviewedClassification": "Clasificación revisada",
+        "unknown": "Desconocido",
         "location": "Ubicación",
         "capturedAt": "Capturado en",
         "previous": "Anterior",

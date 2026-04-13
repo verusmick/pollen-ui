@@ -75,13 +75,8 @@
         "location": "Locatie",
         "basePollen": "Basispollen",
         "dateRange": "Datumbereik",
-        "status": "Status",
         "actions": "Acties",
         "edit": "Bewerken"
-      },
-      "status": {
-        "draft": "Concept",
-        "published": "Gepubliceerd"
       },
       "states": {
         "loading": "Correctiefactoren laden...",
@@ -112,7 +107,6 @@
         "location": "Locatie",
         "basePollen": "Basispollen",
         "dateRange": "Datumbereik",
-        "status": "Status",
         "detailsTitle": "Opgeslagen factoren",
         "pollen": "Pollen",
         "multiplier": "Opgeslagen vermenigvuldiger",
@@ -156,7 +150,6 @@
         "clear": "Wissen",
         "apply": "Toepassen",
         "dateTimeHelp": "Uren kunnen in intervallen van 1 uur worden geselecteerd van 00:00 tot 23:00.",
-        "publishOnSave": "Publiceren bij opslaan",
         "loading": "Laden...",
         "loadError": "Opties niet beschikbaar",
         "optionsLoadError": "Dit veld kon de opties niet laden."
@@ -187,6 +180,7 @@
         "title": "Correctiefactoren",
         "description": "Herverdeel de gedetecteerde gebeurtenissen voor het geselecteerde basispollen na expertbeoordeling.",
         "detectedEventsLabel": "Gedetecteerde gebeurtenissen",
+        "derivedFromEvents": "Beheer hier de toegestane pollenclassificaties. Beoordeelde aantallen worden afgeleid uit de gebeurtenistoewijzingen in de carrousel.",
         "addRow": "Pollenclassificatie toevoegen",
         "selectPollen": "Selecteer pollen",
         "remove": "Verwijderen",
@@ -235,7 +229,9 @@
         "empty": "Er zijn geen gedetecteerde gebeurtenissen gevonden voor de geselecteerde filters.",
         "error": "Gedetecteerde gebeurtenissen konden niet worden geladen.",
         "errorMismatch": "Er zijn gedetecteerde gebeurtenissen teruggegeven, maar het antwoord bevatte geen bruikbare records voor deze selectie.",
-        "classification": "Classificatie",
+        "classification": "Gedetecteerde classificatie",
+        "reviewedClassification": "Beoordeelde classificatie",
+        "unknown": "Onbekend",
         "location": "Locatie",
         "capturedAt": "Vastgelegd op",
         "previous": "Vorige",

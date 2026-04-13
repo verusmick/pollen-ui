@@ -94,7 +94,6 @@ export interface ApiValidationLocationRecord {
 }
 
 export type CorrectionFactorId = string;
-export type CorrectionFactorStatus = 'draft' | 'published';
 export type CorrectionFactorPollenCode = string;
 export type CorrectionFactorUnknownCode = 'UNKNOWN';
 export type CorrectionFactorSelectablePollen =
@@ -140,7 +139,6 @@ export interface CorrectionFactorRecord {
   basePollen: CorrectionFactorPollenCode;
   startDate: string;
   endDate: string;
-  status: CorrectionFactorStatus;
   details: CorrectionFactorDetail[];
 }
 
@@ -165,7 +163,7 @@ export interface CorrectionFactorFormValues {
   startDate: string;
   endDate: string;
   detectedEvents: number | null;
-  publishOnSave: boolean;
+  events: CorrectionFactorReviewedValidationEvent[];
   rows: CorrectionFactorDistributionRowForm[];
 }
 
@@ -235,6 +233,11 @@ export interface CorrectionFactorValidationEvent {
   device: string;
   imageUrl: string;
   index: number | null;
+}
+
+export interface CorrectionFactorReviewedValidationEvent
+  extends CorrectionFactorValidationEvent {
+  reviewedPollen: CorrectionFactorSelectablePollen;
 }
 
 export type CorrectionFactorPreviewStatus =

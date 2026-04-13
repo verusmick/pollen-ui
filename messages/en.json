@@ -75,13 +75,8 @@
         "location": "Location",
         "basePollen": "Base pollen",
         "dateRange": "Date range",
-        "status": "Status",
         "actions": "Actions",
         "edit": "Edit"
-      },
-      "status": {
-        "draft": "Draft",
-        "published": "Published"
       },
       "states": {
         "loading": "Loading correction factors...",
@@ -112,7 +107,6 @@
         "location": "Location",
         "basePollen": "Base pollen",
         "dateRange": "Date range",
-        "status": "Status",
         "detailsTitle": "Stored factors",
         "pollen": "Pollen",
         "multiplier": "Stored multiplier",
@@ -156,7 +150,6 @@
         "clear": "Clear",
         "apply": "Apply",
         "dateTimeHelp": "Hours can be selected in 1-hour intervals from 00:00 to 23:00.",
-        "publishOnSave": "Publish on save",
         "loading": "Loading...",
         "loadError": "Options unavailable",
         "optionsLoadError": "This field could not load its options."
@@ -187,6 +180,7 @@
         "title": "Correction Factors",
         "description": "Reassign the detected events for the selected base pollen after expert review.",
         "detectedEventsLabel": "Detected events",
+        "derivedFromEvents": "Manage allowed pollen classifications here. Reviewed counts are derived from the event assignments in the carousel.",
         "addRow": "Add pollen classification",
         "selectPollen": "Select pollen",
         "remove": "Remove",
@@ -235,7 +229,9 @@
         "empty": "No detected events were found for the selected filters.",
         "error": "Detected events could not be loaded.",
         "errorMismatch": "Detected events were returned, but the response did not contain usable event records for this selection.",
-        "classification": "Classification",
+        "classification": "Detected classification",
+        "reviewedClassification": "Reviewed classification",
+        "unknown": "Unknown",
         "location": "Location",
         "capturedAt": "Captured at",
         "previous": "Previous",

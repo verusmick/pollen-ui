@@ -5,7 +5,6 @@ import type {
   CorrectionFactorDetail,
   CorrectionFactorFormValues,
   CorrectionFactorRecord,
-  CorrectionFactorStatus,
   CorrectionFactorValidationEvent,
 } from '../types';
 import { UNKNOWN_POLLEN_CODE } from '../constants';
@@ -29,16 +28,6 @@ function normalizeFiniteNumber(value: unknown): number | null {
   }
 
   return null;
-}
-
-function deriveCorrectionFactorStatus(
-  details: CorrectionFactorDetail[]
-): CorrectionFactorStatus {
-  if (details.length === 0) {
-    return 'draft';
-  }
-
-  return details.every((detail) => detail.published) ? 'published' : 'draft';
 }
 
 export function mapApiCorrectionFactorDetail(
@@ -65,7 +54,6 @@ export function mapApiCorrectionFactorRecord(
     basePollen: record.pollen,
     startDate: record.start_date,
     endDate: record.end_date,
-    status: deriveCorrectionFactorStatus(details),
     details,
   };
 }
@@ -102,7 +90,7 @@ export function mapCorrectionFactorRecordToFormValues(
     startDate: normalizeCorrectionFactorDateTime(record.startDate),
     endDate: normalizeCorrectionFactorDateTime(record.endDate),
     detectedEvents,
-    publishOnSave: record.status === 'published',
+    events: [],
     rows: baseRow
       ? [baseRow, ...otherRows]
       : [

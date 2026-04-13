@@ -3,14 +3,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { UNKNOWN_POLLEN_CODE } from '../../constants';
 import type {
-  CorrectionFactorValidationEvent,
+  CorrectionFactorReviewedValidationEvent,
+  CorrectionFactorSelectablePollen,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
 
 interface CorrectionFactorEventCarouselProps {
   status: CorrectionFactorValidationEventsStatus;
-  events: CorrectionFactorValidationEvent[];
+  events: CorrectionFactorReviewedValidationEvent[];
+  pollenOptions: CorrectionFactorSelectablePollen[];
   errorMessage?: string | null;
   activeEventIndex: number;
   canGoPrevious: boolean;
@@ -18,6 +21,10 @@ interface CorrectionFactorEventCarouselProps {
   onPrevious: () => void;
   onNext: () => void;
   onSelectEvent: (index: number) => void;
+  onReviewedPollenChange: (
+    eventId: string,
+    reviewedPollen: CorrectionFactorSelectablePollen
+  ) => void;
 }
 
 function formatEventDatetime(timestamp: number): string {
@@ -33,6 +40,7 @@ function formatEventDatetime(timestamp: number): string {
 export function CorrectionFactorEventCarousel({
   status,
   events,
+  pollenOptions,
   errorMessage = null,
   activeEventIndex,
   canGoPrevious,
@@ -40,11 +48,18 @@ export function CorrectionFactorEventCarousel({
   onPrevious,
   onNext,
   onSelectEvent,
+  onReviewedPollenChange,
 }: CorrectionFactorEventCarouselProps) {
   const t = useTranslations('correctionFactorsPage.form.eventsCarousel');
   const activeEvent = events[activeEventIndex] ?? null;
   const [brokenImageIds, setBrokenImageIds] = useState<Record<string, true>>({});
   const thumbnailRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const reviewedPollenOptions = Array.from(
+    new Set([
+      UNKNOWN_POLLEN_CODE,
+      ...pollenOptions.filter((option) => option !== UNKNOWN_POLLEN_CODE),
+    ])
+  );
 
   useEffect(() => {
     setBrokenImageIds({});
@@ -137,6 +152,7 @@ export function CorrectionFactorEventCarousel({
                   alt={t('imageAlt', {
                     classification: activeEvent.classification,
                     index: activeEventIndex + 1,
+                    reviewedClassification: activeEvent.reviewedPollen,
                   })}
                   className="aspect-square w-full object-cover"
                   onError={() => handleImageError(activeEvent.id)}
@@ -151,6 +167,27 @@ export function CorrectionFactorEventCarousel({
                   {activeEvent.classification}
                 </div>
               </div>
+              <label className="block">
+                <span className="text-muted-foreground">
+                  {t('reviewedClassification')}
+                </span>
+                <select
+                  value={activeEvent.reviewedPollen}
+                  onChange={(event) =>
+                    onReviewedPollenChange(
+                      activeEvent.id,
+                      event.target.value as CorrectionFactorSelectablePollen
+                    )
+                  }
+                  className="mt-1 h-9 w-full rounded-md border border-border bg-card px-3 text-sm font-medium text-foreground"
+                >
+                  {reviewedPollenOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option === UNKNOWN_POLLEN_CODE ? t('unknown') : option}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <div>
                 <div className="text-muted-foreground">{t('location')}</div>
                 <div className="font-medium text-foreground">{activeEvent.device}</div>
@@ -203,6 +240,7 @@ export function CorrectionFactorEventCarousel({
                   aria-label={t('thumbnailLabel', {
                     classification: event.classification,
                     index: index + 1,
+                    reviewedClassification: event.reviewedPollen,
                   })}
                 >
                   {brokenImageIds[event.id] ? (

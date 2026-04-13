@@ -75,13 +75,8 @@
         "location": "Ort",
         "basePollen": "Basispollen",
         "dateRange": "Zeitraum",
-        "status": "Status",
         "actions": "Aktionen",
         "edit": "Bearbeiten"
-      },
-      "status": {
-        "draft": "Entwurf",
-        "published": "Veröffentlicht"
       },
       "states": {
         "loading": "Korrekturfaktoren werden geladen...",
@@ -112,7 +107,6 @@
         "location": "Ort",
         "basePollen": "Basispollen",
         "dateRange": "Zeitraum",
-        "status": "Status",
         "detailsTitle": "Gespeicherte Faktoren",
         "pollen": "Pollen",
         "multiplier": "Gespeicherter Multiplikator",
@@ -156,7 +150,6 @@
         "clear": "Leeren",
         "apply": "Übernehmen",
         "dateTimeHelp": "Die Stunden koennen in 1-Stunden-Intervallen von 00:00 bis 23:00 gewaehlt werden.",
-        "publishOnSave": "Beim Speichern veröffentlichen",
         "loading": "Wird geladen...",
         "loadError": "Optionen nicht verfügbar",
         "optionsLoadError": "Für dieses Feld konnten die Optionen nicht geladen werden."
@@ -187,6 +180,7 @@
         "title": "Korrekturfaktoren",
         "description": "Weisen Sie die erkannten Ereignisse für den ausgewählten Basispollen nach der Expertenprüfung neu zu.",
         "detectedEventsLabel": "Erkannte Ereignisse",
+        "derivedFromEvents": "Verwalten Sie hier die erlaubten Pollenklassifikationen. Überprüfte Zählungen werden aus den Ereigniszuweisungen im Karussell abgeleitet.",
         "addRow": "Pollenklassifikation hinzufügen",
         "selectPollen": "Pollen auswählen",
         "remove": "Entfernen",
@@ -235,7 +229,9 @@
         "empty": "Für die ausgewählten Filter wurden keine erkannten Ereignisse gefunden.",
         "error": "Erkannte Ereignisse konnten nicht geladen werden.",
         "errorMismatch": "Es wurden erkannte Ereignisse zurückgegeben, aber die Antwort enthielt keine verwendbaren Datensätze für diese Auswahl.",
-        "classification": "Klassifikation",
+        "classification": "Erkannte Klassifikation",
+        "reviewedClassification": "Überprüfte Klassifikation",
+        "unknown": "Unbekannt",
         "location": "Ort",
         "capturedAt": "Erfasst am",
         "previous": "Zurück",

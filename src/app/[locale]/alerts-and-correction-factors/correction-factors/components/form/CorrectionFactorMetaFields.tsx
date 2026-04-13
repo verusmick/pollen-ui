@@ -32,7 +32,6 @@ interface CorrectionFactorMetaFieldsProps {
   onBasePollenChange: (value: string) => void;
   onStartDateChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
-  onPublishChange: (value: boolean) => void;
 }
 
 export function CorrectionFactorMetaFields({
@@ -52,7 +51,6 @@ export function CorrectionFactorMetaFields({
   onBasePollenChange,
   onStartDateChange,
   onEndDateChange,
-  onPublishChange,
 }: CorrectionFactorMetaFieldsProps) {
   const t = useTranslations('correctionFactorsPage.form.meta');
   const detectedEventsDisplay =
@@ -292,14 +290,6 @@ export function CorrectionFactorMetaFields({
         </label>
       </div>
 
-      <label className="flex items-center gap-3 rounded-md border border-border bg-background px-3 py-2 text-sm">
-        <input
-          type="checkbox"
-          checked={values.publishOnSave}
-          onChange={(event) => onPublishChange(event.target.checked)}
-        />
-        <span className="text-foreground">{t('publishOnSave')}</span>
-      </label>
     </section>
   );
 }

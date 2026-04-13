@@ -131,7 +131,7 @@ export function CorrectionFactorFormContainer({
   useEffect(() => {
     setActiveValidationEventIndex(0);
   }, [
-    validationEvents.events.length,
+    form.values.events.length,
     form.values.location,
     form.values.basePollen,
     form.values.startDate,
@@ -143,6 +143,8 @@ export function CorrectionFactorFormContainer({
       validationEvents.status === 'ready' ||
       validationEvents.status === 'empty'
     ) {
+      form.replaceValidationEvents(validationEvents.events);
+
       if (form.values.detectedEvents !== validationEvents.detectedEvents) {
         form.setField('detectedEvents', validationEvents.detectedEvents);
       }
@@ -150,10 +152,17 @@ export function CorrectionFactorFormContainer({
       return;
     }
 
+    form.replaceValidationEvents([]);
+
     if (form.values.detectedEvents !== null) {
       form.setField('detectedEvents', null);
     }
-  }, [form, validationEvents.detectedEvents, validationEvents.status]);
+  }, [
+    form,
+    validationEvents.detectedEvents,
+    validationEvents.events,
+    validationEvents.status,
+  ]);
 
   useEffect(() => {
     if (
@@ -378,6 +387,7 @@ export function CorrectionFactorFormContainer({
       validationSummary={form.validationSummary}
       isFormValid={form.isValid}
       derived={form.derived}
+      allowedPollenOptions={form.allowedPollenOptions}
       locationOptions={locationOptions}
       pollenOptions={pollenOptions}
       locationsLoading={locationsLoading}
@@ -385,7 +395,7 @@ export function CorrectionFactorFormContainer({
       locationsError={locationOptionsError}
       pollensError={pollenOptionsError}
       validationEventsStatus={carouselValidationStatus}
-      validationEvents={validationEvents.events}
+      validationEvents={form.values.events}
       validationEventsError={carouselValidationError}
       activeValidationEventIndex={activeValidationEventIndex}
       validationEventsStatusText={validationEventsStatusText}
@@ -396,11 +406,12 @@ export function CorrectionFactorFormContainer({
       }
       onNextValidationEvent={() =>
         setActiveValidationEventIndex((current) =>
-          validationEvents.events.length > 0
-            ? Math.min(current + 1, validationEvents.events.length - 1)
+          form.values.events.length > 0
+            ? Math.min(current + 1, form.values.events.length - 1)
             : 0
         )
       }
+      onValidationEventReviewedPollenChange={form.updateEventReviewedPollen}
       saving={saving}
       deleting={deleting}
       actionError={actionError}
@@ -423,7 +434,6 @@ export function CorrectionFactorFormContainer({
       onBasePollenChange={(value) => form.setField('basePollen', value)}
       onStartDateChange={(value) => form.setField('startDate', value)}
       onEndDateChange={(value) => form.setField('endDate', value)}
-      onPublishChange={(value) => form.setField('publishOnSave', value)}
       onAddRow={form.addRow}
       onPollenChange={form.updateRowPollen}
       onReviewedEventsChange={form.updateRowReviewedEvents}

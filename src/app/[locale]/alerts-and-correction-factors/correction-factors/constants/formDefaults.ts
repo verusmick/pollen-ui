@@ -18,7 +18,7 @@ export const DEFAULT_CORRECTION_FACTOR_FORM_VALUES: CorrectionFactorFormValues =
     startDate: '',
     endDate: '',
     detectedEvents: null,
-    publishOnSave: false,
+    events: [],
     rows: [],
   };
 

@@ -1,4 +1,3 @@
-export * from './list/CorrectionFactorStatusBadge';
 export * from './list/CorrectionFactorsFilters';
 export * from './list/CorrectionFactorsHeader';
 export * from './list/CorrectionFactorsListContainer';

@@ -6,12 +6,15 @@ import { useTranslations } from 'next-intl';
 import {
   DEFAULT_CORRECTION_FACTOR_FORM_VALUES,
   EMPTY_CORRECTION_FACTOR_FORM_ERRORS,
+  UNKNOWN_POLLEN_CODE,
 } from '../constants';
 import type {
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormErrors,
   CorrectionFactorFormValues,
+  CorrectionFactorReviewedValidationEvent,
   CorrectionFactorSelectablePollen,
+  CorrectionFactorValidationEvent,
 } from '../types';
 import {
   buildCorrectionFactorDerivedState,
@@ -25,8 +28,7 @@ type TopLevelField =
   | 'basePollen'
   | 'startDate'
   | 'endDate'
-  | 'detectedEvents'
-  | 'publishOnSave';
+  | 'detectedEvents';
 
 type ErrorField = Exclude<keyof CorrectionFactorFormErrors, 'rows' | 'rowErrorsById'>;
 
@@ -71,6 +73,126 @@ function syncBaseRow(values: CorrectionFactorFormValues): CorrectionFactorFormVa
   };
 }
 
+function areReviewedValidationEventsEqual(
+  left: CorrectionFactorReviewedValidationEvent[],
+  right: CorrectionFactorReviewedValidationEvent[]
+): boolean {
+  return (
+    left.length === right.length &&
+    left.every((leftEvent, index) => {
+      const rightEvent = right[index];
+
+      return (
+        rightEvent !== undefined &&
+        leftEvent.id === rightEvent.id &&
+        leftEvent.classification === rightEvent.classification &&
+        leftEvent.datetime === rightEvent.datetime &&
+        leftEvent.device === rightEvent.device &&
+        leftEvent.imageUrl === rightEvent.imageUrl &&
+        leftEvent.index === rightEvent.index &&
+        leftEvent.reviewedPollen === rightEvent.reviewedPollen
+      );
+    })
+  );
+}
+
+function withReviewedPollen(
+  events: CorrectionFactorValidationEvent[],
+  currentEvents: CorrectionFactorReviewedValidationEvent[]
+): CorrectionFactorReviewedValidationEvent[] {
+  const reviewedPollenById = new Map(
+    currentEvents.map((event) => [event.id, event.reviewedPollen])
+  );
+
+  return events.map((event) => ({
+    ...event,
+    reviewedPollen: reviewedPollenById.get(event.id) ?? UNKNOWN_POLLEN_CODE,
+  }));
+}
+
+function buildAllowedPollenOptions(
+  values: CorrectionFactorFormValues
+): CorrectionFactorSelectablePollen[] {
+  const allowedPollens = new Set<CorrectionFactorSelectablePollen>();
+
+  if (values.basePollen) {
+    allowedPollens.add(values.basePollen);
+  }
+
+  for (const row of values.rows) {
+    if (row.pollen && row.pollen !== UNKNOWN_POLLEN_CODE) {
+      allowedPollens.add(row.pollen);
+    }
+  }
+
+  return Array.from(allowedPollens);
+}
+
+function syncRowsFromReviewedEvents(
+  values: CorrectionFactorFormValues
+): CorrectionFactorFormValues {
+  if (!values.basePollen) {
+    return {
+      ...values,
+      events: values.events.map((event) => ({
+        ...event,
+        reviewedPollen: UNKNOWN_POLLEN_CODE,
+      })),
+      rows: [],
+    };
+  }
+
+  const allowedPollens = new Set(buildAllowedPollenOptions(values));
+  const events = values.events.map((event) =>
+    event.reviewedPollen === UNKNOWN_POLLEN_CODE ||
+    allowedPollens.has(event.reviewedPollen)
+      ? event
+      : {
+          ...event,
+          reviewedPollen: UNKNOWN_POLLEN_CODE,
+        }
+  );
+  const reviewedCounts = new Map<CorrectionFactorSelectablePollen, number>();
+
+  for (const event of events) {
+    if (event.reviewedPollen === UNKNOWN_POLLEN_CODE) {
+      continue;
+    }
+
+    reviewedCounts.set(
+      event.reviewedPollen,
+      (reviewedCounts.get(event.reviewedPollen) ?? 0) + 1
+    );
+  }
+
+  const baseRow = values.rows.find((row) => row.isBasePollen);
+  const otherRows = values.rows.filter((row) => !row.isBasePollen);
+
+  return {
+    ...values,
+    events,
+    rows: [
+      baseRow
+        ? {
+            ...baseRow,
+            pollen: values.basePollen,
+            reviewedEvents: String(reviewedCounts.get(values.basePollen) ?? 0),
+            isBasePollen: true,
+          }
+        : buildBaseRow(
+            values.basePollen,
+            String(reviewedCounts.get(values.basePollen) ?? 0)
+          ),
+      ...otherRows.map((row) => ({
+        ...row,
+        reviewedEvents: row.pollen
+          ? String(reviewedCounts.get(row.pollen) ?? 0)
+          : '',
+      })),
+    ],
+  };
+}
+
 export function useCorrectionFactorForm() {
   const t = useTranslations('correctionFactorsPage.form.validation');
   const [values, setValues] = useState<CorrectionFactorFormValues>(
@@ -83,6 +205,10 @@ export function useCorrectionFactorForm() {
 
   const derived = useMemo<CorrectionFactorFormDerivedState>(
     () => buildCorrectionFactorDerivedState(values, 'ratio'),
+    [values]
+  );
+  const allowedPollenOptions = useMemo(
+    () => buildAllowedPollenOptions(values),
     [values]
   );
   const validationMessages = useMemo(
@@ -205,7 +331,7 @@ export function useCorrectionFactorForm() {
       };
 
       if (field === 'basePollen') {
-        return syncBaseRow(next);
+        return syncRowsFromReviewedEvents(syncBaseRow(next));
       }
 
       return next;
@@ -232,7 +358,7 @@ export function useCorrectionFactorForm() {
         return current;
       }
 
-      return {
+      return syncRowsFromReviewedEvents({
         ...current,
         rows: [
           current.rows[0],
@@ -244,18 +370,20 @@ export function useCorrectionFactorForm() {
             isBasePollen: false,
           },
         ],
-      };
+      });
     });
     clearRowsError();
   }
 
   function removeRow(clientId: string) {
-    setValues((current) => ({
-      ...current,
-      rows: current.rows.filter(
-        (row) => row.clientId !== clientId || row.isBasePollen
-      ),
-    }));
+    setValues((current) =>
+      syncRowsFromReviewedEvents({
+        ...current,
+        rows: current.rows.filter(
+          (row) => row.clientId !== clientId || row.isBasePollen
+        ),
+      })
+    );
     clearRowsError();
     clearRowError(clientId);
   }
@@ -264,17 +392,19 @@ export function useCorrectionFactorForm() {
     clientId: string,
     pollen: CorrectionFactorSelectablePollen | ''
   ) {
-    setValues((current) => ({
-      ...current,
-      rows: current.rows.map((row) =>
-        row.clientId === clientId
-          ? {
-              ...row,
-              pollen: row.isBasePollen ? current.basePollen : pollen,
-            }
-          : row
-      ),
-    }));
+    setValues((current) =>
+      syncRowsFromReviewedEvents({
+        ...current,
+        rows: current.rows.map((row) =>
+          row.clientId === clientId
+            ? {
+                ...row,
+                pollen: row.isBasePollen ? current.basePollen : pollen,
+              }
+            : row
+        ),
+      })
+    );
     clearRowsError();
     clearRowError(clientId, 'pollen');
   }
@@ -293,6 +423,72 @@ export function useCorrectionFactorForm() {
     }));
     clearRowsError();
     clearRowError(clientId, 'reviewedEvents');
+  }
+
+  function replaceValidationEvents(events: CorrectionFactorValidationEvent[]) {
+    setValues((current) => {
+      if (events.length === 0) {
+        if (current.events.length === 0) {
+          return current;
+        }
+
+        return syncRowsFromReviewedEvents({
+          ...current,
+          events: [],
+        });
+      }
+
+      const nextEvents = withReviewedPollen(events, current.events);
+
+      if (areReviewedValidationEventsEqual(current.events, nextEvents)) {
+        return current;
+      }
+
+      return syncRowsFromReviewedEvents({
+        ...current,
+        events: nextEvents,
+      });
+    });
+  }
+
+  function updateEventReviewedPollen(
+    eventId: string,
+    reviewedPollen: CorrectionFactorSelectablePollen
+  ) {
+    setValues((current) => {
+      const allowedPollens = new Set(buildAllowedPollenOptions(current));
+      const nextReviewedPollen =
+        reviewedPollen === UNKNOWN_POLLEN_CODE ||
+        allowedPollens.has(reviewedPollen)
+          ? reviewedPollen
+          : UNKNOWN_POLLEN_CODE;
+      let changed = false;
+      const nextEvents = current.events.map((event) => {
+        if (event.id !== eventId) {
+          return event;
+        }
+
+        if (event.reviewedPollen === nextReviewedPollen) {
+          return event;
+        }
+
+        changed = true;
+        return {
+          ...event,
+          reviewedPollen: nextReviewedPollen,
+        };
+      });
+
+      if (!changed) {
+        return current;
+      }
+
+      return syncRowsFromReviewedEvents({
+        ...current,
+        events: nextEvents,
+      });
+    });
+    clearRowsError();
   }
 
   function resetForm() {
@@ -327,6 +523,7 @@ export function useCorrectionFactorForm() {
     values,
     errors,
     derived,
+    allowedPollenOptions,
     isValid,
     validationErrors,
     validationSummary,
@@ -335,6 +532,8 @@ export function useCorrectionFactorForm() {
     removeRow,
     updateRowPollen,
     updateRowReviewedEvents,
+    replaceValidationEvents,
+    updateEventReviewedPollen,
     resetForm,
     replaceValues,
     validate,

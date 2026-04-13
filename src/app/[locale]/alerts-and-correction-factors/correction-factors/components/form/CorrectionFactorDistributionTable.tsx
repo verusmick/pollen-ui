@@ -14,6 +14,7 @@ interface CorrectionFactorDistributionTableProps {
   derived: CorrectionFactorFormDerivedState;
   errors: CorrectionFactorFormErrors;
   validationErrors: CorrectionFactorFormErrors;
+  isEventReviewMode: boolean;
   getPollenOptions: (currentRowPollen: string) => string[];
   onPollenChange: (clientId: string, pollen: string) => void;
   onReviewedEventsChange: (clientId: string, reviewedEvents: string) => void;
@@ -25,6 +26,7 @@ export function CorrectionFactorDistributionTable({
   derived,
   errors,
   validationErrors,
+  isEventReviewMode,
   getPollenOptions,
   onPollenChange,
   onReviewedEventsChange,
@@ -65,6 +67,7 @@ export function CorrectionFactorDistributionTable({
                   multiplier={multiplier}
                   pollenOptions={getPollenOptions(row.pollen)}
                   isBasePollen={row.isBasePollen}
+                  isReadOnly={isEventReviewMode}
                   errors={
                     errors.rowErrorsById[row.clientId] ??
                     validationErrors.rowErrorsById[row.clientId]
@@ -87,6 +90,7 @@ export function CorrectionFactorDistributionTable({
                   pollenOptions={[]}
                   isBasePollen={false}
                   isSyntheticUnknown
+                  isReadOnly
                   onPollenChange={onPollenChange}
                   onReviewedEventsChange={onReviewedEventsChange}
                   onRemove={onRemove}

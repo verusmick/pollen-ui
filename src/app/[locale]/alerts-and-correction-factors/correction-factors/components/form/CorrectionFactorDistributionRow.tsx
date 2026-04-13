@@ -10,6 +10,7 @@ interface CorrectionFactorDistributionRowProps {
   pollenOptions: string[];
   isBasePollen: boolean;
   isSyntheticUnknown?: boolean;
+  isReadOnly?: boolean;
   errors?: {
     pollen?: string;
     reviewedEvents?: string;
@@ -27,6 +28,7 @@ export function CorrectionFactorDistributionRow({
   pollenOptions,
   isBasePollen,
   isSyntheticUnknown = false,
+  isReadOnly = false,
   errors,
   onPollenChange,
   onReviewedEventsChange,
@@ -70,7 +72,7 @@ export function CorrectionFactorDistributionRow({
           onChange={(event) =>
             onReviewedEventsChange(clientId, event.target.value)
           }
-          disabled={isSyntheticUnknown}
+          disabled={isSyntheticUnknown || isReadOnly}
           className={`h-9 w-full rounded-md border bg-card px-3 text-sm text-foreground disabled:bg-muted disabled:text-muted-foreground ${
             errors?.reviewedEvents ? 'border-red-300' : 'border-border'
           }`}

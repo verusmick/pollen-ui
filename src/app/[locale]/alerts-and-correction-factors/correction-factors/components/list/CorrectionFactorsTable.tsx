@@ -35,9 +35,6 @@ export function CorrectionFactorsTable({
                 {t('dateRange')}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('status')}
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t('actions')}
               </th>
             </tr>

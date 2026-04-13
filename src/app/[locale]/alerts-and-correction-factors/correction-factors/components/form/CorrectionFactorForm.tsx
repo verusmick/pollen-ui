@@ -10,7 +10,8 @@ import type {
   CorrectionFactorPreviewStatus,
   CorrectionFactorFormValues,
   CorrectionFactorRecord,
-  CorrectionFactorValidationEvent,
+  CorrectionFactorReviewedValidationEvent,
+  CorrectionFactorSelectablePollen,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
 import { formatCorrectionFactorDateTimeRange } from '../../utils';
@@ -28,6 +29,7 @@ interface CorrectionFactorFormProps {
   validationSummary: string[];
   isFormValid: boolean;
   derived: CorrectionFactorFormDerivedState;
+  allowedPollenOptions: CorrectionFactorSelectablePollen[];
   locationOptions: CorrectionFactorLocationOption[];
   pollenOptions: string[];
   locationsLoading?: boolean;
@@ -35,7 +37,7 @@ interface CorrectionFactorFormProps {
   locationsError?: string | null;
   pollensError?: string | null;
   validationEventsStatus: CorrectionFactorValidationEventsStatus;
-  validationEvents: CorrectionFactorValidationEvent[];
+  validationEvents: CorrectionFactorReviewedValidationEvent[];
   validationEventsError?: string | null;
   activeValidationEventIndex: number;
   validationEventsStatusText?: string | null;
@@ -43,6 +45,10 @@ interface CorrectionFactorFormProps {
   onSelectValidationEvent: (index: number) => void;
   onPreviousValidationEvent: () => void;
   onNextValidationEvent: () => void;
+  onValidationEventReviewedPollenChange: (
+    eventId: string,
+    reviewedPollen: CorrectionFactorSelectablePollen
+  ) => void;
   saving: boolean;
   deleting?: boolean;
   actionError?: string | null;
@@ -63,7 +69,6 @@ interface CorrectionFactorFormProps {
   onBasePollenChange: (value: string) => void;
   onStartDateChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
-  onPublishChange: (value: boolean) => void;
   onAddRow: () => void;
   onPollenChange: (clientId: string, pollen: string) => void;
   onReviewedEventsChange: (clientId: string, reviewedEvents: string) => void;
@@ -85,6 +90,7 @@ export function CorrectionFactorForm({
   validationSummary,
   isFormValid,
   derived,
+  allowedPollenOptions,
   locationOptions,
   pollenOptions,
   locationsLoading = false,
@@ -100,6 +106,7 @@ export function CorrectionFactorForm({
   onSelectValidationEvent,
   onPreviousValidationEvent,
   onNextValidationEvent,
+  onValidationEventReviewedPollenChange,
   saving,
   deleting = false,
   actionError,
@@ -120,7 +127,6 @@ export function CorrectionFactorForm({
   onBasePollenChange,
   onStartDateChange,
   onEndDateChange,
-  onPublishChange,
   onAddRow,
   onPollenChange,
   onReviewedEventsChange,
@@ -130,7 +136,6 @@ export function CorrectionFactorForm({
   onDelete,
 }: CorrectionFactorFormProps) {
   const formT = useTranslations('correctionFactorsPage.form');
-  const listStatusT = useTranslations('correctionFactorsPage.list.status');
   const canGoToPreviousValidationEvent = activeValidationEventIndex > 0;
   const canGoToNextValidationEvent =
     activeValidationEventIndex < validationEvents.length - 1;
@@ -225,16 +230,6 @@ export function CorrectionFactorForm({
                       {formatDateRange(detailRecord.startDate, detailRecord.endDate)}
                     </div>
                   </div>
-                  <div>
-                    <div className="text-muted-foreground">
-                      {formT('editUnavailable.status')}
-                    </div>
-                    <div className="text-foreground">
-                      {detailRecord.status === 'published'
-                        ? listStatusT('published')
-                        : listStatusT('draft')}
-                    </div>
-                  </div>
                 </div>
               </div>
             ) : null}
@@ -314,7 +309,6 @@ export function CorrectionFactorForm({
               onBasePollenChange={onBasePollenChange}
               onStartDateChange={onStartDateChange}
               onEndDateChange={onEndDateChange}
-              onPublishChange={onPublishChange}
             />
 
             <CorrectionFactorDistributionSection
@@ -323,6 +317,7 @@ export function CorrectionFactorForm({
               errors={errors}
               validationErrors={validationErrors}
               canAddRow={canAddRow}
+              isEventReviewMode={values.events.length > 0}
               getPollenOptions={getPollenOptions}
               onAddRow={onAddRow}
               onPollenChange={onPollenChange}
@@ -342,6 +337,7 @@ export function CorrectionFactorForm({
             <CorrectionFactorEventCarousel
               status={validationEventsStatus}
               events={validationEvents}
+              pollenOptions={allowedPollenOptions}
               errorMessage={validationEventsError}
               activeEventIndex={activeValidationEventIndex}
               canGoPrevious={canGoToPreviousValidationEvent}
@@ -349,6 +345,7 @@ export function CorrectionFactorForm({
               onPrevious={onPreviousValidationEvent}
               onNext={onNextValidationEvent}
               onSelectEvent={onSelectValidationEvent}
+              onReviewedPollenChange={onValidationEventReviewedPollenChange}
             />
 
             <CorrectionFactorChartPreview

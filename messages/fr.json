@@ -75,13 +75,8 @@
         "location": "Emplacement",
         "basePollen": "Pollen de base",
         "dateRange": "Plage de dates",
-        "status": "Statut",
         "actions": "Actions",
         "edit": "Modifier"
-      },
-      "status": {
-        "draft": "Brouillon",
-        "published": "Publié"
       },
       "states": {
         "loading": "Chargement des facteurs de correction...",
@@ -112,7 +107,6 @@
         "location": "Emplacement",
         "basePollen": "Pollen de base",
         "dateRange": "Plage de dates",
-        "status": "Statut",
         "detailsTitle": "Facteurs enregistrés",
         "pollen": "Pollen",
         "multiplier": "Multiplicateur enregistré",
@@ -156,7 +150,6 @@
         "clear": "Effacer",
         "apply": "Appliquer",
         "dateTimeHelp": "Les heures peuvent être sélectionnées par intervalles de 1 heure de 00:00 à 23:00.",
-        "publishOnSave": "Publier lors de l’enregistrement",
         "loading": "Chargement...",
         "loadError": "Options indisponibles",
         "optionsLoadError": "Ce champ n'a pas pu charger ses options."
@@ -187,6 +180,7 @@
         "title": "Facteurs de correction",
         "description": "Réattribuez les événements détectés pour le pollen de base sélectionné après revue experte.",
         "detectedEventsLabel": "Événements détectés",
+        "derivedFromEvents": "Gérez ici les classifications de pollen autorisées. Les comptes révisés sont dérivés des attributions d’événements dans le carrousel.",
         "addRow": "Ajouter une classification de pollen",
         "selectPollen": "Sélectionnez un pollen",
         "remove": "Supprimer",
@@ -235,7 +229,9 @@
         "empty": "Aucun événement détecté n’a été trouvé pour les filtres sélectionnés.",
         "error": "Les événements détectés n’ont pas pu être chargés.",
         "errorMismatch": "Des événements détectés ont été renvoyés, mais la réponse ne contenait pas d’enregistrements exploitables pour cette sélection.",
-        "classification": "Classification",
+        "classification": "Classification détectée",
+        "reviewedClassification": "Classification révisée",
+        "unknown": "Inconnu",
         "location": "Emplacement",
         "capturedAt": "Capturé à",
         "previous": "Précédent",

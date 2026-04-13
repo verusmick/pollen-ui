@@ -16,6 +16,7 @@ interface CorrectionFactorDistributionSectionProps {
   errors: CorrectionFactorFormErrors;
   validationErrors: CorrectionFactorFormErrors;
   canAddRow: boolean;
+  isEventReviewMode: boolean;
   getPollenOptions: (currentRowPollen: string) => string[];
   onAddRow: () => void;
   onPollenChange: (clientId: string, pollen: string) => void;
@@ -29,6 +30,7 @@ export function CorrectionFactorDistributionSection({
   errors,
   validationErrors,
   canAddRow,
+  isEventReviewMode,
   getPollenOptions,
   onAddRow,
   onPollenChange,
@@ -49,6 +51,11 @@ export function CorrectionFactorDistributionSection({
               {values.detectedEvents ?? '-'}
             </span>
           </p>
+          {isEventReviewMode ? (
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t('derivedFromEvents')}
+            </p>
+          ) : null}
         </div>
         <button
           type="button"
@@ -65,6 +72,7 @@ export function CorrectionFactorDistributionSection({
         derived={derived}
         errors={errors}
         validationErrors={validationErrors}
+        isEventReviewMode={isEventReviewMode}
         getPollenOptions={getPollenOptions}
         onPollenChange={onPollenChange}
         onReviewedEventsChange={onReviewedEventsChange}

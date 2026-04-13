@@ -24,23 +24,26 @@ export function buildCorrectionFactorWritePayload(
     options.factorPercentageScale
   );
 
-  const correctionFactorDetails = derived.rows
-    .map<ApiCorrectionFactorDetail | null>((row) => {
+  const correctionFactorDetails = derived.rows.reduce<ApiCorrectionFactorDetail[]>(
+    (details, row) => {
       if (!row.pollen) {
         throw new Error('Cannot build payload with an empty pollen row.');
       }
 
       if (row.isSyntheticUnknown || row.pollen === UNKNOWN_POLLEN_CODE) {
-        return null;
+        return details;
       }
 
-      return {
+      details.push({
         pollen: row.pollen,
         factor_percentage: row.multiplier,
-        published: values.publishOnSave,
-      };
-    })
-    .filter((detail): detail is ApiCorrectionFactorDetail => detail !== null);
+        published: details.length === 0,
+      });
+
+      return details;
+    },
+    []
+  );
 
   if (options.unknownPollenApiValue === undefined) {
     // TODO: Backend has not confirmed whether Unknown should be sent explicitly.
