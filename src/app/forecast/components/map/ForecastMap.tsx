@@ -133,11 +133,11 @@ export default function ForecastMap({
         getFillColor: (d: any) => {
           const intensity = d.intensity;
           // Your color scale based on pollen intensity
-          if (intensity <= 0.2) return [0, 100, 0, 60]; // Dark Green - low
-          else if (intensity <= 0.4) return [154, 205, 50, 60]; // Yellow Green
-          else if (intensity <= 0.6) return [255, 255, 0, 60]; // Yellow
-          else if (intensity <= 0.8) return [255, 165, 0, 60]; // Orange
-          else return [255, 0, 0, 60]; // Red - high
+          if (intensity <= 0.2) return [0, 0, 0, 0]; // Transparent
+          else if (intensity <= 0.4) return [255, 255, 0, 60]; // Yellow
+          else if (intensity <= 0.6) return [255, 165, 0, 60]; // Orange
+          else if (intensity <= 0.8) return [255, 0, 0, 60]; // Red
+          else return [128, 0, 128, 60]; // Purple
         },
         getLineColor: [0, 0, 0, 10],
         // lineWidthMinPixels: 0.5,
