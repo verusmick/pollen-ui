@@ -425,17 +425,24 @@ export function useCorrectionFactorForm() {
     clearRowError(clientId, 'reviewedEvents');
   }
 
-  function replaceValidationEvents(events: CorrectionFactorValidationEvent[]) {
+  function replaceValidationEvents(
+    events: CorrectionFactorValidationEvent[],
+    options: { syncRows?: boolean } = {}
+  ) {
+    const syncRows = options.syncRows ?? true;
+
     setValues((current) => {
       if (events.length === 0) {
         if (current.events.length === 0) {
           return current;
         }
 
-        return syncRowsFromReviewedEvents({
+        const next = {
           ...current,
           events: [],
-        });
+        };
+
+        return syncRows ? syncRowsFromReviewedEvents(next) : next;
       }
 
       const nextEvents = withReviewedPollen(events, current.events);
@@ -444,10 +451,12 @@ export function useCorrectionFactorForm() {
         return current;
       }
 
-      return syncRowsFromReviewedEvents({
+      const next = {
         ...current,
         events: nextEvents,
-      });
+      };
+
+      return syncRows ? syncRowsFromReviewedEvents(next) : next;
     });
   }
 

@@ -62,6 +62,10 @@ export function CorrectionFactorMetaFields({
   const endDateTime = splitCorrectionFactorDateTime(values.endDate);
   const startDateError = errors.startDate || validationErrors.startDate;
   const endDateError = errors.endDate || validationErrors.endDate;
+  const hasSelectedLocationOption = locationOptions.some(
+    (option) => option.id === values.location
+  );
+  const hasSelectedPollenOption = pollenOptions.includes(values.basePollen);
 
   function handleStartDateChange(date: string) {
     onStartDateChange(
@@ -127,6 +131,9 @@ export function CorrectionFactorMetaFields({
                   ? t('loadError')
                   : t('allLocations')}
             </option>
+            {values.location && !hasSelectedLocationOption ? (
+              <option value={values.location}>{values.location}</option>
+            ) : null}
             {locationOptions.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
@@ -160,6 +167,9 @@ export function CorrectionFactorMetaFields({
                   ? t('loadError')
                   : t('allPollens')}
             </option>
+            {values.basePollen && !hasSelectedPollenOption ? (
+              <option value={values.basePollen}>{values.basePollen}</option>
+            ) : null}
             {pollenOptions.map((option) => (
               <option key={option} value={option}>
                 {option}

@@ -5,6 +5,8 @@ const CORRECTION_FACTOR_DATE_TIME_PATTERN =
   /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
 const CORRECTION_FACTOR_INPUT_DATE_TIME_PATTERN =
   /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/;
+const CORRECTION_FACTOR_API_DATE_TIME_PATTERN =
+  /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?(?:Z|[+-]\d{2}(?::?\d{2})?)?$/;
 
 function padNumber(value: number): string {
   return String(value).padStart(2, '0');
@@ -120,6 +122,30 @@ export function normalizeCorrectionFactorDateTime(value: string): string {
 
     if (isValidDateParts(year, month, day)) {
       return buildCorrectionFactorDateTimeValue(year, month, day, 0);
+    }
+  }
+
+  const apiDateTimeMatch = CORRECTION_FACTOR_API_DATE_TIME_PATTERN.exec(normalizedValue);
+
+  if (apiDateTimeMatch) {
+    const year = Number(apiDateTimeMatch[1]);
+    const month = Number(apiDateTimeMatch[2]);
+    const day = Number(apiDateTimeMatch[3]);
+    const hour = Number(apiDateTimeMatch[4]);
+    const minute = Number(apiDateTimeMatch[5]);
+    const second = apiDateTimeMatch[6] ? Number(apiDateTimeMatch[6]) : 0;
+    const time = `${apiDateTimeMatch[4]}:${apiDateTimeMatch[5]}`;
+
+    if (
+      isValidDateParts(year, month, day) &&
+      Number.isInteger(hour) &&
+      hour >= 0 &&
+      hour <= 23 &&
+      minute === 0 &&
+      second === 0 &&
+      isCorrectionFactorTimeOption(time)
+    ) {
+      return buildCorrectionFactorDateTimeValue(year, month, day, hour);
     }
   }
 

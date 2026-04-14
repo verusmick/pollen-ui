@@ -35,6 +35,7 @@ export function CorrectionFactorDistributionRow({
   onRemove,
 }: CorrectionFactorDistributionRowProps) {
   const t = useTranslations('correctionFactorsPage.form.distribution');
+  const hasSelectedPollenOption = pollenOptions.includes(pollen);
 
   return (
     <tr className="border-b border-border last:border-b-0">
@@ -53,6 +54,9 @@ export function CorrectionFactorDistributionRow({
             }`}
           >
             <option value="">{t('selectPollen')}</option>
+            {pollen && !hasSelectedPollenOption ? (
+              <option value={pollen}>{pollen}</option>
+            ) : null}
             {pollenOptions.map((option) => (
               <option key={option} value={option}>
                 {option}

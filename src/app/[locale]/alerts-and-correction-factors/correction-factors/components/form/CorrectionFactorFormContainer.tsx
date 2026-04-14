@@ -143,7 +143,9 @@ export function CorrectionFactorFormContainer({
       validationEvents.status === 'ready' ||
       validationEvents.status === 'empty'
     ) {
-      form.replaceValidationEvents(validationEvents.events);
+      form.replaceValidationEvents(validationEvents.events, {
+        syncRows: !isEditMode,
+      });
 
       if (form.values.detectedEvents !== validationEvents.detectedEvents) {
         form.setField('detectedEvents', validationEvents.detectedEvents);
@@ -152,7 +154,9 @@ export function CorrectionFactorFormContainer({
       return;
     }
 
-    form.replaceValidationEvents([]);
+    form.replaceValidationEvents([], {
+      syncRows: !isEditMode,
+    });
 
     if (form.values.detectedEvents !== null) {
       form.setField('detectedEvents', null);
