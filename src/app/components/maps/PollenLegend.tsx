@@ -46,11 +46,11 @@ export const PollenLegend = ({
         style={{ width, height, background: gradient }}
         onClick={() => onToggle?.(true)}
       >
-        <div className="absolute inset-0 flex justify-between items-center px-3">
+        <div className="absolute inset-0 grid grid-cols-5 items-center">
           {visibleLevels.map((level, idx) => (
             <span
               key={idx}
-              className="text-[10px] font-bold text-white select-none"
+              className="text-center text-[10px] font-bold text-white select-none"
               style={{
                 textShadow:
                   '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)',
