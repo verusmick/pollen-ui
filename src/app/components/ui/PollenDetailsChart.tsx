@@ -260,14 +260,15 @@ export const PollenDetailsChart = ({
 
       const level = levelCache[value] || { label: 'none', color: '#fff' };
       const isActive = index === activeIndex;
+      const isTransparentLevel = level.color === MAP_LEVEL_COLORS.very_low;
 
       return (
         <circle
           cx={cx}
           cy={cy}
           r={isActive ? 6 : 4}
-          fill={level.color}
-          stroke={isActive ? '#fff' : undefined}
+          fill={isTransparentLevel ? 'transparent' : level.color}
+          stroke={isTransparentLevel || isActive ? '#fff' : undefined}
           strokeWidth={isActive ? 2 : 1.5}
           style={{ cursor: 'pointer', transition: 'all 0.15s' }}
           onMouseEnter={() => setActiveIndex(index)}
@@ -278,17 +279,23 @@ export const PollenDetailsChart = ({
   );
 
   const CustomActiveDot = memo(
-    ({ cx, cy }: any) => (
-      <circle
-        cx={cx}
-        cy={cy}
-        r={6}
-        stroke="#ffae42"
-        strokeWidth={3}
-        fill="#1E293B"
-      />
-    ),
-    () => true
+    ({ cx, cy, value }: any) => {
+      const level = levelCache[value] || { color: '#fff' };
+      const isTransparentLevel = level.color === MAP_LEVEL_COLORS.very_low;
+
+      return (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={6}
+          stroke={isTransparentLevel ? '#fff' : '#ffae42'}
+          strokeWidth={3}
+          fill={isTransparentLevel ? 'transparent' : '#1E293B'}
+        />
+      );
+    },
+    (prev, next) =>
+      prev.cx === next.cx && prev.cy === next.cy && prev.value === next.value
   );
 
   const CustomTick = memo(({ x, y, payload }: any) => {
