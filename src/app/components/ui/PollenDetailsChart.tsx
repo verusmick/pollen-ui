@@ -151,8 +151,8 @@ export const PollenDetailsChart = ({
 
       if (d.value === 0) {
         cache[0] = {
-          label: 'Very Low',
-          color: MAP_LEVEL_COLORS.very_low,
+          label: 'None',
+          color: MAP_LEVEL_COLORS.none,
         };
         return;
       }
@@ -169,7 +169,7 @@ export const PollenDetailsChart = ({
 
         cache[d.value] = {
           ...level,
-          color: MAP_LEVEL_COLORS[key] || MAP_LEVEL_COLORS.very_low,
+          color: MAP_LEVEL_COLORS[key] || MAP_LEVEL_COLORS.none,
         };
       }
     });
@@ -260,7 +260,7 @@ export const PollenDetailsChart = ({
 
       const level = levelCache[value] || { label: 'none', color: '#fff' };
       const isActive = index === activeIndex;
-      const isTransparentLevel = level.color === MAP_LEVEL_COLORS.very_low;
+      const isTransparentLevel = level.color === MAP_LEVEL_COLORS.none;
 
       return (
         <circle
@@ -281,7 +281,7 @@ export const PollenDetailsChart = ({
   const CustomActiveDot = memo(
     ({ cx, cy, value }: any) => {
       const level = levelCache[value] || { color: '#fff' };
-      const isTransparentLevel = level.color === MAP_LEVEL_COLORS.very_low;
+      const isTransparentLevel = level.color === MAP_LEVEL_COLORS.none;
 
       return (
         <circle

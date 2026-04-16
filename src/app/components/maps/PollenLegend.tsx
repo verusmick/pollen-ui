@@ -8,16 +8,16 @@ interface PollenLegendProps {
 }
 
 const gradient = `linear-gradient(to right,
-  transparent 0%,
-  transparent 20%,
+  rgb(255, 255, 0) 0%,
   rgb(255, 255, 0) 20%,
-  rgb(255, 255, 0) 40%,
+  rgb(255, 165, 0) 20%,
   rgb(255, 165, 0) 40%,
-  rgb(255, 165, 0) 60%,
+  rgb(255, 0, 0) 40%,
   rgb(255, 0, 0) 60%,
-  rgb(255, 0, 0) 80%,
+  rgb(128, 0, 128) 60%,
   rgb(128, 0, 128) 80%,
-  rgb(128, 0, 128) 100%
+  rgb(0, 0, 139) 80%,
+  rgb(0, 0, 139) 100%
 )`;
 
 export const PollenLegend = ({
@@ -30,11 +30,11 @@ export const PollenLegend = ({
 
   const levels = [
     { key: 'none', color: 'transparent' },
-    { key: 'very_low', color: 'transparent' },
-    { key: 'low', color: 'rgb(255, 255, 0)' },
-    { key: 'moderate', color: 'rgb(255, 165, 0)' },
-    { key: 'high', color: 'rgb(255, 0, 0)' },
-    { key: 'very_high', color: 'rgb(128, 0, 128)' },
+    { key: 'very_low', color: 'rgb(255, 255, 0)' },
+    { key: 'low', color: 'rgb(255, 165, 0)' },
+    { key: 'moderate', color: 'rgb(255, 0, 0)' },
+    { key: 'high', color: 'rgb(128, 0, 128)' },
+    { key: 'very_high', color: 'rgb(0, 0, 139)' },
   ];
   const visibleLevels = levels.filter((level) => level.key !== 'none');
 
