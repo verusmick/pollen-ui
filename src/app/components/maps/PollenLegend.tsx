@@ -8,11 +8,16 @@ interface PollenLegendProps {
 }
 
 const gradient = `linear-gradient(to right,
-  rgb(0, 232, 56) 0%,
-  rgb(165, 235, 2) 25%,
-  rgb(235, 187, 2) 50%,
-  rgb(242, 114, 0) 75%,
-  rgb(255, 0, 0) 100%
+  rgb(255, 255, 0) 0%,
+  rgb(255, 255, 0) 20%,
+  rgb(255, 165, 0) 20%,
+  rgb(255, 165, 0) 40%,
+  rgb(255, 0, 0) 40%,
+  rgb(255, 0, 0) 60%,
+  rgb(128, 0, 128) 60%,
+  rgb(128, 0, 128) 80%,
+  rgb(0, 0, 139) 80%,
+  rgb(0, 0, 139) 100%
 )`;
 
 export const PollenLegend = ({
@@ -24,12 +29,12 @@ export const PollenLegend = ({
   const barRef = useRef<HTMLDivElement>(null);
 
   const levels = [
-    { key: 'none', color: '#ffffff' },
-    { key: 'very_low', color: '#00e838' },
-    { key: 'low', color: '#a5eb02' },
-    { key: 'moderate', color: '#ebbb02' },
-    { key: 'high', color: '#f27200' },
-    { key: 'very_high', color: '#ff0000' },
+    { key: 'none', color: 'transparent' },
+    { key: 'very_low', color: 'rgb(255, 255, 0)' },
+    { key: 'low', color: 'rgb(255, 165, 0)' },
+    { key: 'moderate', color: 'rgb(255, 0, 0)' },
+    { key: 'high', color: 'rgb(128, 0, 128)' },
+    { key: 'very_high', color: 'rgb(0, 0, 139)' },
   ];
   const visibleLevels = levels.filter((level) => level.key !== 'none');
 
@@ -41,11 +46,11 @@ export const PollenLegend = ({
         style={{ width, height, background: gradient }}
         onClick={() => onToggle?.(true)}
       >
-        <div className="absolute inset-0 flex justify-between items-center px-3">
+        <div className="absolute inset-0 grid grid-cols-5 items-center">
           {visibleLevels.map((level, idx) => (
             <span
               key={idx}
-              className="text-[10px] font-bold text-white select-none"
+              className="text-center text-[10px] font-bold text-white select-none"
               style={{
                 textShadow:
                   '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)',
