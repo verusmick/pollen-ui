@@ -1,7 +1,8 @@
 export const MAP_LEVEL_COLORS = {
-  very_low: '#00e838',
-  low: '#a5eb02',
-  moderate: '#ebbb02',
-  high: '#f27200',
-  very_high: '#ff0000',
+  none: '#00000000',
+  very_low: '#ffff00',
+  low: '#ffa500',
+  moderate: '#ff0000',
+  high: '#800080',
+  very_high: '#00008b',
 } as const;
