@@ -6,7 +6,7 @@ export const POLLENS = {
   BIRCH: {
     apiKey: 'POLLEN_BIRCH' as const,
     label: 'Birch' as const,
-    defaultBaseDate: getDefaultBaseDate('2022-04-14'),
+    defaultBaseDate: getDefaultBaseDate('2025-04-15'),
     apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
@@ -20,7 +20,7 @@ export const POLLENS = {
   GRASS: {
     apiKey: 'POLLEN_GRASS' as const,
     label: 'Grass' as const,
-    defaultBaseDate: getDefaultBaseDate('2023-06-01'),
+    defaultBaseDate: getDefaultBaseDate('2025-06-02'),
     apiIntervals: '0,3,0,4,15,2,16,50,4,51,100,6,101,200,8,201,1000,9',
     levels: [
       { label: 'None', min: 0, max: 3 },
@@ -34,7 +34,7 @@ export const POLLENS = {
   ALDER: {
     apiKey: 'POLLEN_ALDER' as const,
     label: 'Alder' as const,
-    defaultBaseDate: getDefaultBaseDate('2024-02-14'),
+    defaultBaseDate: getDefaultBaseDate('2025-02-15'),
     apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
