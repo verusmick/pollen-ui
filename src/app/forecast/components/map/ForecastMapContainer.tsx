@@ -80,10 +80,8 @@ export const ForecastMapContainer = () => {
     lat: number;
     lng: number;
   } | null>(null);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const [selectedHour, setSelectedHour] = useState(0);
-  const [timelineStartHour, setTimelineStartHour] = useState(0);
-  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const pollenKeyRef = useRef(pollenSelected.apiKey);
@@ -95,13 +93,7 @@ export const ForecastMapContainer = () => {
   const [resolution, setResolution] = useState<1 | 2 | 3>(1);
   const { fetchChart } = usePollenChart();
   const handlePlayPause = () => {
-    if (!playing) {
-      setTimelineStartHour(selectedHour);
-      setTimelineHasWrapped(false);
-      setPlaying(true);
-    } else {
-      setPlaying(false);
-    }
+    setPlaying((current) => !current);
   };
 
   const forecastParams = useMemo(
@@ -130,7 +122,6 @@ export const ForecastMapContainer = () => {
   };
 
   const handleSliderChange = useCallback((hour: number) => {
-    setPlaying(false);
     setSelectedHour(hour);
   }, []);
 
@@ -140,16 +131,7 @@ export const ForecastMapContainer = () => {
     isLoading: mapDataIsLoading,
     onNextHour: () => {
       setSelectedHour((prevHour) => {
-        const nextHour = prevHour + 1;
-        if (!timelineHasWrapped && nextHour > 47) {
-          setTimelineHasWrapped(true);
-          return 0;
-        }
-        if (timelineHasWrapped && nextHour > timelineStartHour) {
-          setPlaying(false);
-          return prevHour;
-        }
-        return nextHour;
+        return prevHour >= 47 ? 0 : prevHour + 1;
       });
     },
 

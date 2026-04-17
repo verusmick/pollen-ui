@@ -53,10 +53,8 @@ export const NowCastingMapContainer = () => {
   const tSearch = useTranslations('Components.search');
   const tLocation = useTranslations('Components.show_your_location');
 
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const [selectedHour, setSelectedHour] = useState<HourPoint>();
-  const [timelineStartHour, setTimelineStartHour] = useState(0);
-  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
   const [gridCellsResolution, setGridCellsResolution] = useState(0.009);
   const [pollenSelected, setPollenSelected] =
     useState<PollenConfig>(DEFAULT_POLLEN);
@@ -89,7 +87,6 @@ export const NowCastingMapContainer = () => {
     setLongitudes: setNowCastingLngGrid,
   } = nowCastingCoordinates;
   const { fetchChart } = usePollenChart();
-  const playStartHourRef = useRef<number | null>(null);
 
   const nowRaw = dayjs();
   const alignedHour = Math.floor(nowRaw.hour() / 3) * 3;
@@ -154,17 +151,10 @@ export const NowCastingMapContainer = () => {
   };
 
   const handlePlayPause = () => {
-    if (!playing) {
-      playStartHourRef.current = selectedHour?.hourIndex ?? 0;
-      setPlaying(true);
-    } else {
-      setPlaying(false);
-      playStartHourRef.current = null;
-    }
+    setPlaying((current) => !current);
   };
 
   const handleSliderChange = useCallback((newHour: HourPoint) => {
-    setPlaying(false);
     setSelectedHour(newHour);
   }, []);
 
@@ -223,14 +213,6 @@ export const NowCastingMapContainer = () => {
           prevHour.hourIndex,
           'next'
         );
-        if (
-          playStartHourRef.current !== null &&
-          nextHour?.hourIndex === playStartHourRef.current
-        ) {
-          setPlaying(false);
-          playStartHourRef.current = null;
-          return nextHour;
-        }
 
         return nextHour || prevHour;
       });

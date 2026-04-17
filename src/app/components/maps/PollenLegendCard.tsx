@@ -13,6 +13,15 @@ interface PollenLegendCardProps {
   cardRef: React.RefObject<HTMLDivElement | null>;
 }
 
+const levelColors: Record<string, string> = {
+  none: 'transparent',
+  very_low: 'rgb(255, 255, 0)',
+  low: 'rgb(255, 165, 0)',
+  moderate: 'rgb(255, 0, 0)',
+  high: 'rgb(128, 0, 128)',
+  very_high: 'rgb(0, 0, 139)',
+};
+
 export const PollenLegendCard = ({
   open,
   levels,
@@ -39,7 +48,7 @@ export const PollenLegendCard = ({
           <li key={idx} className="flex items-center gap-2">
             <span
               className="inline-block w-4 h-4 rounded-sm shrink-0"
-              style={{ backgroundColor: level.color }}
+              style={{ backgroundColor: levelColors[level.key] ?? level.color }}
             ></span>
 
             <span className="flex-1 min-w-20">
