@@ -1,15 +1,16 @@
-import { MAP_LEVEL_COLORS } from '@/constants';
-import { PollenLevel } from '@/types';
-import { getDefaultBaseDate } from '@/utils';
+import { MAP_LEVEL_COLORS } from '@/app/constants';
+import { PollenLevel } from '@/app/types';
+import { getDefaultBaseDate } from '@/app/utils';
 
 export const POLLENS = {
   BIRCH: {
     apiKey: 'POLLEN_BIRCH' as const,
     label: 'Birch' as const,
     defaultBaseDate: getDefaultBaseDate('2022-04-14'),
-    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
-      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'None', min: 0, max: 5 },
+      { label: 'Very Low', min: 6, max: 30 },
       { label: 'Low', min: 31, max: 100 },
       { label: 'Moderate', min: 101, max: 200 },
       { label: 'High', min: 201, max: 400 },
@@ -20,9 +21,10 @@ export const POLLENS = {
     apiKey: 'POLLEN_GRASS' as const,
     label: 'Grass' as const,
     defaultBaseDate: getDefaultBaseDate('2023-06-01'),
-    apiIntervals: '1,15,2,16,50,4,51,100,6,101,200,8,201,1000,9',
+    apiIntervals: '0,3,0,4,15,2,16,50,4,51,100,6,101,200,8,201,1000,9',
     levels: [
-      { label: 'Very Low', min: 1, max: 15 },
+      { label: 'None', min: 0, max: 3 },
+      { label: 'Very Low', min: 4, max: 15 },
       { label: 'Low', min: 16, max: 50 },
       { label: 'Moderate', min: 51, max: 100 },
       { label: 'High', min: 101, max: 200 },
@@ -33,9 +35,10 @@ export const POLLENS = {
     apiKey: 'POLLEN_ALDER' as const,
     label: 'Alder' as const,
     defaultBaseDate: getDefaultBaseDate('2024-02-14'),
-    apiIntervals: '1,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
     levels: [
-      { label: 'Very Low', min: 1, max: 30 },
+      { label: 'None', min: 0, max: 5 },
+      { label: 'Very Low', min: 6, max: 30 },
       { label: 'Low', min: 31, max: 100 },
       { label: 'Moderate', min: 101, max: 200 },
       { label: 'High', min: 201, max: 400 },

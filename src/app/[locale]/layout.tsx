@@ -1,4 +1,4 @@
-import { ClientLayout } from '@/components/layout';
+import { ClientLayout } from '@/app/components/layout';
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';

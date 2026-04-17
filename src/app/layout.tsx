@@ -28,14 +28,18 @@ export default function AppRootLayout({
             __html: `
 (function() {
   try {
-    const stored = localStorage.getItem('app-theme');
-    const theme = stored ? JSON.parse(stored)?.state?.theme : null;
+    const pathWithoutLocale = window.location.pathname.replace(/^\\/(en|es|de|fr|ar|nl)(?=\\/|$)/, '') || '/';
+    const lightThemeRoutes = [
+      '/alerts-and-correction-factors',
+      '/rules-and-notifications'
+    ];
+    const useLightTheme = lightThemeRoutes.some(function(route) {
+      return pathWithoutLocale === route || pathWithoutLocale.indexOf(route + '/') === 0;
+    });
 
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else if (theme === 'light') {
+    if (useLightTheme) {
       document.documentElement.classList.remove('dark');
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    } else {
       document.documentElement.classList.add('dark');
     }
   } catch (_) {}

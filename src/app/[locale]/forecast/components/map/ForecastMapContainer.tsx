@@ -5,23 +5,25 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import dayjs from 'dayjs';
 
-import { ForecastMap } from '../../components';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
+
+import { ForecastMap } from '@/app/[locale]/forecast/components';
 
 import {
   DEFAULT_POLLEN,
   getLevelsForLegend,
   POLLEN_ENTRIES,
   type PollenConfig,
-} from '../../constants';
+} from '@/app/[locale]/forecast/constants';
 
-import { getRegionBounds } from '@/constants';
+import { getRegionBounds } from '@/app/constants';
 
 import {
   useHourlyForecast,
   usePollenPlayback,
   usePollenCacheManager,
   usePollenPrefetch,
-} from '../../hooks';
+} from '@/app/[locale]/forecast/hooks';
 
 import {
   LoadingSpinner,
@@ -34,20 +36,19 @@ import {
   PollenLegendCard,
   PollenLegend,
   PollenTimeline,
-} from '@/components';
+} from '@/app/components';
 import {
   useCoordinatesStore,
   useLoadingStore,
   usePartialLoadingStore,
-  usePollenDetailsChartStore,
-} from '@/store';
-import { useSidebar } from '@/context';
-import { useIsLargeScreen, usePollenChart } from '@/hooks';
-import { computeResFromZoom, getGridCellsResolution } from '@/utils/maps';
+} from '@/app/stores';
+import { useSidebar } from '@/app/context';
+import { useIsLargeScreen, usePollenChart } from '@/app/hooks';
+import { computeResFromZoom, getGridCellsResolution } from '@/app/utils/maps';
 
 const PollenDetailsChart = dynamic(
   () =>
-    import('@/components/ui/PollenDetailsChart').then(
+    import('@/app/components/ui/PollenDetailsChart').then(
       (mod) => mod.PollenDetailsChart
     ),
   { ssr: false }
@@ -79,10 +80,8 @@ export const ForecastMapContainer = () => {
     lat: number;
     lng: number;
   } | null>(null);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const [selectedHour, setSelectedHour] = useState(0);
-  const [timelineStartHour, setTimelineStartHour] = useState(0);
-  const [timelineHasWrapped, setTimelineHasWrapped] = useState(false);
 
   const legendCardRef = useRef<HTMLDivElement>(null);
   const pollenKeyRef = useRef(pollenSelected.apiKey);
@@ -94,13 +93,7 @@ export const ForecastMapContainer = () => {
   const [resolution, setResolution] = useState<1 | 2 | 3>(1);
   const { fetchChart } = usePollenChart();
   const handlePlayPause = () => {
-    if (!playing) {
-      setTimelineStartHour(selectedHour);
-      setTimelineHasWrapped(false);
-      setPlaying(true);
-    } else {
-      setPlaying(false);
-    }
+    setPlaying((current) => !current);
   };
 
   const forecastParams = useMemo(
@@ -129,7 +122,6 @@ export const ForecastMapContainer = () => {
   };
 
   const handleSliderChange = useCallback((hour: number) => {
-    setPlaying(false);
     setSelectedHour(hour);
   }, []);
 
@@ -139,16 +131,7 @@ export const ForecastMapContainer = () => {
     isLoading: mapDataIsLoading,
     onNextHour: () => {
       setSelectedHour((prevHour) => {
-        const nextHour = prevHour + 1;
-        if (!timelineHasWrapped && nextHour > 47) {
-          setTimelineHasWrapped(true);
-          return 0;
-        }
-        if (timelineHasWrapped && nextHour > timelineStartHour) {
-          setPlaying(false);
-          return prevHour;
-        }
-        return nextHour;
+        return prevHour >= 47 ? 0 : prevHour + 1;
       });
     },
 

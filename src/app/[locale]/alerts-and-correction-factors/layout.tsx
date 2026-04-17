@@ -1,18 +1,8 @@
 'use client';
-import { useThemeStore } from '@/store';
-import Link from 'next/link';
-import { useEffect, ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
+import { ReactNode } from 'react';
+import { Link, usePathname } from '@/features/i18n/routing';
 
 export default function Layout({ children }: { children: ReactNode }) {
-  const setTheme = useThemeStore((s) => s.setTheme);
-  useEffect(() => {
-    setTheme('light');
-    return () => {
-      setTheme('dark');
-    };
-  }, []);
-
   const pathname = usePathname();
 
   const tabs = [

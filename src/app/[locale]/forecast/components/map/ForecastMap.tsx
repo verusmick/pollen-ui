@@ -17,20 +17,20 @@ import type { Feature, FeatureCollection } from 'geojson';
 import bavariaGeo from '@/data/bavaria.geo.json';
 import germanyGeo from '@/data/germany.geo.json';
 
-import { MapTooltip } from '../../components';
+import { MapTooltip } from '@/app/[locale]/forecast/components';
 
 import filterPointsInRegion from '@/utils/deck/filterPointsInRegion';
 import { debounce, getBoundsFromViewState } from '@/utils';
-import { getInitialViewState } from '../../utils';
-import { MapZoomControls } from '@/components';
+import { getInitialViewState } from '@/app/[locale]/forecast/utils';
+import { MapZoomControls } from '@/app/components';
 import {
   useCurrentLocationStore,
   usePartialLoadingStore,
   useSearchLocationStore,
-  usePollenDetailsChartStore,
-} from '@/store';
-import { getRegionGeo } from '@/utils/maps';
-import { usePollenChart } from '@/hooks';
+} from '@/app/stores';
+import { getRegionGeo } from '@/app/utils/maps';
+import { usePollenChart } from '@/app/hooks';
+import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 
 // Define the grid cell size in degrees
 // const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
@@ -95,7 +95,7 @@ export default function ForecastMap({
       pollenSelected,
       currentDate,
       setShowPollenDetailsChart,
-    ],
+    ]
   );
 
   // Convert your API data to grid cells
@@ -133,15 +133,12 @@ export default function ForecastMap({
         getFillColor: (d: any) => {
           const intensity = d.intensity;
           // Your color scale based on pollen intensity
-          if (intensity <= 0.2)
-            return [0, 100, 0, 60]; // Dark Green - low
-          else if (intensity <= 0.4)
-            return [154, 205, 50, 60]; // Yellow Green
-          else if (intensity <= 0.6)
-            return [255, 255, 0, 60]; // Yellow
-          else if (intensity <= 0.8)
-            return [255, 165, 0, 60]; // Orange
-          else return [255, 0, 0, 60]; // Red - high
+          if (intensity <= 0) return [0, 0, 0, 0]; // None
+          else if (intensity <= 0.2) return [255, 255, 0, 60]; // Very low
+          else if (intensity <= 0.4) return [255, 165, 0, 60]; // Low
+          else if (intensity <= 0.6) return [255, 0, 0, 60]; // Moderate
+          else if (intensity <= 0.8) return [128, 0, 128, 60]; // High
+          else return [0, 0, 139, 80]; // Very high
         },
         getLineColor: [0, 0, 0, 10],
         // lineWidthMinPixels: 0.5,
@@ -169,7 +166,7 @@ export default function ForecastMap({
           handleGridCellClick(info.coordinate[1], info.coordinate[0]);
         },
       }),
-    [gridCells, handleGridCellClick],
+    [gridCells, handleGridCellClick]
   );
 
   const pinIconLayer = useMemo(() => {
@@ -208,8 +205,7 @@ export default function ForecastMap({
     () =>
       new TileLayer({
         id: 'base-map',
-        data: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png',
-
+        data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
         minZoom: 0,
         maxZoom: 19,
         tileSize: 256,
@@ -229,7 +225,7 @@ export default function ForecastMap({
           });
         },
       }),
-    [],
+    []
   );
 
   // Bavaria boundary
@@ -286,7 +282,7 @@ export default function ForecastMap({
       const zoom = viewState.zoom;
 
       onRegionChange?.({ bBox, zoom });
-    }, 80),
+    }, 80)
   ).current;
 
   const handleViewStateChange = useCallback((e: any) => {
