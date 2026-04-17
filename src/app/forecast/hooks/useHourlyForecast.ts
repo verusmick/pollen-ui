@@ -11,7 +11,8 @@ export function useHourlyForecast(params: {
   pollen: PollenApiKey;
   box?: string;
   includeCoords?: boolean;
-  intervals?: string
+  intervals?: string;
+  res?: number;
 }) {
   const normalizedParams = useMemo(() => {
     const dateToUse = dayjs(params.date + 'T00:00:00')

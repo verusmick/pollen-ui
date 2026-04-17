@@ -2,10 +2,11 @@
   "HomePage": {
     "title": "Hello world 2"
   },
-  "forecastPage": {
-    "title": "Forecast Map",
-    "description": "Interactive pollen forecast map",
-    "message_loading": "Pollen Forecast Map",
+  "Sidebar": {
+    "title": "PollenScience.eu",
+    "maps": "Maps"
+  },
+  "Components": {
     "pollen": "pollen/m³",
     "search": {
       "title_tooltip_search": "Search",
@@ -42,5 +43,15 @@
       "high_leg": "High allergy risk",
       "very_high_leg": "Very high allergy risk"
     }
+  },
+  "forecastPage": {
+    "title": "Forecast Map",
+    "description": "Interactive pollen forecast map",
+    "message_loading": "Pollen Forecast Map",
+    "pollen": "pollen/m³"
+  },
+  "nowCastingPage": {
+    "title": "Nowcasting",
+    "message_loading": "Nowcasting Map"
   }
 }

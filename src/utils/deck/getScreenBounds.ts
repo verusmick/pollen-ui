@@ -21,5 +21,5 @@ export function getBoundsFromViewState(viewState: ViewState) {
   const minLat = se[1];
   const maxLat = nw[1];
 
-  return [minLon, minLat, maxLon, maxLat];
+  return [minLon, minLat, maxLon, maxLat] as [number, number, number, number];
 }

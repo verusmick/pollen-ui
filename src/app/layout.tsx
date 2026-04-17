@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { ReactQueryWrapper } from './forecast/provider/providers';
 
 import './globals.css';
-import { ReactQueryWrapper } from './forecast/provider/providers';
+import { ClientLayout } from './components/layout';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,16 +23,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider>
-          <ReactQueryWrapper>{children}</ReactQueryWrapper>
+          <ReactQueryWrapper>
+            <ClientLayout>{children}</ClientLayout>
+          </ReactQueryWrapper>
         </NextIntlClientProvider>
       </body>
     </html>

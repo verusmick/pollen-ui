@@ -1,4 +1,4 @@
-import { REGION_BOUNDS } from '@/app/forecast/constants';
+import { REGION_BOUNDS } from "@/app/constants/maps/regionBounds";
 // const viewMapInitialState = {
 //   longitude: 11.5,
 //   latitude: 48.8,
@@ -22,7 +22,7 @@ export const getInitialViewState = () => {
   const maxDiff = Math.max(lonDiff, latDiff);
 
   let zoom = 7;
-  if (maxDiff > 8) zoom = 5.8;       // Germany wide
+  if (maxDiff > 8) zoom = 5.9;       // Germany wide
   else if (maxDiff > 4) zoom = 7;  // Bavaria
   else zoom = 7;                   // smaller regions
 
