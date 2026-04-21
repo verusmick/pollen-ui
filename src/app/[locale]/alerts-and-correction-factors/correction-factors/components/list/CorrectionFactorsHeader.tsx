@@ -7,7 +7,7 @@ export function CorrectionFactorsHeader() {
   const t = useTranslations('correctionFactorsPage.list');
 
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 className="text-lg font-semibold text-foreground">{t('title')}</h1>
         <p className="text-sm text-muted-foreground">{t('description')}</p>
@@ -15,7 +15,7 @@ export function CorrectionFactorsHeader() {
 
       <Link
         href="/alerts-and-correction-factors/correction-factors/new"
-        className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+        className="inline-flex shrink-0 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90"
       >
         {t('newButton')}
       </Link>
