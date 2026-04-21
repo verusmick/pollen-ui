@@ -8,7 +8,7 @@ export const POLLENS = {
     label: 'Alder (Alnus)' as const,
     defaultBaseDate: getDefaultBaseDate('2025-03-05'),
     defaultHour: 15,
-    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,5,30,2,30,100,4,100,200,6,200,400,8,400,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
       { label: 'Very Low', min: 6, max: 30 },
@@ -24,7 +24,7 @@ export const POLLENS = {
     label: 'Pine (Pinaceae)' as const,
     defaultBaseDate: getDefaultBaseDate('2025-05-07'),
     defaultHour: 12,
-    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,5,30,2,30,100,4,100,200,6,200,400,8,400,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
       { label: 'Very Low', min: 6, max: 30 },
@@ -39,7 +39,7 @@ export const POLLENS = {
     label: 'Birch (Betula)' as const,
     defaultBaseDate: getDefaultBaseDate('2025-04-15'),
     defaultHour: 12,
-    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,5,30,2,30,100,4,100,200,6,200,400,8,400,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
       { label: 'Very Low', min: 6, max: 30 },
@@ -54,7 +54,7 @@ export const POLLENS = {
     label: 'Hazel (Corylus)' as const,
     defaultBaseDate: getDefaultBaseDate('2025-03-01'),
     defaultHour: 12,
-    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,5,30,2,30,100,4,100,200,6,200,400,8,400,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
       { label: 'Very Low', min: 6, max: 30 },
@@ -69,7 +69,7 @@ export const POLLENS = {
     label: 'Ash (Fraxinus)' as const,
     defaultBaseDate: getDefaultBaseDate('2025-04-13'),
     defaultHour: 12,
-    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,5,30,2,30,100,4,100,200,6,200,400,8,400,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
       { label: 'Very Low', min: 6, max: 30 },
@@ -95,7 +95,7 @@ export const POLLENS = {
     label: 'Grasses (Poaceae)' as const,
     defaultBaseDate: getDefaultBaseDate('2025-06-06'),
     defaultHour: 12,
-    apiIntervals: '0,3,0,4,15,2,16,50,4,51,100,6,101,200,8,201,1000,9',
+    apiIntervals: '0,3,0,3,15,2,15,50,4,50,100,6,100,200,8,200,1000,9',
     levels: [
       { label: 'None', min: 0, max: 3 },
       { label: 'Very Low', min: 4, max: 15 },
@@ -110,7 +110,7 @@ export const POLLENS = {
     label: 'Oak (Quercus)' as const,
     defaultBaseDate: getDefaultBaseDate('2025-04-17'),
     defaultHour: 12,
-    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,5,30,2,30,100,4,100,200,6,200,400,8,400,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
       { label: 'Very Low', min: 6, max: 30 },
@@ -125,7 +125,7 @@ export const POLLENS = {
     label: 'Nettle (Urtica)' as const,
     defaultBaseDate: getDefaultBaseDate('2025-08-09'),
     defaultHour: 12,
-    apiIntervals: '0,5,0,6,30,2,31,100,4,101,200,6,201,400,8,401,1000,9',
+    apiIntervals: '0,5,0,5,30,2,30,100,4,100,200,6,200,400,8,400,1000,9',
     levels: [
       { label: 'None', min: 0, max: 5 },
       { label: 'Very Low', min: 6, max: 30 },
