@@ -32,6 +32,76 @@ import { getRegionGeo } from '@/app/utils/maps';
 import { usePollenChart } from '@/app/hooks';
 import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 
+const OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const DEFAULT_MAPTILER_MAP_ID = 'dataviz-v4';
+const MAPTILER_LOGO_URL = 'https://api.maptiler.com/resources/logo.svg';
+
+type BaseMapConfig = {
+  attribution: string;
+  attributionType: 'custom' | 'maptiler' | 'osm';
+  maxZoom: number;
+  showMapTilerLogo: boolean;
+  tileUrl: string;
+};
+
+const getNumberEnv = (envValue: string | undefined, fallback: number) => {
+  const value = Number(envValue);
+
+  return Number.isFinite(value) ? value : fallback;
+};
+
+const getBaseMapConfig = (): BaseMapConfig => {
+  const customTileUrl = process.env.NEXT_PUBLIC_BASE_MAP_TILE_URL?.trim();
+
+  if (customTileUrl) {
+    const attribution = process.env.NEXT_PUBLIC_BASE_MAP_ATTRIBUTION?.trim();
+    const isMapTiler = customTileUrl.includes('api.maptiler.com');
+
+    return {
+      attribution:
+        attribution ||
+        (isMapTiler
+          ? '© MapTiler © OpenStreetMap contributors'
+          : '© OpenStreetMap contributors'),
+      attributionType: attribution ? 'custom' : isMapTiler ? 'maptiler' : 'osm',
+      maxZoom: getNumberEnv(process.env.NEXT_PUBLIC_BASE_MAP_MAX_ZOOM, 19),
+      showMapTilerLogo:
+        process.env.NEXT_PUBLIC_BASE_MAP_SHOW_MAPTILER_LOGO === 'true' ||
+        isMapTiler,
+      tileUrl: customTileUrl,
+    };
+  }
+
+  const mapTilerApiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY?.trim();
+
+  if (mapTilerApiKey) {
+    const mapId =
+      process.env.NEXT_PUBLIC_MAPTILER_MAP_ID?.trim() ||
+      DEFAULT_MAPTILER_MAP_ID;
+
+    return {
+      attribution: '© MapTiler © OpenStreetMap contributors',
+      attributionType: 'maptiler',
+      maxZoom: getNumberEnv(process.env.NEXT_PUBLIC_BASE_MAP_MAX_ZOOM, 22),
+      showMapTilerLogo: true,
+      tileUrl: `https://api.maptiler.com/maps/${mapId}/256/{z}/{x}/{y}.png?key=${encodeURIComponent(mapTilerApiKey)}`,
+    };
+  }
+
+  return {
+    attribution: '© OpenStreetMap contributors',
+    attributionType: 'osm',
+    maxZoom: getNumberEnv(process.env.NEXT_PUBLIC_BASE_MAP_MAX_ZOOM, 19),
+    showMapTilerLogo: false,
+    tileUrl: OSM_TILE_URL,
+  };
+};
+
+const attributionLinkStyle = {
+  color: '#333',
+  textDecoration: 'none',
+};
+
 // Define the grid cell size in degrees
 // const GRID_RESOLUTION = 0.02; // Adjust this for larger/smaller quadrants
 
@@ -71,6 +141,7 @@ export default function ForecastMap({
     longitude: pollenDetailsChartLongitude,
   } = usePollenDetailsChartStore();
   const { fetchChart } = usePollenChart();
+  const baseMapConfig = useMemo(() => getBaseMapConfig(), []);
   const handleGridCellClick = useCallback(
     async (clickLat: number, clickLon: number) => {
       setShowPollenDetailsChart(true, '', null, clickLat, clickLon);
@@ -200,14 +271,13 @@ export default function ForecastMap({
     });
   }, [pollenDetailsChartLatitude, pollenDetailsChartLongitude, name]);
 
-  // Free OpenStreetMap base layer
   const baseMapLayer = useMemo(
     () =>
       new TileLayer({
         id: 'base-map',
-        data: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png',
+        data: baseMapConfig.tileUrl,
         minZoom: 0,
-        maxZoom: 19,
+        maxZoom: baseMapConfig.maxZoom,
         tileSize: 256,
         renderSubLayers: (props) => {
           const { bbox, data, id } = props.tile;
@@ -225,7 +295,7 @@ export default function ForecastMap({
           });
         },
       }),
-    []
+    [baseMapConfig]
   );
 
   // Bavaria boundary
@@ -322,7 +392,7 @@ export default function ForecastMap({
   }, [currentLocationLat, currentLocationLong]);
 
   return (
-    <>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <DeckGL
         initialViewState={viewMapState}
         controller={true}
@@ -352,6 +422,74 @@ export default function ForecastMap({
           setViewMapState((prev) => ({ ...prev, zoom: newZoom }))
         }
       />
-    </>
+      {baseMapConfig.showMapTilerLogo && (
+        <a
+          href="https://www.maptiler.com"
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            position: 'absolute',
+            left: 8,
+            bottom: 8,
+            zIndex: 1,
+            pointerEvents: 'auto',
+          }}
+        >
+          <img
+            src={MAPTILER_LOGO_URL}
+            alt="MapTiler"
+            style={{ display: 'block', height: 24 }}
+          />
+        </a>
+      )}
+      <div
+        style={{
+          position: 'absolute',
+          right: 8,
+          bottom: 8,
+          zIndex: 1,
+          maxWidth: 'calc(100% - 16px)',
+          padding: '2px 6px',
+          background: 'rgba(255, 255, 255, 0.86)',
+          borderRadius: 4,
+          color: '#333',
+          fontSize: 11,
+          lineHeight: '16px',
+          pointerEvents: 'auto',
+        }}
+      >
+        {baseMapConfig.attributionType === 'maptiler' ? (
+          <>
+            <a
+              href="https://www.maptiler.com/copyright/"
+              target="_blank"
+              rel="noreferrer"
+              style={attributionLinkStyle}
+            >
+              © MapTiler
+            </a>{' '}
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noreferrer"
+              style={attributionLinkStyle}
+            >
+              © OpenStreetMap contributors
+            </a>
+          </>
+        ) : baseMapConfig.attributionType === 'osm' ? (
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noreferrer"
+            style={attributionLinkStyle}
+          >
+            © OpenStreetMap contributors
+          </a>
+        ) : (
+          baseMapConfig.attribution
+        )}
+      </div>
+    </div>
   );
 }
