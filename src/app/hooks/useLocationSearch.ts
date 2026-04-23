@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useSearchLocationStore } from '@/app/stores/maps/searchLocationStore';
-import { usePollenDetailsChartStore } from '@/app/stores/pollen';
 import { usePartialLoadingStore } from '@/app/stores';
 import { usePollenChart } from '@/app/hooks';
+import { useCoordinatesStore } from '@/app/stores';
+import { findClosestCoordinate } from '@/app/forecast/utils';
 
 export const useLocationSearch = ({
   currentDate,
@@ -25,32 +26,53 @@ export const useLocationSearch = ({
   const [loading, setLoading] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
 
-  const setLocation = useSearchLocationStore((state) => state.setLocation);
+  const { location: prevLocation, setLocation } = useSearchLocationStore();
   const { setChartLoading } = usePartialLoadingStore();
   const { fetchChart } = usePollenChart();
+
   const handleSelect = async (item: any) => {
+    const lat = parseFloat(item.lat);
+    const lng = parseFloat(item.lon);
+    const place_id = item.place_id;
+
+    const { forecast, nowCasting } = useCoordinatesStore.getState();
+
+    const closestLat = forecast.latitudes.length
+      ? findClosestCoordinate(lat, forecast.latitudes)
+      : lat;
+    const closestLng = forecast.longitudes.length
+      ? findClosestCoordinate(lng, forecast.longitudes)
+      : lng;
+
     const selected = {
-      lat: parseFloat(item.lat),
-      lng: parseFloat(item.lon),
+      lat,
+      lng,
+      closestLat,
+      closestLng,
       name: item.display_name,
       boundingbox: item.boundingbox,
+      place_id,
     };
+
     setLocation(selected);
-    onSelect(selected);
+
+    onSelect({ lat, lng });
+
     setQuery(item.display_name);
     setSuggestions([]);
 
     try {
       setChartLoading(true);
       await fetchChart({
-        lat: selected.lat,
-        lng: selected.lng,
+        lat: closestLat,
+        lng: closestLng,
         pollen: pollenSelected,
         date: currentDate,
       });
-      setChartLoading(false);
     } catch (err) {
       console.error(err);
+    } finally {
+      setChartLoading(false);
     }
   };
 
