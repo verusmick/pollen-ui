@@ -11,15 +11,15 @@ import type {
 import {
   VALIDATION_EVENTS_RESPONSE_MISMATCH,
   normalizeValidationEventsResponse,
-  toMeasurementPreviewRange,
 } from '../utils';
 import { correctionFactorKeys } from '../constants';
 
 interface UseCorrectionFactorValidationEventsOptions {
   location: string;
   basePollen: string;
-  startDate: string;
-  endDate: string;
+  selectedSliceId: string | null;
+  selectedSliceFrom: number | null;
+  selectedSliceTo: number | null;
 }
 
 interface UseCorrectionFactorValidationEventsResult {
@@ -30,24 +30,47 @@ interface UseCorrectionFactorValidationEventsResult {
   isReady: boolean;
 }
 
+function isNonRetryableValidationEventsError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return /\((4\d\d)\)/.test(error.message);
+}
+
 export function useCorrectionFactorValidationEvents({
   location,
   basePollen,
-  startDate,
-  endDate,
+  selectedSliceId,
+  selectedSliceFrom,
+  selectedSliceTo,
 }: UseCorrectionFactorValidationEventsOptions): UseCorrectionFactorValidationEventsResult {
+  const hasValidSliceSelection =
+    typeof selectedSliceId === 'string' &&
+    selectedSliceId.length > 0 &&
+    typeof selectedSliceFrom === 'number' &&
+    Number.isFinite(selectedSliceFrom) &&
+    typeof selectedSliceTo === 'number' &&
+    Number.isFinite(selectedSliceTo);
   const range = useMemo(
-    () => toMeasurementPreviewRange(startDate, endDate),
-    [endDate, startDate]
+    () =>
+      hasValidSliceSelection
+        ? {
+            from: selectedSliceFrom,
+            to: selectedSliceTo,
+          }
+        : null,
+    [hasValidSliceSelection, selectedSliceFrom, selectedSliceTo]
   );
   const isReady = Boolean(location) && Boolean(basePollen) && range !== null;
 
   const validationEventsQuery = useQuery({
     queryKey: correctionFactorKeys.validationEvent({
-      location,
-      basePollen,
-      startDate,
-      endDate,
+      location: location || '',
+      basePollen: basePollen || '',
+      sliceId: selectedSliceId ?? '',
+      from: range?.from ?? 0,
+      to: range?.to ?? 0,
     }),
     queryFn: async () => {
       if (!range || !location || !basePollen) {
@@ -70,6 +93,13 @@ export function useCorrectionFactorValidationEvents({
       return normalized;
     },
     enabled: isReady,
+    retry: (failureCount, error) => {
+      if (isNonRetryableValidationEventsError(error)) {
+        return false;
+      }
+
+      return failureCount < 3;
+    },
     staleTime: 1000 * 60 * 5,
   });
 

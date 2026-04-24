@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 
@@ -44,16 +44,11 @@ export function CorrectionFactorFormContainer({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [editHydrationMessage, setEditHydrationMessage] = useState<string | null>(
-    null
-  );
   const hydratedRecordIdRef = useRef<string | null>(null);
   const form = useCorrectionFactorForm();
   const detailQuery = useCorrectionFactorDetail(
     isEditMode ? correctionFactorId : undefined
   );
-  const [activeValidationEventIndex, setActiveValidationEventIndex] = useState(0);
-  const appliedValidationDetectedEventsRef = useRef<string | null>(null);
 
   const {
     data: locationOptions = [],
@@ -78,34 +73,72 @@ export function CorrectionFactorFormContainer({
   });
   const validationLocationOption =
     locationOptions.find((option) => option.id === form.values.location) ?? null;
-  const validationLocation = validationLocationOption?.validationName ?? '';
+  const validationLocation =
+    validationLocationOption?.validationName ??
+    validationLocationOption?.name ??
+    validationLocationOption?.id ??
+    '';
   const validationLocationMappingError =
     form.values.location &&
     !locationsLoading &&
     !locationsError &&
-    !validationLocationOption
+    (!validationLocationOption || !validationLocation)
       ? t('meta.detectedEventsLocationMappingError', {
           location: form.values.location,
         })
       : null;
-  const validationEvents = useCorrectionFactorValidationEvents({
-    location: validationLocation,
-    basePollen: form.values.basePollen,
-    startDate: form.values.startDate,
-    endDate: form.values.endDate,
-  });
   const preview = useCorrectionFactorPreview({
     values: form.values,
     derived: form.derived,
+  });
+  const selectedPreviewSlice = useMemo(() => {
+    if (!form.values.selectedSliceId) {
+      return null;
+    }
+
+    const point =
+      preview.series?.points.find(
+        (candidate) => candidate.sliceId === form.values.selectedSliceId
+      ) ?? null;
+
+    if (point) {
+      return {
+        id: point.sliceId,
+        from: point.timestamp,
+        to: point.endTimestamp,
+      };
+    }
+
+    const slice =
+      preview.slices.find((candidate) => candidate.id === form.values.selectedSliceId) ??
+      null;
+
+    if (slice) {
+      return {
+        id: slice.id,
+        from: slice.from,
+        to: slice.to,
+      };
+    }
+
+    return null;
+  }, [form.values.selectedSliceId, preview.series, preview.slices]);
+  const hasSelectedPreviewSlice = selectedPreviewSlice !== null;
+  const selectedPreviewSliceId = selectedPreviewSlice?.id ?? null;
+  const selectedPreviewSliceFrom = selectedPreviewSlice?.from ?? null;
+  const selectedPreviewSliceTo = selectedPreviewSlice?.to ?? null;
+  const validationEvents = useCorrectionFactorValidationEvents({
+    location: validationLocation,
+    basePollen: form.values.basePollen,
+    selectedSliceId: selectedPreviewSliceId,
+    selectedSliceFrom: selectedPreviewSliceFrom,
+    selectedSliceTo: selectedPreviewSliceTo,
   });
 
   useEffect(() => {
     form.resetForm();
     setActionError(null);
-    setEditHydrationMessage(null);
-    setActiveValidationEventIndex(0);
     hydratedRecordIdRef.current = null;
-    appliedValidationDetectedEventsRef.current = null;
   }, [correctionFactorId, mode]);
 
   useEffect(() => {
@@ -117,26 +150,21 @@ export function CorrectionFactorFormContainer({
       return;
     }
 
-    try {
-      appliedValidationDetectedEventsRef.current = null;
-      form.replaceValues(mapCorrectionFactorRecordToFormValues(detailQuery.data));
-      setEditHydrationMessage(null);
-      hydratedRecordIdRef.current = detailQuery.data.id;
-    } catch {
-      setEditHydrationMessage(t('editUnavailable.reason'));
-      hydratedRecordIdRef.current = detailQuery.data.id;
-    }
-  }, [detailQuery.data, form, isEditMode, t]);
+    form.replaceValues(mapCorrectionFactorRecordToFormValues(detailQuery.data));
+    hydratedRecordIdRef.current = detailQuery.data.id;
+  }, [detailQuery.data, form, isEditMode]);
 
   useEffect(() => {
-    setActiveValidationEventIndex(0);
-  }, [
-    form.values.events.length,
-    form.values.location,
-    form.values.basePollen,
-    form.values.startDate,
-    form.values.endDate,
-  ]);
+    if (!form.values.selectedSliceId) {
+      return;
+    }
+
+    if (selectedPreviewSlice) {
+      return;
+    }
+
+    form.setSelectedSliceId(null);
+  }, [form, form.values.selectedSliceId, selectedPreviewSlice]);
 
   useEffect(() => {
     if (
@@ -168,50 +196,10 @@ export function CorrectionFactorFormContainer({
     validationEvents.status,
   ]);
 
-  useEffect(() => {
-    if (
-      !isEditMode ||
-      !detailQuery.data ||
-      (validationEvents.status !== 'ready' && validationEvents.status !== 'empty')
-    ) {
-      return;
-    }
-
-    const detectedEvents = validationEvents.detectedEvents;
-
-    if (detectedEvents === null) {
-      return;
-    }
-
-    if (appliedValidationDetectedEventsRef.current === detailQuery.data.id) {
-      return;
-    }
-
-    if (detectedEvents <= 0) {
-      return;
-    }
-
-    form.replaceValues(
-      mapCorrectionFactorRecordToFormValues(detailQuery.data, {
-        detectedEvents,
-      })
-    );
-    appliedValidationDetectedEventsRef.current = detailQuery.data.id;
-  }, [
-    detailQuery.data,
-    form,
-    isEditMode,
-    validationEvents.status,
-    validationEvents.detectedEvents,
-  ]);
-
   const detailError =
     isEditMode && detailQuery.isError ? t('states.loadError') : null;
-  const editHydrationBlocked =
-    isEditMode &&
-    !detailQuery.isLoading &&
-    !detailError &&
-    Boolean(detailQuery.data && editHydrationMessage);
+  const showStoredMultiplierView =
+    isEditMode && !form.hasReviewSessionChanges;
   const submitDisabled =
     saving ||
     deleting ||
@@ -219,8 +207,7 @@ export function CorrectionFactorFormContainer({
     (isEditMode &&
       (!correctionFactorId ||
         detailQuery.isLoading ||
-        Boolean(detailError) ||
-        editHydrationBlocked));
+        Boolean(detailError)));
   const deleteDisabled =
     deleting ||
     saving ||
@@ -237,15 +224,21 @@ export function CorrectionFactorFormContainer({
         fallbackMessage: t('meta.optionsLoadError'),
       })
     : null;
-  const validationEventsStatusText = !validationEvents.isReady
-    ? validationLocationMappingError
-      ? null
-      : t('meta.detectedEventsHint')
-    : validationEvents.status === 'loading'
-      ? t('meta.detectedEventsLoading')
-      : validationEvents.status === 'ready' || validationEvents.status === 'empty'
-        ? t('meta.detectedEventsLoaded')
-        : null;
+  const isDateRangeSelectionComplete = Boolean(form.values.location) &&
+    Boolean(form.values.basePollen) &&
+    Boolean(form.values.startDate) &&
+    Boolean(form.values.endDate);
+  const validationEventsStatusText = validationLocationMappingError
+    ? null
+    : !isDateRangeSelectionComplete
+      ? t('meta.detectedEventsHint')
+      : !hasSelectedPreviewSlice
+        ? t('meta.detectedEventsSelectSlice')
+        : validationEvents.status === 'loading'
+          ? t('meta.detectedEventsLoading')
+          : validationEvents.status === 'ready' || validationEvents.status === 'empty'
+            ? t('meta.detectedEventsLoaded')
+            : null;
   const validationEventsError = validationLocationMappingError
     ? validationLocationMappingError
     : validationEvents.status === 'error'
@@ -257,6 +250,10 @@ export function CorrectionFactorFormContainer({
   const carouselValidationStatus = validationLocationMappingError
     ? 'error'
     : validationEvents.status;
+  const carouselIdleMessage =
+    isDateRangeSelectionComplete && !hasSelectedPreviewSlice
+    ? t('eventsCarousel.selectSlice')
+    : null;
   const carouselValidationError = validationLocationMappingError
     ? validationLocationMappingError
     : validationEvents.status === 'error'
@@ -324,6 +321,7 @@ export function CorrectionFactorFormContainer({
       const payload = buildCorrectionFactorWritePayload(form.values, {
         // TODO: Confirm backend factor_percentage scale before enabling edit parity.
         factorPercentageScale: 'ratio',
+        preferStoredMultipliers: showStoredMultiplierView,
       });
 
       if (isEditMode && correctionFactorId) {
@@ -391,7 +389,6 @@ export function CorrectionFactorFormContainer({
       validationSummary={form.validationSummary}
       isFormValid={form.isValid}
       derived={form.derived}
-      allowedPollenOptions={form.allowedPollenOptions}
       locationOptions={locationOptions}
       pollenOptions={pollenOptions}
       locationsLoading={locationsLoading}
@@ -400,37 +397,30 @@ export function CorrectionFactorFormContainer({
       pollensError={pollenOptionsError}
       validationEventsStatus={carouselValidationStatus}
       validationEvents={form.values.events}
+      validationEventsIdleMessage={carouselIdleMessage}
       validationEventsError={carouselValidationError}
-      activeValidationEventIndex={activeValidationEventIndex}
       validationEventsStatusText={validationEventsStatusText}
       validationEventsFieldError={validationEventsError}
-      onSelectValidationEvent={setActiveValidationEventIndex}
-      onPreviousValidationEvent={() =>
-        setActiveValidationEventIndex((current) => Math.max(current - 1, 0))
-      }
-      onNextValidationEvent={() =>
-        setActiveValidationEventIndex((current) =>
-          form.values.events.length > 0
-            ? Math.min(current + 1, form.values.events.length - 1)
-            : 0
-        )
-      }
-      onValidationEventReviewedPollenChange={form.updateEventReviewedPollen}
+      onToggleValidationEventAccepted={form.toggleEventAccepted}
       saving={saving}
       deleting={deleting}
       actionError={actionError}
       detailLoading={isEditMode ? detailQuery.isLoading : false}
       detailError={detailError}
-      editHydrationBlocked={editHydrationBlocked}
-      editHydrationMessage={editHydrationMessage}
+      editHydrationBlocked={false}
+      editHydrationMessage={null}
       detailRecord={detailQuery.data ?? null}
       submitDisabled={submitDisabled}
       deleteDisabled={deleteDisabled}
       canDelete={isEditMode}
-      canAddRow={Boolean(form.values.basePollen)}
+      canAddRow={Boolean(form.values.basePollen) && !showStoredMultiplierView}
+      showStoredMultiplierView={showStoredMultiplierView}
       previewStatus={preview.status}
       previewSeries={preview.series}
+      previewSlices={preview.slices}
+      selectedPreviewSliceId={form.values.selectedSliceId}
       previewError={previewError}
+      onSelectPreviewSlice={form.setSelectedSliceId}
       getPollenOptions={(currentRowPollen) =>
         form.getPollenOptions(currentRowPollen, pollenOptions)
       }

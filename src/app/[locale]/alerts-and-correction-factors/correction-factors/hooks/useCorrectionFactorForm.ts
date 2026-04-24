@@ -193,6 +193,17 @@ function syncRowsFromReviewedEvents(
   };
 }
 
+function clearSelectedSlice(values: CorrectionFactorFormValues): CorrectionFactorFormValues {
+  if (values.selectedSliceId === null) {
+    return values;
+  }
+
+  return {
+    ...values,
+    selectedSliceId: null,
+  };
+}
+
 export function useCorrectionFactorForm() {
   const t = useTranslations('correctionFactorsPage.form.validation');
   const [values, setValues] = useState<CorrectionFactorFormValues>(
@@ -202,6 +213,7 @@ export function useCorrectionFactorForm() {
     EMPTY_CORRECTION_FACTOR_FORM_ERRORS
   );
   const [hasValidated, setHasValidated] = useState(false);
+  const [hasReviewSessionChanges, setHasReviewSessionChanges] = useState(false);
 
   const derived = useMemo<CorrectionFactorFormDerivedState>(
     () => buildCorrectionFactorDerivedState(values, 'ratio'),
@@ -330,12 +342,32 @@ export function useCorrectionFactorForm() {
         [field]: nextValue,
       };
 
-      if (field === 'basePollen') {
-        return syncRowsFromReviewedEvents(syncBaseRow(next));
+      if (
+        field === 'location' ||
+        field === 'basePollen' ||
+        field === 'startDate' ||
+        field === 'endDate'
+      ) {
+        const nextWithoutSelectedSlice = clearSelectedSlice(next);
+
+        if (field === 'basePollen') {
+          return syncRowsFromReviewedEvents(syncBaseRow(nextWithoutSelectedSlice));
+        }
+
+        return nextWithoutSelectedSlice;
       }
 
       return next;
     });
+
+    if (
+      field === 'location' ||
+      field === 'basePollen' ||
+      field === 'startDate' ||
+      field === 'endDate'
+    ) {
+      setHasReviewSessionChanges(false);
+    }
 
     if (
       field === 'location' ||
@@ -367,6 +399,7 @@ export function useCorrectionFactorForm() {
             clientId: createRowId(),
             pollen: '',
             reviewedEvents: '',
+            storedMultiplier: null,
             isBasePollen: false,
           },
         ],
@@ -430,6 +463,10 @@ export function useCorrectionFactorForm() {
     options: { syncRows?: boolean } = {}
   ) {
     const syncRows = options.syncRows ?? true;
+
+    if (events.length === 0) {
+      setHasReviewSessionChanges(false);
+    }
 
     setValues((current) => {
       if (events.length === 0) {
@@ -497,17 +534,76 @@ export function useCorrectionFactorForm() {
         events: nextEvents,
       });
     });
+    setHasReviewSessionChanges(true);
     clearRowsError();
+  }
+
+  function toggleEventAccepted(eventId: string) {
+    setValues((current) => {
+      if (!current.basePollen) {
+        return current;
+      }
+
+      let changed = false;
+      const nextEvents = current.events.map((event) => {
+        if (event.id !== eventId) {
+          return event;
+        }
+
+        const nextReviewedPollen =
+          event.reviewedPollen === current.basePollen
+            ? UNKNOWN_POLLEN_CODE
+            : current.basePollen;
+
+        if (event.reviewedPollen === nextReviewedPollen) {
+          return event;
+        }
+
+        changed = true;
+
+        return {
+          ...event,
+          reviewedPollen: nextReviewedPollen,
+        };
+      });
+
+      if (!changed) {
+        return current;
+      }
+
+      return syncRowsFromReviewedEvents({
+        ...current,
+        events: nextEvents,
+      });
+    });
+    setHasReviewSessionChanges(true);
+    clearRowsError();
+  }
+
+  function setSelectedSliceId(selectedSliceId: string | null) {
+    setHasReviewSessionChanges(false);
+    setValues((current) => {
+      if (current.selectedSliceId === selectedSliceId) {
+        return current;
+      }
+
+      return {
+        ...current,
+        selectedSliceId,
+      };
+    });
   }
 
   function resetForm() {
     setValues(DEFAULT_CORRECTION_FACTOR_FORM_VALUES);
+    setHasReviewSessionChanges(false);
     setHasValidated(false);
     setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
   }
 
   function replaceValues(nextValues: CorrectionFactorFormValues) {
     setValues(nextValues);
+    setHasReviewSessionChanges(false);
     setHasValidated(false);
     setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
   }
@@ -533,6 +629,7 @@ export function useCorrectionFactorForm() {
     errors,
     derived,
     allowedPollenOptions,
+    hasReviewSessionChanges,
     isValid,
     validationErrors,
     validationSummary,
@@ -543,6 +640,8 @@ export function useCorrectionFactorForm() {
     updateRowReviewedEvents,
     replaceValidationEvents,
     updateEventReviewedPollen,
+    toggleEventAccepted,
+    setSelectedSliceId,
     resetForm,
     replaceValues,
     validate,

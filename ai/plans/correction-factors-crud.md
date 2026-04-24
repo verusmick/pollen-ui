@@ -38,7 +38,15 @@ This document defines architecture and skeletons only, not full implementation.
 6. Do not introduce a form library.
 7. Do not introduce a feature store in phase 1. No Zustand is needed unless draft state must be shared across distant components later.
 8. Treat form start/end values as date-plus-hour selections aligned to the measurements API 3-hour granularity.
-9. Treat per-event reviewed classification as the form source of truth; the correction table is a derived summary.
+9. Make the chart the primary review driver for the create/edit experience.
+10. Keep the selected date range as the chart query input, but do not load validation-event images for the whole range up front.
+11. Load validation-event images only after the scientist selects a peak or time slice from the chart.
+12. Replace the current vertical carousel-first review model with a faster CAPTCHA-style image-selection workflow.
+13. In version 1, event review is binary:
+    - selected image = base pollen
+    - unselected image = `UNKNOWN`
+14. Keep additional pollen-classification support possible in types and utilities, but do not let that future flexibility drive the v1 UI.
+15. Treat event assignments as the only editable review source of truth. Reviewed counts, unknown counts, and multipliers remain derived outputs.
 
 ## Route Integration
 
@@ -108,10 +116,11 @@ src/app/[locale]/alerts-and-correction-factors/correction-factors/
       CorrectionFactorForm.tsx
       CorrectionFactorFormHeader.tsx
       CorrectionFactorMetaFields.tsx
-      CorrectionFactorEventReviewCarousel.tsx
+      CorrectionFactorChartReviewSection.tsx
       CorrectionFactorDistributionSection.tsx
       CorrectionFactorDistributionTable.tsx
-      CorrectionFactorDistributionRow.tsx
+      CorrectionFactorEventSelectionGrid.tsx
+      CorrectionFactorPeakSelectionSummary.tsx
       CorrectionFactorTotals.tsx
       CorrectionFactorChartPreview.tsx
       CorrectionFactorActions.tsx
@@ -120,7 +129,8 @@ src/app/[locale]/alerts-and-correction-factors/correction-factors/
     useCorrectionFactorsList.ts
     useCorrectionFactorDetail.ts
     useCorrectionFactorForm.ts
-    useCorrectionFactorPreview.ts
+    useCorrectionFactorChartPreview.ts
+    useCorrectionFactorPeakEvents.ts
   constants/
     index.ts
     queryKeys.ts
@@ -174,12 +184,13 @@ CorrectionFactorFormContainer
   CorrectionFactorFormHeader
   CorrectionFactorForm
     CorrectionFactorMetaFields
-    CorrectionFactorEventReviewCarousel
+    CorrectionFactorChartReviewSection
+      CorrectionFactorChartPreview
+      CorrectionFactorPeakSelectionSummary
+    CorrectionFactorEventSelectionGrid
     CorrectionFactorDistributionSection
       CorrectionFactorDistributionTable
-        CorrectionFactorDistributionRow
       CorrectionFactorTotals
-    CorrectionFactorChartPreview
     CorrectionFactorActions
       SaveButton
       DeleteButton (edit only)
@@ -189,9 +200,48 @@ Responsibilities:
 
 - container owns bootstrap, submit, delete, navigation, error handling
 - form component stays presentational and receives state + callbacks
-- event review carousel is the main review surface for assigning pollen classifications to detected images
-- distribution section renders a derived summary of reviewed event assignments
-- chart preview receives already-derived series, not raw mutable form logic
+- chart review section is the primary workflow surface and owns peak/time-slice selection
+- event review grid loads only the currently selected peak/time slice and exposes fast image acceptance toggles
+- distribution section renders a derived summary of reviewed event assignments and is not a second editable review system
+- chart preview receives immutable chart source data plus selected-slice state, not raw mutable review logic
+
+## Workflow
+
+The new scientific review flow is chart-first:
+
+1. The scientist chooses location, base pollen, and date range.
+2. Those top-level controls load the chart data for the selected range.
+3. No validation-event images are loaded yet.
+4. The scientist inspects the chart and selects a peak or time slice directly from the chart.
+5. That selection becomes the active review scope.
+6. Only then does the page load and show the detected-event images for that selected scope.
+7. The scientist reviews images in a fast selection grid:
+   - click image to accept it as the base pollen
+   - leave it unselected to keep it as `UNKNOWN`
+8. Reviewed counts and multipliers are recalculated from the event assignments for the active review scope.
+9. The chart remains visually above the image-review area so exploration stays first and event review stays second.
+
+## Source of Truth Strategy
+
+Avoid competing sources of truth by separating editable state from queried source data:
+
+- top-level form inputs are the editable source of truth for:
+  - `location`
+  - `basePollen`
+  - `startDate`
+  - `endDate`
+- chart series and selectable peaks/time slices come from React Query and are never copied into a second mutable store
+- selected peak/time slice is a single local UI state value, typically `selectedSliceId`
+- slice-scoped validation events come from React Query for the selected slice only
+- reviewed event assignments are the only editable review state and should be keyed by `eventId`
+- detected-event counts, reviewed counts, unknown counts, summary rows, and multipliers are derived from queried slice events plus reviewed assignments
+
+Do not keep:
+
+- a full-range event-image array in form state
+- manual reviewed-count inputs
+- editable correction-table rows that can diverge from image assignments
+- separate reviewed state inside both chart components and event-review components
 
 ## TypeScript Domain Types
 
@@ -230,19 +280,29 @@ export interface CorrectionFactorListFilters {
 
 ### UI Form Types
 
-The UI edits per-event reviewed classification, not reviewed counts or multipliers. Counts are derived from event assignments.
+The UI edits reviewed event assignments, not manual counts or manual multipliers.
 
 ```ts
 export type CorrectionFactorFormMode = 'create' | 'edit';
 
-export interface CorrectionFactorDetectedEventForm {
+export interface CorrectionFactorReviewSlice {
+  id: string;
+  label: string;
+  from: number;
+  to: number;
+  peakTimestamp: number;
+}
+
+export interface CorrectionFactorDetectedEvent {
   eventId: string;
   imageUrl: string;
-  reviewedPollen: CorrectionFactorSelectablePollen;
+  datetime: number;
+  classification: string;
+  sliceId: string;
 }
 
 export interface CorrectionFactorDistributionSummaryRow {
-  clientId: string;
+  key: string;
   pollen: CorrectionFactorSelectablePollen;
   reviewedEventsNumber: number;
   multiplier: number;
@@ -254,8 +314,11 @@ export interface CorrectionFactorFormValues {
   basePollen: CorrectionFactorPollenCode | '';
   startDate: string; // datetime string with 3-hour granularity
   endDate: string; // datetime string with 3-hour granularity
-  detectedEvents: number | null;
-  events: CorrectionFactorDetectedEventForm[];
+  selectedSliceId: string | null;
+  reviewedAssignmentsByEventId: Record<
+    string,
+    CorrectionFactorSelectablePollen
+  >;
 }
 
 export interface CorrectionFactorFormErrors {
@@ -263,40 +326,34 @@ export interface CorrectionFactorFormErrors {
   basePollen?: string;
   startDate?: string;
   endDate?: string;
-  detectedEvents?: string;
+  selectedSliceId?: string;
   eventReview?: string;
-  eventErrorsById: Record<
-    string,
-    {
-      reviewedPollen?: string;
-    }
-  >;
 }
 
 export interface CorrectionFactorFormDerivedState {
   rows: CorrectionFactorDistributionSummaryRow[];
-  assignedReviewedEvents: number;
+  detectedEvents: number;
+  acceptedEvents: number;
   unknownReviewedEvents: number;
   totalReviewedEvents: number;
-  remainingEvents: number;
-  isBalanced: boolean;
-  hasDuplicatePollens: boolean;
-  reviewedCountsByPollen: Record<CorrectionFactorSelectablePollen, number>;
-  multipliersByPollen: Record<CorrectionFactorSelectablePollen, number>;
+  multiplierByPollen: Record<CorrectionFactorSelectablePollen, number>;
 }
 ```
 
-Detected events are API-derived rather than manually entered:
+Version 1 keeps the review interaction binary even though the types stay extensible:
 
-- load validation events only after `location`, `basePollen`, `startDate`, and `endDate` are all present
-- convert the selected date range into Unix timestamps for the validation query
-- set `detectedEvents` from the normalized validation-event result count
-- keep the detected-events field read-only in the form UI
-- initialize each event image with `reviewedPollen = UNKNOWN`
-- use the right-side carousel as the main event review surface, not only as a viewer
-- let the scientist assign a pollen classification per event image from the carousel
-- derive correction-table reviewed counts from event assignments instead of typed inputs
-- treat empty validation responses and unusable validation payloads as distinct UX states
+- the visible event-review UI only toggles between base pollen and `UNKNOWN`
+- `CorrectionFactorSelectablePollen` stays broad enough to support additional pollens later
+- summary rows remain derived so future classification expansion does not require reintroducing manual count inputs
+
+Detected events are slice-derived rather than manually entered:
+
+- load chart data after `location`, `basePollen`, `startDate`, and `endDate` are all present
+- do not load validation-event images until `selectedSliceId` is set
+- convert the selected slice into Unix timestamps for the validation-event query
+- treat unselected images as `UNKNOWN`
+- derive reviewed counts and multipliers from assignments for the current review scope instead of typed inputs
+- treat empty slice responses and unusable validation payloads as distinct UX states
 
 Validation-location integration is adapter-driven:
 
@@ -315,6 +372,11 @@ export interface CorrectionFactorPreviewPoint {
 
 export interface CorrectionFactorPreviewSeries {
   points: CorrectionFactorPreviewPoint[];
+}
+
+export interface CorrectionFactorChartPreviewData {
+  series: CorrectionFactorPreviewSeries;
+  slices: CorrectionFactorReviewSlice[];
 }
 ```
 
@@ -336,7 +398,7 @@ src/app/api/correction-factors/route.ts
   POST   -> ${POLLEN_API_BASE}/api/correctionFactors
 
 src/app/api/correction-factors/[correctionFactorId]/route.ts
-  GET    -> ${POLLEN_API_BASE}/api/correctionFactors/:id   # only if backend supports it
+  GET    -> ${POLLEN_API_BASE}/api/correctionFactors/:id
   PUT    -> ${POLLEN_API_BASE}/api/correctionFactors/:id
   DELETE -> ${POLLEN_API_BASE}/api/correctionFactors/:id
 ```
@@ -391,7 +453,8 @@ Use feature-local mappers in `utils/correctionFactorMappers.ts`:
 
 Important mapping rule:
 
-- UI owns per-event `reviewedPollen`
+- UI owns reviewed assignments keyed by `eventId`
+- chart range data and selected-slice event data stay in query results
 - reviewed event counts are derived from event assignments
 - API owns `factor_percentage`
 - conversion happens only in derived state and payload builder
@@ -411,21 +474,21 @@ export const correctionFactorKeys = {
     [...correctionFactorKeys.lists(), filters] as const,
   details: () => [...correctionFactorKeys.all, 'detail'] as const,
   detail: (id: string) => [...correctionFactorKeys.details(), id] as const,
-  previews: () => [...correctionFactorKeys.all, 'preview'] as const,
-  preview: (params: {
+  charts: () => [...correctionFactorKeys.all, 'chart'] as const,
+  chart: (params: {
     location: string;
     basePollen: string;
     startDate: string;
     endDate: string;
-  }) => [...correctionFactorKeys.previews(), params] as const,
-  validationEvents: () =>
-    [...correctionFactorKeys.all, 'validationEvents'] as const,
-  validationEvent: (params: {
+  }) => [...correctionFactorKeys.charts(), params] as const,
+  peakEvents: () => [...correctionFactorKeys.all, 'peakEvents'] as const,
+  peakEvent: (params: {
     location: string;
     basePollen: string;
-    startDate: string;
-    endDate: string;
-  }) => [...correctionFactorKeys.validationEvents(), params] as const,
+    sliceId: string;
+    from: number;
+    to: number;
+  }) => [...correctionFactorKeys.peakEvents(), params] as const,
 };
 ```
 
@@ -434,7 +497,8 @@ export const correctionFactorKeys = {
 ```ts
 export function useCorrectionFactorsList(filters: CorrectionFactorListFilters) {}
 export function useCorrectionFactorDetail(id: string) {}
-export function useCorrectionFactorPreview(params: PreviewSourceParams) {}
+export function useCorrectionFactorChartPreview(params: ChartSourceParams) {}
+export function useCorrectionFactorPeakEvents(params: PeakEventsParams) {}
 ```
 
 Responsibilities:
@@ -445,13 +509,15 @@ Responsibilities:
   - edit bootstrap query
   - current API detail hydrates stored multipliers only
   - do not convert stored multipliers into manual reviewed-count inputs
-  - per-event reviewed classification requires event-level persistence or defaults back to `UNKNOWN`
-- `useCorrectionFactorPreview`
-  - fetches the original chart source only
-  - corrected series is derived locally from current event assignments
-- `useCorrectionFactorValidationEvents`
-  - fetches validation-event images and detected-event totals
-  - initializes event assignments with `reviewedPollen = UNKNOWN`
+  - peak selection and per-event reviewed assignments require additional persisted context
+- `useCorrectionFactorChartPreview`
+  - fetches the chart source for the selected date range
+  - returns immutable chart series plus selectable peak/time-slice metadata
+  - keeps chart querying independent from event-image querying
+- `useCorrectionFactorPeakEvents`
+  - fetches validation-event images only for the selected peak/time slice
+  - does not run until chart selection is complete
+  - merges query results with form-owned reviewed assignments
   - distinguishes idle/loading/empty/error/mismatch states for form UX
 
 ### Write Strategy
@@ -464,7 +530,7 @@ To stay close to current project conventions:
   - `correctionFactorKeys.lists()`
   - `correctionFactorKeys.details()`
   - `correctionFactorKeys.detail(id)` when relevant
-- clear inactive list/detail/preview/validation-event queries before navigating so stale form data does not flash after route changes
+- clear inactive list/detail/chart/peak-event queries before navigating so stale form data does not flash after route changes
 - navigate back to the locale-scoped list route after create, update, and delete
 
 This is the smallest React Query extension necessary for CRUD.
@@ -486,9 +552,16 @@ The hook should own:
 - `errors`
 - derived state
 - field setters
-- event classification update actions
+- selected-slice state
+- event assignment toggle actions
 - submit payload builder
 - validation trigger
+
+The hook should not own:
+
+- chart query results
+- peak-event query results
+- manually editable summary rows or detected-event counts
 
 Why local state instead of Zustand:
 
@@ -497,7 +570,7 @@ Why local state instead of Zustand:
 - no cross-route sharing is required
 - this matches current project guidance from `ai/context.md`
 
-## Validation Strategy for the Correction Table
+## Validation Strategy for the Chart-Driven Review
 
 Keep validation in a pure utility:
 
@@ -514,19 +587,19 @@ Validation rules:
 3. `startDate` is required.
 4. `endDate` is required.
 5. `endDate >= startDate`.
-6. `detectedEvents` must exist before submit.
-7. validation events must be loaded before submit.
-8. every validation event must have a reviewed classification.
-9. default reviewed classification is `UNKNOWN`.
-10. `UNKNOWN` is valid and represents an unassigned/default-unknown event.
-11. correction-table rows are derived from event assignments and are not manual count inputs.
-12. the summary table should include the base pollen row and any pollen assigned at least once.
-13. duplicate summary rows are not allowed.
+6. a peak/time slice must be selected before submit.
+7. selected-slice validation events must be loaded before submit.
+8. unselected images are valid and represent `UNKNOWN`; the user does not need to click every image.
+9. event review stays binary in v1:
+   - base pollen
+   - `UNKNOWN`
+10. correction-table rows are derived from event assignments and are not manual count inputs.
+11. the summary table should include the base pollen row and the `UNKNOWN` row.
 
 Recommended validation timing:
 
 - field-level validation after the first submit attempt and during subsequent edits
-- event-level validation after the first submit attempt and during subsequent edits
+- selected-slice validation after the first submit attempt and during subsequent edits
 - full-form validation on submit
 - keep save disabled while the form remains invalid, and surface a visible validation summary so the disabled state is explainable
 
@@ -542,7 +615,8 @@ export function buildCorrectionFactorDerivedState(
 
 Rules:
 
-- `reviewedCount = count(events where reviewedPollen matches pollen)`
+- the active review scope is the currently selected peak/time slice
+- `reviewedCount = count(events in selected slice where assignment matches pollen)`
 - `multiplier = reviewedCount / detectedEvents`
 - multipliers are read-only UI values
 - multipliers are not stored as editable form state
@@ -551,10 +625,11 @@ Rules:
 Special handling:
 
 - base pollen row is included in the summary table and gets a derived multiplier
-- users classify event images; they do not type reviewed counts
-- `UNKNOWN` count is derived from events still classified as `UNKNOWN`
+- users accept images; they do not type reviewed counts
+- `UNKNOWN` count is derived from events still left unselected
 - `UNKNOWN` is shown in the UI as a derived count
 - `UNKNOWN` is omitted from the API payload
+- future additional pollen classes can extend the same derived-row utility without changing the v1 image-review interaction
 
 Why this shape:
 
@@ -573,7 +648,7 @@ export function buildCorrectionFactorWritePayload(
 
 ## Chart Preview Update Strategy
 
-The chart should separate source loading from correction math.
+The chart should separate range querying, slice selection, and correction math.
 
 Recommended flow:
 
@@ -582,46 +657,53 @@ Recommended flow:
    - base pollen
    - start date
    - end date
-2. Store that query result as immutable source data.
-3. Recalculate corrected series locally every time event assignments change.
-4. Re-render chart from:
+2. Normalize that chart response into:
+   - chart points
+   - selectable peak/time-slice descriptors
+3. Store that query result as immutable source data.
+4. Recalculate corrected series locally every time selected-slice event assignments change.
+5. Re-render chart from:
    - `originalSeries`
    - `correctedSeries`
+   - `selectedSlice`
 
-This avoids refetching on every event classification change.
+This avoids refetching the chart on every event-selection change and prevents full-range image preloading.
 
 Suggested hook shape:
 
 ```ts
-export function useCorrectionFactorPreview(params: {
+export function useCorrectionFactorChartPreview(params: {
   location: string;
   basePollen: string;
   startDate: string;
   endDate: string;
-  events: CorrectionFactorDetectedEventForm[];
-  detectedEvents: number | null;
 }) {}
 ```
 
 Internals:
 
-- `useQuery` fetches source data only when top-level selection is complete
-- `useMemo` transforms source data into corrected preview
+- `useQuery` fetches chart source data only when top-level selection is complete
+- `useMemo` derives selectable peak/time slices and corrected preview overlays
+- changing `selectedSliceId` must not trigger a chart refetch
+- selecting a slice enables the separate peak-events query
 
 ### Important Contract Gap
 
-The provided CRUD contract does not define a preview-data endpoint.
+The measurements preview source now exists, but peak-driven review still has one important gap.
 
 Therefore:
 
-- the preview component boundary should be implemented now
-- the preview data adapter should be isolated in `useCorrectionFactorPreview`
-- actual chart data fetching depends on a backend source being confirmed
+- chart data fetching can be built against `GET /api/measurements`
+- peak/time-slice selection should be isolated in the chart adapter layer
+- backend still needs to confirm whether selectable peak slices come from:
+  - upstream metadata
+  - or client-side derivation from measurements
+- validation-event loading must stay keyed to the selected slice, not to the whole date range
 
 Phase 1 fallback:
 
-- render the chart shell and local derived legend/state
-- gate live preview behind available source data
+- render the chart from measurements and derive selectable slices locally if needed
+- gate event-image loading behind explicit chart selection
 
 ## Create vs Edit Form Strategy
 
@@ -639,14 +721,16 @@ Initialization:
 - empty location
 - empty base pollen
 - empty dates
-- no validation events or summary rows until top-level selections are complete
+- no selected slice
+- no validation-event images or derived summary rows until chart selection is complete
 
 Behavior:
 
-- completing the top-level selections loads validation events
-- each loaded event defaults to `UNKNOWN`
-- the right-side carousel is used to assign pollen per event image
-- the correction table updates as a derived summary of event assignments
+- completing the top-level selections loads the chart only
+- the scientist selects a peak/time slice from the chart
+- each event in the selected slice defaults to `UNKNOWN`
+- the event-review grid uses click-to-accept behavior for base pollen
+- the correction table updates as a derived summary of event assignments for the selected slice
 
 ### Edit Mode
 
@@ -659,20 +743,22 @@ Bootstrap:
 
 ### Edit Hydration Behavior
 
-The UI edits per-event reviewed classification, but the contract stores `factor_percentage`.
+The UI edits peak-scoped per-event assignments, but the contract still stores `factor_percentage`.
 
 Current implemented behavior:
 
 - fetch existing correction factor detail
-- load validation events for the correction factor range
-- initialize event classifications to `UNKNOWN` unless event-level assignments are available
+- hydrate top-level fields from the stored record
+- do not pretend stored multipliers can reconstruct:
+  - the original selected peak/time slice
+  - the reviewed event assignments
 - treat stored `factor_percentage` values as legacy summary data, not editable event assignments
 
 Implication:
 
-- edit mode cannot reconstruct reviewed per-image classifications from stored multipliers
-- do not add manual reviewed-count inputs to compensate for missing event-level edit data
-- this constraint should stay documented in the UI and state docs until the backend returns lossless event assignments
+- edit mode cannot fully restore the new workflow from stored multipliers alone
+- do not add manual reviewed-count inputs to compensate for missing event-level data
+- a complete edit experience requires persisted slice context and event assignments, or edit stays partially blocked/read-only for legacy records
 
 ## First-Version Publish Strategy
 
@@ -695,7 +781,14 @@ The list/form need selectable:
 
 - location
 - base pollen
-- correction-table pollen rows
+
+Version 1 does not need a freeform review-classification picker.
+
+Important note:
+
+- keep additional pollen types supported in domain types and payload utilities
+- do not expose extra pollen choices in the image-review UI for v1
+- do not make the distribution summary editable just to surface future pollen support
 
 Because the current contract does not define option endpoints:
 
@@ -730,16 +823,23 @@ Important note:
 
 - implement shared form component tree
 - implement local form hook
-- implement validation-event loading and default `UNKNOWN` assignments
-- implement event review carousel classification controls
+- implement chart-first workspace and layout
+- implement chart querying for the selected date range
+- implement peak/time-slice selection state
+- implement submit payload builder
+
+### Phase 4. Slice-Scoped Event Review
+
+- implement slice-scoped validation-event loading
+- implement CAPTCHA-style event selection grid
+- default unselected images to `UNKNOWN`
 - implement derived summary table rules
 - implement reviewed-count and multiplier derivation
-- implement submit payload builder
 - wire create request
 
 Create flow should be completed before edit/delete work begins.
 
-### Phase 4. Edit and Delete
+### Phase 5. Edit and Delete
 
 - implement edit bootstrap query
 - implement shared mode-specific actions
@@ -749,13 +849,7 @@ Create flow should be completed before edit/delete work begins.
 Dependency:
 
 - backend must support `GET /api/correctionFactors/:id`
-- backend must support edit bootstrap data well enough to reconstruct per-event reviewed classifications, or edit must fall back to `UNKNOWN` assignments
-
-### Phase 5. Chart Preview
-
-- add chart preview component boundary
-- wire preview query adapter once source endpoint is confirmed
-- compute corrected series locally from derived event assignments
+- backend must provide slice context and event assignments well enough to restore the peak-driven workflow, or edit must stay partially limited
 
 ### Phase 6. UX Polish
 
@@ -797,13 +891,19 @@ export function CorrectionFactorFormContainer(props: {
     initialValues: ...,
   });
 
-  const preview = useCorrectionFactorPreview({
+  const chart = useCorrectionFactorChartPreview({
     location: form.values.location,
     basePollen: form.values.basePollen,
     startDate: form.values.startDate,
     endDate: form.values.endDate,
-    events: form.values.events,
-    detectedEvents: form.values.detectedEvents,
+  });
+  const selectedSlice =
+    chart.data?.slices.find((slice) => slice.id === form.values.selectedSliceId) ??
+    null;
+  const peakEvents = useCorrectionFactorPeakEvents({
+    location: form.values.location,
+    basePollen: form.values.basePollen,
+    selectedSlice,
   });
 
   async function handleSubmit() {}
@@ -813,7 +913,9 @@ export function CorrectionFactorFormContainer(props: {
     <CorrectionFactorForm
       mode={props.mode}
       form={form}
-      preview={preview}
+      chart={chart}
+      selectedSlice={selectedSlice}
+      peakEvents={peakEvents}
       onSubmit={handleSubmit}
       onDelete={props.mode === 'edit' ? handleDelete : undefined}
     />
@@ -821,16 +923,17 @@ export function CorrectionFactorFormContainer(props: {
 }
 ```
 
-### Event Review Carousel Skeleton
+### Event Selection Grid Skeleton
 
 ```ts
-export interface CorrectionFactorEventReviewCarouselProps {
-  events: CorrectionFactorDetectedEventForm[];
-  pollenOptions: CorrectionFactorSelectablePollen[];
-  onEventClassificationChange: (
-    eventId: string,
-    reviewedPollen: CorrectionFactorSelectablePollen
-  ) => void;
+export interface CorrectionFactorEventSelectionGridProps {
+  events: CorrectionFactorDetectedEvent[];
+  reviewedAssignmentsByEventId: Record<
+    string,
+    CorrectionFactorSelectablePollen
+  >;
+  basePollen: string;
+  onToggleAccepted: (eventId: string) => void;
 }
 ```
 
@@ -838,16 +941,15 @@ export interface CorrectionFactorEventReviewCarouselProps {
 
 ```ts
 export interface CorrectionFactorDistributionTableProps {
-  detectedEvents: number | null;
   derived: CorrectionFactorFormDerivedState;
 }
 ```
 
 ## Open Dependencies / Risks
 
-1. The current contract does not specify a `GET by id` endpoint.
-2. The current contract does not specify how to hydrate per-event reviewed classifications for edit mode.
-3. The current contract does not specify a chart preview endpoint.
+1. Edit mode still lacks a lossless source for restoring selected slice context and per-event reviewed assignments.
+2. The backend must confirm whether peak/time-slice metadata comes from upstream data or should be derived client-side from measurements.
+3. The validation-event query must remain slice-scoped; loading full-range images again would violate the new workflow.
 4. The current contract does not define how `Unknown` should be encoded in API payloads.
 5. The current contract does not define where location and pollen option lists come from.
 6. The backend must confirm whether `factor_percentage` is a fractional ratio or a percentage value.
@@ -867,6 +969,8 @@ Proceed with:
 - client helper layer in `src/lib/api`
 - React Query for reads
 - local form hook for create/edit
+- chart-first layout and workflow
+- slice-scoped event loading
 - pure utilities for validation, mapping, and multiplier math
 
 Do not introduce:
@@ -875,5 +979,6 @@ Do not introduce:
 - a form library
 - a Zustand store for the form
 - a heavy generic CRUD abstraction
+- manual reviewed-count editing as a fallback workflow
 
 This keeps the feature aligned with the current project rather than redesigning the app around it.

@@ -16,6 +16,7 @@ interface CorrectionFactorDistributionSectionProps {
   errors: CorrectionFactorFormErrors;
   validationErrors: CorrectionFactorFormErrors;
   canAddRow: boolean;
+  showStoredMultiplierView: boolean;
   isEventReviewMode: boolean;
   getPollenOptions: (currentRowPollen: string) => string[];
   onAddRow: () => void;
@@ -30,6 +31,7 @@ export function CorrectionFactorDistributionSection({
   errors,
   validationErrors,
   canAddRow,
+  showStoredMultiplierView,
   isEventReviewMode,
   getPollenOptions,
   onAddRow,
@@ -45,15 +47,14 @@ export function CorrectionFactorDistributionSection({
         <div>
           <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
           <p className="text-sm text-muted-foreground">{t('description')}</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t('detectedEventsLabel')}:{' '}
-            <span className="font-medium text-foreground">
-              {values.detectedEvents ?? '-'}
-            </span>
-          </p>
           {isEventReviewMode ? (
             <p className="mt-2 text-sm text-muted-foreground">
               {t('derivedFromEvents')}
+            </p>
+          ) : null}
+          {showStoredMultiplierView ? (
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t('restoredMultiplierGuidance')}
             </p>
           ) : null}
         </div>
@@ -66,23 +67,25 @@ export function CorrectionFactorDistributionSection({
           {t('addRow')}
         </button>
       </div>
-
       <CorrectionFactorDistributionTable
         rows={values.rows}
         derived={derived}
         errors={errors}
         validationErrors={validationErrors}
         isEventReviewMode={isEventReviewMode}
+        showStoredMultiplierView={showStoredMultiplierView}
         getPollenOptions={getPollenOptions}
         onPollenChange={onPollenChange}
         onReviewedEventsChange={onReviewedEventsChange}
         onRemove={onRemoveRow}
       />
 
-      <CorrectionFactorTotals
-        derived={derived}
-        tableError={errors.rows ?? validationErrors.rows}
-      />
+      {!showStoredMultiplierView ? (
+        <CorrectionFactorTotals
+          derived={derived}
+          tableError={errors.rows ?? validationErrors.rows}
+        />
+      ) : null}
     </section>
   );
 }

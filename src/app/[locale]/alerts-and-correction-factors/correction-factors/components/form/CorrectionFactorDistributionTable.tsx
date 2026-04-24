@@ -15,6 +15,7 @@ interface CorrectionFactorDistributionTableProps {
   errors: CorrectionFactorFormErrors;
   validationErrors: CorrectionFactorFormErrors;
   isEventReviewMode: boolean;
+  showStoredMultiplierView: boolean;
   getPollenOptions: (currentRowPollen: string) => string[];
   onPollenChange: (clientId: string, pollen: string) => void;
   onReviewedEventsChange: (clientId: string, reviewedEvents: string) => void;
@@ -27,6 +28,7 @@ export function CorrectionFactorDistributionTable({
   errors,
   validationErrors,
   isEventReviewMode,
+  showStoredMultiplierView,
   getPollenOptions,
   onPollenChange,
   onReviewedEventsChange,
@@ -56,7 +58,9 @@ export function CorrectionFactorDistributionTable({
           </thead>
           <tbody>
             {rows.map((row) => {
-              const multiplier = derived.multipliersByRowId[row.clientId] ?? 0;
+              const multiplier = showStoredMultiplierView
+                ? row.storedMultiplier ?? 0
+                : derived.multipliersByRowId[row.clientId] ?? 0;
 
               return (
                 <CorrectionFactorDistributionRow
@@ -67,7 +71,8 @@ export function CorrectionFactorDistributionTable({
                   multiplier={multiplier}
                   pollenOptions={getPollenOptions(row.pollen)}
                   isBasePollen={row.isBasePollen}
-                  isReadOnly={isEventReviewMode}
+                  isReadOnly={isEventReviewMode || showStoredMultiplierView}
+                  showStoredMultiplierView={showStoredMultiplierView}
                   errors={
                     errors.rowErrorsById[row.clientId] ??
                     validationErrors.rowErrorsById[row.clientId]
@@ -78,7 +83,8 @@ export function CorrectionFactorDistributionTable({
                 />
               );
             })}
-            {derived.rows
+            {!showStoredMultiplierView
+              ? derived.rows
               .filter((row) => row.isSyntheticUnknown)
               .map((row) => (
                 <CorrectionFactorDistributionRow
@@ -95,7 +101,8 @@ export function CorrectionFactorDistributionTable({
                   onReviewedEventsChange={onReviewedEventsChange}
                   onRemove={onRemove}
                 />
-              ))}
+              ))
+              : null}
           </tbody>
         </table>
       </div>

@@ -8,11 +8,13 @@ import { correctionFactorKeys } from '../constants';
 import type {
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormValues,
+  CorrectionFactorReviewSlice,
   CorrectionFactorPreviewSeries,
   CorrectionFactorPreviewSourcePoint,
   CorrectionFactorPreviewStatus,
 } from '../types';
 import {
+  buildCorrectionFactorReviewSlices,
   buildCorrectionFactorPreviewSeries,
   normalizeMeasurementsPreviewSource,
   toMeasurementPreviewRange,
@@ -26,6 +28,7 @@ interface UseCorrectionFactorPreviewOptions {
 interface UseCorrectionFactorPreviewResult {
   status: CorrectionFactorPreviewStatus;
   series: CorrectionFactorPreviewSeries | null;
+  slices: CorrectionFactorReviewSlice[];
   error: Error | null;
 }
 
@@ -71,6 +74,10 @@ export function useCorrectionFactorPreview({
   });
 
   const sourcePoints = (previewQuery.data ?? []) as CorrectionFactorPreviewSourcePoint[];
+  const slices = useMemo(
+    () => buildCorrectionFactorReviewSlices(sourcePoints),
+    [sourcePoints]
+  );
   const series = useMemo(
     () =>
       sourcePoints.length > 0
@@ -83,6 +90,7 @@ export function useCorrectionFactorPreview({
     return {
       status: 'idle',
       series: null,
+      slices: [],
       error: null,
     };
   }
@@ -91,6 +99,7 @@ export function useCorrectionFactorPreview({
     return {
       status: 'loading',
       series: null,
+      slices: [],
       error: null,
     };
   }
@@ -99,6 +108,7 @@ export function useCorrectionFactorPreview({
     return {
       status: 'error',
       series: null,
+      slices: [],
       error: previewQuery.error instanceof Error ? previewQuery.error : null,
     };
   }
@@ -107,6 +117,7 @@ export function useCorrectionFactorPreview({
     return {
       status: 'empty',
       series: null,
+      slices: [],
       error: null,
     };
   }
@@ -114,6 +125,7 @@ export function useCorrectionFactorPreview({
   return {
     status: 'ready',
     series,
+    slices,
     error: null,
   };
 }

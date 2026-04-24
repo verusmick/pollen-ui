@@ -35,25 +35,27 @@ export function CorrectionFactorFormHeader({
     mode === 'edit' ? t('editDescription') : t('description');
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4 lg:flex-row lg:items-start lg:justify-between">
-      <div className="space-y-1">
-        <h1 className="text-lg font-semibold text-foreground">{title}</h1>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+          <p className="max-w-3xl text-sm text-muted-foreground">{description}</p>
+        </div>
 
-      <div className="lg:min-w-[260px]">
-        <CorrectionFactorActions
-          mode={mode}
-          saving={saving}
-          deleting={deleting}
-          actionError={actionError}
-          submitDisabled={submitDisabled}
-          deleteDisabled={deleteDisabled}
-          showDelete={showDelete}
-          onCancel={onCancel}
-          onSubmit={onSubmit}
-          onDelete={onDelete}
-        />
+        <div className="xl:min-w-[360px] xl:max-w-[420px]">
+          <CorrectionFactorActions
+            mode={mode}
+            saving={saving}
+            deleting={deleting}
+            actionError={actionError}
+            submitDisabled={submitDisabled}
+            deleteDisabled={deleteDisabled}
+            showDelete={showDelete}
+            onCancel={onCancel}
+            onSubmit={onSubmit}
+            onDelete={onDelete}
+          />
+        </div>
       </div>
     </div>
   );

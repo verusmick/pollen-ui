@@ -6,12 +6,12 @@ import type {
   CorrectionFactorFormMode,
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormErrors,
+  CorrectionFactorReviewSlice,
   CorrectionFactorPreviewSeries,
   CorrectionFactorPreviewStatus,
   CorrectionFactorFormValues,
   CorrectionFactorRecord,
   CorrectionFactorReviewedValidationEvent,
-  CorrectionFactorSelectablePollen,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
 import { formatCorrectionFactorDateTimeRange } from '../../utils';
@@ -29,7 +29,6 @@ interface CorrectionFactorFormProps {
   validationSummary: string[];
   isFormValid: boolean;
   derived: CorrectionFactorFormDerivedState;
-  allowedPollenOptions: CorrectionFactorSelectablePollen[];
   locationOptions: CorrectionFactorLocationOption[];
   pollenOptions: string[];
   locationsLoading?: boolean;
@@ -38,17 +37,11 @@ interface CorrectionFactorFormProps {
   pollensError?: string | null;
   validationEventsStatus: CorrectionFactorValidationEventsStatus;
   validationEvents: CorrectionFactorReviewedValidationEvent[];
+  validationEventsIdleMessage?: string | null;
   validationEventsError?: string | null;
-  activeValidationEventIndex: number;
   validationEventsStatusText?: string | null;
   validationEventsFieldError?: string | null;
-  onSelectValidationEvent: (index: number) => void;
-  onPreviousValidationEvent: () => void;
-  onNextValidationEvent: () => void;
-  onValidationEventReviewedPollenChange: (
-    eventId: string,
-    reviewedPollen: CorrectionFactorSelectablePollen
-  ) => void;
+  onToggleValidationEventAccepted: (eventId: string) => void;
   saving: boolean;
   deleting?: boolean;
   actionError?: string | null;
@@ -61,9 +54,13 @@ interface CorrectionFactorFormProps {
   deleteDisabled?: boolean;
   canDelete?: boolean;
   canAddRow: boolean;
+  showStoredMultiplierView?: boolean;
   previewStatus: CorrectionFactorPreviewStatus;
   previewSeries: CorrectionFactorPreviewSeries | null;
+  previewSlices: CorrectionFactorReviewSlice[];
+  selectedPreviewSliceId: string | null;
   previewError?: string | null;
+  onSelectPreviewSlice: (sliceId: string) => void;
   getPollenOptions: (currentRowPollen: string) => string[];
   onLocationChange: (value: string) => void;
   onBasePollenChange: (value: string) => void;
@@ -90,7 +87,6 @@ export function CorrectionFactorForm({
   validationSummary,
   isFormValid,
   derived,
-  allowedPollenOptions,
   locationOptions,
   pollenOptions,
   locationsLoading = false,
@@ -99,14 +95,11 @@ export function CorrectionFactorForm({
   pollensError = null,
   validationEventsStatus,
   validationEvents,
+  validationEventsIdleMessage = null,
   validationEventsError = null,
-  activeValidationEventIndex,
   validationEventsStatusText = null,
   validationEventsFieldError = null,
-  onSelectValidationEvent,
-  onPreviousValidationEvent,
-  onNextValidationEvent,
-  onValidationEventReviewedPollenChange,
+  onToggleValidationEventAccepted,
   saving,
   deleting = false,
   actionError,
@@ -119,9 +112,13 @@ export function CorrectionFactorForm({
   deleteDisabled = false,
   canDelete = false,
   canAddRow,
+  showStoredMultiplierView = false,
   previewStatus,
   previewSeries,
+  previewSlices,
+  selectedPreviewSliceId,
   previewError = null,
+  onSelectPreviewSlice,
   getPollenOptions,
   onLocationChange,
   onBasePollenChange,
@@ -136,9 +133,8 @@ export function CorrectionFactorForm({
   onDelete,
 }: CorrectionFactorFormProps) {
   const formT = useTranslations('correctionFactorsPage.form');
-  const canGoToPreviousValidationEvent = activeValidationEventIndex > 0;
-  const canGoToNextValidationEvent =
-    activeValidationEventIndex < validationEvents.length - 1;
+  const selectedPreviewSlice =
+    previewSlices.find((slice) => slice.id === selectedPreviewSliceId) ?? null;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
@@ -290,8 +286,8 @@ export function CorrectionFactorForm({
       ) : null}
 
       {!(mode === 'edit' && (detailLoading || detailError || editHydrationBlocked)) ? (
-        <div className="grid min-h-0 items-start gap-4 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-          <div className="min-w-0 space-y-4">
+        <div className="grid min-h-0 items-start gap-4 xl:grid-cols-[minmax(320px,360px)_minmax(0,1fr)] 2xl:grid-cols-[minmax(340px,380px)_minmax(0,1fr)]">
+          <aside className="min-w-0 space-y-4 xl:sticky xl:top-4">
             <CorrectionFactorMetaFields
               values={values}
               errors={errors}
@@ -311,12 +307,20 @@ export function CorrectionFactorForm({
               onEndDateChange={onEndDateChange}
             />
 
+            {mode === 'edit' ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <p className="font-medium">{formT('editHydration.title')}</p>
+                <p className="mt-1">{formT('editHydration.description')}</p>
+              </div>
+            ) : null}
+
             <CorrectionFactorDistributionSection
               values={values}
               derived={derived}
               errors={errors}
               validationErrors={validationErrors}
               canAddRow={canAddRow}
+              showStoredMultiplierView={showStoredMultiplierView}
               isEventReviewMode={values.events.length > 0}
               getPollenOptions={getPollenOptions}
               onAddRow={onAddRow}
@@ -324,34 +328,26 @@ export function CorrectionFactorForm({
               onReviewedEventsChange={onReviewedEventsChange}
               onRemoveRow={onRemoveRow}
             />
-
-            {mode === 'edit' ? (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                <p className="font-medium">{formT('editHydration.title')}</p>
-                <p className="mt-1">{formT('editHydration.description')}</p>
-              </div>
-            ) : null}
-          </div>
+          </aside>
 
           <div className="min-w-0 space-y-4">
-            <CorrectionFactorEventCarousel
-              status={validationEventsStatus}
-              events={validationEvents}
-              pollenOptions={allowedPollenOptions}
-              errorMessage={validationEventsError}
-              activeEventIndex={activeValidationEventIndex}
-              canGoPrevious={canGoToPreviousValidationEvent}
-              canGoNext={canGoToNextValidationEvent}
-              onPrevious={onPreviousValidationEvent}
-              onNext={onNextValidationEvent}
-              onSelectEvent={onSelectValidationEvent}
-              onReviewedPollenChange={onValidationEventReviewedPollenChange}
-            />
-
             <CorrectionFactorChartPreview
               status={previewStatus}
               series={previewSeries}
+              slices={previewSlices}
+              selectedSliceId={selectedPreviewSliceId}
               errorMessage={previewError}
+              onSelectSlice={onSelectPreviewSlice}
+            />
+
+            <CorrectionFactorEventCarousel
+              status={validationEventsStatus}
+              events={validationEvents}
+              basePollen={values.basePollen}
+              selectedSliceLabel={selectedPreviewSlice?.label ?? null}
+              idleMessage={validationEventsIdleMessage}
+              errorMessage={validationEventsError}
+              onToggleAccepted={onToggleValidationEventAccepted}
             />
           </div>
         </div>

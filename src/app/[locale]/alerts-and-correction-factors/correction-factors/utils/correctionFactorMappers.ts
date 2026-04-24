@@ -65,20 +65,13 @@ export function mapApiCorrectionFactorsList(
 }
 
 export function mapCorrectionFactorRecordToFormValues(
-  record: CorrectionFactorRecord,
-  options?: {
-    detectedEvents?: number | null;
-  }
+  record: CorrectionFactorRecord
 ): CorrectionFactorFormValues {
-  const detectedEvents =
-    options?.detectedEvents !== undefined ? options.detectedEvents : null;
   const normalizedRows = record.details.map((detail, index) => ({
     clientId: detail.id ?? `cf-detail-${record.id}-${index}`,
     pollen: detail.pollen,
-    reviewedEvents:
-      detectedEvents !== null
-        ? String(detail.factorPercentage * detectedEvents)
-        : String(detail.factorPercentage),
+    reviewedEvents: '',
+    storedMultiplier: detail.factorPercentage,
     isBasePollen: detail.pollen === record.basePollen,
   }));
   const baseRow = normalizedRows.find((row) => row.isBasePollen);
@@ -89,7 +82,8 @@ export function mapCorrectionFactorRecordToFormValues(
     basePollen: record.basePollen,
     startDate: normalizeCorrectionFactorDateTime(record.startDate),
     endDate: normalizeCorrectionFactorDateTime(record.endDate),
-    detectedEvents,
+    selectedSliceId: null,
+    detectedEvents: null,
     events: [],
     rows: baseRow
       ? [baseRow, ...otherRows]
@@ -97,7 +91,8 @@ export function mapCorrectionFactorRecordToFormValues(
           {
             clientId: `cf-base-${record.id}`,
             pollen: record.basePollen,
-            reviewedEvents: '0',
+            reviewedEvents: '',
+            storedMultiplier: null,
             isBasePollen: true,
           },
           ...otherRows,

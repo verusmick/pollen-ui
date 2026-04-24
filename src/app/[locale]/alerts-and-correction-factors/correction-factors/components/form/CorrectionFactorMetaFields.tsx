@@ -107,8 +107,13 @@ export function CorrectionFactorMetaFields({
 
   return (
     <section className="space-y-4 rounded-lg border border-border bg-card p-4">
-      <div>
-        <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
+      <div className="flex items-center gap-3">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-sm font-semibold text-foreground">
+          1
+        </span>
+        <div>
+          <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -299,7 +304,6 @@ export function CorrectionFactorMetaFields({
           ) : null}
         </label>
       </div>
-
     </section>
   );
 }

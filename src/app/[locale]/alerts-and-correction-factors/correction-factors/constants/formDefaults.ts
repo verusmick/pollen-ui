@@ -17,6 +17,7 @@ export const DEFAULT_CORRECTION_FACTOR_FORM_VALUES: CorrectionFactorFormValues =
     basePollen: '',
     startDate: '',
     endDate: '',
+    selectedSliceId: null,
     detectedEvents: null,
     events: [],
     rows: [],

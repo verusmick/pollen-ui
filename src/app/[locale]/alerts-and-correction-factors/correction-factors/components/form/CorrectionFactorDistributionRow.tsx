@@ -11,6 +11,7 @@ interface CorrectionFactorDistributionRowProps {
   isBasePollen: boolean;
   isSyntheticUnknown?: boolean;
   isReadOnly?: boolean;
+  showStoredMultiplierView?: boolean;
   errors?: {
     pollen?: string;
     reviewedEvents?: string;
@@ -29,6 +30,7 @@ export function CorrectionFactorDistributionRow({
   isBasePollen,
   isSyntheticUnknown = false,
   isReadOnly = false,
+  showStoredMultiplierView = false,
   errors,
   onPollenChange,
   onReviewedEventsChange,
@@ -40,9 +42,9 @@ export function CorrectionFactorDistributionRow({
   return (
     <tr className="border-b border-border last:border-b-0">
       <td className="px-4 py-3 align-top">
-        {isSyntheticUnknown ? (
+        {isSyntheticUnknown || showStoredMultiplierView ? (
           <div className="flex h-9 items-center rounded-md border border-border bg-muted px-3 text-sm text-foreground">
-            {t('unknown')}
+            {isSyntheticUnknown ? t('unknown') : pollen}
           </div>
         ) : (
           <select
@@ -69,18 +71,24 @@ export function CorrectionFactorDistributionRow({
         ) : null}
       </td>
       <td className="px-4 py-3 align-top">
-        <input
-          type="number"
-          min="0"
-          value={reviewedEvents}
-          onChange={(event) =>
-            onReviewedEventsChange(clientId, event.target.value)
-          }
-          disabled={isSyntheticUnknown || isReadOnly}
-          className={`h-9 w-full rounded-md border bg-card px-3 text-sm text-foreground disabled:bg-muted disabled:text-muted-foreground ${
-            errors?.reviewedEvents ? 'border-red-300' : 'border-border'
-          }`}
-        />
+        {showStoredMultiplierView ? (
+          <div className="flex h-9 items-center rounded-md border border-border bg-muted px-3 text-sm text-muted-foreground">
+            {t('reviewedEventsUnavailable')}
+          </div>
+        ) : (
+          <input
+            type="number"
+            min="0"
+            value={reviewedEvents}
+            onChange={(event) =>
+              onReviewedEventsChange(clientId, event.target.value)
+            }
+            disabled={isSyntheticUnknown || isReadOnly}
+            className={`h-9 w-full rounded-md border bg-card px-3 text-sm text-foreground disabled:bg-muted disabled:text-muted-foreground ${
+              errors?.reviewedEvents ? 'border-red-300' : 'border-border'
+            }`}
+          />
+        )}
         {errors?.reviewedEvents ? (
           <div className="pt-1 text-xs text-red-600">{errors.reviewedEvents}</div>
         ) : null}
@@ -91,6 +99,8 @@ export function CorrectionFactorDistributionRow({
       <td className="px-4 py-3 text-right">
         {isSyntheticUnknown ? (
           <span className="text-xs text-muted-foreground">{t('automatic')}</span>
+        ) : showStoredMultiplierView ? (
+          <span className="text-xs text-muted-foreground">{t('restored')}</span>
         ) : isBasePollen ? (
           <span className="text-xs text-muted-foreground">{t('baseRow')}</span>
         ) : (

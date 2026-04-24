@@ -23,45 +23,55 @@ export function CorrectionFactorTotals({
 
   return (
     <div className="space-y-2 rounded-lg border border-border bg-card p-4 text-sm">
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-muted-foreground">{t('assignedEvents')}</span>
-        <span className="font-medium text-foreground">
-          {derived.assignedReviewedEvents}
-        </span>
-      </div>
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-muted-foreground">{t('unknownEvents')}</span>
-        <span className="font-medium text-foreground">
-          {derived.unknownReviewedEvents}
-        </span>
-      </div>
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-muted-foreground">{t('totalReviewedEvents')}</span>
-        <span
-          className={
-            derived.hasOverAllocatedEvents
-              ? 'font-medium text-red-600'
-              : derived.unknownReviewedEvents > 0
-                ? 'font-medium text-amber-600'
-                : 'font-medium text-green-600'
-          }
-        >
-          {derived.totalReviewedEvents}
-        </span>
-      </div>
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-muted-foreground">{differenceLabel}</span>
-        <span
-          className={
-            derived.hasOverAllocatedEvents
-              ? 'font-medium text-red-600'
-              : derived.isBalanced
-                ? 'font-medium text-green-600'
-                : 'font-medium text-amber-600'
-          }
-        >
-          {differenceValue}
-        </span>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-lg border border-border bg-background px-3 py-2">
+          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t('assignedEvents')}
+          </div>
+          <div className="mt-1 text-lg font-semibold text-foreground">
+            {derived.assignedReviewedEvents}
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-background px-3 py-2">
+          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t('unknownEvents')}
+          </div>
+          <div className="mt-1 text-lg font-semibold text-foreground">
+            {derived.unknownReviewedEvents}
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-background px-3 py-2">
+          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t('totalReviewedEvents')}
+          </div>
+          <div
+            className={
+              derived.hasOverAllocatedEvents
+                ? 'mt-1 text-lg font-semibold text-red-600'
+                : derived.unknownReviewedEvents > 0
+                  ? 'mt-1 text-lg font-semibold text-amber-600'
+                  : 'mt-1 text-lg font-semibold text-green-600'
+            }
+          >
+            {derived.totalReviewedEvents}
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-background px-3 py-2">
+          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {differenceLabel}
+          </div>
+          <div
+            className={
+              derived.hasOverAllocatedEvents
+                ? 'mt-1 text-lg font-semibold text-red-600'
+                : derived.isBalanced
+                  ? 'mt-1 text-lg font-semibold text-green-600'
+                  : 'mt-1 text-lg font-semibold text-amber-600'
+            }
+          >
+            {differenceValue}
+          </div>
+        </div>
       </div>
       <div
         className={

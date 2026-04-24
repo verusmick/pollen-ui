@@ -23,20 +23,32 @@ export function buildCorrectionFactorWritePayload(
     values,
     options.factorPercentageScale
   );
+  const preferStoredMultipliers = options.preferStoredMultipliers ?? false;
 
   const correctionFactorDetails = derived.rows.reduce<ApiCorrectionFactorDetail[]>(
-    (details, row) => {
-      if (!row.pollen) {
+    (details, derivedRow) => {
+      if (!derivedRow.pollen) {
         throw new Error('Cannot build payload with an empty pollen row.');
       }
 
-      if (row.isSyntheticUnknown || row.pollen === UNKNOWN_POLLEN_CODE) {
+      if (
+        derivedRow.isSyntheticUnknown ||
+        derivedRow.pollen === UNKNOWN_POLLEN_CODE
+      ) {
         return details;
       }
 
+      const sourceRow = values.rows.find(
+        (candidate) => candidate.clientId === derivedRow.clientId
+      );
+      const factorPercentage =
+        preferStoredMultipliers && sourceRow?.storedMultiplier !== undefined
+          ? sourceRow.storedMultiplier ?? derivedRow.multiplier
+          : derivedRow.multiplier;
+
       details.push({
-        pollen: row.pollen,
-        factor_percentage: row.multiplier,
+        pollen: derivedRow.pollen,
+        factor_percentage: factorPercentage,
         published: details.length === 0,
       });
 

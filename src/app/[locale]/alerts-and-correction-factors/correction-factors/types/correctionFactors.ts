@@ -154,6 +154,7 @@ export interface CorrectionFactorDistributionRowForm {
   clientId: string;
   pollen: CorrectionFactorSelectablePollen | '';
   reviewedEvents: string;
+  storedMultiplier?: number | null;
   isBasePollen: boolean;
 }
 
@@ -162,6 +163,7 @@ export interface CorrectionFactorFormValues {
   basePollen: CorrectionFactorPollenCode | '';
   startDate: string;
   endDate: string;
+  selectedSliceId: string | null;
   detectedEvents: number | null;
   events: CorrectionFactorReviewedValidationEvent[];
   rows: CorrectionFactorDistributionRowForm[];
@@ -207,10 +209,13 @@ export interface CorrectionFactorFormDerivedState {
 export interface CorrectionFactorPayloadBuildOptions {
   factorPercentageScale: CorrectionFactorPercentageScale;
   unknownPollenApiValue?: string | null;
+  preferStoredMultipliers?: boolean;
 }
 
 export interface CorrectionFactorPreviewPoint {
+  sliceId: string;
   timestamp: number;
+  endTimestamp: number;
   label: string;
   originalValue: number;
   correctedValue: number;
@@ -218,6 +223,14 @@ export interface CorrectionFactorPreviewPoint {
 
 export interface CorrectionFactorPreviewSeries {
   points: CorrectionFactorPreviewPoint[];
+}
+
+export interface CorrectionFactorReviewSlice {
+  id: string;
+  from: number;
+  to: number;
+  peakTimestamp: number;
+  label: string;
 }
 
 export interface CorrectionFactorPreviewSourcePoint {

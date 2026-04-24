@@ -1,30 +1,21 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { UNKNOWN_POLLEN_CODE } from '../../constants';
 import type {
   CorrectionFactorReviewedValidationEvent,
-  CorrectionFactorSelectablePollen,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
 
 interface CorrectionFactorEventCarouselProps {
   status: CorrectionFactorValidationEventsStatus;
   events: CorrectionFactorReviewedValidationEvent[];
-  pollenOptions: CorrectionFactorSelectablePollen[];
+  basePollen: string;
+  selectedSliceLabel?: string | null;
+  idleMessage?: string | null;
   errorMessage?: string | null;
-  activeEventIndex: number;
-  canGoPrevious: boolean;
-  canGoNext: boolean;
-  onPrevious: () => void;
-  onNext: () => void;
-  onSelectEvent: (index: number) => void;
-  onReviewedPollenChange: (
-    eventId: string,
-    reviewedPollen: CorrectionFactorSelectablePollen
-  ) => void;
+  onToggleAccepted: (eventId: string) => void;
 }
 
 function formatEventDatetime(timestamp: number): string {
@@ -40,43 +31,23 @@ function formatEventDatetime(timestamp: number): string {
 export function CorrectionFactorEventCarousel({
   status,
   events,
-  pollenOptions,
+  basePollen,
+  selectedSliceLabel = null,
+  idleMessage = null,
   errorMessage = null,
-  activeEventIndex,
-  canGoPrevious,
-  canGoNext,
-  onPrevious,
-  onNext,
-  onSelectEvent,
-  onReviewedPollenChange,
+  onToggleAccepted,
 }: CorrectionFactorEventCarouselProps) {
   const t = useTranslations('correctionFactorsPage.form.eventsCarousel');
-  const activeEvent = events[activeEventIndex] ?? null;
   const [brokenImageIds, setBrokenImageIds] = useState<Record<string, true>>({});
-  const thumbnailRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const reviewedPollenOptions = Array.from(
-    new Set([
-      UNKNOWN_POLLEN_CODE,
-      ...pollenOptions.filter((option) => option !== UNKNOWN_POLLEN_CODE),
-    ])
+  const acceptedCount = useMemo(
+    () =>
+      events.filter((event) => event.reviewedPollen === basePollen).length,
+    [basePollen, events]
   );
 
   useEffect(() => {
     setBrokenImageIds({});
   }, [events]);
-
-  useEffect(() => {
-    const activeThumbnail = thumbnailRefs.current[activeEventIndex];
-
-    if (!activeThumbnail) {
-      return;
-    }
-
-    activeThumbnail.scrollIntoView({
-      block: 'nearest',
-      behavior: 'smooth',
-    });
-  }, [activeEventIndex]);
 
   function handleImageError(eventId: string) {
     setBrokenImageIds((current) => {
@@ -94,18 +65,30 @@ export function CorrectionFactorEventCarousel({
   return (
     <section className="min-h-0 rounded-lg border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
+        <div className="flex items-start gap-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-sm font-semibold text-foreground">
+            3
+          </span>
+          <div>
+            <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
+          </div>
         </div>
-        <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-          {t('count', { count: events.length })}
+        <div className="flex flex-wrap justify-end gap-2">
+          {selectedSliceLabel ? (
+            <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-foreground">
+              {selectedSliceLabel}
+            </div>
+          ) : null}
+          <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+            {t('count', { count: events.length })}
+          </div>
         </div>
       </div>
 
       {status === 'idle' ? (
         <div className="mt-4 rounded-lg border border-dashed border-border bg-background px-4 py-8 text-sm text-muted-foreground">
-          {t('idle')}
+          {idleMessage ?? t('idle')}
         </div>
       ) : null}
 
@@ -138,123 +121,109 @@ export function CorrectionFactorEventCarousel({
         </div>
       ) : null}
 
-      {status === 'ready' && activeEvent ? (
-        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_88px]">
-          <div className="space-y-4">
-            <div className="overflow-hidden rounded-lg border border-border bg-background">
-              {brokenImageIds[activeEvent.id] ? (
-                <div className="flex aspect-square items-center justify-center bg-muted px-6 text-center text-sm text-muted-foreground">
-                  {t('imageUnavailable')}
-                </div>
-              ) : (
-                <img
-                  src={activeEvent.imageUrl}
-                  alt={t('imageAlt', {
-                    classification: activeEvent.classification,
-                    index: activeEventIndex + 1,
-                    reviewedClassification: activeEvent.reviewedPollen,
-                  })}
-                  className="aspect-square w-full object-cover"
-                  onError={() => handleImageError(activeEvent.id)}
-                />
-              )}
+      {status === 'ready' ? (
+        <div className="mt-4 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                {t('selectionInstruction', { basePollen })}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('selectionHint')}
+              </p>
             </div>
-
-            <div className="space-y-2 rounded-lg border border-border bg-background p-4 text-sm">
-              <div>
-                <div className="text-muted-foreground">{t('classification')}</div>
-                <div className="font-medium text-foreground">
-                  {activeEvent.classification}
-                </div>
-              </div>
-              <label className="block">
-                <span className="text-muted-foreground">
-                  {t('reviewedClassification')}
-                </span>
-                <select
-                  value={activeEvent.reviewedPollen}
-                  onChange={(event) =>
-                    onReviewedPollenChange(
-                      activeEvent.id,
-                      event.target.value as CorrectionFactorSelectablePollen
-                    )
-                  }
-                  className="mt-1 h-9 w-full rounded-md border border-border bg-card px-3 text-sm font-medium text-foreground"
-                >
-                  {reviewedPollenOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option === UNKNOWN_POLLEN_CODE ? t('unknown') : option}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div>
-                <div className="text-muted-foreground">{t('location')}</div>
-                <div className="font-medium text-foreground">{activeEvent.device}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">{t('capturedAt')}</div>
-                <div className="font-medium text-foreground">
-                  {formatEventDatetime(activeEvent.datetime)}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={onPrevious}
-                disabled={!canGoPrevious}
-                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {t('previous')}
-              </button>
-              <button
-                type="button"
-                onClick={onNext}
-                disabled={!canGoNext}
-                className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {t('next')}
-              </button>
+            <div className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-foreground">
+              {t('acceptedCount', {
+                acceptedCount,
+                totalCount: events.length,
+              })}
             </div>
           </div>
 
-          <div className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto overscroll-contain pr-1">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {events.map((event, index) => {
-              const isActive = index === activeEventIndex;
+              const isAccepted = event.reviewedPollen === basePollen;
+              const isBroken = Boolean(brokenImageIds[event.id]);
 
               return (
                 <button
                   key={event.id}
-                  ref={(element) => {
-                    thumbnailRefs.current[index] = element;
-                  }}
                   type="button"
-                  onClick={() => onSelectEvent(index)}
-                  className={`overflow-hidden rounded-lg border bg-background text-left transition ${
-                    isActive
-                      ? 'border-foreground shadow-sm'
-                      : 'border-border hover:border-muted-foreground'
+                  onClick={() => onToggleAccepted(event.id)}
+                  aria-pressed={isAccepted}
+                  className={`group overflow-hidden rounded-xl border text-left transition focus:outline-none focus:ring-2 focus:ring-foreground/20 ${
+                    isAccepted
+                      ? 'border-emerald-600 bg-emerald-50 shadow-sm ring-1 ring-emerald-200'
+                      : 'border-border bg-background opacity-80 hover:border-muted-foreground hover:opacity-100'
                   }`}
-                  aria-label={t('thumbnailLabel', {
+                  aria-label={t('tileAriaLabel', {
                     classification: event.classification,
                     index: index + 1,
-                    reviewedClassification: event.reviewedPollen,
+                    state: isAccepted
+                      ? t('acceptedState', { basePollen })
+                      : t('unknownState'),
                   })}
                 >
-                  {brokenImageIds[event.id] ? (
-                    <div className="flex aspect-square items-center justify-center bg-muted px-2 text-center text-[11px] text-muted-foreground">
-                      {t('imageUnavailableShort')}
+                  <div className="relative">
+                    {isBroken ? (
+                      <div className="flex aspect-square items-center justify-center bg-muted px-4 text-center text-sm text-muted-foreground">
+                        {t('imageUnavailable')}
+                      </div>
+                    ) : (
+                      <img
+                        src={event.imageUrl}
+                        alt={t('imageAlt', {
+                          classification: event.classification,
+                          index: index + 1,
+                        })}
+                        className={`aspect-square w-full object-cover transition ${
+                          isAccepted ? 'opacity-100' : 'opacity-65 group-hover:opacity-90'
+                        }`}
+                        onError={() => handleImageError(event.id)}
+                      />
+                    )}
+
+                    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
+                      <span
+                        className={`rounded-full px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${
+                          isAccepted
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-background/90 text-foreground'
+                        }`}
+                      >
+                        {isAccepted
+                          ? t('acceptedBadge', { basePollen })
+                          : t('unknownBadge')}
+                      </span>
+                      <span className="rounded-full bg-background/90 px-2 py-1 text-[11px] font-medium text-foreground">
+                        {t('tileNumber', { index: index + 1 })}
+                      </span>
                     </div>
-                  ) : (
-                    <img
-                      src={event.imageUrl}
-                      alt=""
-                      className="aspect-square w-full object-cover"
-                      onError={() => handleImageError(event.id)}
-                    />
-                  )}
+                  </div>
+
+                  <div className="space-y-2 p-3">
+                    <div>
+                      <div className="text-xs text-muted-foreground">
+                        {t('classification')}
+                      </div>
+                      <div className="text-sm font-medium text-foreground">
+                        {event.classification}
+                      </div>
+                    </div>
+
+                    <div className="grid gap-2 text-xs text-muted-foreground">
+                      <div>
+                        <div>{t('location')}</div>
+                        <div className="font-medium text-foreground">{event.device}</div>
+                      </div>
+                      <div>
+                        <div>{t('capturedAt')}</div>
+                        <div className="font-medium text-foreground">
+                          {formatEventDatetime(event.datetime)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </button>
               );
             })}

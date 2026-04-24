@@ -22,7 +22,8 @@ export const correctionFactorKeys = {
   validationEvent: (params: {
     location: string;
     basePollen: string;
-    startDate: string;
-    endDate: string;
+    sliceId: string;
+    from: number;
+    to: number;
   }) => [...correctionFactorKeys.validationEvents(), params] as const,
 };

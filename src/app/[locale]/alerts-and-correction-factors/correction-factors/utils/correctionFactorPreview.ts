@@ -3,6 +3,7 @@ import type {
   ApiMeasurementRecord,
   ApiMeasurementsResponse,
   CorrectionFactorPreviewPoint,
+  CorrectionFactorReviewSlice,
   CorrectionFactorPreviewSeries,
   CorrectionFactorPreviewSourcePoint,
 } from '../types';
@@ -56,6 +57,24 @@ function formatPreviewLabel(timestamp: number): string {
     minute: '2-digit',
     timeZone: 'UTC',
   }).format(new Date(timestamp * 1000));
+}
+
+function formatPreviewSliceLabel(startTimestamp: number, endTimestamp: number): string {
+  const formatter = new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC',
+  });
+
+  return `${formatter.format(new Date(startTimestamp * 1000))} - ${formatter.format(
+    new Date(endTimestamp * 1000)
+  )}`;
+}
+
+function toPreviewSliceId(point: CorrectionFactorPreviewSourcePoint): string {
+  return `${point.timestamp}-${point.endTimestamp}`;
 }
 
 export function toMeasurementPreviewRange(
@@ -115,12 +134,26 @@ export function normalizeMeasurementsPreviewSource(
     .sort((left, right) => left.timestamp - right.timestamp);
 }
 
+export function buildCorrectionFactorReviewSlices(
+  sourcePoints: CorrectionFactorPreviewSourcePoint[]
+): CorrectionFactorReviewSlice[] {
+  return sourcePoints.map((point) => ({
+    id: toPreviewSliceId(point),
+    from: point.timestamp,
+    to: point.endTimestamp,
+    peakTimestamp: point.timestamp,
+    label: formatPreviewSliceLabel(point.timestamp, point.endTimestamp),
+  }));
+}
+
 export function buildCorrectionFactorPreviewSeries(
   originalValues: CorrectionFactorPreviewSourcePoint[],
   basePollenMultiplier: number
 ): CorrectionFactorPreviewSeries {
   const points: CorrectionFactorPreviewPoint[] = originalValues.map((point) => ({
+    sliceId: toPreviewSliceId(point),
     timestamp: point.timestamp,
+    endTimestamp: point.endTimestamp,
     label: formatPreviewLabel(point.timestamp),
     originalValue: point.value,
     correctedValue: point.value * basePollenMultiplier,
