@@ -55,10 +55,10 @@
     "message_loading": "Carte de nowcasting"
   },
   "correctionFactorsPage": {
-    "description": "Ajustez et gérez les corrections appliquées aux pics de pollen détectés.",
+    "description": "Consultez et gérez les corrections enregistrées pour les pics de pollen détectés.",
     "list": {
       "title": "Facteurs de correction",
-      "description": "Ajustez et gérez les corrections appliquées aux pics de pollen détectés.",
+      "description": "Consultez et gérez les corrections enregistrées pour les pics de pollen détectés.",
       "newButton": "Nouveau facteur de correction",
       "filters": {
         "fromDate": "À partir du",
@@ -89,8 +89,8 @@
     "form": {
       "title": "Facteur de correction",
       "editTitle": "Modifier le facteur de correction",
-      "description": "Définissez comment ce facteur de correction redistribuera les comptes d’événements entre pollens sur une période donnée.",
-      "editDescription": "Consultez le facteur de correction enregistré, vérifiez les multiplicateurs persistés et lancez une nouvelle session de revue depuis le graphique lorsque vous devez le mettre à jour.",
+      "description": "Sélectionnez un pic dans le graphique et examinez ses images détectées pour créer une correction.",
+      "editDescription": "Consultez cette correction enregistrée. Les sélections d’images précédentes ne sont pas conservées, alors sélectionnez un pic du graphique pour revoir les images si nécessaire.",
       "submitErrorFallback": "Impossible d’enregistrer le facteur de correction.",
       "updateErrorFallback": "Impossible de mettre à jour le facteur de correction.",
       "deleteErrorFallback": "Impossible de supprimer le facteur de correction.",
@@ -99,40 +99,38 @@
         "loadError": "Impossible de charger le facteur de correction."
       },
       "editUnavailable": {
-        "title": "La modification n’est pas disponible pour cet enregistrement",
-        "description": "L’enregistrement backend ne fournit pas assez d’informations pour reconstruire les valeurs d’événements révisés requises par ce formulaire. Les données enregistrées sont affichées ci-dessous à titre de référence et la suppression reste disponible.",
+        "title": "Cette correction enregistrée ne peut pas être modifiée ici",
+        "description": "La correction enregistrée peut être consultée ci-dessous, mais les sélections d’images précédentes ne sont pas disponibles.",
         "reasonLabel": "Raison",
-        "reason": "Les valeurs d’événements révisés ne peuvent pas être reconstruites à partir de la charge utile de détail backend actuelle.",
-        "summaryTitle": "Enregistrement stocké",
+        "reason": "Les sélections d’images précédentes ne sont pas disponibles pour cette correction enregistrée.",
+        "summaryTitle": "Correction enregistrée",
         "location": "Emplacement",
         "basePollen": "Pollen de base",
         "dateRange": "Plage de dates",
         "detailsTitle": "Facteurs enregistrés",
         "pollen": "Pollen",
-        "multiplier": "Multiplicateur enregistré",
+        "multiplier": "Facteur enregistré",
         "published": "Publié",
         "yes": "Oui",
         "no": "Non",
-        "empty": "Aucun détail de facteur enregistré n’est disponible pour cet enregistrement."
+        "empty": "Aucun détail enregistré n’est disponible pour cette correction."
       },
       "meta": {
-        "title": "Emplacement et date/heure",
+        "title": "Choisir le lieu et la période",
         "location": "Emplacement",
         "allLocations": "Sélectionnez un emplacement",
         "basePollen": "Pollen de base",
         "allPollens": "Sélectionnez un pollen",
-        "detectedEvents": "Événements détectés",
-        "detectedEventsReadOnlyBadge": "Lecture seule",
-        "detectedEventsReadOnlyHelp": "Cette valeur provient toujours de l’API de validation et ne peut pas être modifiée manuellement.",
-        "detectedEventsHint": "Les événements détectés seront disponibles après la sélection de l’emplacement, du pollen de base et de l’intervalle complet de date et d’heure, puis après le choix d’un segment du graphique à examiner.",
+        "detectedEvents": "Images détectées",
+        "detectedEventsHint": "Les images détectées apparaissent après avoir choisi un lieu, le pollen de base, la période et un pic du graphique.",
         "detectedEventsLoadingValue": "Chargement...",
-        "detectedEventsValuePlaceholder": "Pas encore disponible",
-        "detectedEventsSelectSlice": "Sélectionnez un segment du graphique pour charger les événements détectés à examiner.",
-        "detectedEventsLoading": "Chargement des événements détectés depuis l’API de validation...",
-        "detectedEventsLoaded": "Les événements détectés sont dérivés automatiquement du nombre de résultats de l’API de validation pour le segment de graphique sélectionné.",
-        "detectedEventsError": "Les événements détectés n’ont pas pu être chargés depuis l’API de validation.",
-        "detectedEventsMismatchError": "La réponse de l’API de validation ne contenait pas d’événements détectés exploitables pour cette sélection.",
-        "detectedEventsLocationMappingError": "L’emplacement du facteur de correction \"{location}\" n’a pas pu être associé à un nom d’emplacement de l’API de validation.",
+        "detectedEventsValuePlaceholder": "Sélectionnez un pic du graphique",
+        "detectedEventsSelectSlice": "Sélectionnez un pic du graphique pour examiner ses images détectées.",
+        "detectedEventsLoading": "Chargement des images détectées...",
+        "detectedEventsLoaded": "Images détectées trouvées pour le pic sélectionné.",
+        "detectedEventsError": "Impossible de charger les images détectées.",
+        "detectedEventsMismatchError": "Aucune image détectée n’était disponible pour ce pic du graphique.",
+        "detectedEventsLocationMappingError": "Les images détectées ne sont pas disponibles pour le lieu sélectionné \"{location}\".",
         "startDate": "Date et heure de début",
         "endDate": "Date et heure de fin",
         "startPlaceholder": "Date de début",
@@ -150,7 +148,7 @@
         "time": "Heure",
         "clear": "Effacer",
         "apply": "Appliquer",
-        "dateTimeHelp": "Les heures peuvent être sélectionnées par intervalles de 1 heure de 00:00 à 23:00.",
+        "dateTimeHelp": "Les heures utilisent des pas de 1 heure.",
         "loading": "Chargement...",
         "loadError": "Options indisponibles",
         "optionsLoadError": "Ce champ n'a pas pu charger ses options."
@@ -167,7 +165,7 @@
         "startDateInvalid": "La date/heure de début doit utiliser une heure pleine valide.",
         "endDateInvalid": "La date/heure de fin doit utiliser une heure pleine valide.",
         "endDateOrder": "La date de fin doit être postérieure ou égale à la date de début.",
-        "detectedEventsRequired": "Les événements détectés sont requis.",
+        "detectedEventsRequired": "Sélectionnez un pic du graphique avec des images détectées.",
         "atLeastOneRow": "Au moins une ligne de correction est requise.",
         "exactlyOneBaseRow": "Une seule ligne de pollen de base est requise.",
         "baseRowFirst": "La ligne de pollen de base doit être la première.",
@@ -178,74 +176,107 @@
         "overAllocated": "Les événements révisés ne peuvent pas dépasser les événements détectés."
       },
       "distribution": {
-        "title": "Facteurs de correction",
-        "description": "Réattribuez les événements détectés pour le pollen de base sélectionné après revue experte.",
-        "detectedEventsLabel": "Événements détectés",
-        "derivedFromEvents": "Gérez ici les classifications de pollen autorisées. Les comptes révisés sont dérivés des attributions d’événements dans le carrousel.",
-        "restoredMultiplierGuidance": "Cette vue d’édition affiche les multiplicateurs enregistrés côté backend. Les nombres d’événements révisés restent indisponibles tant que vous n’avez pas sélectionné un segment du graphique et commencé une nouvelle revue.",
-        "addRow": "Ajouter une classification de pollen",
-        "selectPollen": "Sélectionnez un pollen",
-        "remove": "Supprimer",
-        "baseRow": "Ligne de base",
-        "restored": "Restauré",
-        "automatic": "Automatique",
-        "reviewedEventsUnavailable": "Indisponible",
-        "unknown": "Inconnu",
-        "table": {
-          "pollen": "Répartition du pollen",
-          "reviewedEvents": "Événements révisés",
-          "multiplier": "Facteur multiplicateur",
-          "actions": "Actions"
-        }
+        "title": "Résumé de la correction",
+        "description": "Vérifiez les résultats de la revue d’images sélectionnée.",
+        "helperText": "Cliquez sur les images dans le panneau de revue pour mettre à jour ce résumé.",
+        "detectedImages": "Images détectées",
+        "markedAsBasePollen": "Marquées comme {basePollen}",
+        "markedAsBasePollenFallback": "Marquées comme pollen de base",
+        "countedAsUnknown": "Comptées comme Inconnu",
+        "correctionMultiplier": "Multiplicateur de correction",
+        "restoredMultiplierGuidance": "Pour les mettre a jour, selectionnez un pic du graphique et revoyez les images.",
+        "savedTitle": "Facteurs enregistres",
+        "savedDescription": "Cette correction enregistree affiche uniquement le multiplicateur stocke."
       },
       "totals": {
-        "assignedEvents": "Événements attribués",
-        "unknownEvents": "Événements inconnus",
-        "totalReviewedEvents": "Total des événements révisés",
-        "difference": "Sur-attribué",
-        "remainingEvents": "Événements restants",
-        "overAssigned": "Sur-attribué",
-        "balancedMessage": "Les événements révisés sont entièrement équilibrés.",
-        "unknownRemainderMessage": "Les événements restants seront attribués à Inconnu : {count}.",
-        "overAllocatedMessage": "Les événements révisés dépassent les événements détectés de {count}."
+        "overAllocatedMessage": "Les images sélectionnées dépassent les images détectées de {count}."
       },
       "editHydration": {
-        "title": "Multiplicateurs restaurés",
-        "description": "Ce facteur de correction a été restauré à partir de multiplicateurs persistés. Les sélections d’événements d’origine ne sont pas disponibles dans la version actuelle de l’API. Sélectionnez un segment du graphique pour démarrer une nouvelle session de revue."
+        "title": "Correction enregistrée chargée",
+        "description": "Cette correction enregistrée a été chargée. Les sélections d’images précédentes ne sont pas conservées, alors sélectionnez un pic du graphique pour revoir les images."
       },
       "preview": {
-        "title": "Graphique (Original vs Corrigé)",
-        "description": "Le graphique utilise les mesures d’origine du pollen de base sélectionné et applique localement le facteur de correction actuel. Sélectionnez un segment du graphique pour lancer la revue des événements détectés.",
-        "loading": "Chargement des mesures d’aperçu...",
-        "idle": "Sélectionnez un emplacement, un pollen de base, une date/heure de début et une date/heure de fin pour charger l’aperçu.",
-        "empty": "Aucune donnée de mesure n’est disponible pour la période sélectionnée.",
-        "error": "Impossible de charger les mesures d’aperçu.",
+        "title": "Pics du graphique",
+        "description": "Sélectionnez un pic dans le graphique pour examiner ses images détectées.",
+        "loading": "Chargement des pics du graphique...",
+        "idle": "Choisissez un lieu, le pollen de base et la période pour afficher les pics du graphique.",
+        "empty": "Aucun pic du graphique n’a été trouvé pour la période sélectionnée.",
+        "error": "Impossible de charger les pics du graphique.",
+        "range": {
+          "current": "Plage : {range}",
+          "pending": "Pas encore disponible"
+        },
+        "resolution": {
+          "current": "Résolution : {resolution}",
+          "pending": "En attente",
+          "month": "Intervalles mensuels",
+          "week": "Intervalles hebdomadaires",
+          "day": "Intervalles quotidiens",
+          "measurement": "Pics du graphique"
+        },
+        "navigation": {
+          "title": "Navigation du graphique",
+          "drillDownMode": "Sélectionnez un groupe de pics plus large pour resserrer le graphique.",
+          "reviewMode": "Sélectionnez un pic du graphique pour examiner ses images détectées.",
+          "up": "Revenir à la plage précédente"
+        },
+        "bucketSelection": {
+          "title": "Sélection du graphique",
+          "drillDownDescription": "Sélectionnez un groupe de pics plus large pour resserrer le graphique avant de choisir un pic.",
+          "reviewDescription": "Sélectionnez un pic du graphique pour examiner ses images détectées.",
+          "drillDownAction": "Descendre",
+          "reviewAction": "Examiner les images détectées"
+        },
         "sliceSelection": {
-          "title": "Segment de revue",
-          "description": "Cliquez sur un point du graphique ou choisissez un segment ci-dessous pour charger uniquement les événements détectés de cet intervalle.",
-          "dotAriaLabel": "Sélectionner ce segment du graphique pour la revue",
-          "noneSelected": "Aucun segment du graphique n’a encore été sélectionné.",
-          "selected": "Segment sélectionné : {slice}"
+          "noneSelected": "Aucun pic du graphique sélectionné pour le moment.",
+          "selected": "Pic du graphique sélectionné : {slice}"
+        },
+        "tooltip": {
+          "value": "{value} Pollen/m3"
         },
         "series": {
-          "original": "Série d’origine",
-          "corrected": "Série corrigée"
+          "original": "Mesuré",
+          "corrected": "Corrigé"
         }
       },
+      "reviewSummary": {
+        "title": "Revue des images",
+        "description": "Ouvrez le panneau de revue des images pour le pic du graphique sélectionné.",
+        "action": "Revoir les images",
+        "selectedSlice": "Pic du graphique",
+        "slicePending": "Aucun pic du graphique sélectionné pour le moment",
+        "detectedEvents": "Images détectées",
+        "accepted": "Correspond au pollen de base",
+        "unknown": "Inconnus",
+        "countPending": "Pas encore disponible",
+        "count": "{count, plural, =0 {0 evenement} one {# evenement} other {# evenements}}",
+        "readyHint": "Cliquez sur les images qui correspondent à {basePollen}. Les images non sélectionnées sont comptées comme Inconnu."
+      },
+      "reviewWorkspace": {
+        "eyebrow": "Revue des images",
+        "title": "Images détectées",
+        "description": "Examinez les images du pic du graphique sélectionné.",
+        "close": "Fermer la revue",
+        "selectedSlice": "Pic du graphique",
+        "slicePending": "Aucun pic du graphique sélectionné pour le moment",
+        "accepted": "Correspond au pollen de base",
+        "unknown": "Inconnus",
+        "count": "{count, plural, =0 {0 evenement} one {# evenement} other {# evenements}}"
+      },
       "eventsCarousel": {
-        "title": "Événements détectés",
-        "description": "Cliquez sur les images qui correspondent au pollen de base dans le segment de graphique sélectionné.",
+        "title": "Images détectées",
+        "description": "Examinez les images du pic du graphique sélectionné.",
         "count": "{count, plural, =0 {0 événement} one {# événement} other {# événements}}",
-        "idle": "Sélectionnez un emplacement, un pollen de base, une date/heure de début et une date/heure de fin pour charger les événements détectés.",
-        "selectSlice": "Sélectionnez un segment du graphique pour charger les événements détectés à examiner.",
-        "empty": "Aucun événement détecté n’a été trouvé pour les filtres sélectionnés.",
-        "error": "Les événements détectés n’ont pas pu être chargés.",
-        "errorMismatch": "Des événements détectés ont été renvoyés, mais la réponse ne contenait pas d’enregistrements exploitables pour cette sélection.",
-        "selectionInstruction": "Cliquez sur chaque image qui doit compter comme {basePollen}.",
-        "selectionHint": "Les images sélectionnées comptent comme pollen de base. Les images non sélectionnées restent Inconnu.",
-        "acceptedCount": "{acceptedCount} sur {totalCount} acceptés",
-        "classification": "Classification détectée",
-        "reviewedClassification": "Classification révisée",
+        "idle": "Choisissez un lieu, le pollen de base et la période pour charger les pics du graphique.",
+        "selectSlice": "Sélectionnez un pic du graphique pour examiner ses images détectées.",
+        "empty": "Aucune image détectée n’a été trouvée pour le pic du graphique sélectionné.",
+        "error": "Impossible de charger les images détectées.",
+        "errorMismatch": "Aucune image détectée n’était disponible pour ce pic du graphique.",
+        "selectionInstruction": "Cliquez sur les images qui correspondent à {basePollen}.",
+        "selectionHint": "Les images non sélectionnées sont comptées comme Inconnu.",
+        "acceptedCount": "{acceptedCount} sur {totalCount} correspondent à {basePollen}",
+        "classification": "Pollen détecté",
+        "reviewedClassification": "Pollen revu",
         "unknown": "Inconnu",
         "acceptedBadge": "{basePollen}",
         "unknownBadge": "Inconnu",

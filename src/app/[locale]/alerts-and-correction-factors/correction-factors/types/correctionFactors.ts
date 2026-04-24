@@ -125,6 +125,11 @@ export type CorrectionFactorTimeOption =
   | '22:00'
   | '23:00';
 export type CorrectionFactorPercentageScale = 'ratio' | 'percentage';
+export type CorrectionFactorChartResolution =
+  | 'month'
+  | 'week'
+  | 'day'
+  | 'measurement';
 
 export interface CorrectionFactorDetail {
   id?: string;
@@ -163,7 +168,7 @@ export interface CorrectionFactorFormValues {
   basePollen: CorrectionFactorPollenCode | '';
   startDate: string;
   endDate: string;
-  selectedSliceId: string | null;
+  selectedReviewSliceId: string | null;
   detectedEvents: number | null;
   events: CorrectionFactorReviewedValidationEvent[];
   rows: CorrectionFactorDistributionRowForm[];
@@ -212,17 +217,40 @@ export interface CorrectionFactorPayloadBuildOptions {
   preferStoredMultipliers?: boolean;
 }
 
+export interface CorrectionFactorChartRange {
+  from: number;
+  to: number;
+}
+
+export interface CorrectionFactorChartNavigationState {
+  rootRange: CorrectionFactorChartRange | null;
+  visibleRange: CorrectionFactorChartRange | null;
+  canDrillUp: boolean;
+  depth: number;
+}
+
 export interface CorrectionFactorPreviewPoint {
-  sliceId: string;
+  id: string;
   timestamp: number;
   endTimestamp: number;
+  peakTimestamp: number;
+  peakEndTimestamp: number;
+  axisLabel: string;
   label: string;
+  detailLabel: string;
+  peakDateLabel: string;
+  peakTimeRangeLabel: string;
   originalValue: number;
   correctedValue: number;
+  resolution: CorrectionFactorChartResolution;
+  isReviewSlice: boolean;
+  sourcePointsCount: number;
 }
 
 export interface CorrectionFactorPreviewSeries {
   points: CorrectionFactorPreviewPoint[];
+  resolution: CorrectionFactorChartResolution;
+  showPointMarkers: boolean;
 }
 
 export interface CorrectionFactorReviewSlice {

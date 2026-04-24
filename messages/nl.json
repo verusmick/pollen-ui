@@ -55,10 +55,10 @@
     "message_loading": "Nowcastingkaart"
   },
   "correctionFactorsPage": {
-    "description": "Pas correcties aan en beheer ze die worden toegepast op gedetecteerde pollenpieken.",
+    "description": "Bekijk en beheer opgeslagen correcties voor gedetecteerde pollenpieken.",
     "list": {
       "title": "Correctiefactoren",
-      "description": "Pas correcties aan en beheer ze die worden toegepast op gedetecteerde pollenpieken.",
+      "description": "Bekijk en beheer opgeslagen correcties voor gedetecteerde pollenpieken.",
       "newButton": "Nieuwe correctiefactor",
       "filters": {
         "fromDate": "Vanaf datum",
@@ -89,8 +89,8 @@
     "form": {
       "title": "Correctiefactor",
       "editTitle": "Correctiefactor bewerken",
-      "description": "Bepaal hoe deze correctiefactor gebeurtenisaantallen over pollen verdeelt binnen een specifiek tijdsinterval.",
-      "editDescription": "Bekijk de opgeslagen correctiefactor, controleer de persistente multipliers en start vanuit de grafiek een nieuwe beoordelingssessie wanneer u deze wilt bijwerken.",
+      "description": "Selecteer een piek in de grafiek en bekijk de gedetecteerde beelden om een correctie te maken.",
+      "editDescription": "Bekijk deze opgeslagen correctie. Eerdere beeldselecties worden niet bewaard, dus selecteer een piek in de grafiek om de beelden opnieuw te bekijken als dat nodig is.",
       "submitErrorFallback": "De correctiefactor kon niet worden opgeslagen.",
       "updateErrorFallback": "De correctiefactor kon niet worden bijgewerkt.",
       "deleteErrorFallback": "De correctiefactor kon niet worden verwijderd.",
@@ -99,40 +99,38 @@
         "loadError": "De correctiefactor kon niet worden geladen."
       },
       "editUnavailable": {
-        "title": "Bewerken is niet beschikbaar voor dit record",
-        "description": "Het backend-record bevat niet genoeg informatie om de invoer voor beoordeelde gebeurtenissen te reconstrueren die dit formulier vereist. De opgeslagen gegevens worden hieronder ter referentie getoond en verwijderen blijft beschikbaar.",
+        "title": "Deze opgeslagen correctie kan hier niet worden bewerkt",
+        "description": "De opgeslagen correctie kan hieronder worden bekeken, maar de eerdere beeldselecties zijn niet beschikbaar.",
         "reasonLabel": "Reden",
-        "reason": "Waarden voor beoordeelde gebeurtenissen kunnen niet worden gereconstrueerd uit de huidige backend-detailpayload.",
-        "summaryTitle": "Opgeslagen record",
+        "reason": "Eerdere beeldselecties zijn niet beschikbaar voor deze opgeslagen correctie.",
+        "summaryTitle": "Opgeslagen correctie",
         "location": "Locatie",
         "basePollen": "Basispollen",
         "dateRange": "Datumbereik",
         "detailsTitle": "Opgeslagen factoren",
         "pollen": "Pollen",
-        "multiplier": "Opgeslagen vermenigvuldiger",
+        "multiplier": "Opgeslagen factor",
         "published": "Gepubliceerd",
         "yes": "Ja",
         "no": "Nee",
-        "empty": "Er zijn geen opgeslagen factordetails beschikbaar voor dit record."
+        "empty": "Er zijn geen opgeslagen factordetails beschikbaar voor deze correctie."
       },
       "meta": {
-        "title": "Locatie en datum/tijd",
+        "title": "Kies locatie en periode",
         "location": "Locatie",
         "allLocations": "Selecteer een locatie",
         "basePollen": "Basispollen",
         "allPollens": "Selecteer een pollen",
-        "detectedEvents": "Gedetecteerde gebeurtenissen",
-        "detectedEventsReadOnlyBadge": "Alleen-lezen",
-        "detectedEventsReadOnlyHelp": "Deze waarde wordt altijd afgeleid van de validatie-API en kan niet handmatig worden bewerkt.",
-        "detectedEventsHint": "Gedetecteerde gebeurtenissen worden beschikbaar nadat locatie, basispollen en het volledige datum- en tijdbereik zijn geselecteerd en daarna een grafieksegment voor beoordeling is gekozen.",
+        "detectedEvents": "Gedetecteerde beelden",
+        "detectedEventsHint": "Gedetecteerde beelden verschijnen nadat u een locatie, basispollen, datumbereik en grafiekpiek hebt gekozen.",
         "detectedEventsLoadingValue": "Laden...",
-        "detectedEventsValuePlaceholder": "Nog niet beschikbaar",
-        "detectedEventsSelectSlice": "Selecteer een grafieksegment om gedetecteerde gebeurtenissen voor beoordeling te laden.",
-        "detectedEventsLoading": "Gedetecteerde gebeurtenissen worden geladen vanuit de validatie-API...",
-        "detectedEventsLoaded": "Gedetecteerde gebeurtenissen worden automatisch afgeleid uit het aantal resultaten van de validatie-API voor het geselecteerde grafieksegment.",
-        "detectedEventsError": "Gedetecteerde gebeurtenissen konden niet worden geladen vanuit de validatie-API.",
-        "detectedEventsMismatchError": "Het antwoord van de validatie-API bevatte geen bruikbare gedetecteerde gebeurtenissen voor deze selectie.",
-        "detectedEventsLocationMappingError": "De geselecteerde correctiefactorlocatie \"{location}\" kon niet worden gekoppeld aan een locatienaam van de validatie-API.",
+        "detectedEventsValuePlaceholder": "Selecteer een grafiekpiek",
+        "detectedEventsSelectSlice": "Selecteer een grafiekpiek om de gedetecteerde beelden te bekijken.",
+        "detectedEventsLoading": "Gedetecteerde beelden laden...",
+        "detectedEventsLoaded": "Gedetecteerde beelden gevonden voor de geselecteerde grafiekpiek.",
+        "detectedEventsError": "Gedetecteerde beelden konden niet worden geladen.",
+        "detectedEventsMismatchError": "Er waren geen gedetecteerde beelden beschikbaar voor deze grafiekpiek.",
+        "detectedEventsLocationMappingError": "Gedetecteerde beelden zijn niet beschikbaar voor de geselecteerde locatie \"{location}\".",
         "startDate": "Startdatum en tijd",
         "endDate": "Einddatum en tijd",
         "startPlaceholder": "Startdatum",
@@ -150,7 +148,7 @@
         "time": "Tijd",
         "clear": "Wissen",
         "apply": "Toepassen",
-        "dateTimeHelp": "Uren kunnen in intervallen van 1 uur worden geselecteerd van 00:00 tot 23:00.",
+        "dateTimeHelp": "Tijden gebruiken stappen van 1 uur.",
         "loading": "Laden...",
         "loadError": "Opties niet beschikbaar",
         "optionsLoadError": "Dit veld kon de opties niet laden."
@@ -167,7 +165,7 @@
         "startDateInvalid": "Startdatum/tijd moet een geldig heel uur gebruiken.",
         "endDateInvalid": "Einddatum/tijd moet een geldig heel uur gebruiken.",
         "endDateOrder": "De einddatum moet na of gelijk aan de startdatum zijn.",
-        "detectedEventsRequired": "Gedetecteerde gebeurtenissen zijn verplicht.",
+        "detectedEventsRequired": "Selecteer een grafiekpiek met gedetecteerde beelden.",
         "atLeastOneRow": "Minimaal één correctierij is verplicht.",
         "exactlyOneBaseRow": "Precies één basispollenrij is verplicht.",
         "baseRowFirst": "De basispollenrij moet de eerste rij zijn.",
@@ -178,74 +176,107 @@
         "overAllocated": "Beoordeelde gebeurtenissen mogen niet hoger zijn dan gedetecteerde gebeurtenissen."
       },
       "distribution": {
-        "title": "Correctiefactoren",
-        "description": "Herverdeel de gedetecteerde gebeurtenissen voor het geselecteerde basispollen na expertbeoordeling.",
-        "detectedEventsLabel": "Gedetecteerde gebeurtenissen",
-        "derivedFromEvents": "Beheer hier de toegestane pollenclassificaties. Beoordeelde aantallen worden afgeleid uit de gebeurtenistoewijzingen in de carrousel.",
-        "restoredMultiplierGuidance": "Deze bewerkingsweergave toont de in de backend opgeslagen multipliers. Aantallen beoordeelde gebeurtenissen blijven niet beschikbaar totdat u een grafieksegment selecteert en een nieuwe beoordeling start.",
-        "addRow": "Pollenclassificatie toevoegen",
-        "selectPollen": "Selecteer pollen",
-        "remove": "Verwijderen",
-        "baseRow": "Basisrij",
-        "restored": "Hersteld",
-        "automatic": "Automatisch",
-        "reviewedEventsUnavailable": "Niet beschikbaar",
-        "unknown": "Onbekend",
-        "table": {
-          "pollen": "Pollenverdeling",
-          "reviewedEvents": "Beoordeelde gebeurtenissen",
-          "multiplier": "Factormultiplicator",
-          "actions": "Acties"
-        }
+        "title": "Correctieoverzicht",
+        "description": "Bekijk de resultaten van de geselecteerde beeldbeoordeling.",
+        "helperText": "Klik op beelden in het beoordelingspaneel om dit overzicht bij te werken.",
+        "detectedImages": "Gedetecteerde beelden",
+        "markedAsBasePollen": "Gemarkeerd als {basePollen}",
+        "markedAsBasePollenFallback": "Gemarkeerd als basispollen",
+        "countedAsUnknown": "Geteld als Onbekend",
+        "correctionMultiplier": "Correctiemultiplier",
+        "restoredMultiplierGuidance": "Selecteer een grafiekpiek en bekijk de beelden opnieuw om ze bij te werken.",
+        "savedTitle": "Opgeslagen factoren",
+        "savedDescription": "Deze opgeslagen correctie toont alleen de opgeslagen multiplier."
       },
       "totals": {
-        "assignedEvents": "Toegewezen gebeurtenissen",
-        "unknownEvents": "Onbekende gebeurtenissen",
-        "totalReviewedEvents": "Totaal beoordeelde gebeurtenissen",
-        "difference": "Te veel toegewezen",
-        "remainingEvents": "Resterende gebeurtenissen",
-        "overAssigned": "Te veel toegewezen",
-        "balancedMessage": "Beoordeelde gebeurtenissen zijn volledig in balans.",
-        "unknownRemainderMessage": "Resterende gebeurtenissen worden toegewezen aan Onbekend: {count}.",
-        "overAllocatedMessage": "Beoordeelde gebeurtenissen overschrijden gedetecteerde gebeurtenissen met {count}."
+        "overAllocatedMessage": "Geselecteerde beelden overschrijden de gedetecteerde beelden met {count}."
       },
       "editHydration": {
-        "title": "Herstelde multipliers",
-        "description": "Deze correctiefactor is hersteld uit persistente multipliers. De oorspronkelijke gebeurtenisselecties zijn niet beschikbaar in de huidige API-versie. Selecteer een grafieksegment om een nieuwe beoordelingssessie te starten."
+        "title": "Opgeslagen correctie geladen",
+        "description": "Deze opgeslagen correctie is geladen. Eerdere beeldselecties worden niet bewaard, dus selecteer een grafiekpiek om de beelden opnieuw te bekijken."
       },
       "preview": {
-        "title": "Grafiek (Origineel vs Gecorrigeerd)",
-        "description": "De grafiek gebruikt de oorspronkelijke metingen voor het geselecteerde basispollen en past de huidige correctiefactor lokaal toe. Selecteer een grafieksegment om de beoordeling van gedetecteerde gebeurtenissen te starten.",
-        "loading": "Previewmetingen laden...",
-        "idle": "Selecteer een locatie, basispollen, startdatum/tijd en einddatum/tijd om de preview te laden.",
-        "empty": "Er zijn geen meetgegevens beschikbaar voor het geselecteerde bereik.",
-        "error": "De previewmetingen konden niet worden geladen.",
+        "title": "Grafiekpieken",
+        "description": "Selecteer een piek in de grafiek om de gedetecteerde beelden te bekijken.",
+        "loading": "Grafiekpieken laden...",
+        "idle": "Kies een locatie, basispollen en datumbereik om grafiekpieken te tonen.",
+        "empty": "Er zijn geen grafiekpieken gevonden voor het geselecteerde bereik.",
+        "error": "Grafiekpieken konden niet worden geladen.",
+        "range": {
+          "current": "Bereik: {range}",
+          "pending": "Nog niet beschikbaar"
+        },
+        "resolution": {
+          "current": "Resolutie: {resolution}",
+          "pending": "In afwachting",
+          "month": "Maandelijkse buckets",
+          "week": "Wekelijkse buckets",
+          "day": "Dagelijkse buckets",
+          "measurement": "Grafiekpieken"
+        },
+        "navigation": {
+          "title": "Grafieknavigatie",
+          "drillDownMode": "Selecteer een bredere piekgroep om de grafiek te verfijnen.",
+          "reviewMode": "Selecteer een grafiekpiek om de gedetecteerde beelden te bekijken.",
+          "up": "Terug naar vorig bereik"
+        },
+        "bucketSelection": {
+          "title": "Grafiekselectie",
+          "drillDownDescription": "Selecteer eerst een bredere piekgroep om de grafiek te verfijnen en daarna een grafiekpiek.",
+          "reviewDescription": "Selecteer een grafiekpiek om de gedetecteerde beelden te bekijken.",
+          "drillDownAction": "Inzoomen",
+          "reviewAction": "Gedetecteerde beelden bekijken"
+        },
         "sliceSelection": {
-          "title": "Beoordelingssegment",
-          "description": "Klik op een punt in de grafiek of kies hieronder een segment om alleen de gedetecteerde gebeurtenissen van dat tijdvak te laden.",
-          "dotAriaLabel": "Selecteer dit grafieksegment voor beoordeling",
-          "noneSelected": "Er is nog geen grafieksegment geselecteerd.",
-          "selected": "Geselecteerd segment: {slice}"
+          "noneSelected": "Nog geen grafiekpiek geselecteerd.",
+          "selected": "Geselecteerde grafiekpiek: {slice}"
+        },
+        "tooltip": {
+          "value": "{value} Pollen/m3"
         },
         "series": {
-          "original": "Originele reeks",
-          "corrected": "Gecorrigeerde reeks"
+          "original": "Gemeten",
+          "corrected": "Gecorrigeerd"
         }
       },
-      "eventsCarousel": {
-        "title": "Gedetecteerde gebeurtenissen",
-        "description": "Klik op de afbeeldingen die overeenkomen met het basispollen in het geselecteerde grafieksegment.",
+      "reviewSummary": {
+        "title": "Beeldbeoordeling",
+        "description": "Open het paneel voor beeldbeoordeling van de geselecteerde grafiekpiek.",
+        "action": "Beelden bekijken",
+        "selectedSlice": "Grafiekpiek",
+        "slicePending": "Nog geen grafiekpiek geselecteerd",
+        "detectedEvents": "Gedetecteerde beelden",
+        "accepted": "Komt overeen met basispollen",
+        "unknown": "Onbekend",
+        "countPending": "Nog niet beschikbaar",
         "count": "{count, plural, =0 {0 gebeurtenissen} one {# gebeurtenis} other {# gebeurtenissen}}",
-        "idle": "Selecteer een locatie, basispollen, startdatum/tijd en einddatum/tijd om gedetecteerde gebeurtenissen te laden.",
-        "selectSlice": "Selecteer een grafieksegment om gedetecteerde gebeurtenissen voor beoordeling te laden.",
-        "empty": "Er zijn geen gedetecteerde gebeurtenissen gevonden voor de geselecteerde filters.",
-        "error": "Gedetecteerde gebeurtenissen konden niet worden geladen.",
-        "errorMismatch": "Er zijn gedetecteerde gebeurtenissen teruggegeven, maar het antwoord bevatte geen bruikbare records voor deze selectie.",
-        "selectionInstruction": "Klik op elke afbeelding die als {basePollen} moet meetellen.",
-        "selectionHint": "Geselecteerde afbeeldingen tellen als basispollen. Niet-geselecteerde afbeeldingen blijven Onbekend.",
-        "acceptedCount": "{acceptedCount} van {totalCount} geaccepteerd",
-        "classification": "Gedetecteerde classificatie",
-        "reviewedClassification": "Beoordeelde classificatie",
+        "readyHint": "Klik op beelden die overeenkomen met {basePollen}. Niet-geselecteerde beelden tellen als Onbekend."
+      },
+      "reviewWorkspace": {
+        "eyebrow": "Beeldbeoordeling",
+        "title": "Gedetecteerde beelden",
+        "description": "Bekijk de beelden voor de geselecteerde grafiekpiek.",
+        "close": "Beoordeling sluiten",
+        "selectedSlice": "Grafiekpiek",
+        "slicePending": "Nog geen grafiekpiek geselecteerd",
+        "accepted": "Komt overeen met basispollen",
+        "unknown": "Onbekend",
+        "count": "{count, plural, =0 {0 gebeurtenissen} one {# gebeurtenis} other {# gebeurtenissen}}"
+      },
+      "eventsCarousel": {
+        "title": "Gedetecteerde beelden",
+        "description": "Bekijk de beelden voor de geselecteerde grafiekpiek.",
+        "count": "{count, plural, =0 {0 gebeurtenissen} one {# gebeurtenis} other {# gebeurtenissen}}",
+        "idle": "Kies een locatie, basispollen en datumbereik om grafiekpieken te laden.",
+        "selectSlice": "Selecteer een grafiekpiek om de gedetecteerde beelden te bekijken.",
+        "empty": "Er zijn geen gedetecteerde beelden gevonden voor de geselecteerde grafiekpiek.",
+        "error": "Gedetecteerde beelden konden niet worden geladen.",
+        "errorMismatch": "Er waren geen gedetecteerde beelden beschikbaar voor deze grafiekpiek.",
+        "selectionInstruction": "Klik op beelden die overeenkomen met {basePollen}.",
+        "selectionHint": "Niet-geselecteerde beelden tellen als Onbekend.",
+        "acceptedCount": "{acceptedCount} van {totalCount} komen overeen met {basePollen}",
+        "classification": "Gedetecteerd pollen",
+        "reviewedClassification": "Beoordeeld pollen",
         "unknown": "Onbekend",
         "acceptedBadge": "{basePollen}",
         "unknownBadge": "Onbekend",

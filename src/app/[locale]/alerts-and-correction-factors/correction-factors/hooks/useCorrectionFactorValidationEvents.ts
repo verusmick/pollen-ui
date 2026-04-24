@@ -17,9 +17,9 @@ import { correctionFactorKeys } from '../constants';
 interface UseCorrectionFactorValidationEventsOptions {
   location: string;
   basePollen: string;
-  selectedSliceId: string | null;
-  selectedSliceFrom: number | null;
-  selectedSliceTo: number | null;
+  selectedReviewSliceId: string | null;
+  selectedReviewSliceFrom: number | null;
+  selectedReviewSliceTo: number | null;
 }
 
 interface UseCorrectionFactorValidationEventsResult {
@@ -41,26 +41,26 @@ function isNonRetryableValidationEventsError(error: unknown): boolean {
 export function useCorrectionFactorValidationEvents({
   location,
   basePollen,
-  selectedSliceId,
-  selectedSliceFrom,
-  selectedSliceTo,
+  selectedReviewSliceId,
+  selectedReviewSliceFrom,
+  selectedReviewSliceTo,
 }: UseCorrectionFactorValidationEventsOptions): UseCorrectionFactorValidationEventsResult {
   const hasValidSliceSelection =
-    typeof selectedSliceId === 'string' &&
-    selectedSliceId.length > 0 &&
-    typeof selectedSliceFrom === 'number' &&
-    Number.isFinite(selectedSliceFrom) &&
-    typeof selectedSliceTo === 'number' &&
-    Number.isFinite(selectedSliceTo);
+    typeof selectedReviewSliceId === 'string' &&
+    selectedReviewSliceId.length > 0 &&
+    typeof selectedReviewSliceFrom === 'number' &&
+    Number.isFinite(selectedReviewSliceFrom) &&
+    typeof selectedReviewSliceTo === 'number' &&
+    Number.isFinite(selectedReviewSliceTo);
   const range = useMemo(
     () =>
       hasValidSliceSelection
         ? {
-            from: selectedSliceFrom,
-            to: selectedSliceTo,
+            from: selectedReviewSliceFrom,
+            to: selectedReviewSliceTo,
           }
         : null,
-    [hasValidSliceSelection, selectedSliceFrom, selectedSliceTo]
+    [hasValidSliceSelection, selectedReviewSliceFrom, selectedReviewSliceTo]
   );
   const isReady = Boolean(location) && Boolean(basePollen) && range !== null;
 
@@ -68,7 +68,7 @@ export function useCorrectionFactorValidationEvents({
     queryKey: correctionFactorKeys.validationEvent({
       location: location || '',
       basePollen: basePollen || '',
-      sliceId: selectedSliceId ?? '',
+      reviewSliceId: selectedReviewSliceId ?? '',
       from: range?.from ?? 0,
       to: range?.to ?? 0,
     }),

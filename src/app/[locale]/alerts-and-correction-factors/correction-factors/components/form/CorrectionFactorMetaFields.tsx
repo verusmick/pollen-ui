@@ -267,12 +267,7 @@ export function CorrectionFactorMetaFields({
         </div>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="flex items-center justify-between gap-3">
-            <span className="text-muted-foreground">{t('detectedEvents')}</span>
-            <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              {t('detectedEventsReadOnlyBadge')}
-            </span>
-          </span>
+          <span className="text-muted-foreground">{t('detectedEvents')}</span>
           <input
             type="text"
             value={detectedEventsDisplay}
@@ -285,9 +280,6 @@ export function CorrectionFactorMetaFields({
                 : 'border-border'
             } ${detectedEventsBusy ? 'animate-pulse' : ''}`}
           />
-          <span className="text-xs text-muted-foreground">
-            {t('detectedEventsReadOnlyHelp')}
-          </span>
           {validationEventsStatusText ? (
             <span className="flex items-center gap-2 text-xs text-muted-foreground">
               {detectedEventsBusy ? (

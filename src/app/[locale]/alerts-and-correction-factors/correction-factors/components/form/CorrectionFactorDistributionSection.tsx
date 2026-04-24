@@ -15,14 +15,8 @@ interface CorrectionFactorDistributionSectionProps {
   derived: CorrectionFactorFormDerivedState;
   errors: CorrectionFactorFormErrors;
   validationErrors: CorrectionFactorFormErrors;
-  canAddRow: boolean;
   showStoredMultiplierView: boolean;
   isEventReviewMode: boolean;
-  getPollenOptions: (currentRowPollen: string) => string[];
-  onAddRow: () => void;
-  onPollenChange: (clientId: string, pollen: string) => void;
-  onReviewedEventsChange: (clientId: string, reviewedEvents: string) => void;
-  onRemoveRow: (clientId: string) => void;
 }
 
 export function CorrectionFactorDistributionSection({
@@ -30,26 +24,26 @@ export function CorrectionFactorDistributionSection({
   derived,
   errors,
   validationErrors,
-  canAddRow,
   showStoredMultiplierView,
   isEventReviewMode,
-  getPollenOptions,
-  onAddRow,
-  onPollenChange,
-  onReviewedEventsChange,
-  onRemoveRow,
 }: CorrectionFactorDistributionSectionProps) {
   const t = useTranslations('correctionFactorsPage.form.distribution');
+  const title = showStoredMultiplierView ? t('savedTitle') : t('title');
+  const description = showStoredMultiplierView
+    ? t('savedDescription')
+    : t('description');
+  const baseStoredMultiplier =
+    values.rows.find((row) => row.isBasePollen)?.storedMultiplier ?? null;
 
   return (
     <section className="space-y-4 rounded-lg border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-4">
+      <div>
         <div>
-          <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
-          <p className="text-sm text-muted-foreground">{t('description')}</p>
-          {isEventReviewMode ? (
+          <h2 className="text-base font-semibold text-foreground">{title}</h2>
+          <p className="text-sm text-muted-foreground">{description}</p>
+          {!showStoredMultiplierView && isEventReviewMode ? (
             <p className="mt-2 text-sm text-muted-foreground">
-              {t('derivedFromEvents')}
+              {t('helperText')}
             </p>
           ) : null}
           {showStoredMultiplierView ? (
@@ -58,26 +52,13 @@ export function CorrectionFactorDistributionSection({
             </p>
           ) : null}
         </div>
-        <button
-          type="button"
-          onClick={onAddRow}
-          disabled={!canAddRow}
-          className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-background disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {t('addRow')}
-        </button>
       </div>
       <CorrectionFactorDistributionTable
-        rows={values.rows}
         derived={derived}
-        errors={errors}
-        validationErrors={validationErrors}
-        isEventReviewMode={isEventReviewMode}
+        detectedEvents={values.detectedEvents}
+        basePollen={values.basePollen}
         showStoredMultiplierView={showStoredMultiplierView}
-        getPollenOptions={getPollenOptions}
-        onPollenChange={onPollenChange}
-        onReviewedEventsChange={onReviewedEventsChange}
-        onRemove={onRemoveRow}
+        storedMultiplier={baseStoredMultiplier}
       />
 
       {!showStoredMultiplierView ? (

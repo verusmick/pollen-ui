@@ -16,67 +16,90 @@ import {
 import { useTranslations } from 'next-intl';
 
 import type {
-  CorrectionFactorReviewSlice,
+  CorrectionFactorChartRange,
+  CorrectionFactorChartResolution,
+  CorrectionFactorPreviewPoint,
   CorrectionFactorPreviewSeries,
   CorrectionFactorPreviewStatus,
+  CorrectionFactorReviewSlice,
 } from '../../types';
+import { formatCorrectionFactorChartRange } from '../../utils';
 
 interface CorrectionFactorChartPreviewProps {
+  basePollen: string;
   status: CorrectionFactorPreviewStatus;
   series: CorrectionFactorPreviewSeries | null;
-  slices: CorrectionFactorReviewSlice[];
+  reviewSlices: CorrectionFactorReviewSlice[];
   selectedSliceId: string | null;
+  visibleRange: CorrectionFactorChartRange | null;
+  resolution: CorrectionFactorChartResolution | null;
+  canDrillUp: boolean;
   errorMessage?: string | null;
-  onSelectSlice: (sliceId: string) => void;
+  onActivateBucket: (bucketId: string) => void;
+  onDrillUp: () => void;
 }
 
 function formatValue(value: number): string {
   return Number.isInteger(value) ? `${value}` : value.toFixed(2);
 }
 
+function formatResolutionLabel(
+  resolution: CorrectionFactorChartResolution | null,
+  t: (key: string) => string
+): string {
+  switch (resolution) {
+    case 'month':
+      return t('resolution.month');
+    case 'week':
+      return t('resolution.week');
+    case 'day':
+      return t('resolution.day');
+    case 'measurement':
+      return t('resolution.measurement');
+    default:
+      return t('resolution.pending');
+  }
+}
+
 function isFiniteCoordinate(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
-function getSliceIdFromDotProps(
-  props: DotItemDotProps,
-  series: CorrectionFactorPreviewSeries | null
-): string | null {
-  const pointFromSeries =
-    typeof props.index === 'number' ? series?.points[props.index] : undefined;
-
-  if (pointFromSeries?.sliceId) {
-    return pointFromSeries.sliceId;
-  }
-
-  const { payload } = props;
-
-  if (payload && typeof payload === 'object' && 'sliceId' in payload) {
-    return typeof payload.sliceId === 'string' ? payload.sliceId : null;
-  }
-
-  return null;
-}
-
 export function CorrectionFactorChartPreview({
+  basePollen,
   status,
   series,
-  slices,
+  reviewSlices,
   selectedSliceId,
+  visibleRange,
+  resolution,
+  canDrillUp,
   errorMessage = null,
-  onSelectSlice,
+  onActivateBucket,
+  onDrillUp,
 }: CorrectionFactorChartPreviewProps) {
   const t = useTranslations('correctionFactorsPage.form.preview');
-  const sliceButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const bucketButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const selectedSlice =
-    slices.find((slice) => slice.id === selectedSliceId) ?? null;
+    reviewSlices.find((slice) => slice.id === selectedSliceId) ?? null;
+  const selectedPoint =
+    series?.points.find(
+      (point) => point.id === selectedSliceId && point.isReviewSlice
+    ) ?? null;
+  const visibleRangeLabel = formatCorrectionFactorChartRange(visibleRange);
+  const showBucketButtons =
+    series?.resolution === 'day' || series?.resolution === 'measurement';
+  const xAxisMinTickGap =
+    resolution === 'measurement' ? 6 : resolution === 'day' ? 24 : 24;
+  const xAxisInterval =
+    resolution === 'measurement' ? 0 : 'preserveStartEnd';
 
   useEffect(() => {
-    if (!selectedSliceId) {
+    if (!selectedSliceId || !showBucketButtons) {
       return;
     }
 
-    const selectedButton = sliceButtonRefs.current[selectedSliceId];
+    const selectedButton = bucketButtonRefs.current[selectedSliceId];
 
     if (!selectedButton) {
       return;
@@ -87,45 +110,86 @@ export function CorrectionFactorChartPreview({
       block: 'nearest',
       inline: 'center',
     });
-  }, [selectedSliceId, slices]);
+  }, [selectedSliceId, showBucketButtons, series?.points]);
 
-  function handleSliceButtonClick(
+  function handleBucketButtonClick(
     event: MouseEvent<HTMLButtonElement>,
-    sliceId: string
+    bucketId: string
   ) {
     event.preventDefault();
-    onSelectSlice(sliceId);
+    onActivateBucket(bucketId);
   }
 
-  function handleDotKeyDown(
-    event: KeyboardEvent<SVGCircleElement>,
-    sliceId: string
+  function handleBucketKeyDown(
+    event: KeyboardEvent<HTMLButtonElement>,
+    bucketId: string
   ) {
     if (event.key !== 'Enter' && event.key !== ' ') {
       return;
     }
 
     event.preventDefault();
-    onSelectSlice(sliceId);
+    onActivateBucket(bucketId);
   }
 
-  function handleDotSelect(sliceId: string) {
-    onSelectSlice(sliceId);
+  function handleChartClick(state: unknown) {
+    if (!state || typeof state !== 'object' || !('activePayload' in state)) {
+      return;
+    }
+
+    const activePayload = state.activePayload;
+
+    if (!Array.isArray(activePayload)) {
+      return;
+    }
+
+    const bucketId = activePayload[0]?.payload?.id;
+
+    if (typeof bucketId !== 'string' || bucketId.length === 0) {
+      return;
+    }
+
+    onActivateBucket(bucketId);
   }
 
-  function renderSelectableDot(props: DotItemDotProps) {
-    const { cx, cy } = props;
-    const sliceId = getSliceIdFromDotProps(props, series);
+  function handleDotKeyDown(
+    event: KeyboardEvent<SVGCircleElement>,
+    bucketId: string
+  ) {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
+    event.preventDefault();
+    onActivateBucket(bucketId);
+  }
+
+  function handleDotMouseDown(event: MouseEvent<SVGCircleElement>) {
+    // Prevent mouse clicks from leaving the browser's default focus outline
+    // on the SVG element, while still allowing keyboard focus/navigation.
+    event.preventDefault();
+  }
+
+  function renderPeakDot(props: DotItemDotProps) {
+    const { cx, cy, payload } = props;
+    const bucketId =
+      payload && typeof payload === 'object' && 'id' in payload
+        ? payload.id
+        : null;
 
     if (
       !isFiniteCoordinate(cx) ||
       !isFiniteCoordinate(cy) ||
-      typeof sliceId !== 'string'
+      typeof bucketId !== 'string'
     ) {
       return null;
     }
 
-    const isSelected = sliceId === selectedSliceId;
+    const isSelected = bucketId === selectedSliceId;
+    const isReviewSlice =
+      payload && typeof payload === 'object' && 'isReviewSlice' in payload
+        ? payload.isReviewSlice === true
+        : false;
 
     return (
       <g>
@@ -139,22 +203,94 @@ export function CorrectionFactorChartPreview({
           className="cursor-pointer"
           role="button"
           tabIndex={0}
-          aria-label={t('sliceSelection.dotAriaLabel')}
-          onClick={() => handleDotSelect(sliceId)}
-          onKeyDown={(event) => handleDotKeyDown(event, sliceId)}
+          aria-label={
+            isReviewSlice
+              ? t('bucketSelection.reviewAction')
+              : t('bucketSelection.drillDownAction')
+          }
+          onMouseDown={handleDotMouseDown}
+          onClick={() => onActivateBucket(bucketId)}
+          onKeyDown={(event) => handleDotKeyDown(event, bucketId)}
         />
         <circle
           cx={cx}
           cy={cy}
-          r={isSelected ? 5 : 3}
-          fill={isSelected ? '#1f2937' : '#2563eb'}
+          r={isSelected ? 5 : 4}
+          fill={isSelected ? '#111827' : '#2563eb'}
           stroke="#ffffff"
-          strokeWidth={isSelected ? 2 : 1}
+          strokeWidth={isSelected ? 2 : 1.5}
           className="cursor-pointer"
-          onClick={() => handleDotSelect(sliceId)}
+          onMouseDown={handleDotMouseDown}
+          onClick={() => onActivateBucket(bucketId)}
         />
+        {isSelected && isReviewSlice ? (
+          <foreignObject
+            x={Math.min(Math.max(cx - 90, 8), 540)}
+            y={Math.max(cy - 118, 8)}
+            width={180}
+            height={116}
+            pointerEvents="none"
+          >
+            <div className="h-full w-full overflow-visible">
+              {renderTooltipCard(payload, 'selected')}
+            </div>
+          </foreignObject>
+        ) : null}
       </g>
     );
+  }
+
+  function renderTooltipCard(
+    point: CorrectionFactorPreviewPoint,
+    variant: 'hover' | 'selected'
+  ) {
+    const cardClassName =
+      variant === 'selected'
+        ? 'rounded-lg border border-sky-400 bg-sky-50 px-3 py-2 shadow-md'
+        : 'rounded-lg border border-border bg-background px-3 py-2 shadow-md';
+    const titleClassName =
+      variant === 'selected'
+        ? 'text-sm font-semibold text-sky-950'
+        : 'text-sm font-semibold text-foreground';
+    const dateClassName =
+      variant === 'selected' ? 'mt-1 text-sm text-sky-900' : 'mt-1 text-sm text-foreground';
+    const timeClassName =
+      variant === 'selected' ? 'text-sm text-sky-700' : 'text-sm text-muted-foreground';
+    const valueClassName =
+      variant === 'selected'
+        ? 'mt-2 text-sm font-medium text-sky-950'
+        : 'mt-2 text-sm font-medium text-foreground';
+
+    return (
+      <div className={cardClassName}>
+        <div className={titleClassName}>{basePollen}</div>
+        <div className={dateClassName}>{point.peakDateLabel}</div>
+        <div className={timeClassName}>{point.peakTimeRangeLabel}</div>
+        <div className={valueClassName}>
+          {t('tooltip.value', {
+            value: formatValue(point.originalValue),
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  function renderTooltipContent({
+    active,
+    payload,
+  }: {
+    active?: boolean;
+    payload?: ReadonlyArray<{
+      payload?: CorrectionFactorPreviewPoint;
+    }>;
+  }) {
+    const point = payload?.[0]?.payload;
+
+    if (!active || !point) {
+      return null;
+    }
+
+    return renderTooltipCard(point, 'hover');
   }
 
   return (
@@ -171,12 +307,34 @@ export function CorrectionFactorChartPreview({
             </p>
           </div>
         </div>
-        <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-          {selectedSlice
-            ? t('sliceSelection.selected', {
-                slice: selectedSlice.label,
-              })
-            : t('sliceSelection.noneSelected')}
+
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {canDrillUp ? (
+            <button
+              type="button"
+              onClick={onDrillUp}
+              className="inline-flex cursor-pointer items-center justify-center rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-foreground transition hover:bg-muted"
+            >
+              {t('navigation.up')}
+            </button>
+          ) : null}
+          <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+            {t('range.current', {
+              range: visibleRangeLabel ?? t('range.pending'),
+            })}
+          </div>
+          <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+            {t('resolution.current', {
+              resolution: formatResolutionLabel(resolution, t),
+            })}
+          </div>
+          <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+            {selectedSlice
+              ? t('sliceSelection.selected', {
+                  slice: selectedSlice.label,
+                })
+              : t('sliceSelection.noneSelected')}
+          </div>
         </div>
       </div>
 
@@ -206,15 +364,16 @@ export function CorrectionFactorChartPreview({
 
       {status === 'ready' && series ? (
         <div className="mt-4 space-y-4">
-          <div className="h-[380px] min-w-0 rounded-lg border border-border bg-background p-4 xl:h-[430px]">
+          <div className="relative h-[380px] min-w-0 rounded-lg border border-border bg-background p-4 xl:h-[430px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={series.points}>
+              <LineChart data={series.points} onClick={handleChartClick}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis
-                  dataKey="label"
+                  dataKey="axisLabel"
                   tickLine={false}
                   axisLine={false}
-                  minTickGap={24}
+                  minTickGap={xAxisMinTickGap}
+                  interval={xAxisInterval}
                   tick={{ fontSize: 12 }}
                 />
                 <YAxis
@@ -223,12 +382,7 @@ export function CorrectionFactorChartPreview({
                   tick={{ fontSize: 12 }}
                   tickFormatter={formatValue}
                 />
-                <Tooltip
-                  formatter={(value: number, name: string) => [
-                    formatValue(value),
-                    name,
-                  ]}
-                />
+                <Tooltip content={renderTooltipContent} />
                 <Legend />
                 <Line
                   type="monotone"
@@ -236,8 +390,8 @@ export function CorrectionFactorChartPreview({
                   name={t('series.original')}
                   stroke="#2563eb"
                   strokeWidth={2}
-                  dot={renderSelectableDot}
-                  activeDot={{ r: 5 }}
+                  dot={renderPeakDot}
+                  activeDot={false}
                 />
                 <Line
                   type="monotone"
@@ -251,50 +405,56 @@ export function CorrectionFactorChartPreview({
             </ResponsiveContainer>
           </div>
 
-          <div className="space-y-3 rounded-lg border border-border bg-background p-4">
-            <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground">
-                {t('sliceSelection.title')}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {t('sliceSelection.description')}
-              </p>
+          {showBucketButtons ? (
+            <div className="space-y-3 rounded-lg border border-border bg-background p-4">
+            <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-1">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {t('bucketSelection.title')}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {series.resolution === 'measurement'
+                    ? t('bucketSelection.reviewDescription')
+                    : t('bucketSelection.drillDownDescription')}
+                </p>
+              </div>
+              <div className="rounded-md border border-dashed border-border px-3 py-2 text-sm text-muted-foreground">
+                {selectedSlice
+                  ? t('sliceSelection.selected', {
+                      slice: selectedSlice.label,
+                    })
+                  : t('sliceSelection.noneSelected')}
+              </div>
             </div>
 
             <div className="-mx-1 overflow-x-auto pb-1">
               <div className="flex min-w-max gap-2 px-1">
-                {slices.map((slice) => {
-                  const isSelected = slice.id === selectedSliceId;
+                {series.points.map((point) => {
+                  const isSelected = point.id === selectedSliceId;
 
                   return (
                     <button
-                      key={slice.id}
+                      key={point.id}
                       ref={(element) => {
-                        sliceButtonRefs.current[slice.id] = element;
+                        bucketButtonRefs.current[point.id] = element;
                       }}
                       type="button"
-                      onClick={(event) => handleSliceButtonClick(event, slice.id)}
-                      className={`rounded-md border px-3 py-2 text-sm transition ${
+                      onClick={(event) => handleBucketButtonClick(event, point.id)}
+                      onKeyDown={(event) => handleBucketKeyDown(event, point.id)}
+                      className={`rounded-md border px-3 py-2 text-left text-sm transition ${
                         isSelected
                           ? 'border-foreground bg-foreground text-background'
                           : 'border-border bg-card text-foreground hover:bg-muted'
                       }`}
                     >
-                      {slice.label}
+                      <div className="font-medium">{point.label}</div>
                     </button>
                   );
                 })}
               </div>
             </div>
-
-            <div className="rounded-md border border-dashed border-border px-3 py-2 text-sm text-muted-foreground">
-              {selectedSlice
-                ? t('sliceSelection.selected', {
-                    slice: selectedSlice.label,
-                  })
-                : t('sliceSelection.noneSelected')}
             </div>
-          </div>
+          ) : null}
         </div>
       ) : null}
     </section>

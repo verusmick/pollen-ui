@@ -82,7 +82,7 @@ export function mapCorrectionFactorRecordToFormValues(
     basePollen: record.basePollen,
     startDate: normalizeCorrectionFactorDateTime(record.startDate),
     endDate: normalizeCorrectionFactorDateTime(record.endDate),
-    selectedSliceId: null,
+    selectedReviewSliceId: null,
     detectedEvents: null,
     events: [],
     rows: baseRow

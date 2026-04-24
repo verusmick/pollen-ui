@@ -3,6 +3,8 @@
 import type { CorrectionFactorLocationOption } from '@/lib/api/correctionFactors';
 import { useTranslations } from 'next-intl';
 import type {
+  CorrectionFactorChartRange,
+  CorrectionFactorChartResolution,
   CorrectionFactorFormMode,
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormErrors,
@@ -17,9 +19,10 @@ import type {
 import { formatCorrectionFactorDateTimeRange } from '../../utils';
 import { CorrectionFactorChartPreview } from './CorrectionFactorChartPreview';
 import { CorrectionFactorDistributionSection } from './CorrectionFactorDistributionSection';
-import { CorrectionFactorEventCarousel } from './CorrectionFactorEventCarousel';
 import { CorrectionFactorFormHeader } from './CorrectionFactorFormHeader';
 import { CorrectionFactorMetaFields } from './CorrectionFactorMetaFields';
+import { CorrectionFactorReviewSummary } from './CorrectionFactorReviewSummary';
+import { CorrectionFactorReviewWorkspace } from './CorrectionFactorReviewWorkspace';
 
 interface CorrectionFactorFormProps {
   mode: CorrectionFactorFormMode;
@@ -42,6 +45,9 @@ interface CorrectionFactorFormProps {
   validationEventsStatusText?: string | null;
   validationEventsFieldError?: string | null;
   onToggleValidationEventAccepted: (eventId: string) => void;
+  reviewWorkspaceOpen: boolean;
+  onOpenReviewWorkspace: () => void;
+  onCloseReviewWorkspace: () => void;
   saving: boolean;
   deleting?: boolean;
   actionError?: string | null;
@@ -53,23 +59,22 @@ interface CorrectionFactorFormProps {
   submitDisabled?: boolean;
   deleteDisabled?: boolean;
   canDelete?: boolean;
-  canAddRow: boolean;
   showStoredMultiplierView?: boolean;
+  basePollen: string;
   previewStatus: CorrectionFactorPreviewStatus;
   previewSeries: CorrectionFactorPreviewSeries | null;
-  previewSlices: CorrectionFactorReviewSlice[];
+  previewReviewSlices: CorrectionFactorReviewSlice[];
   selectedPreviewSliceId: string | null;
+  previewVisibleRange: CorrectionFactorChartRange | null;
+  previewCanDrillUp: boolean;
+  previewResolution: CorrectionFactorChartResolution | null;
   previewError?: string | null;
-  onSelectPreviewSlice: (sliceId: string) => void;
-  getPollenOptions: (currentRowPollen: string) => string[];
+  onActivatePreviewBucket: (bucketId: string) => void;
+  onDrillUpPreviewRange: () => void;
   onLocationChange: (value: string) => void;
   onBasePollenChange: (value: string) => void;
   onStartDateChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
-  onAddRow: () => void;
-  onPollenChange: (clientId: string, pollen: string) => void;
-  onReviewedEventsChange: (clientId: string, reviewedEvents: string) => void;
-  onRemoveRow: (clientId: string) => void;
   onCancel: () => void;
   onSubmit: () => void;
   onDelete?: () => void;
@@ -100,6 +105,9 @@ export function CorrectionFactorForm({
   validationEventsStatusText = null,
   validationEventsFieldError = null,
   onToggleValidationEventAccepted,
+  reviewWorkspaceOpen,
+  onOpenReviewWorkspace,
+  onCloseReviewWorkspace,
   saving,
   deleting = false,
   actionError,
@@ -111,30 +119,29 @@ export function CorrectionFactorForm({
   submitDisabled = false,
   deleteDisabled = false,
   canDelete = false,
-  canAddRow,
   showStoredMultiplierView = false,
+  basePollen,
   previewStatus,
   previewSeries,
-  previewSlices,
+  previewReviewSlices,
   selectedPreviewSliceId,
+  previewVisibleRange,
+  previewCanDrillUp,
+  previewResolution,
   previewError = null,
-  onSelectPreviewSlice,
-  getPollenOptions,
+  onActivatePreviewBucket,
+  onDrillUpPreviewRange,
   onLocationChange,
   onBasePollenChange,
   onStartDateChange,
   onEndDateChange,
-  onAddRow,
-  onPollenChange,
-  onReviewedEventsChange,
-  onRemoveRow,
   onCancel,
   onSubmit,
   onDelete,
 }: CorrectionFactorFormProps) {
   const formT = useTranslations('correctionFactorsPage.form');
   const selectedPreviewSlice =
-    previewSlices.find((slice) => slice.id === selectedPreviewSliceId) ?? null;
+    previewReviewSlices.find((slice) => slice.id === selectedPreviewSliceId) ?? null;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
@@ -319,39 +326,52 @@ export function CorrectionFactorForm({
               derived={derived}
               errors={errors}
               validationErrors={validationErrors}
-              canAddRow={canAddRow}
               showStoredMultiplierView={showStoredMultiplierView}
               isEventReviewMode={values.events.length > 0}
-              getPollenOptions={getPollenOptions}
-              onAddRow={onAddRow}
-              onPollenChange={onPollenChange}
-              onReviewedEventsChange={onReviewedEventsChange}
-              onRemoveRow={onRemoveRow}
             />
           </aside>
 
           <div className="min-w-0 space-y-4">
             <CorrectionFactorChartPreview
+              basePollen={basePollen}
               status={previewStatus}
               series={previewSeries}
-              slices={previewSlices}
+              reviewSlices={previewReviewSlices}
               selectedSliceId={selectedPreviewSliceId}
+              visibleRange={previewVisibleRange}
+              resolution={previewResolution}
+              canDrillUp={previewCanDrillUp}
               errorMessage={previewError}
-              onSelectSlice={onSelectPreviewSlice}
+              onActivateBucket={onActivatePreviewBucket}
+              onDrillUp={onDrillUpPreviewRange}
             />
 
-            <CorrectionFactorEventCarousel
+            <CorrectionFactorReviewSummary
               status={validationEventsStatus}
               events={validationEvents}
+              detectedEvents={values.detectedEvents}
               basePollen={values.basePollen}
+              hasSelectedSlice={selectedPreviewSlice !== null}
               selectedSliceLabel={selectedPreviewSlice?.label ?? null}
-              idleMessage={validationEventsIdleMessage}
               errorMessage={validationEventsError}
-              onToggleAccepted={onToggleValidationEventAccepted}
+              statusText={validationEventsFieldError ?? validationEventsStatusText}
+              onOpenReviewWorkspace={onOpenReviewWorkspace}
             />
           </div>
         </div>
       ) : null}
+
+      <CorrectionFactorReviewWorkspace
+        open={reviewWorkspaceOpen}
+        status={validationEventsStatus}
+        events={validationEvents}
+        basePollen={values.basePollen}
+        selectedSliceLabel={selectedPreviewSlice?.label ?? null}
+        idleMessage={validationEventsIdleMessage}
+        errorMessage={validationEventsError}
+        onToggleAccepted={onToggleValidationEventAccepted}
+        onClose={onCloseReviewWorkspace}
+      />
     </div>
   );
 }

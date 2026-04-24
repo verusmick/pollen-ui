@@ -9,6 +9,8 @@ import {
   UNKNOWN_POLLEN_CODE,
 } from '../constants';
 import type {
+  CorrectionFactorChartNavigationState,
+  CorrectionFactorChartRange,
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormErrors,
   CorrectionFactorFormValues,
@@ -18,8 +20,10 @@ import type {
 } from '../types';
 import {
   buildCorrectionFactorDerivedState,
+  didCorrectionFactorRangeChange,
   hasCorrectionFactorFormErrors,
   listCorrectionFactorFormErrors,
+  toMeasurementPreviewRange,
   validateCorrectionFactorForm,
 } from '../utils';
 
@@ -193,14 +197,16 @@ function syncRowsFromReviewedEvents(
   };
 }
 
-function clearSelectedSlice(values: CorrectionFactorFormValues): CorrectionFactorFormValues {
-  if (values.selectedSliceId === null) {
+function clearSelectedReviewSlice(
+  values: CorrectionFactorFormValues
+): CorrectionFactorFormValues {
+  if (values.selectedReviewSliceId === null) {
     return values;
   }
 
   return {
     ...values,
-    selectedSliceId: null,
+    selectedReviewSliceId: null,
   };
 }
 
@@ -214,6 +220,13 @@ export function useCorrectionFactorForm() {
   );
   const [hasValidated, setHasValidated] = useState(false);
   const [hasReviewSessionChanges, setHasReviewSessionChanges] = useState(false);
+  const [chartRangeStack, setChartRangeStack] = useState<CorrectionFactorChartRange[]>(
+    []
+  );
+  const rootChartRange = useMemo(
+    () => toMeasurementPreviewRange(values.startDate, values.endDate),
+    [values.endDate, values.startDate]
+  );
 
   const derived = useMemo<CorrectionFactorFormDerivedState>(
     () => buildCorrectionFactorDerivedState(values, 'ratio'),
@@ -253,6 +266,17 @@ export function useCorrectionFactorForm() {
     () => listCorrectionFactorFormErrors(validationErrors),
     [validationErrors]
   );
+  const chartNavigation = useMemo<CorrectionFactorChartNavigationState>(() => {
+    const visibleRange =
+      chartRangeStack[chartRangeStack.length - 1] ?? rootChartRange ?? null;
+
+    return {
+      rootRange: rootChartRange,
+      visibleRange,
+      canDrillUp: chartRangeStack.length > 1,
+      depth: chartRangeStack.length,
+    };
+  }, [chartRangeStack, rootChartRange]);
 
   useEffect(() => {
     if (!hasValidated) {
@@ -261,6 +285,23 @@ export function useCorrectionFactorForm() {
 
     setErrors(validationErrors);
   }, [hasValidated, validationErrors]);
+
+  useEffect(() => {
+    if (!rootChartRange) {
+      setChartRangeStack((current) => (current.length === 0 ? current : []));
+      return;
+    }
+
+    setChartRangeStack((current) => {
+      const currentRoot = current[0] ?? null;
+
+      if (!didCorrectionFactorRangeChange(currentRoot, rootChartRange) && current.length > 0) {
+        return current;
+      }
+
+      return [rootChartRange];
+    });
+  }, [rootChartRange]);
 
   function clearTopLevelError(field: ErrorField) {
     setErrors((current) => {
@@ -348,13 +389,15 @@ export function useCorrectionFactorForm() {
         field === 'startDate' ||
         field === 'endDate'
       ) {
-        const nextWithoutSelectedSlice = clearSelectedSlice(next);
+        const nextWithoutSelectedReviewSlice = clearSelectedReviewSlice(next);
 
         if (field === 'basePollen') {
-          return syncRowsFromReviewedEvents(syncBaseRow(nextWithoutSelectedSlice));
+          return syncRowsFromReviewedEvents(
+            syncBaseRow(nextWithoutSelectedReviewSlice)
+          );
         }
 
-        return nextWithoutSelectedSlice;
+        return nextWithoutSelectedReviewSlice;
       }
 
       return next;
@@ -367,6 +410,7 @@ export function useCorrectionFactorForm() {
       field === 'endDate'
     ) {
       setHasReviewSessionChanges(false);
+      setChartRangeStack([]);
     }
 
     if (
@@ -580,22 +624,49 @@ export function useCorrectionFactorForm() {
     clearRowsError();
   }
 
-  function setSelectedSliceId(selectedSliceId: string | null) {
+  function setSelectedReviewSliceId(selectedReviewSliceId: string | null) {
     setHasReviewSessionChanges(false);
     setValues((current) => {
-      if (current.selectedSliceId === selectedSliceId) {
+      if (current.selectedReviewSliceId === selectedReviewSliceId) {
         return current;
       }
 
       return {
         ...current,
-        selectedSliceId,
+        selectedReviewSliceId,
       };
     });
   }
 
+  function drillDownToRange(nextRange: CorrectionFactorChartRange) {
+    setHasReviewSessionChanges(false);
+    setValues((current) => clearSelectedReviewSlice(current));
+    setChartRangeStack((current) => {
+      if (current.length === 0) {
+        return rootChartRange ? [rootChartRange, nextRange] : [nextRange];
+      }
+
+      const currentRange = current[current.length - 1] ?? null;
+
+      if (!didCorrectionFactorRangeChange(currentRange, nextRange)) {
+        return current;
+      }
+
+      return [...current, nextRange];
+    });
+  }
+
+  function drillUpChartRange() {
+    setHasReviewSessionChanges(false);
+    setValues((current) => clearSelectedReviewSlice(current));
+    setChartRangeStack((current) =>
+      current.length > 1 ? current.slice(0, -1) : current
+    );
+  }
+
   function resetForm() {
     setValues(DEFAULT_CORRECTION_FACTOR_FORM_VALUES);
+    setChartRangeStack([]);
     setHasReviewSessionChanges(false);
     setHasValidated(false);
     setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
@@ -603,6 +674,7 @@ export function useCorrectionFactorForm() {
 
   function replaceValues(nextValues: CorrectionFactorFormValues) {
     setValues(nextValues);
+    setChartRangeStack([]);
     setHasReviewSessionChanges(false);
     setHasValidated(false);
     setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
@@ -628,6 +700,7 @@ export function useCorrectionFactorForm() {
     values,
     errors,
     derived,
+    chartNavigation,
     allowedPollenOptions,
     hasReviewSessionChanges,
     isValid,
@@ -641,7 +714,9 @@ export function useCorrectionFactorForm() {
     replaceValidationEvents,
     updateEventReviewedPollen,
     toggleEventAccepted,
-    setSelectedSliceId,
+    setSelectedReviewSliceId,
+    drillDownToRange,
+    drillUpChartRange,
     resetForm,
     replaceValues,
     validate,

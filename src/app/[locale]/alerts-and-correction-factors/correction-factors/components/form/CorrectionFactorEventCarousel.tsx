@@ -136,11 +136,12 @@ export function CorrectionFactorEventCarousel({
               {t('acceptedCount', {
                 acceptedCount,
                 totalCount: events.length,
+                basePollen,
               })}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {events.map((event, index) => {
               const isAccepted = event.reviewedPollen === basePollen;
               const isBroken = Boolean(brokenImageIds[event.id]);

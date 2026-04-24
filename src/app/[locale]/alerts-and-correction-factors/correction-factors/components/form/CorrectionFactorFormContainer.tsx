@@ -44,7 +44,10 @@ export function CorrectionFactorFormContainer({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [reviewWorkspaceOpen, setReviewWorkspaceOpen] = useState(false);
   const hydratedRecordIdRef = useRef<string | null>(null);
+  const pendingAutoOpenSliceIdRef = useRef<string | null>(null);
+  const previousSelectedSliceIdRef = useRef<string | null>(null);
   const form = useCorrectionFactorForm();
   const detailQuery = useCorrectionFactorDetail(
     isEditMode ? correctionFactorId : undefined
@@ -90,39 +93,45 @@ export function CorrectionFactorFormContainer({
   const preview = useCorrectionFactorPreview({
     values: form.values,
     derived: form.derived,
+    visibleRange: form.chartNavigation.visibleRange,
   });
   const selectedPreviewSlice = useMemo(() => {
-    if (!form.values.selectedSliceId) {
+    if (!form.values.selectedReviewSliceId) {
       return null;
     }
 
     const point =
       preview.series?.points.find(
-        (candidate) => candidate.sliceId === form.values.selectedSliceId
+        (candidate) =>
+          candidate.id === form.values.selectedReviewSliceId &&
+          candidate.isReviewSlice
       ) ?? null;
 
     if (point) {
       return {
-        id: point.sliceId,
+        id: point.id,
         from: point.timestamp,
         to: point.endTimestamp,
+        label: point.label,
       };
     }
 
     const slice =
-      preview.slices.find((candidate) => candidate.id === form.values.selectedSliceId) ??
-      null;
+      preview.reviewSlices.find(
+        (candidate) => candidate.id === form.values.selectedReviewSliceId
+      ) ?? null;
 
     if (slice) {
       return {
         id: slice.id,
         from: slice.from,
         to: slice.to,
+        label: slice.label,
       };
     }
 
     return null;
-  }, [form.values.selectedSliceId, preview.series, preview.slices]);
+  }, [form.values.selectedReviewSliceId, preview.reviewSlices, preview.series]);
   const hasSelectedPreviewSlice = selectedPreviewSlice !== null;
   const selectedPreviewSliceId = selectedPreviewSlice?.id ?? null;
   const selectedPreviewSliceFrom = selectedPreviewSlice?.from ?? null;
@@ -130,14 +139,15 @@ export function CorrectionFactorFormContainer({
   const validationEvents = useCorrectionFactorValidationEvents({
     location: validationLocation,
     basePollen: form.values.basePollen,
-    selectedSliceId: selectedPreviewSliceId,
-    selectedSliceFrom: selectedPreviewSliceFrom,
-    selectedSliceTo: selectedPreviewSliceTo,
+    selectedReviewSliceId: selectedPreviewSliceId,
+    selectedReviewSliceFrom: selectedPreviewSliceFrom,
+    selectedReviewSliceTo: selectedPreviewSliceTo,
   });
 
   useEffect(() => {
     form.resetForm();
     setActionError(null);
+    setReviewWorkspaceOpen(false);
     hydratedRecordIdRef.current = null;
   }, [correctionFactorId, mode]);
 
@@ -155,16 +165,57 @@ export function CorrectionFactorFormContainer({
   }, [detailQuery.data, form, isEditMode]);
 
   useEffect(() => {
-    if (!form.values.selectedSliceId) {
+    if (!form.values.selectedReviewSliceId) {
+      pendingAutoOpenSliceIdRef.current = null;
+      previousSelectedSliceIdRef.current = null;
+      setReviewWorkspaceOpen(false);
       return;
+    }
+
+    if (
+      previousSelectedSliceIdRef.current !== form.values.selectedReviewSliceId
+    ) {
+      pendingAutoOpenSliceIdRef.current = form.values.selectedReviewSliceId;
+      previousSelectedSliceIdRef.current = form.values.selectedReviewSliceId;
     }
 
     if (selectedPreviewSlice) {
       return;
     }
 
-    form.setSelectedSliceId(null);
-  }, [form, form.values.selectedSliceId, selectedPreviewSlice]);
+    pendingAutoOpenSliceIdRef.current = null;
+    form.setSelectedReviewSliceId(null);
+  }, [form, form.values.selectedReviewSliceId, selectedPreviewSlice]);
+
+  useEffect(() => {
+    const pendingSliceId = pendingAutoOpenSliceIdRef.current;
+
+    if (!pendingSliceId || pendingSliceId !== selectedPreviewSliceId) {
+      return;
+    }
+
+    if (
+      validationEvents.status === 'ready' &&
+      validationEvents.detectedEvents !== null &&
+      validationEvents.detectedEvents > 0
+    ) {
+      setReviewWorkspaceOpen(true);
+      pendingAutoOpenSliceIdRef.current = null;
+      return;
+    }
+
+    if (
+      validationEvents.status === 'empty' ||
+      validationEvents.status === 'error' ||
+      !selectedPreviewSliceId
+    ) {
+      pendingAutoOpenSliceIdRef.current = null;
+    }
+  }, [
+    selectedPreviewSliceId,
+    validationEvents.detectedEvents,
+    validationEvents.status,
+  ]);
 
   useEffect(() => {
     if (
@@ -268,6 +319,25 @@ export function CorrectionFactorFormContainer({
           fallbackMessage: t('preview.error'),
         })
       : null;
+
+  function handleActivatePreviewBucket(bucketId: string) {
+    const bucket =
+      preview.series?.points.find((candidate) => candidate.id === bucketId) ?? null;
+
+    if (!bucket) {
+      return;
+    }
+
+    if (bucket.isReviewSlice) {
+      form.setSelectedReviewSliceId(bucket.id);
+      return;
+    }
+
+    form.drillDownToRange({
+      from: bucket.timestamp,
+      to: bucket.endTimestamp,
+    });
+  }
 
   async function refreshCorrectionFactorQueries(id?: string) {
     await Promise.all([
@@ -402,6 +472,9 @@ export function CorrectionFactorFormContainer({
       validationEventsStatusText={validationEventsStatusText}
       validationEventsFieldError={validationEventsError}
       onToggleValidationEventAccepted={form.toggleEventAccepted}
+      reviewWorkspaceOpen={reviewWorkspaceOpen}
+      onOpenReviewWorkspace={() => setReviewWorkspaceOpen(true)}
+      onCloseReviewWorkspace={() => setReviewWorkspaceOpen(false)}
       saving={saving}
       deleting={deleting}
       actionError={actionError}
@@ -413,25 +486,22 @@ export function CorrectionFactorFormContainer({
       submitDisabled={submitDisabled}
       deleteDisabled={deleteDisabled}
       canDelete={isEditMode}
-      canAddRow={Boolean(form.values.basePollen) && !showStoredMultiplierView}
       showStoredMultiplierView={showStoredMultiplierView}
+      basePollen={form.values.basePollen}
       previewStatus={preview.status}
       previewSeries={preview.series}
-      previewSlices={preview.slices}
-      selectedPreviewSliceId={form.values.selectedSliceId}
+      previewReviewSlices={preview.reviewSlices}
+      selectedPreviewSliceId={form.values.selectedReviewSliceId}
+      previewVisibleRange={form.chartNavigation.visibleRange}
+      previewCanDrillUp={form.chartNavigation.canDrillUp}
+      previewResolution={preview.series?.resolution ?? null}
       previewError={previewError}
-      onSelectPreviewSlice={form.setSelectedSliceId}
-      getPollenOptions={(currentRowPollen) =>
-        form.getPollenOptions(currentRowPollen, pollenOptions)
-      }
+      onActivatePreviewBucket={handleActivatePreviewBucket}
+      onDrillUpPreviewRange={form.drillUpChartRange}
       onLocationChange={(value) => form.setField('location', value)}
       onBasePollenChange={(value) => form.setField('basePollen', value)}
       onStartDateChange={(value) => form.setField('startDate', value)}
       onEndDateChange={(value) => form.setField('endDate', value)}
-      onAddRow={form.addRow}
-      onPollenChange={form.updateRowPollen}
-      onReviewedEventsChange={form.updateRowReviewedEvents}
-      onRemoveRow={form.removeRow}
       onCancel={() => router.replace(listHref)}
       onSubmit={handleSubmit}
       onDelete={handleDelete}

@@ -55,10 +55,10 @@
     "message_loading": "Mapa de nowcasting"
   },
   "correctionFactorsPage": {
-    "description": "Ajuste y gestione las correcciones aplicadas a los picos de polen detectados.",
+    "description": "Revise y gestione correcciones guardadas para picos de polen detectados.",
     "list": {
       "title": "Factores de corrección",
-      "description": "Ajuste y gestione las correcciones aplicadas a los picos de polen detectados.",
+      "description": "Revise y gestione correcciones guardadas para picos de polen detectados.",
       "newButton": "Nuevo factor de corrección",
       "filters": {
         "fromDate": "Desde",
@@ -89,8 +89,8 @@
     "form": {
       "title": "Factor de corrección",
       "editTitle": "Editar factor de corrección",
-      "description": "Defina cómo este factor de corrección redistribuirá los conteos de eventos entre pólenes durante un intervalo de tiempo específico.",
-      "editDescription": "Revise el factor de corrección almacenado, inspeccione los multiplicadores persistidos e inicie una nueva sesión de revisión desde el gráfico cuando necesite actualizarlo.",
+      "description": "Seleccione un pico en el gráfico y revise sus imágenes detectadas para crear una corrección.",
+      "editDescription": "Revise esta corrección guardada. Las selecciones previas de imágenes no se conservan, así que seleccione un pico en el gráfico para revisar las imágenes otra vez si hace falta.",
       "submitErrorFallback": "No se pudo guardar el factor de corrección.",
       "updateErrorFallback": "No se pudo actualizar el factor de corrección.",
       "deleteErrorFallback": "No se pudo eliminar el factor de corrección.",
@@ -99,40 +99,38 @@
         "loadError": "No se pudo cargar el factor de corrección."
       },
       "editUnavailable": {
-        "title": "La edición no está disponible para este registro",
-        "description": "El registro del backend no proporciona suficiente información para reconstruir las entradas de eventos revisados que requiere este formulario. Los datos almacenados se muestran abajo como referencia y la eliminación sigue disponible.",
+        "title": "Esta corrección guardada no se puede editar aquí",
+        "description": "La corrección guardada puede revisarse abajo, pero las selecciones previas de imágenes no están disponibles.",
         "reasonLabel": "Motivo",
-        "reason": "Los valores de eventos revisados no se pueden reconstruir a partir del payload de detalle actual del backend.",
-        "summaryTitle": "Registro almacenado",
+        "reason": "Las selecciones previas de imágenes no están disponibles para esta corrección guardada.",
+        "summaryTitle": "Corrección guardada",
         "location": "Ubicación",
         "basePollen": "Polen base",
         "dateRange": "Rango de fechas",
-        "detailsTitle": "Factores almacenados",
+        "detailsTitle": "Factores guardados",
         "pollen": "Polen",
-        "multiplier": "Multiplicador almacenado",
+        "multiplier": "Factor guardado",
         "published": "Publicado",
         "yes": "Sí",
         "no": "No",
-        "empty": "No hay detalles de factores almacenados para este registro."
+        "empty": "No hay detalles guardados para esta corrección."
       },
       "meta": {
-        "title": "Ubicación y fecha/hora",
+        "title": "Elija ubicación y rango de tiempo",
         "location": "Ubicación",
         "allLocations": "Seleccione una ubicación",
         "basePollen": "Polen base",
         "allPollens": "Seleccione un polen",
-        "detectedEvents": "Eventos detectados",
-        "detectedEventsReadOnlyBadge": "Solo lectura",
-        "detectedEventsReadOnlyHelp": "Este valor siempre se deriva de la API de validación y no se puede editar manualmente.",
-        "detectedEventsHint": "Los eventos detectados estarán disponibles después de seleccionar ubicación, polen base y el rango completo de fecha y hora, y luego elegir un segmento del gráfico para revisar.",
+        "detectedEvents": "Imágenes detectadas",
+        "detectedEventsHint": "Las imágenes detectadas aparecen después de elegir una ubicación, el polen base, el rango de fechas y un pico en el gráfico.",
         "detectedEventsLoadingValue": "Cargando...",
-        "detectedEventsValuePlaceholder": "Aún no disponible",
-        "detectedEventsSelectSlice": "Seleccione un segmento del gráfico para cargar los eventos detectados para revisión.",
-        "detectedEventsLoading": "Cargando eventos detectados desde la API de validación...",
-        "detectedEventsLoaded": "Los eventos detectados se derivan automáticamente del conteo de resultados de la API de validación para el segmento seleccionado del gráfico.",
-        "detectedEventsError": "No se pudieron cargar los eventos detectados desde la API de validación.",
-        "detectedEventsMismatchError": "La respuesta de la API de validación no incluyó eventos detectados utilizables para esta selección.",
-        "detectedEventsLocationMappingError": "No se pudo mapear la ubicación del factor de corrección \"{location}\" a un nombre de ubicación de la API de validación.",
+        "detectedEventsValuePlaceholder": "Seleccione un pico en el gráfico",
+        "detectedEventsSelectSlice": "Seleccione un pico en el gráfico para revisar sus imágenes detectadas.",
+        "detectedEventsLoading": "Cargando imágenes detectadas...",
+        "detectedEventsLoaded": "Se encontraron imágenes detectadas para el pico seleccionado.",
+        "detectedEventsError": "No se pudieron cargar las imágenes detectadas.",
+        "detectedEventsMismatchError": "No había imágenes detectadas disponibles para este pico del gráfico.",
+        "detectedEventsLocationMappingError": "Las imágenes detectadas no están disponibles para la ubicación seleccionada \"{location}\".",
         "startDate": "Fecha y hora de inicio",
         "endDate": "Fecha y hora de fin",
         "startPlaceholder": "Fecha de inicio",
@@ -150,7 +148,7 @@
         "time": "Hora",
         "clear": "Limpiar",
         "apply": "Aplicar",
-        "dateTimeHelp": "Las horas se pueden seleccionar en intervalos de 1 hora desde las 00:00 hasta las 23:00.",
+        "dateTimeHelp": "Las horas usan intervalos de 1 hora.",
         "loading": "Cargando...",
         "loadError": "Opciones no disponibles",
         "optionsLoadError": "Este campo no pudo cargar sus opciones."
@@ -167,7 +165,7 @@
         "startDateInvalid": "La fecha/hora de inicio debe usar una hora en punto válida.",
         "endDateInvalid": "La fecha/hora de fin debe usar una hora en punto válida.",
         "endDateOrder": "La fecha de fin debe ser posterior o igual a la fecha de inicio.",
-        "detectedEventsRequired": "Los eventos detectados son obligatorios.",
+        "detectedEventsRequired": "Seleccione un pico del gráfico con imágenes detectadas.",
         "atLeastOneRow": "Se requiere al menos una fila de corrección.",
         "exactlyOneBaseRow": "Se requiere exactamente una fila de polen base.",
         "baseRowFirst": "La fila de polen base debe ser la primera.",
@@ -178,74 +176,107 @@
         "overAllocated": "Los eventos revisados no pueden exceder los eventos detectados."
       },
       "distribution": {
-        "title": "Factores de corrección",
-        "description": "Reasigne los eventos detectados para el polen base seleccionado después de la revisión experta.",
-        "detectedEventsLabel": "Eventos detectados",
-        "derivedFromEvents": "Administre aquí las clasificaciones de polen permitidas. Los conteos revisados se derivan de las asignaciones de eventos en el carrusel.",
-        "restoredMultiplierGuidance": "Esta vista de edición muestra los multiplicadores almacenados del backend. Los conteos de eventos revisados no estarán disponibles hasta que seleccione un segmento del gráfico e inicie una nueva revisión.",
-        "addRow": "Agregar clasificación de polen",
-        "selectPollen": "Seleccione polen",
-        "remove": "Quitar",
-        "baseRow": "Fila base",
-        "restored": "Restaurado",
-        "automatic": "Automático",
-        "reviewedEventsUnavailable": "No disponible",
-        "unknown": "Desconocido",
-        "table": {
-          "pollen": "Distribución de polen",
-          "reviewedEvents": "Eventos revisados",
-          "multiplier": "Factor multiplicador",
-          "actions": "Acciones"
-        }
+        "title": "Resumen de la corrección",
+        "description": "Revise los resultados de la revisión de imágenes seleccionada.",
+        "helperText": "Haga clic en las imágenes del panel de revisión para actualizar este resumen.",
+        "detectedImages": "Imágenes detectadas",
+        "markedAsBasePollen": "Marcadas como {basePollen}",
+        "markedAsBasePollenFallback": "Marcadas como polen base",
+        "countedAsUnknown": "Contadas como Desconocido",
+        "correctionMultiplier": "Multiplicador de corrección",
+        "restoredMultiplierGuidance": "Para actualizarlos, seleccione un pico en el gráfico y revise las imágenes otra vez.",
+        "savedTitle": "Factores guardados",
+        "savedDescription": "Esta corrección guardada muestra solo el multiplicador almacenado."
       },
       "totals": {
-        "assignedEvents": "Eventos asignados",
-        "unknownEvents": "Eventos desconocidos",
-        "totalReviewedEvents": "Eventos revisados totales",
-        "difference": "Exceso asignado",
-        "remainingEvents": "Eventos restantes",
-        "overAssigned": "Exceso asignado",
-        "balancedMessage": "Los eventos revisados están completamente balanceados.",
-        "unknownRemainderMessage": "Los eventos restantes se asignarán a Desconocido: {count}.",
-        "overAllocatedMessage": "Los eventos revisados exceden los eventos detectados por {count}."
+        "overAllocatedMessage": "Las imágenes seleccionadas superan las imágenes detectadas en {count}."
       },
       "editHydration": {
-        "title": "Multiplicadores restaurados",
-        "description": "Este factor de corrección se restauró a partir de multiplicadores persistidos. Las selecciones originales de eventos no están disponibles en la versión actual de la API. Seleccione un segmento del gráfico para iniciar una nueva sesión de revisión."
+        "title": "Corrección guardada cargada",
+        "description": "Se cargó esta corrección guardada. Las selecciones previas de imágenes no se conservan, así que seleccione un pico en el gráfico para revisar las imágenes otra vez."
       },
       "preview": {
-        "title": "Gráfico (Original vs Corregido)",
-        "description": "El gráfico usa las mediciones originales del polen base seleccionado y aplica localmente el factor de corrección actual. Seleccione un segmento del gráfico para iniciar la revisión de eventos detectados.",
-        "loading": "Cargando mediciones de vista previa...",
-        "idle": "Seleccione una ubicación, polen base, fecha/hora de inicio y fecha/hora de fin para cargar la vista previa.",
-        "empty": "No hay datos de medición disponibles para el rango seleccionado.",
-        "error": "No se pudieron cargar las mediciones de vista previa.",
+        "title": "Picos del gráfico",
+        "description": "Seleccione un pico en el gráfico para revisar sus imágenes detectadas.",
+        "loading": "Cargando picos del gráfico...",
+        "idle": "Elija una ubicación, el polen base y el rango de fechas para mostrar los picos del gráfico.",
+        "empty": "No se encontraron picos del gráfico para el rango seleccionado.",
+        "error": "No se pudieron cargar los picos del gráfico.",
+        "range": {
+          "current": "Rango: {range}",
+          "pending": "Aún no disponible"
+        },
+        "resolution": {
+          "current": "Resolución: {resolution}",
+          "pending": "Pendiente",
+          "month": "Intervalos mensuales",
+          "week": "Intervalos semanales",
+          "day": "Intervalos diarios",
+          "measurement": "Picos del gráfico"
+        },
+        "navigation": {
+          "title": "Navegación del gráfico",
+          "drillDownMode": "Seleccione un grupo de picos más amplio para acotar el gráfico.",
+          "reviewMode": "Seleccione un pico del gráfico para revisar sus imágenes detectadas.",
+          "up": "Volver al rango anterior"
+        },
+        "bucketSelection": {
+          "title": "Selección del gráfico",
+          "drillDownDescription": "Seleccione un grupo de picos más amplio para acotar el gráfico antes de elegir un pico.",
+          "reviewDescription": "Seleccione un pico del gráfico para revisar sus imágenes detectadas.",
+          "drillDownAction": "Profundizar",
+          "reviewAction": "Revisar imágenes detectadas"
+        },
         "sliceSelection": {
-          "title": "Segmento de revisión",
-          "description": "Haga clic en un punto del gráfico o elija un segmento abajo para cargar solo los eventos detectados de ese intervalo de tiempo.",
-          "dotAriaLabel": "Seleccione este segmento del gráfico para revisión",
-          "noneSelected": "Aún no se ha seleccionado ningún segmento del gráfico.",
-          "selected": "Segmento seleccionado: {slice}"
+          "noneSelected": "Todavía no se ha seleccionado ningún pico del gráfico.",
+          "selected": "Pico del gráfico seleccionado: {slice}"
+        },
+        "tooltip": {
+          "value": "{value} Pollen/m3"
         },
         "series": {
-          "original": "Serie original",
-          "corrected": "Serie corregida"
+          "original": "Medido",
+          "corrected": "Corregido"
         }
       },
-      "eventsCarousel": {
-        "title": "Eventos detectados",
-        "description": "Haga clic en las imágenes que coincidan con el polen base en el segmento seleccionado del gráfico.",
+      "reviewSummary": {
+        "title": "Revisión de imágenes",
+        "description": "Abra el panel de revisión de imágenes para el pico del gráfico seleccionado.",
+        "action": "Revisar imágenes",
+        "selectedSlice": "Pico del gráfico",
+        "slicePending": "Todavía no se ha seleccionado ningún pico del gráfico",
+        "detectedEvents": "Imágenes detectadas",
+        "accepted": "Coinciden con el polen base",
+        "unknown": "Desconocidos",
+        "countPending": "Aún no disponible",
         "count": "{count, plural, =0 {0 eventos} one {# evento} other {# eventos}}",
-        "idle": "Seleccione una ubicación, polen base, fecha/hora de inicio y fecha/hora de fin para cargar los eventos detectados.",
-        "selectSlice": "Seleccione un segmento del gráfico para cargar los eventos detectados para revisión.",
-        "empty": "No se encontraron eventos detectados para los filtros seleccionados.",
-        "error": "No se pudieron cargar los eventos detectados.",
-        "errorMismatch": "Se devolvieron eventos detectados, pero la respuesta no contenía registros utilizables para esta selección.",
-        "selectionInstruction": "Haga clic en cada imagen que deba contar como {basePollen}.",
-        "selectionHint": "Las imágenes seleccionadas cuentan como el polen base. Las no seleccionadas permanecen como Desconocido.",
-        "acceptedCount": "{acceptedCount} de {totalCount} aceptados",
-        "classification": "Clasificación detectada",
-        "reviewedClassification": "Clasificación revisada",
+        "readyHint": "Haga clic en las imágenes que coincidan con {basePollen}. Las imágenes no seleccionadas se cuentan como Desconocido."
+      },
+      "reviewWorkspace": {
+        "eyebrow": "Revisión de imágenes",
+        "title": "Imágenes detectadas",
+        "description": "Revise las imágenes del pico del gráfico seleccionado.",
+        "close": "Cerrar revisión",
+        "selectedSlice": "Pico del gráfico",
+        "slicePending": "Todavía no se ha seleccionado ningún pico del gráfico",
+        "accepted": "Coinciden con el polen base",
+        "unknown": "Desconocidos",
+        "count": "{count, plural, =0 {0 eventos} one {# evento} other {# eventos}}"
+      },
+      "eventsCarousel": {
+        "title": "Imágenes detectadas",
+        "description": "Revise las imágenes del pico del gráfico seleccionado.",
+        "count": "{count, plural, =0 {0 eventos} one {# evento} other {# eventos}}",
+        "idle": "Elija una ubicación, el polen base y el rango de fechas para cargar los picos del gráfico.",
+        "selectSlice": "Seleccione un pico del gráfico para revisar sus imágenes detectadas.",
+        "empty": "No se encontraron imágenes detectadas para el pico del gráfico seleccionado.",
+        "error": "No se pudieron cargar las imágenes detectadas.",
+        "errorMismatch": "No había imágenes detectadas disponibles para este pico del gráfico.",
+        "selectionInstruction": "Haga clic en las imágenes que coincidan con {basePollen}.",
+        "selectionHint": "Las imágenes no seleccionadas se cuentan como Desconocido.",
+        "acceptedCount": "{acceptedCount} de {totalCount} coinciden con {basePollen}",
+        "classification": "Polen detectado",
+        "reviewedClassification": "Polen revisado",
         "unknown": "Desconocido",
         "acceptedBadge": "{basePollen}",
         "unknownBadge": "Desconocido",

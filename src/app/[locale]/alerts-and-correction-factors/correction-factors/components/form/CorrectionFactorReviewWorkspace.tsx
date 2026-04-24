@@ -1,0 +1,172 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+
+import type {
+  CorrectionFactorReviewedValidationEvent,
+  CorrectionFactorValidationEventsStatus,
+} from '../../types';
+import { CorrectionFactorEventCarousel } from './CorrectionFactorEventCarousel';
+
+interface CorrectionFactorReviewWorkspaceProps {
+  open: boolean;
+  status: CorrectionFactorValidationEventsStatus;
+  events: CorrectionFactorReviewedValidationEvent[];
+  basePollen: string;
+  selectedSliceLabel?: string | null;
+  idleMessage?: string | null;
+  errorMessage?: string | null;
+  onToggleAccepted: (eventId: string) => void;
+  onClose: () => void;
+}
+
+export function CorrectionFactorReviewWorkspace({
+  open,
+  status,
+  events,
+  basePollen,
+  selectedSliceLabel = null,
+  idleMessage = null,
+  errorMessage = null,
+  onToggleAccepted,
+  onClose,
+}: CorrectionFactorReviewWorkspaceProps) {
+  const t = useTranslations('correctionFactorsPage.form.reviewWorkspace');
+  const [shouldRender, setShouldRender] = useState(open);
+  const [isVisible, setIsVisible] = useState(open);
+  const acceptedCount = events.filter(
+    (event) => event.reviewedPollen === basePollen
+  ).length;
+  const unknownCount = events.length - acceptedCount;
+
+  useEffect(() => {
+    if (open) {
+      setShouldRender(true);
+
+      const frameId = window.requestAnimationFrame(() => {
+        setIsVisible(true);
+      });
+
+      return () => {
+        window.cancelAnimationFrame(frameId);
+      };
+    }
+
+    setIsVisible(false);
+
+    const timeoutId = window.setTimeout(() => {
+      setShouldRender(false);
+    }, 220);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!shouldRender) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose, shouldRender]);
+
+  if (!shouldRender) {
+    return null;
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label={t('close')}
+        onClick={onClose}
+        className={`fixed inset-0 z-30 bg-black/20 transition-opacity duration-200 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+
+      <aside
+        className={`fixed inset-y-0 right-0 z-40 flex w-full max-w-[860px] flex-col border-l border-border bg-background shadow-2xl transition-all duration-200 ease-out ${
+          isVisible ? 'translate-x-0 opacity-100' : 'translate-x-6 opacity-0'
+        }`}
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-border px-4 py-4 sm:px-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              {t('eyebrow')}
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-foreground">
+              {t('title')}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t('description')}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="cursor-pointer rounded-md border border-rose-600 bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:border-rose-700 hover:bg-rose-700"
+          >
+            {t('close')}
+          </button>
+        </div>
+
+        <div className="border-b border-border px-4 py-4 sm:px-6">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-lg border border-border bg-card px-4 py-3">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('selectedSlice')}
+              </div>
+              <div className="mt-2 text-sm font-medium text-foreground">
+                {selectedSliceLabel ?? t('slicePending')}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-card px-4 py-3">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('accepted')}
+              </div>
+              <div className="mt-2 text-sm font-medium text-foreground">
+                {t('count', { count: acceptedCount })}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-card px-4 py-3">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('unknown')}
+              </div>
+              <div className="mt-2 text-sm font-medium text-foreground">
+                {t('count', { count: unknownCount })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+          <CorrectionFactorEventCarousel
+            status={status}
+            events={events}
+            basePollen={basePollen}
+            selectedSliceLabel={selectedSliceLabel}
+            idleMessage={idleMessage}
+            errorMessage={errorMessage}
+            onToggleAccepted={onToggleAccepted}
+          />
+        </div>
+      </aside>
+    </>
+  );
+}

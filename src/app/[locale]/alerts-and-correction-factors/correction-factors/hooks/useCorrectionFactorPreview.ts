@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getCorrectionFactorMeasurements } from '@/lib/api/correctionFactors';
 import { correctionFactorKeys } from '../constants';
 import type {
+  CorrectionFactorChartRange,
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormValues,
   CorrectionFactorReviewSlice,
@@ -16,6 +17,7 @@ import type {
 import {
   buildCorrectionFactorReviewSlices,
   buildCorrectionFactorPreviewSeries,
+  resolveCorrectionFactorVisibleRange,
   normalizeMeasurementsPreviewSource,
   toMeasurementPreviewRange,
 } from '../utils';
@@ -23,25 +25,31 @@ import {
 interface UseCorrectionFactorPreviewOptions {
   values: CorrectionFactorFormValues;
   derived: CorrectionFactorFormDerivedState;
+  visibleRange: CorrectionFactorChartRange | null;
 }
 
 interface UseCorrectionFactorPreviewResult {
   status: CorrectionFactorPreviewStatus;
   series: CorrectionFactorPreviewSeries | null;
-  slices: CorrectionFactorReviewSlice[];
+  reviewSlices: CorrectionFactorReviewSlice[];
   error: Error | null;
 }
 
 export function useCorrectionFactorPreview({
   values,
   derived,
+  visibleRange,
 }: UseCorrectionFactorPreviewOptions): UseCorrectionFactorPreviewResult {
-  const range = useMemo(
+  const rootRange = useMemo(
     () => toMeasurementPreviewRange(values.startDate, values.endDate),
     [values.endDate, values.startDate]
   );
+  const resolvedVisibleRange = useMemo(
+    () => resolveCorrectionFactorVisibleRange(visibleRange, rootRange),
+    [rootRange, visibleRange]
+  );
   const isReadyForPreview =
-    Boolean(values.location) && Boolean(values.basePollen) && range !== null;
+    Boolean(values.location) && Boolean(values.basePollen) && rootRange !== null;
   const basePollenMultiplier =
     derived.rows.find((row) => row.isBasePollen)?.multiplier ?? 0;
 
@@ -53,13 +61,13 @@ export function useCorrectionFactorPreview({
       endDate: values.endDate,
     }),
     queryFn: async () => {
-      if (!range || !values.basePollen) {
+      if (!rootRange || !values.basePollen) {
         return [];
       }
 
       const response = await getCorrectionFactorMeasurements({
-        from: range.from,
-        to: range.to,
+        from: rootRange.from,
+        to: rootRange.to,
         locations: values.location,
         pollen: values.basePollen,
       });
@@ -74,23 +82,27 @@ export function useCorrectionFactorPreview({
   });
 
   const sourcePoints = (previewQuery.data ?? []) as CorrectionFactorPreviewSourcePoint[];
-  const slices = useMemo(
-    () => buildCorrectionFactorReviewSlices(sourcePoints),
-    [sourcePoints]
-  );
   const series = useMemo(
     () =>
-      sourcePoints.length > 0
-        ? buildCorrectionFactorPreviewSeries(sourcePoints, basePollenMultiplier)
+      sourcePoints.length > 0 && resolvedVisibleRange
+        ? buildCorrectionFactorPreviewSeries(
+            sourcePoints,
+            resolvedVisibleRange,
+            basePollenMultiplier
+          )
         : null,
-    [basePollenMultiplier, sourcePoints]
+    [basePollenMultiplier, resolvedVisibleRange, sourcePoints]
+  );
+  const reviewSlices = useMemo(
+    () => buildCorrectionFactorReviewSlices(series),
+    [series]
   );
 
   if (!isReadyForPreview) {
     return {
       status: 'idle',
       series: null,
-      slices: [],
+      reviewSlices: [],
       error: null,
     };
   }
@@ -99,7 +111,7 @@ export function useCorrectionFactorPreview({
     return {
       status: 'loading',
       series: null,
-      slices: [],
+      reviewSlices: [],
       error: null,
     };
   }
@@ -108,7 +120,7 @@ export function useCorrectionFactorPreview({
     return {
       status: 'error',
       series: null,
-      slices: [],
+      reviewSlices: [],
       error: previewQuery.error instanceof Error ? previewQuery.error : null,
     };
   }
@@ -117,7 +129,7 @@ export function useCorrectionFactorPreview({
     return {
       status: 'empty',
       series: null,
-      slices: [],
+      reviewSlices: [],
       error: null,
     };
   }
@@ -125,7 +137,7 @@ export function useCorrectionFactorPreview({
   return {
     status: 'ready',
     series,
-    slices,
+    reviewSlices,
     error: null,
   };
 }

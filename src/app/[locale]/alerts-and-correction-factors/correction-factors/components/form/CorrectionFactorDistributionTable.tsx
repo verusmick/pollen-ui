@@ -2,110 +2,73 @@
 
 import { useTranslations } from 'next-intl';
 
-import type {
-  CorrectionFactorFormDerivedState,
-  CorrectionFactorFormErrors,
-  CorrectionFactorDistributionRowForm,
-} from '../../types';
-import { CorrectionFactorDistributionRow } from './CorrectionFactorDistributionRow';
+import type { CorrectionFactorFormDerivedState } from '../../types';
 
 interface CorrectionFactorDistributionTableProps {
-  rows: CorrectionFactorDistributionRowForm[];
   derived: CorrectionFactorFormDerivedState;
-  errors: CorrectionFactorFormErrors;
-  validationErrors: CorrectionFactorFormErrors;
-  isEventReviewMode: boolean;
+  detectedEvents: number | null;
+  basePollen: string;
   showStoredMultiplierView: boolean;
-  getPollenOptions: (currentRowPollen: string) => string[];
-  onPollenChange: (clientId: string, pollen: string) => void;
-  onReviewedEventsChange: (clientId: string, reviewedEvents: string) => void;
-  onRemove: (clientId: string) => void;
+  storedMultiplier?: number | null;
+}
+
+interface SummaryMetricProps {
+  label: string;
+  value: string | number;
+}
+
+function SummaryMetric({ label, value }: SummaryMetricProps) {
+  return (
+    <div className="rounded-lg border border-border bg-background px-4 py-3">
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-1 text-lg font-semibold text-foreground">{value}</div>
+    </div>
+  );
 }
 
 export function CorrectionFactorDistributionTable({
-  rows,
   derived,
-  errors,
-  validationErrors,
-  isEventReviewMode,
+  detectedEvents,
+  basePollen,
   showStoredMultiplierView,
-  getPollenOptions,
-  onPollenChange,
-  onReviewedEventsChange,
-  onRemove,
+  storedMultiplier = null,
 }: CorrectionFactorDistributionTableProps) {
   const t = useTranslations('correctionFactorsPage.form.distribution');
+  const baseRow = derived.rows.find(
+    (row) => row.isBasePollen && !row.isSyntheticUnknown
+  );
+  const basePollenCount = baseRow?.reviewedEventsNumber ?? 0;
+  const correctionMultiplier = showStoredMultiplierView
+    ? (storedMultiplier ?? 0)
+    : (baseRow?.multiplier ?? 0);
+  const basePollenLabel = basePollen
+    ? t('markedAsBasePollen', { basePollen })
+    : t('markedAsBasePollenFallback');
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border">
-      <div className="overflow-x-auto">
-        <table className="min-w-full table-auto">
-          <thead className="bg-background">
-            <tr className="border-b border-border text-left">
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('table.pollen')}
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('table.reviewedEvents')}
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('table.multiplier')}
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('table.actions')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => {
-              const multiplier = showStoredMultiplierView
-                ? row.storedMultiplier ?? 0
-                : derived.multipliersByRowId[row.clientId] ?? 0;
-
-              return (
-                <CorrectionFactorDistributionRow
-                  key={row.clientId}
-                  clientId={row.clientId}
-                  pollen={row.pollen}
-                  reviewedEvents={row.reviewedEvents}
-                  multiplier={multiplier}
-                  pollenOptions={getPollenOptions(row.pollen)}
-                  isBasePollen={row.isBasePollen}
-                  isReadOnly={isEventReviewMode || showStoredMultiplierView}
-                  showStoredMultiplierView={showStoredMultiplierView}
-                  errors={
-                    errors.rowErrorsById[row.clientId] ??
-                    validationErrors.rowErrorsById[row.clientId]
-                  }
-                  onPollenChange={onPollenChange}
-                  onReviewedEventsChange={onReviewedEventsChange}
-                  onRemove={onRemove}
-                />
-              );
-            })}
-            {!showStoredMultiplierView
-              ? derived.rows
-              .filter((row) => row.isSyntheticUnknown)
-              .map((row) => (
-                <CorrectionFactorDistributionRow
-                  key={row.clientId}
-                  clientId={row.clientId}
-                  pollen={row.pollen}
-                  reviewedEvents={String(row.reviewedEventsNumber)}
-                  multiplier={row.multiplier}
-                  pollenOptions={[]}
-                  isBasePollen={false}
-                  isSyntheticUnknown
-                  isReadOnly
-                  onPollenChange={onPollenChange}
-                  onReviewedEventsChange={onReviewedEventsChange}
-                  onRemove={onRemove}
-                />
-              ))
-              : null}
-          </tbody>
-        </table>
-      </div>
+    <div className="grid gap-3 sm:grid-cols-2">
+      {!showStoredMultiplierView ? (
+        <>
+          <SummaryMetric
+            label={t('detectedImages')}
+            value={detectedEvents ?? 0}
+          />
+          <SummaryMetric
+            label={basePollenLabel}
+            value={basePollenCount}
+          />
+          <SummaryMetric
+            label={t('countedAsUnknown')}
+            value={derived.unknownReviewedEvents}
+          />
+        </>
+      ) : null}
+      <SummaryMetric
+        label={t('correctionMultiplier')}
+        value={correctionMultiplier.toFixed(2)}
+      />
     </div>
   );
 }
