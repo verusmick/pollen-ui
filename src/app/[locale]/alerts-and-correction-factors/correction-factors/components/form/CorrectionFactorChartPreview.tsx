@@ -42,47 +42,37 @@ function formatValue(value: number): string {
 }
 
 function buildMeasurementAxisTicks(
-  series: CorrectionFactorPreviewSeries | null,
+  visibleRange: CorrectionFactorChartRange | null,
   resolution: CorrectionFactorChartResolution | null
 ): number[] | undefined {
-  if (resolution !== 'measurement' || !series || series.points.length === 0) {
+  if (resolution !== 'measurement' || !visibleRange) {
     return undefined;
   }
 
-  const maxTicks = 18;
-  const step = Math.max(1, Math.ceil(series.points.length / maxTicks));
-  const ticks = series.points
-    .filter((_, index) => index % step === 0)
-    .map((point) => point.displayTimestamp);
-  const lastTick = series.points[series.points.length - 1]?.displayTimestamp;
+  const hourInSeconds = 60 * 60;
+  const firstTick = Math.ceil(visibleRange.from / hourInSeconds) * hourInSeconds;
+  const ticks: number[] = [];
 
-  if (typeof lastTick === 'number' && ticks[ticks.length - 1] !== lastTick) {
-    ticks.push(lastTick);
+  for (let tick = firstTick; tick <= visibleRange.to; tick += hourInSeconds) {
+    ticks.push(tick);
+  }
+
+  if (ticks.length === 0) {
+    return [visibleRange.from + (visibleRange.to - visibleRange.from) / 2];
   }
 
   return ticks;
 }
 
-function formatMeasurementAxisTick(
-  value: number,
-  series: CorrectionFactorPreviewSeries | null
-): string {
-  if (!series || series.points.length === 0) {
-    return '';
-  }
-
-  const nearestPoint = series.points.reduce((currentNearest, point) =>
-    Math.abs(point.displayTimestamp - value) <
-    Math.abs(currentNearest.displayTimestamp - value)
-      ? point
-      : currentNearest
-  );
-
+function formatCompactUtcTime(timestamp: number): string {
   return new Intl.DateTimeFormat(undefined, {
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
     timeZone: 'UTC',
-  }).format(new Date(nearestPoint.displayTimestamp * 1000));
+  })
+    .format(new Date(timestamp * 1000))
+    .replace(':00', '')
+    .replace(/\s/g, '');
 }
 
 function formatResolutionLabel(
@@ -125,14 +115,15 @@ export function CorrectionFactorChartPreview({
   const showBucketButtons =
     series?.resolution === 'day' || series?.resolution === 'measurement';
   const xAxisMinTickGap =
-    resolution === 'measurement' ? 6 : resolution === 'day' ? 24 : 24;
+    resolution === 'measurement' ? 0 : resolution === 'day' ? 24 : 24;
   const xAxisInterval =
     resolution === 'measurement' ? 0 : 'preserveStartEnd';
   const xAxisDataKey = resolution === 'measurement' ? 'displayTimestamp' : 'axisLabel';
   const xAxisTicks = useMemo(
-    () => buildMeasurementAxisTicks(series, resolution),
-    [resolution, series]
+    () => buildMeasurementAxisTicks(visibleRange, resolution),
+    [resolution, visibleRange]
   );
+  const lineType = resolution === 'measurement' ? 'linear' : 'monotone';
 
   useEffect(() => {
     if (!selectedSliceId || !showBucketButtons) {
@@ -405,18 +396,23 @@ export function CorrectionFactorChartPreview({
                   dataKey={xAxisDataKey}
                   type={resolution === 'measurement' ? 'number' : 'category'}
                   domain={
-                    resolution === 'measurement' ? ['dataMin', 'dataMax'] : undefined
+                    resolution === 'measurement' && visibleRange
+                      ? [visibleRange.from, visibleRange.to]
+                      : undefined
                   }
                   ticks={xAxisTicks}
                   tickFormatter={(value) =>
                     resolution === 'measurement'
-                      ? formatMeasurementAxisTick(Number(value), series)
+                      ? formatCompactUtcTime(Number(value))
                       : String(value)
                   }
                   tickLine={false}
                   axisLine={false}
                   minTickGap={xAxisMinTickGap}
                   interval={xAxisInterval}
+                  height={resolution === 'measurement' ? 54 : undefined}
+                  angle={resolution === 'measurement' ? -35 : 0}
+                  textAnchor={resolution === 'measurement' ? 'end' : 'middle'}
                   tick={{ fontSize: 12 }}
                 />
                 <YAxis
@@ -428,7 +424,7 @@ export function CorrectionFactorChartPreview({
                 <Tooltip content={renderTooltipContent} />
                 <Legend />
                 <Line
-                  type="monotone"
+                  type={lineType}
                   dataKey="originalValue"
                   name={t('series.original')}
                   stroke="#2563eb"
@@ -437,7 +433,7 @@ export function CorrectionFactorChartPreview({
                   activeDot={false}
                 />
                 <Line
-                  type="monotone"
+                  type={lineType}
                   dataKey="correctedValue"
                   name={t('series.corrected')}
                   stroke="#ea580c"
