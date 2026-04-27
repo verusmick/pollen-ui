@@ -125,6 +125,7 @@ export type CorrectionFactorTimeOption =
   | '22:00'
   | '23:00';
 export type CorrectionFactorPercentageScale = 'ratio' | 'percentage';
+export type CorrectionFactorMultiplierMode = 'eventBased' | 'manual';
 export type CorrectionFactorChartResolution =
   | 'month'
   | 'week'
@@ -170,6 +171,8 @@ export interface CorrectionFactorFormValues {
   endDate: string;
   selectedReviewSliceId: string | null;
   detectedEvents: number | null;
+  multiplierMode: CorrectionFactorMultiplierMode;
+  manualMultiplier: string;
   events: CorrectionFactorReviewedValidationEvent[];
   rows: CorrectionFactorDistributionRowForm[];
 }
@@ -180,6 +183,7 @@ export interface CorrectionFactorFormErrors {
   startDate?: string;
   endDate?: string;
   detectedEvents?: string;
+  manualMultiplier?: string;
   rows?: string;
   rowErrorsById: Record<
     string,

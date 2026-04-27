@@ -15,6 +15,7 @@ import type {
   CorrectionFactorRecord,
   CorrectionFactorReviewedValidationEvent,
   CorrectionFactorValidationEventsStatus,
+  CorrectionFactorMultiplierMode,
 } from '../../types';
 import { formatCorrectionFactorDateTimeRange } from '../../utils';
 import { CorrectionFactorChartPreview } from './CorrectionFactorChartPreview';
@@ -49,6 +50,8 @@ interface CorrectionFactorFormProps {
   onOpenReviewWorkspace: () => void;
   onCloseReviewWorkspace: () => void;
   onSelectReviewSlice: (sliceId: string) => void;
+  onMultiplierModeChange: (mode: CorrectionFactorMultiplierMode) => void;
+  onManualMultiplierChange: (value: string) => void;
   saving: boolean;
   deleting?: boolean;
   actionError?: string | null;
@@ -114,6 +117,8 @@ export function CorrectionFactorForm({
   onOpenReviewWorkspace,
   onCloseReviewWorkspace,
   onSelectReviewSlice,
+  onMultiplierModeChange,
+  onManualMultiplierChange,
   saving,
   deleting = false,
   actionError,
@@ -346,6 +351,8 @@ export function CorrectionFactorForm({
               validationErrors={validationErrors}
               showStoredMultiplierView={showStoredMultiplierView}
               isEventReviewMode={values.events.length > 0}
+              onMultiplierModeChange={onMultiplierModeChange}
+              onManualMultiplierChange={onManualMultiplierChange}
             />
           </aside>
 

@@ -173,7 +173,9 @@
         "pollenRequired": "حبوب اللقاح مطلوبة.",
         "reviewedEventsNonNegative": "يجب أن تكون الأحداث المُراجعة رقمًا غير سالب.",
         "duplicatePollens": "لا يُسمح بتكرار أنواع حبوب اللقاح.",
-        "overAllocated": "لا يمكن أن تتجاوز الأحداث المُراجعة الأحداث المكتشفة."
+        "overAllocated": "لا يمكن أن تتجاوز الأحداث المُراجعة الأحداث المكتشفة.",
+        "manualMultiplierRequired": "المضاعف اليدوي مطلوب في الوضع اليدوي.",
+        "manualMultiplierNonNegative": "يجب أن يكون المضاعف اليدوي رقمًا غير سالب."
       },
       "distribution": {
         "title": "ملخص التصحيح",
@@ -186,7 +188,15 @@
         "correctionMultiplier": "مضاعف التصحيح",
         "restoredMultiplierGuidance": "لتحديثها، اختر قمة من المخطط وراجع الأحداث مرة أخرى.",
         "savedTitle": "العوامل المحفوظة",
-        "savedDescription": "يعرض هذا التصحيح المحفوظ مضاعف التصحيح المخزن فقط."
+        "savedDescription": "يعرض هذا التصحيح المحفوظ مضاعف التصحيح المخزن فقط.",
+        "eventBasedMode": "حسب الأحداث",
+        "manualMode": "تجاوز يدوي",
+        "manualActiveNotice": "التجاوز اليدوي نشط. تبقى اختيارات الأحداث مرئية، لكن المضاعف المحفوظ يستخدم القيمة اليدوية.",
+        "manualMultiplierLabel": "المضاعف اليدوي",
+        "manualMultiplierHelp": "أدخل المضاعف النهائي الذي سيتم حفظه لحبوب اللقاح الأساسية.",
+        "useEventBasedMultiplier": "استخدام المضاعف حسب الأحداث",
+        "eventBasedModeHelp": "يتم حساب المضاعف من الأحداث المطابقة مقسومة على الأحداث المكتشفة.",
+        "manualCorrectionMultiplier": "مضاعف التصحيح اليدوي"
       },
       "totals": {
         "overAllocatedMessage": "الأحداث المحددة تتجاوز الأحداث المكتشفة بمقدار {count}."

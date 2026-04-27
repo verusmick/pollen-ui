@@ -173,7 +173,9 @@
         "pollenRequired": "Pollen ist erforderlich.",
         "reviewedEventsNonNegative": "Überprüfte Ereignisse müssen eine nicht negative Zahl sein.",
         "duplicatePollens": "Doppelte Pollen sind nicht erlaubt.",
-        "overAllocated": "Überprüfte Ereignisse dürfen die erkannten Ereignisse nicht überschreiten."
+        "overAllocated": "Überprüfte Ereignisse dürfen die erkannten Ereignisse nicht überschreiten.",
+        "manualMultiplierRequired": "Der manuelle Multiplikator ist im manuellen Modus erforderlich.",
+        "manualMultiplierNonNegative": "Der manuelle Multiplikator muss eine nicht negative Zahl sein."
       },
       "distribution": {
         "title": "Korrekturübersicht",
@@ -186,7 +188,15 @@
         "correctionMultiplier": "Korrekturmultiplikator",
         "restoredMultiplierGuidance": "Um sie zu aktualisieren, wählen Sie eine Diagrammspitze aus und prüfen Sie die Ereignisse erneut.",
         "savedTitle": "Gespeicherte Faktoren",
-        "savedDescription": "Diese gespeicherte Korrektur zeigt nur den gespeicherten Multiplikator."
+        "savedDescription": "Diese gespeicherte Korrektur zeigt nur den gespeicherten Multiplikator.",
+        "eventBasedMode": "Ereignisbasiert",
+        "manualMode": "Manuelle Überschreibung",
+        "manualActiveNotice": "Die manuelle Überschreibung ist aktiv. Ereignisauswahlen bleiben sichtbar, aber der gespeicherte Multiplikator verwendet den manuellen Wert.",
+        "manualMultiplierLabel": "Manueller Multiplikator",
+        "manualMultiplierHelp": "Geben Sie den endgültigen Multiplikator ein, der für den Basispollen gespeichert wird.",
+        "useEventBasedMultiplier": "Ereignisbasierten Multiplikator verwenden",
+        "eventBasedModeHelp": "Der Multiplikator wird aus passenden Ereignissen geteilt durch erkannte Ereignisse berechnet.",
+        "manualCorrectionMultiplier": "Manueller Korrekturmultiplikator"
       },
       "totals": {
         "overAllocatedMessage": "Ausgewählte Ereignisse überschreiten die erkannten Ereignisse um {count}."

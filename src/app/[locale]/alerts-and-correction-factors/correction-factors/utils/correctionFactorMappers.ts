@@ -117,6 +117,8 @@ export function mapCorrectionFactorRecordToFormValues(
     endDate: normalizeCorrectionFactorDateTime(record.endDate),
     selectedReviewSliceId: null,
     detectedEvents: null,
+    multiplierMode: 'eventBased',
+    manualMultiplier: '',
     events: [],
     rows: baseRow
       ? [baseRow, ...otherRows]

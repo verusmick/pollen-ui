@@ -173,7 +173,9 @@
         "pollenRequired": "Le pollen est requis.",
         "reviewedEventsNonNegative": "Les événements révisés doivent être un nombre non négatif.",
         "duplicatePollens": "Les doublons de pollen ne sont pas autorisés.",
-        "overAllocated": "Les événements révisés ne peuvent pas dépasser les événements détectés."
+        "overAllocated": "Les événements révisés ne peuvent pas dépasser les événements détectés.",
+        "manualMultiplierRequired": "Le multiplicateur manuel est requis en mode manuel.",
+        "manualMultiplierNonNegative": "Le multiplicateur manuel doit être un nombre positif ou nul."
       },
       "distribution": {
         "title": "Résumé de la correction",
@@ -186,7 +188,15 @@
         "correctionMultiplier": "Multiplicateur de correction",
         "restoredMultiplierGuidance": "Pour les mettre a jour, selectionnez un pic du graphique et revoyez les événements.",
         "savedTitle": "Facteurs enregistres",
-        "savedDescription": "Cette correction enregistree affiche uniquement le multiplicateur stocke."
+        "savedDescription": "Cette correction enregistree affiche uniquement le multiplicateur stocke.",
+        "eventBasedMode": "Basé sur les événements",
+        "manualMode": "Remplacement manuel",
+        "manualActiveNotice": "Le remplacement manuel est actif. Les sélections d’événements restent visibles, mais le multiplicateur enregistré utilise la valeur manuelle.",
+        "manualMultiplierLabel": "Multiplicateur manuel",
+        "manualMultiplierHelp": "Saisissez le multiplicateur final à enregistrer pour le pollen de base.",
+        "useEventBasedMultiplier": "Utiliser le multiplicateur basé sur les événements",
+        "eventBasedModeHelp": "Le multiplicateur est calculé avec les événements correspondants divisés par les événements détectés.",
+        "manualCorrectionMultiplier": "Multiplicateur de correction manuel"
       },
       "totals": {
         "overAllocatedMessage": "Les événements sélectionnés dépassent les événements détectés de {count}."

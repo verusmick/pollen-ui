@@ -173,7 +173,9 @@
         "pollenRequired": "Pollen is required.",
         "reviewedEventsNonNegative": "Reviewed events must be a non-negative number.",
         "duplicatePollens": "Duplicate pollens are not allowed.",
-        "overAllocated": "Reviewed events cannot exceed detected events."
+        "overAllocated": "Reviewed events cannot exceed detected events.",
+        "manualMultiplierRequired": "Manual multiplier is required in manual mode.",
+        "manualMultiplierNonNegative": "Manual multiplier must be a non-negative number."
       },
       "distribution": {
         "title": "Correction summary",
@@ -186,7 +188,15 @@
         "correctionMultiplier": "Correction multiplier",
         "restoredMultiplierGuidance": "To update them, select a chart peak and review the events again.",
         "savedTitle": "Saved factors",
-        "savedDescription": "This saved correction shows the stored multiplier only."
+        "savedDescription": "This saved correction shows the stored multiplier only.",
+        "eventBasedMode": "Event-based",
+        "manualMode": "Manual override",
+        "manualActiveNotice": "Manual override is active. Event selections remain visible, but the saved multiplier uses the manual value.",
+        "manualMultiplierLabel": "Manual multiplier",
+        "manualMultiplierHelp": "Enter the final multiplier to save for the base pollen.",
+        "useEventBasedMultiplier": "Use event-based multiplier",
+        "eventBasedModeHelp": "The multiplier is calculated from matching events divided by detected events.",
+        "manualCorrectionMultiplier": "Manual correction multiplier"
       },
       "totals": {
         "overAllocatedMessage": "Selected events exceed the detected events by {count}."

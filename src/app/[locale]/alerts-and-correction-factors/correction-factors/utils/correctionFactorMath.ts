@@ -16,6 +16,16 @@ function toNonNegativeNumber(value: string): number {
   return parsed;
 }
 
+function toManualMultiplier(value: string): number | null {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return null;
+  }
+
+  return parsed;
+}
+
 function scaleFactor(
   ratio: number,
   factorPercentageScale: CorrectionFactorPercentageScale
@@ -35,14 +45,21 @@ export function buildCorrectionFactorDerivedRows(
 
   return values.rows.map((row) => {
     const reviewedEventsNumber = toNonNegativeNumber(row.reviewedEvents);
-    const ratio =
+    const eventBasedRatio =
       detectedEvents > 0 ? reviewedEventsNumber / detectedEvents : 0;
+    const isManualBaseMultiplier =
+      values.multiplierMode === 'manual' && row.isBasePollen;
+    const manualMultiplier = toManualMultiplier(values.manualMultiplier);
+    const multiplier =
+      isManualBaseMultiplier && manualMultiplier !== null
+        ? scaleFactor(manualMultiplier, factorPercentageScale)
+        : scaleFactor(eventBasedRatio, factorPercentageScale);
 
     return {
       clientId: row.clientId,
       pollen: row.pollen,
       reviewedEventsNumber,
-      multiplier: scaleFactor(ratio, factorPercentageScale),
+      multiplier,
       isBasePollen: row.isBasePollen,
       isSyntheticUnknown: false,
     };

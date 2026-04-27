@@ -50,7 +50,8 @@ This document defines architecture and skeletons only, not full implementation.
     - selected image = base pollen
     - unselected image = `UNKNOWN`
 16. Keep additional pollen-classification support possible in types and utilities, but do not let that future flexibility drive the v1 UI.
-17. Treat event assignments as the only editable review source of truth. Reviewed counts, unknown counts, and multipliers remain derived outputs.
+17. Treat event assignments as the editable review source of truth for event-based correction. Reviewed counts and unknown counts remain derived outputs.
+18. Allow an explicit manual multiplier override mode. In event-based mode the base-pollen multiplier is derived from event assignments; in manual mode the saved base-pollen multiplier comes from the user-entered value while event selections remain visible review context.
 
 ## Route Integration
 
@@ -247,8 +248,11 @@ Avoid competing sources of truth by separating editable state from queried sourc
   - drill-down path or breadcrumb state
 - final review-slice selection is a separate local UI state value, typically `selectedReviewSliceId`
 - review-slice validation events come from React Query for the selected final-granularity slice only
-- reviewed event assignments are the only editable review state and should be keyed by `eventId`
-- detected-event counts, reviewed counts, unknown counts, summary rows, and multipliers are derived from queried review-slice events plus reviewed assignments
+- reviewed event assignments are the editable review state and should be keyed by `eventId`
+- detected-event counts, reviewed counts, unknown counts, and summary rows are derived from queried review-slice events plus reviewed assignments
+- correction multiplier source is explicit:
+  - event-based mode derives it from reviewed assignments
+  - manual mode saves the user-entered override value
 
 Do not keep:
 

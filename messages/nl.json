@@ -173,7 +173,9 @@
         "pollenRequired": "Pollen is verplicht.",
         "reviewedEventsNonNegative": "Beoordeelde gebeurtenissen moeten een niet-negatief getal zijn.",
         "duplicatePollens": "Dubbele pollen zijn niet toegestaan.",
-        "overAllocated": "Beoordeelde gebeurtenissen mogen niet hoger zijn dan gedetecteerde gebeurtenissen."
+        "overAllocated": "Beoordeelde gebeurtenissen mogen niet hoger zijn dan gedetecteerde gebeurtenissen.",
+        "manualMultiplierRequired": "De handmatige multiplier is verplicht in handmatige modus.",
+        "manualMultiplierNonNegative": "De handmatige multiplier moet een niet-negatief getal zijn."
       },
       "distribution": {
         "title": "Correctieoverzicht",
@@ -186,7 +188,15 @@
         "correctionMultiplier": "Correctiemultiplier",
         "restoredMultiplierGuidance": "Selecteer een grafiekpiek en bekijk de gebeurtenissen opnieuw om ze bij te werken.",
         "savedTitle": "Opgeslagen factoren",
-        "savedDescription": "Deze opgeslagen correctie toont alleen de opgeslagen multiplier."
+        "savedDescription": "Deze opgeslagen correctie toont alleen de opgeslagen multiplier.",
+        "eventBasedMode": "Op gebeurtenissen gebaseerd",
+        "manualMode": "Handmatige override",
+        "manualActiveNotice": "Handmatige override is actief. Gebeurtenisselecties blijven zichtbaar, maar de opgeslagen multiplier gebruikt de handmatige waarde.",
+        "manualMultiplierLabel": "Handmatige multiplier",
+        "manualMultiplierHelp": "Voer de definitieve multiplier in die voor het basispollen wordt opgeslagen.",
+        "useEventBasedMultiplier": "Gebeurtenis-multiplier gebruiken",
+        "eventBasedModeHelp": "De multiplier wordt berekend uit overeenkomende gebeurtenissen gedeeld door gedetecteerde gebeurtenissen.",
+        "manualCorrectionMultiplier": "Handmatige correctiemultiplier"
       },
       "totals": {
         "overAllocatedMessage": "Geselecteerde gebeurtenissen overschrijden de gedetecteerde gebeurtenissen met {count}."

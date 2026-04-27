@@ -14,6 +14,7 @@ import type {
   CorrectionFactorFormDerivedState,
   CorrectionFactorFormErrors,
   CorrectionFactorFormValues,
+  CorrectionFactorMultiplierMode,
   CorrectionFactorReviewedValidationEvent,
   CorrectionFactorSelectablePollen,
   CorrectionFactorValidationEvent,
@@ -32,7 +33,8 @@ type TopLevelField =
   | 'basePollen'
   | 'startDate'
   | 'endDate'
-  | 'detectedEvents';
+  | 'detectedEvents'
+  | 'manualMultiplier';
 
 type ErrorField = Exclude<keyof CorrectionFactorFormErrors, 'rows' | 'rowErrorsById'>;
 
@@ -256,6 +258,8 @@ export function useCorrectionFactorForm() {
       baseRowMatch: t('baseRowMatch'),
       pollenRequired: t('pollenRequired'),
       reviewedEventsNonNegative: t('reviewedEventsNonNegative'),
+      manualMultiplierRequired: t('manualMultiplierRequired'),
+      manualMultiplierNonNegative: t('manualMultiplierNonNegative'),
       duplicatePollens: t('duplicatePollens'),
       overAllocated: t('overAllocated'),
     }),
@@ -422,7 +426,8 @@ export function useCorrectionFactorForm() {
       field === 'basePollen' ||
       field === 'startDate' ||
       field === 'endDate' ||
-      field === 'detectedEvents'
+      field === 'detectedEvents' ||
+      field === 'manualMultiplier'
     ) {
       clearTopLevelError(field);
     }
@@ -642,6 +647,42 @@ export function useCorrectionFactorForm() {
     });
   }
 
+  function setMultiplierMode(multiplierMode: CorrectionFactorMultiplierMode) {
+    if (multiplierMode === 'manual') {
+      setHasReviewSessionChanges(true);
+    }
+
+    setValues((current) => {
+      if (current.multiplierMode === multiplierMode) {
+        return current;
+      }
+
+      if (multiplierMode === 'manual' && current.manualMultiplier.trim() === '') {
+        const currentDerived = buildCorrectionFactorDerivedState(current, 'ratio');
+        const baseMultiplier =
+          currentDerived.rows.find((row) => row.isBasePollen && !row.isSyntheticUnknown)
+            ?.multiplier ?? 0;
+
+        return {
+          ...current,
+          multiplierMode,
+          manualMultiplier: baseMultiplier.toFixed(2),
+        };
+      }
+
+      return {
+        ...current,
+        multiplierMode,
+      };
+    });
+    clearTopLevelError('manualMultiplier');
+  }
+
+  function updateManualMultiplier(manualMultiplier: string) {
+    setHasReviewSessionChanges(true);
+    setField('manualMultiplier', manualMultiplier);
+  }
+
   function drillDownToRange(nextRange: CorrectionFactorChartRange) {
     setHasReviewSessionChanges(false);
     setValues((current) => clearSelectedReviewSlice(current));
@@ -719,6 +760,8 @@ export function useCorrectionFactorForm() {
     updateEventReviewedPollen,
     toggleEventAccepted,
     setSelectedReviewSliceId,
+    setMultiplierMode,
+    updateManualMultiplier,
     drillDownToRange,
     drillUpChartRange,
     resetForm,

@@ -481,6 +481,8 @@ export function CorrectionFactorFormContainer({
       onOpenReviewWorkspace={() => setReviewWorkspaceOpen(true)}
       onCloseReviewWorkspace={() => setReviewWorkspaceOpen(false)}
       onSelectReviewSlice={handleSelectReviewSlice}
+      onMultiplierModeChange={form.setMultiplierMode}
+      onManualMultiplierChange={form.updateManualMultiplier}
       saving={saving}
       deleting={deleting}
       actionError={actionError}

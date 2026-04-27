@@ -2,7 +2,10 @@
 
 import { useTranslations } from 'next-intl';
 
-import type { CorrectionFactorFormDerivedState } from '../../types';
+import type {
+  CorrectionFactorFormDerivedState,
+  CorrectionFactorMultiplierMode,
+} from '../../types';
 
 interface CorrectionFactorDistributionTableProps {
   derived: CorrectionFactorFormDerivedState;
@@ -10,6 +13,7 @@ interface CorrectionFactorDistributionTableProps {
   basePollen: string;
   showStoredMultiplierView: boolean;
   storedMultiplier?: number | null;
+  multiplierMode: CorrectionFactorMultiplierMode;
 }
 
 interface SummaryMetricProps {
@@ -34,6 +38,7 @@ export function CorrectionFactorDistributionTable({
   basePollen,
   showStoredMultiplierView,
   storedMultiplier = null,
+  multiplierMode,
 }: CorrectionFactorDistributionTableProps) {
   const t = useTranslations('correctionFactorsPage.form.distribution');
   const baseRow = derived.rows.find(
@@ -46,6 +51,10 @@ export function CorrectionFactorDistributionTable({
   const basePollenLabel = basePollen
     ? t('markedAsBasePollen', { basePollen })
     : t('markedAsBasePollenFallback');
+  const multiplierLabel =
+    multiplierMode === 'manual' && !showStoredMultiplierView
+      ? t('manualCorrectionMultiplier')
+      : t('correctionMultiplier');
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -66,7 +75,7 @@ export function CorrectionFactorDistributionTable({
         </>
       ) : null}
       <SummaryMetric
-        label={t('correctionMultiplier')}
+        label={multiplierLabel}
         value={correctionMultiplier.toFixed(2)}
       />
     </div>

@@ -19,6 +19,8 @@ export const DEFAULT_CORRECTION_FACTOR_FORM_VALUES: CorrectionFactorFormValues =
     endDate: '',
     selectedReviewSliceId: null,
     detectedEvents: null,
+    multiplierMode: 'eventBased',
+    manualMultiplier: '',
     events: [],
     rows: [],
   };

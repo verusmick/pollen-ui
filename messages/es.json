@@ -173,7 +173,9 @@
         "pollenRequired": "El polen es obligatorio.",
         "reviewedEventsNonNegative": "Los eventos revisados deben ser un número no negativo.",
         "duplicatePollens": "No se permiten pólenes duplicados.",
-        "overAllocated": "Los eventos revisados no pueden exceder los eventos detectados."
+        "overAllocated": "Los eventos revisados no pueden exceder los eventos detectados.",
+        "manualMultiplierRequired": "El multiplicador manual es obligatorio en modo manual.",
+        "manualMultiplierNonNegative": "El multiplicador manual debe ser un número no negativo."
       },
       "distribution": {
         "title": "Resumen de la corrección",
@@ -186,7 +188,15 @@
         "correctionMultiplier": "Multiplicador de corrección",
         "restoredMultiplierGuidance": "Para actualizarlos, seleccione un pico en el gráfico y revise los eventos otra vez.",
         "savedTitle": "Factores guardados",
-        "savedDescription": "Esta corrección guardada muestra solo el multiplicador almacenado."
+        "savedDescription": "Esta corrección guardada muestra solo el multiplicador almacenado.",
+        "eventBasedMode": "Según eventos",
+        "manualMode": "Anulación manual",
+        "manualActiveNotice": "La anulación manual está activa. Las selecciones de eventos siguen visibles, pero el multiplicador guardado usa el valor manual.",
+        "manualMultiplierLabel": "Multiplicador manual",
+        "manualMultiplierHelp": "Introduzca el multiplicador final que se guardará para el polen base.",
+        "useEventBasedMultiplier": "Usar multiplicador según eventos",
+        "eventBasedModeHelp": "El multiplicador se calcula con eventos coincidentes dividido entre eventos detectados.",
+        "manualCorrectionMultiplier": "Multiplicador manual de corrección"
       },
       "totals": {
         "overAllocatedMessage": "Los eventos seleccionados superan los eventos detectados en {count}."

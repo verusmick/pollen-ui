@@ -22,6 +22,8 @@ interface CorrectionFactorValidationMessages {
   baseRowMatch: string;
   pollenRequired: string;
   reviewedEventsNonNegative: string;
+  manualMultiplierRequired: string;
+  manualMultiplierNonNegative: string;
   duplicatePollens: string;
   overAllocated: string;
 }
@@ -73,6 +75,14 @@ export function validateCorrectionFactorForm(
 
   if (values.detectedEvents === null) {
     errors.detectedEvents = messages.detectedEventsRequired;
+  }
+
+  if (values.multiplierMode === 'manual') {
+    if (values.manualMultiplier.trim() === '') {
+      errors.manualMultiplier = messages.manualMultiplierRequired;
+    } else if (!isValidNonNegativeNumber(values.manualMultiplier)) {
+      errors.manualMultiplier = messages.manualMultiplierNonNegative;
+    }
   }
 
   if (values.rows.length === 0) {
@@ -155,6 +165,7 @@ export function listCorrectionFactorFormErrors(
     'startDate',
     'endDate',
     'detectedEvents',
+    'manualMultiplier',
     'rows',
   ] as const) {
     const value = errors[key];
