@@ -89,8 +89,8 @@
     "form": {
       "title": "Correctiefactor",
       "editTitle": "Correctiefactor bewerken",
-      "description": "Selecteer een piek in de grafiek en bekijk de gedetecteerde beelden om een correctie te maken.",
-      "editDescription": "Bekijk deze opgeslagen correctie. Eerdere beeldselecties worden niet bewaard, dus selecteer een piek in de grafiek om de beelden opnieuw te bekijken als dat nodig is.",
+      "description": "Selecteer een piek in de grafiek en bekijk de gedetecteerde gebeurtenissen om een correctie te maken.",
+      "editDescription": "Bekijk deze opgeslagen correctie. Eerdere gebeurtenisselecties worden niet bewaard, dus selecteer een piek in de grafiek om de gebeurtenissen opnieuw te bekijken als dat nodig is.",
       "submitErrorFallback": "De correctiefactor kon niet worden opgeslagen.",
       "updateErrorFallback": "De correctiefactor kon niet worden bijgewerkt.",
       "deleteErrorFallback": "De correctiefactor kon niet worden verwijderd.",
@@ -100,9 +100,9 @@
       },
       "editUnavailable": {
         "title": "Deze opgeslagen correctie kan hier niet worden bewerkt",
-        "description": "De opgeslagen correctie kan hieronder worden bekeken, maar de eerdere beeldselecties zijn niet beschikbaar.",
+        "description": "De opgeslagen correctie kan hieronder worden bekeken, maar de eerdere gebeurtenisselecties zijn niet beschikbaar.",
         "reasonLabel": "Reden",
-        "reason": "Eerdere beeldselecties zijn niet beschikbaar voor deze opgeslagen correctie.",
+        "reason": "Eerdere gebeurtenisselecties zijn niet beschikbaar voor deze opgeslagen correctie.",
         "summaryTitle": "Opgeslagen correctie",
         "location": "Locatie",
         "basePollen": "Basispollen",
@@ -121,16 +121,16 @@
         "allLocations": "Selecteer een locatie",
         "basePollen": "Basispollen",
         "allPollens": "Selecteer een pollen",
-        "detectedEvents": "Gedetecteerde beelden",
-        "detectedEventsHint": "Gedetecteerde beelden verschijnen nadat u een locatie, basispollen, datumbereik en grafiekpiek hebt gekozen.",
+        "detectedEvents": "Gedetecteerde gebeurtenissen",
+        "detectedEventsHint": "Gedetecteerde gebeurtenissen verschijnen nadat u een locatie, basispollen, datumbereik en grafiekpiek hebt gekozen.",
         "detectedEventsLoadingValue": "Laden...",
         "detectedEventsValuePlaceholder": "Selecteer een grafiekpiek",
-        "detectedEventsSelectSlice": "Selecteer een grafiekpiek om de gedetecteerde beelden te bekijken.",
-        "detectedEventsLoading": "Gedetecteerde beelden laden...",
-        "detectedEventsLoaded": "Gedetecteerde beelden gevonden voor de geselecteerde grafiekpiek.",
-        "detectedEventsError": "Gedetecteerde beelden konden niet worden geladen.",
-        "detectedEventsMismatchError": "Er waren geen gedetecteerde beelden beschikbaar voor deze grafiekpiek.",
-        "detectedEventsLocationMappingError": "Gedetecteerde beelden zijn niet beschikbaar voor de geselecteerde locatie \"{location}\".",
+        "detectedEventsSelectSlice": "Selecteer een grafiekpiek om de gedetecteerde gebeurtenissen te bekijken.",
+        "detectedEventsLoading": "Gedetecteerde gebeurtenissen laden...",
+        "detectedEventsLoaded": "Gedetecteerde gebeurtenissen gevonden voor de geselecteerde grafiekpiek.",
+        "detectedEventsError": "Gedetecteerde gebeurtenissen konden niet worden geladen.",
+        "detectedEventsMismatchError": "Er waren geen gedetecteerde gebeurtenissen beschikbaar voor deze grafiekpiek.",
+        "detectedEventsLocationMappingError": "Gedetecteerde gebeurtenissen zijn niet beschikbaar voor de geselecteerde locatie \"{location}\".",
         "startDate": "Startdatum en tijd",
         "endDate": "Einddatum en tijd",
         "startPlaceholder": "Startdatum",
@@ -165,7 +165,7 @@
         "startDateInvalid": "Startdatum/tijd moet een geldig heel uur gebruiken.",
         "endDateInvalid": "Einddatum/tijd moet een geldig heel uur gebruiken.",
         "endDateOrder": "De einddatum moet na of gelijk aan de startdatum zijn.",
-        "detectedEventsRequired": "Selecteer een grafiekpiek met gedetecteerde beelden.",
+        "detectedEventsRequired": "Selecteer een grafiekpiek met gedetecteerde gebeurtenissen.",
         "atLeastOneRow": "Minimaal één correctierij is verplicht.",
         "exactlyOneBaseRow": "Precies één basispollenrij is verplicht.",
         "baseRowFirst": "De basispollenrij moet de eerste rij zijn.",
@@ -177,27 +177,27 @@
       },
       "distribution": {
         "title": "Correctieoverzicht",
-        "description": "Bekijk de resultaten van de geselecteerde beeldbeoordeling.",
-        "helperText": "Klik op beelden in het beoordelingspaneel om dit overzicht bij te werken.",
-        "detectedImages": "Gedetecteerde beelden",
+        "description": "Bekijk de resultaten van de geselecteerde gebeurtenisbeoordeling.",
+        "helperText": "Beoordeel gebeurtenissen in het beoordelingspaneel om dit overzicht bij te werken.",
+        "detectedImages": "Gedetecteerde gebeurtenissen",
         "markedAsBasePollen": "Gemarkeerd als {basePollen}",
         "markedAsBasePollenFallback": "Gemarkeerd als basispollen",
         "countedAsUnknown": "Geteld als Onbekend",
         "correctionMultiplier": "Correctiemultiplier",
-        "restoredMultiplierGuidance": "Selecteer een grafiekpiek en bekijk de beelden opnieuw om ze bij te werken.",
+        "restoredMultiplierGuidance": "Selecteer een grafiekpiek en bekijk de gebeurtenissen opnieuw om ze bij te werken.",
         "savedTitle": "Opgeslagen factoren",
         "savedDescription": "Deze opgeslagen correctie toont alleen de opgeslagen multiplier."
       },
       "totals": {
-        "overAllocatedMessage": "Geselecteerde beelden overschrijden de gedetecteerde beelden met {count}."
+        "overAllocatedMessage": "Geselecteerde gebeurtenissen overschrijden de gedetecteerde gebeurtenissen met {count}."
       },
       "editHydration": {
         "title": "Opgeslagen correctie geladen",
-        "description": "Deze opgeslagen correctie is geladen. Eerdere beeldselecties worden niet bewaard, dus selecteer een grafiekpiek om de beelden opnieuw te bekijken."
+        "description": "Deze opgeslagen correctie is geladen. Eerdere gebeurtenisselecties worden niet bewaard, dus selecteer een grafiekpiek om de gebeurtenissen opnieuw te bekijken."
       },
       "preview": {
         "title": "Grafiekpieken",
-        "description": "Selecteer een piek in de grafiek om de gedetecteerde beelden te bekijken.",
+        "description": "Selecteer een piek in de grafiek om de gedetecteerde gebeurtenissen te bekijken.",
         "loading": "Grafiekpieken laden...",
         "idle": "Kies een locatie, basispollen en datumbereik om grafiekpieken te tonen.",
         "empty": "Er zijn geen grafiekpieken gevonden voor het geselecteerde bereik.",
@@ -217,22 +217,24 @@
         "navigation": {
           "title": "Grafieknavigatie",
           "drillDownMode": "Selecteer een bredere piekgroep om de grafiek te verfijnen.",
-          "reviewMode": "Selecteer een grafiekpiek om de gedetecteerde beelden te bekijken.",
+          "reviewMode": "Selecteer een grafiekpiek om de gedetecteerde gebeurtenissen te bekijken.",
           "up": "Terug naar vorig bereik"
         },
         "bucketSelection": {
           "title": "Grafiekselectie",
           "drillDownDescription": "Selecteer eerst een bredere piekgroep om de grafiek te verfijnen en daarna een grafiekpiek.",
-          "reviewDescription": "Selecteer een grafiekpiek om de gedetecteerde beelden te bekijken.",
+          "reviewDescription": "Selecteer een grafiekpiek om de gedetecteerde gebeurtenissen te bekijken.",
           "drillDownAction": "Inzoomen",
-          "reviewAction": "Gedetecteerde beelden bekijken"
+          "reviewAction": "Gedetecteerde gebeurtenissen bekijken",
+          "intervalValue": "{value} Pollen/m³"
         },
         "sliceSelection": {
           "noneSelected": "Nog geen grafiekpiek geselecteerd.",
-          "selected": "Geselecteerde grafiekpiek: {slice}"
+          "selected": "Geselecteerde grafiekpiek: {slice}",
+          "labelWithContext": "{slice} · {pollen}: {value} Pollen/m³"
         },
         "tooltip": {
-          "value": "{value} Pollen/m3"
+          "value": "{value} Pollen/m³"
         },
         "series": {
           "original": "Gemeten",
@@ -240,38 +242,42 @@
         }
       },
       "reviewSummary": {
-        "title": "Beeldbeoordeling",
-        "description": "Open het paneel voor beeldbeoordeling van de geselecteerde grafiekpiek.",
-        "action": "Beelden bekijken",
+        "title": "Gebeurtenisbeoordeling",
+        "description": "Open het beoordelingspaneel voor de geselecteerde grafiekpiek.",
+        "action": "Gebeurtenissen bekijken",
         "selectedSlice": "Grafiekpiek",
         "slicePending": "Nog geen grafiekpiek geselecteerd",
-        "detectedEvents": "Gedetecteerde beelden",
+        "detectedEvents": "Gedetecteerde gebeurtenissen",
         "accepted": "Komt overeen met basispollen",
         "unknown": "Onbekend",
         "countPending": "Nog niet beschikbaar",
         "count": "{count, plural, =0 {0 gebeurtenissen} one {# gebeurtenis} other {# gebeurtenissen}}",
-        "readyHint": "Klik op beelden die overeenkomen met {basePollen}. Niet-geselecteerde beelden tellen als Onbekend."
+        "readyHint": "Beoordeel gebeurtenissen die overeenkomen met {basePollen}. Niet-geselecteerde gebeurtenissen tellen als Onbekend."
       },
       "reviewWorkspace": {
         "eyebrow": "Beeldbeoordeling",
-        "title": "Gedetecteerde beelden",
+        "title": "Gedetecteerde gebeurtenissen",
         "description": "Bekijk de beelden voor de geselecteerde grafiekpiek.",
         "close": "Beoordeling sluiten",
         "selectedSlice": "Grafiekpiek",
         "slicePending": "Nog geen grafiekpiek geselecteerd",
         "accepted": "Komt overeen met basispollen",
         "unknown": "Onbekend",
-        "count": "{count, plural, =0 {0 gebeurtenissen} one {# gebeurtenis} other {# gebeurtenissen}}"
+        "count": "{count, plural, =0 {0 gebeurtenissen} one {# gebeurtenis} other {# gebeurtenissen}}",
+        "previousPeak": "Vorige piek",
+        "currentPeak": "Piek {current} van {total}",
+        "currentPeakPending": "Geen piek geselecteerd",
+        "nextPeak": "Volgende piek"
       },
       "eventsCarousel": {
-        "title": "Gedetecteerde beelden",
+        "title": "Gedetecteerde gebeurtenissen",
         "description": "Bekijk de beelden voor de geselecteerde grafiekpiek.",
         "count": "{count, plural, =0 {0 gebeurtenissen} one {# gebeurtenis} other {# gebeurtenissen}}",
         "idle": "Kies een locatie, basispollen en datumbereik om grafiekpieken te laden.",
-        "selectSlice": "Selecteer een grafiekpiek om de gedetecteerde beelden te bekijken.",
-        "empty": "Er zijn geen gedetecteerde beelden gevonden voor de geselecteerde grafiekpiek.",
-        "error": "Gedetecteerde beelden konden niet worden geladen.",
-        "errorMismatch": "Er waren geen gedetecteerde beelden beschikbaar voor deze grafiekpiek.",
+        "selectSlice": "Selecteer een grafiekpiek om de gedetecteerde gebeurtenissen te bekijken.",
+        "empty": "Er zijn geen gedetecteerde gebeurtenissen gevonden voor de geselecteerde grafiekpiek.",
+        "error": "Gedetecteerde gebeurtenissen konden niet worden geladen.",
+        "errorMismatch": "Er waren geen gedetecteerde gebeurtenissen beschikbaar voor deze grafiekpiek.",
         "selectionInstruction": "Klik op beelden die overeenkomen met {basePollen}.",
         "selectionHint": "Niet-geselecteerde beelden tellen als Onbekend.",
         "acceptedCount": "{acceptedCount} van {totalCount} komen overeen met {basePollen}",

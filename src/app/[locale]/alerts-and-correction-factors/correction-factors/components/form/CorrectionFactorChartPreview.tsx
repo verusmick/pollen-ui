@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { KeyboardEvent, MouseEvent } from 'react';
 import {
   CartesianGrid,
@@ -21,7 +21,6 @@ import type {
   CorrectionFactorPreviewPoint,
   CorrectionFactorPreviewSeries,
   CorrectionFactorPreviewStatus,
-  CorrectionFactorReviewSlice,
 } from '../../types';
 import { formatCorrectionFactorChartRange } from '../../utils';
 
@@ -29,7 +28,6 @@ interface CorrectionFactorChartPreviewProps {
   basePollen: string;
   status: CorrectionFactorPreviewStatus;
   series: CorrectionFactorPreviewSeries | null;
-  reviewSlices: CorrectionFactorReviewSlice[];
   selectedSliceId: string | null;
   visibleRange: CorrectionFactorChartRange | null;
   resolution: CorrectionFactorChartResolution | null;
@@ -41,6 +39,50 @@ interface CorrectionFactorChartPreviewProps {
 
 function formatValue(value: number): string {
   return Number.isInteger(value) ? `${value}` : value.toFixed(2);
+}
+
+function buildMeasurementAxisTicks(
+  series: CorrectionFactorPreviewSeries | null,
+  resolution: CorrectionFactorChartResolution | null
+): number[] | undefined {
+  if (resolution !== 'measurement' || !series || series.points.length === 0) {
+    return undefined;
+  }
+
+  const maxTicks = 18;
+  const step = Math.max(1, Math.ceil(series.points.length / maxTicks));
+  const ticks = series.points
+    .filter((_, index) => index % step === 0)
+    .map((point) => point.displayTimestamp);
+  const lastTick = series.points[series.points.length - 1]?.displayTimestamp;
+
+  if (typeof lastTick === 'number' && ticks[ticks.length - 1] !== lastTick) {
+    ticks.push(lastTick);
+  }
+
+  return ticks;
+}
+
+function formatMeasurementAxisTick(
+  value: number,
+  series: CorrectionFactorPreviewSeries | null
+): string {
+  if (!series || series.points.length === 0) {
+    return '';
+  }
+
+  const nearestPoint = series.points.reduce((currentNearest, point) =>
+    Math.abs(point.displayTimestamp - value) <
+    Math.abs(currentNearest.displayTimestamp - value)
+      ? point
+      : currentNearest
+  );
+
+  return new Intl.DateTimeFormat(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC',
+  }).format(new Date(nearestPoint.displayTimestamp * 1000));
 }
 
 function formatResolutionLabel(
@@ -69,7 +111,6 @@ export function CorrectionFactorChartPreview({
   basePollen,
   status,
   series,
-  reviewSlices,
   selectedSliceId,
   visibleRange,
   resolution,
@@ -80,12 +121,6 @@ export function CorrectionFactorChartPreview({
 }: CorrectionFactorChartPreviewProps) {
   const t = useTranslations('correctionFactorsPage.form.preview');
   const bucketButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const selectedSlice =
-    reviewSlices.find((slice) => slice.id === selectedSliceId) ?? null;
-  const selectedPoint =
-    series?.points.find(
-      (point) => point.id === selectedSliceId && point.isReviewSlice
-    ) ?? null;
   const visibleRangeLabel = formatCorrectionFactorChartRange(visibleRange);
   const showBucketButtons =
     series?.resolution === 'day' || series?.resolution === 'measurement';
@@ -93,6 +128,11 @@ export function CorrectionFactorChartPreview({
     resolution === 'measurement' ? 6 : resolution === 'day' ? 24 : 24;
   const xAxisInterval =
     resolution === 'measurement' ? 0 : 'preserveStartEnd';
+  const xAxisDataKey = resolution === 'measurement' ? 'displayTimestamp' : 'axisLabel';
+  const xAxisTicks = useMemo(
+    () => buildMeasurementAxisTicks(series, resolution),
+    [resolution, series]
+  );
 
   useEffect(() => {
     if (!selectedSliceId || !showBucketButtons) {
@@ -328,13 +368,6 @@ export function CorrectionFactorChartPreview({
               resolution: formatResolutionLabel(resolution, t),
             })}
           </div>
-          <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-            {selectedSlice
-              ? t('sliceSelection.selected', {
-                  slice: selectedSlice.label,
-                })
-              : t('sliceSelection.noneSelected')}
-          </div>
         </div>
       </div>
 
@@ -369,7 +402,17 @@ export function CorrectionFactorChartPreview({
               <LineChart data={series.points} onClick={handleChartClick}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis
-                  dataKey="axisLabel"
+                  dataKey={xAxisDataKey}
+                  type={resolution === 'measurement' ? 'number' : 'category'}
+                  domain={
+                    resolution === 'measurement' ? ['dataMin', 'dataMax'] : undefined
+                  }
+                  ticks={xAxisTicks}
+                  tickFormatter={(value) =>
+                    resolution === 'measurement'
+                      ? formatMeasurementAxisTick(Number(value), series)
+                      : String(value)
+                  }
                   tickLine={false}
                   axisLine={false}
                   minTickGap={xAxisMinTickGap}
@@ -407,7 +450,7 @@ export function CorrectionFactorChartPreview({
 
           {showBucketButtons ? (
             <div className="space-y-3 rounded-lg border border-border bg-background p-4">
-            <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+            <div>
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold text-foreground">
                   {t('bucketSelection.title')}
@@ -417,13 +460,6 @@ export function CorrectionFactorChartPreview({
                     ? t('bucketSelection.reviewDescription')
                     : t('bucketSelection.drillDownDescription')}
                 </p>
-              </div>
-              <div className="rounded-md border border-dashed border-border px-3 py-2 text-sm text-muted-foreground">
-                {selectedSlice
-                  ? t('sliceSelection.selected', {
-                      slice: selectedSlice.label,
-                    })
-                  : t('sliceSelection.noneSelected')}
               </div>
             </div>
 
@@ -441,13 +477,22 @@ export function CorrectionFactorChartPreview({
                       type="button"
                       onClick={(event) => handleBucketButtonClick(event, point.id)}
                       onKeyDown={(event) => handleBucketKeyDown(event, point.id)}
-                      className={`rounded-md border px-3 py-2 text-left text-sm transition ${
+                      className={`rounded-md border px-3 py-2 text-center text-sm transition ${
                         isSelected
                           ? 'border-foreground bg-foreground text-background'
                           : 'border-border bg-card text-foreground hover:bg-muted'
                       }`}
                     >
                       <div className="font-medium">{point.label}</div>
+                      <div
+                        className={`mt-1 text-xs ${
+                          isSelected ? 'text-background/80' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {t('bucketSelection.intervalValue', {
+                          value: formatValue(point.originalValue),
+                        })}
+                      </div>
                     </button>
                   );
                 })}

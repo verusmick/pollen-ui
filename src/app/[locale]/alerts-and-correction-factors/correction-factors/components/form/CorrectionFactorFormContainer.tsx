@@ -320,6 +320,11 @@ export function CorrectionFactorFormContainer({
         })
       : null;
 
+  function handleSelectReviewSlice(sliceId: string) {
+    form.setSelectedReviewSliceId(sliceId);
+    setReviewWorkspaceOpen(true);
+  }
+
   function handleActivatePreviewBucket(bucketId: string) {
     const bucket =
       preview.series?.points.find((candidate) => candidate.id === bucketId) ?? null;
@@ -329,7 +334,7 @@ export function CorrectionFactorFormContainer({
     }
 
     if (bucket.isReviewSlice) {
-      form.setSelectedReviewSliceId(bucket.id);
+      handleSelectReviewSlice(bucket.id);
       return;
     }
 
@@ -475,6 +480,7 @@ export function CorrectionFactorFormContainer({
       reviewWorkspaceOpen={reviewWorkspaceOpen}
       onOpenReviewWorkspace={() => setReviewWorkspaceOpen(true)}
       onCloseReviewWorkspace={() => setReviewWorkspaceOpen(false)}
+      onSelectReviewSlice={handleSelectReviewSlice}
       saving={saving}
       deleting={deleting}
       actionError={actionError}

@@ -13,7 +13,6 @@ interface CorrectionFactorReviewSummaryProps {
   detectedEvents: number | null;
   basePollen: string;
   hasSelectedSlice: boolean;
-  selectedSliceLabel?: string | null;
   statusText?: string | null;
   errorMessage?: string | null;
   onOpenReviewWorkspace: () => void;
@@ -25,7 +24,6 @@ export function CorrectionFactorReviewSummary({
   detectedEvents,
   basePollen,
   hasSelectedSlice,
-  selectedSliceLabel = null,
   statusText = null,
   errorMessage = null,
   onOpenReviewWorkspace,
@@ -63,16 +61,7 @@ export function CorrectionFactorReviewSummary({
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-lg border border-border bg-background px-4 py-3">
-          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t('selectedSlice')}
-          </div>
-          <div className="mt-2 text-sm font-medium text-foreground">
-            {selectedSliceLabel ?? t('slicePending')}
-          </div>
-        </div>
-
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
         <div className="rounded-lg border border-border bg-background px-4 py-3">
           <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {t('detectedEvents')}

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 
 import type {
   CorrectionFactorReviewedValidationEvent,
+  CorrectionFactorReviewSlice,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
 import { CorrectionFactorEventCarousel } from './CorrectionFactorEventCarousel';
@@ -15,9 +16,12 @@ interface CorrectionFactorReviewWorkspaceProps {
   events: CorrectionFactorReviewedValidationEvent[];
   basePollen: string;
   selectedSliceLabel?: string | null;
+  reviewSlices: CorrectionFactorReviewSlice[];
+  selectedSliceId: string | null;
   idleMessage?: string | null;
   errorMessage?: string | null;
   onToggleAccepted: (eventId: string) => void;
+  onSelectReviewSlice: (sliceId: string) => void;
   onClose: () => void;
 }
 
@@ -27,9 +31,12 @@ export function CorrectionFactorReviewWorkspace({
   events,
   basePollen,
   selectedSliceLabel = null,
+  reviewSlices,
+  selectedSliceId,
   idleMessage = null,
   errorMessage = null,
   onToggleAccepted,
+  onSelectReviewSlice,
   onClose,
 }: CorrectionFactorReviewWorkspaceProps) {
   const t = useTranslations('correctionFactorsPage.form.reviewWorkspace');
@@ -39,6 +46,17 @@ export function CorrectionFactorReviewWorkspace({
     (event) => event.reviewedPollen === basePollen
   ).length;
   const unknownCount = events.length - acceptedCount;
+  const selectedSliceIndex = reviewSlices.findIndex(
+    (slice) => slice.id === selectedSliceId
+  );
+  const currentPeakNumber =
+    selectedSliceIndex >= 0 ? selectedSliceIndex + 1 : null;
+  const previousSlice =
+    selectedSliceIndex > 0 ? reviewSlices[selectedSliceIndex - 1] : null;
+  const nextSlice =
+    selectedSliceIndex >= 0 && selectedSliceIndex < reviewSlices.length - 1
+      ? reviewSlices[selectedSliceIndex + 1]
+      : null;
 
   useEffect(() => {
     if (open) {
@@ -125,6 +143,41 @@ export function CorrectionFactorReviewWorkspace({
         </div>
 
         <div className="border-b border-border px-4 py-4 sm:px-6">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (previousSlice) {
+                  onSelectReviewSlice(previousSlice.id);
+                }
+              }}
+              disabled={!previousSlice}
+              className="inline-flex cursor-pointer items-center justify-center rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {t('previousPeak')}
+            </button>
+            <div className="rounded-md border border-border bg-card px-3 py-2 text-sm font-medium text-foreground">
+              {currentPeakNumber === null
+                ? t('currentPeakPending')
+                : t('currentPeak', {
+                    current: currentPeakNumber,
+                    total: reviewSlices.length,
+                  })}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (nextSlice) {
+                  onSelectReviewSlice(nextSlice.id);
+                }
+              }}
+              disabled={!nextSlice}
+              className="inline-flex cursor-pointer items-center justify-center rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {t('nextPeak')}
+            </button>
+          </div>
+
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-lg border border-border bg-card px-4 py-3">
               <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -160,7 +213,6 @@ export function CorrectionFactorReviewWorkspace({
             status={status}
             events={events}
             basePollen={basePollen}
-            selectedSliceLabel={selectedSliceLabel}
             idleMessage={idleMessage}
             errorMessage={errorMessage}
             onToggleAccepted={onToggleAccepted}

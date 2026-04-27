@@ -48,6 +48,7 @@ interface CorrectionFactorFormProps {
   reviewWorkspaceOpen: boolean;
   onOpenReviewWorkspace: () => void;
   onCloseReviewWorkspace: () => void;
+  onSelectReviewSlice: (sliceId: string) => void;
   saving: boolean;
   deleting?: boolean;
   actionError?: string | null;
@@ -84,6 +85,10 @@ function formatDateRange(startDate: string, endDate: string): string {
   return formatCorrectionFactorDateTimeRange(startDate, endDate);
 }
 
+function formatValue(value: number): string {
+  return Number.isInteger(value) ? `${value}` : value.toFixed(2);
+}
+
 export function CorrectionFactorForm({
   mode,
   values,
@@ -108,6 +113,7 @@ export function CorrectionFactorForm({
   reviewWorkspaceOpen,
   onOpenReviewWorkspace,
   onCloseReviewWorkspace,
+  onSelectReviewSlice,
   saving,
   deleting = false,
   actionError,
@@ -142,6 +148,18 @@ export function CorrectionFactorForm({
   const formT = useTranslations('correctionFactorsPage.form');
   const selectedPreviewSlice =
     previewReviewSlices.find((slice) => slice.id === selectedPreviewSliceId) ?? null;
+  const selectedPreviewPoint =
+    previewSeries?.points.find(
+      (point) => point.id === selectedPreviewSliceId && point.isReviewSlice
+    ) ?? null;
+  const selectedPreviewSliceLabel =
+    selectedPreviewPoint && values.basePollen
+      ? formT('preview.sliceSelection.labelWithContext', {
+          slice: selectedPreviewSlice?.label ?? selectedPreviewPoint.label,
+          pollen: values.basePollen,
+          value: formatValue(selectedPreviewPoint.originalValue),
+        })
+      : selectedPreviewSlice?.label ?? null;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
@@ -336,7 +354,6 @@ export function CorrectionFactorForm({
               basePollen={basePollen}
               status={previewStatus}
               series={previewSeries}
-              reviewSlices={previewReviewSlices}
               selectedSliceId={selectedPreviewSliceId}
               visibleRange={previewVisibleRange}
               resolution={previewResolution}
@@ -352,7 +369,6 @@ export function CorrectionFactorForm({
               detectedEvents={values.detectedEvents}
               basePollen={values.basePollen}
               hasSelectedSlice={selectedPreviewSlice !== null}
-              selectedSliceLabel={selectedPreviewSlice?.label ?? null}
               errorMessage={validationEventsError}
               statusText={validationEventsFieldError ?? validationEventsStatusText}
               onOpenReviewWorkspace={onOpenReviewWorkspace}
@@ -366,10 +382,13 @@ export function CorrectionFactorForm({
         status={validationEventsStatus}
         events={validationEvents}
         basePollen={values.basePollen}
-        selectedSliceLabel={selectedPreviewSlice?.label ?? null}
+        selectedSliceLabel={selectedPreviewSliceLabel}
+        reviewSlices={previewReviewSlices}
+        selectedSliceId={selectedPreviewSliceId}
         idleMessage={validationEventsIdleMessage}
         errorMessage={validationEventsError}
         onToggleAccepted={onToggleValidationEventAccepted}
+        onSelectReviewSlice={onSelectReviewSlice}
         onClose={onCloseReviewWorkspace}
       />
     </div>

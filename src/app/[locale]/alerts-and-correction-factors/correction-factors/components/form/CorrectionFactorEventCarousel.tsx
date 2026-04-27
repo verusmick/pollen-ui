@@ -12,7 +12,6 @@ interface CorrectionFactorEventCarouselProps {
   status: CorrectionFactorValidationEventsStatus;
   events: CorrectionFactorReviewedValidationEvent[];
   basePollen: string;
-  selectedSliceLabel?: string | null;
   idleMessage?: string | null;
   errorMessage?: string | null;
   onToggleAccepted: (eventId: string) => void;
@@ -32,7 +31,6 @@ export function CorrectionFactorEventCarousel({
   status,
   events,
   basePollen,
-  selectedSliceLabel = null,
   idleMessage = null,
   errorMessage = null,
   onToggleAccepted,
@@ -75,11 +73,6 @@ export function CorrectionFactorEventCarousel({
           </div>
         </div>
         <div className="flex flex-wrap justify-end gap-2">
-          {selectedSliceLabel ? (
-            <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-foreground">
-              {selectedSliceLabel}
-            </div>
-          ) : null}
           <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
             {t('count', { count: events.length })}
           </div>
@@ -202,27 +195,9 @@ export function CorrectionFactorEventCarousel({
                     </div>
                   </div>
 
-                  <div className="space-y-2 p-3">
-                    <div>
-                      <div className="text-xs text-muted-foreground">
-                        {t('classification')}
-                      </div>
-                      <div className="text-sm font-medium text-foreground">
-                        {event.classification}
-                      </div>
-                    </div>
-
-                    <div className="grid gap-2 text-xs text-muted-foreground">
-                      <div>
-                        <div>{t('location')}</div>
-                        <div className="font-medium text-foreground">{event.device}</div>
-                      </div>
-                      <div>
-                        <div>{t('capturedAt')}</div>
-                        <div className="font-medium text-foreground">
-                          {formatEventDatetime(event.datetime)}
-                        </div>
-                      </div>
+                  <div className="p-3">
+                    <div className="text-sm font-medium text-foreground">
+                      {formatEventDatetime(event.datetime)}
                     </div>
                   </div>
                 </button>

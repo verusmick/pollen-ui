@@ -89,8 +89,8 @@
     "form": {
       "title": "Correction Factor",
       "editTitle": "Edit Correction Factor",
-      "description": "Select a chart peak and review its detected images to create a correction.",
-      "editDescription": "Review this saved correction. Previous image selections are not stored, so select a chart peak to review the images again if needed.",
+      "description": "Select a chart peak and review its detected events to create a correction.",
+      "editDescription": "Review this saved correction. Previous event selections are not stored, so select a chart peak to review the events again if needed.",
       "submitErrorFallback": "Failed to save the correction factor.",
       "updateErrorFallback": "Failed to update the correction factor.",
       "deleteErrorFallback": "Failed to delete the correction factor.",
@@ -100,9 +100,9 @@
       },
       "editUnavailable": {
         "title": "This saved correction cannot be edited here",
-        "description": "The saved correction can be reviewed below, but the previous image selections are not available.",
+        "description": "The saved correction can be reviewed below, but the previous event selections are not available.",
         "reasonLabel": "Reason",
-        "reason": "Previous image selections are not available for this saved correction.",
+        "reason": "Previous event selections are not available for this saved correction.",
         "summaryTitle": "Saved correction",
         "location": "Location",
         "basePollen": "Base pollen",
@@ -121,16 +121,16 @@
         "allLocations": "Select a location",
         "basePollen": "Base pollen",
         "allPollens": "Select a pollen",
-        "detectedEvents": "Detected images",
-        "detectedEventsHint": "Detected images appear after you choose a location, base pollen, date range, and chart peak.",
+        "detectedEvents": "Detected events",
+        "detectedEventsHint": "Detected events appear after you choose a location, base pollen, date range, and chart peak.",
         "detectedEventsLoadingValue": "Loading...",
         "detectedEventsValuePlaceholder": "Select a chart peak",
-        "detectedEventsSelectSlice": "Select a chart peak to review its detected images.",
-        "detectedEventsLoading": "Loading detected images...",
-        "detectedEventsLoaded": "Detected images found for the selected chart peak.",
-        "detectedEventsError": "Detected images could not be loaded.",
-        "detectedEventsMismatchError": "Detected images were not available for this chart peak.",
-        "detectedEventsLocationMappingError": "Detected images are not available for the selected location \"{location}\".",
+        "detectedEventsSelectSlice": "Select a chart peak to review its detected events.",
+        "detectedEventsLoading": "Loading detected events...",
+        "detectedEventsLoaded": "Detected events found for the selected chart peak.",
+        "detectedEventsError": "Detected events could not be loaded.",
+        "detectedEventsMismatchError": "Detected events were not available for this chart peak.",
+        "detectedEventsLocationMappingError": "Detected events are not available for the selected location \"{location}\".",
         "startDate": "Start date and time",
         "endDate": "End date and time",
         "startPlaceholder": "Start date",
@@ -165,7 +165,7 @@
         "startDateInvalid": "Start date/time must use a valid whole-hour value.",
         "endDateInvalid": "End date/time must use a valid whole-hour value.",
         "endDateOrder": "End date must be after or equal to start date.",
-        "detectedEventsRequired": "Select a chart peak with detected images.",
+        "detectedEventsRequired": "Select a chart peak with detected events.",
         "atLeastOneRow": "At least one correction row is required.",
         "exactlyOneBaseRow": "Exactly one base pollen row is required.",
         "baseRowFirst": "The base pollen row must be the first row.",
@@ -177,27 +177,27 @@
       },
       "distribution": {
         "title": "Correction summary",
-        "description": "Review the results from the selected image review.",
-        "helperText": "Click images in the review panel to update this summary.",
-        "detectedImages": "Detected images",
+        "description": "Review the results from the selected event review.",
+        "helperText": "Review events in the panel to update this summary.",
+        "detectedImages": "Detected events",
         "markedAsBasePollen": "Marked as {basePollen}",
         "markedAsBasePollenFallback": "Marked as base pollen",
         "countedAsUnknown": "Counted as Unknown",
         "correctionMultiplier": "Correction multiplier",
-        "restoredMultiplierGuidance": "To update them, select a chart peak and review the images again.",
+        "restoredMultiplierGuidance": "To update them, select a chart peak and review the events again.",
         "savedTitle": "Saved factors",
         "savedDescription": "This saved correction shows the stored multiplier only."
       },
       "totals": {
-        "overAllocatedMessage": "Selected images exceed the detected images by {count}."
+        "overAllocatedMessage": "Selected events exceed the detected events by {count}."
       },
       "editHydration": {
         "title": "Saved correction loaded",
-        "description": "This saved correction was loaded. Previous image selections are not stored, so select a chart peak to review the images again."
+        "description": "This saved correction was loaded. Previous event selections are not stored, so select a chart peak to review the events again."
       },
       "preview": {
         "title": "Chart peaks",
-        "description": "Select a peak in the chart to review its detected images.",
+        "description": "Select a peak in the chart to review its detected events.",
         "loading": "Loading chart peaks...",
         "idle": "Choose a location, base pollen, and date range to show chart peaks.",
         "empty": "No chart peaks were found for the selected range.",
@@ -217,22 +217,24 @@
         "navigation": {
           "title": "Chart navigation",
           "drillDownMode": "Select a broader peak group to narrow the chart.",
-          "reviewMode": "Select a chart peak to review its detected images.",
+          "reviewMode": "Select a chart peak to review its detected events.",
           "up": "Back to previous range"
         },
         "bucketSelection": {
           "title": "Chart selection",
           "drillDownDescription": "Select a broader peak group to narrow the chart before choosing a chart peak.",
-          "reviewDescription": "Select a chart peak to review its detected images.",
+          "reviewDescription": "Select a chart peak to review its detected events.",
           "drillDownAction": "Drill down",
-          "reviewAction": "Review detected images"
+          "reviewAction": "Review detected events",
+          "intervalValue": "{value} Pollen/m³"
         },
         "sliceSelection": {
           "noneSelected": "No chart peak selected yet.",
-          "selected": "Selected chart peak: {slice}"
+          "selected": "Selected chart peak: {slice}",
+          "labelWithContext": "{slice} · {pollen}: {value} Pollen/m³"
         },
         "tooltip": {
-          "value": "{value} Pollen/m3"
+          "value": "{value} Pollen/m³"
         },
         "series": {
           "original": "Measured",
@@ -240,38 +242,42 @@
         }
       },
       "reviewSummary": {
-        "title": "Image review",
-        "description": "Open the image review panel for the selected chart peak.",
-        "action": "Review images",
+        "title": "Event review",
+        "description": "Open the review panel for the selected chart peak.",
+        "action": "Review events",
         "selectedSlice": "Chart peak",
         "slicePending": "No chart peak selected yet",
-        "detectedEvents": "Detected images",
+        "detectedEvents": "Detected events",
         "accepted": "Matches base pollen",
         "unknown": "Unknown",
         "countPending": "Not available yet",
         "count": "{count, plural, =0 {0 events} one {# event} other {# events}}",
-        "readyHint": "Click images that match {basePollen}. Unselected images are counted as Unknown."
+        "readyHint": "Review events that match {basePollen}. Unselected events are counted as Unknown."
       },
       "reviewWorkspace": {
         "eyebrow": "Image review",
-        "title": "Detected images",
+        "title": "Detected Events",
         "description": "Review images for the selected chart peak.",
         "close": "Close review",
         "selectedSlice": "Chart peak",
         "slicePending": "No chart peak selected yet",
         "accepted": "Matches base pollen",
         "unknown": "Unknown",
+        "previousPeak": "Previous peak",
+        "currentPeak": "Peak {current} of {total}",
+        "currentPeakPending": "Peak not selected",
+        "nextPeak": "Next peak",
         "count": "{count, plural, =0 {0 events} one {# event} other {# events}}"
       },
       "eventsCarousel": {
-        "title": "Detected images",
+        "title": "Detected Events",
         "description": "Review images for the selected chart peak.",
         "count": "{count, plural, =0 {0 events} one {# event} other {# events}}",
         "idle": "Choose a location, base pollen, and date range to load chart peaks.",
-        "selectSlice": "Select a chart peak to review its detected images.",
-        "empty": "No detected images were found for the selected chart peak.",
-        "error": "Detected images could not be loaded.",
-        "errorMismatch": "Detected images were not available for this chart peak.",
+        "selectSlice": "Select a chart peak to review its detected events.",
+        "empty": "No detected events were found for the selected chart peak.",
+        "error": "Detected events could not be loaded.",
+        "errorMismatch": "Detected events were not available for this chart peak.",
         "selectionInstruction": "Click images that match {basePollen}.",
         "selectionHint": "Unselected images are counted as Unknown.",
         "acceptedCount": "{acceptedCount} of {totalCount} match {basePollen}",

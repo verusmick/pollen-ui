@@ -233,6 +233,7 @@ export interface CorrectionFactorPreviewPoint {
   id: string;
   timestamp: number;
   endTimestamp: number;
+  displayTimestamp: number;
   peakTimestamp: number;
   peakEndTimestamp: number;
   axisLabel: string;
@@ -264,6 +265,7 @@ export interface CorrectionFactorReviewSlice {
 export interface CorrectionFactorPreviewSourcePoint {
   timestamp: number;
   endTimestamp: number;
+  displayTimestamp: number;
   value: number;
 }
 

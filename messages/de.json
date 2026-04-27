@@ -89,8 +89,8 @@
     "form": {
       "title": "Korrekturfaktor",
       "editTitle": "Korrekturfaktor bearbeiten",
-      "description": "Wählen Sie eine Diagrammspitze aus und prüfen Sie deren erkannte Bilder, um eine Korrektur zu erstellen.",
-      "editDescription": "Prüfen Sie diese gespeicherte Korrektur. Frühere Bildauswahlen werden nicht gespeichert. Wählen Sie daher bei Bedarf eine Diagrammspitze aus, um die Bilder erneut zu prüfen.",
+      "description": "Wählen Sie eine Diagrammspitze aus und prüfen Sie deren erkannte Ereignisse, um eine Korrektur zu erstellen.",
+      "editDescription": "Prüfen Sie diese gespeicherte Korrektur. Frühere Ereignisauswahlen werden nicht gespeichert. Wählen Sie daher bei Bedarf eine Diagrammspitze aus, um die Ereignisse erneut zu prüfen.",
       "submitErrorFallback": "Der Korrekturfaktor konnte nicht gespeichert werden.",
       "updateErrorFallback": "Der Korrekturfaktor konnte nicht aktualisiert werden.",
       "deleteErrorFallback": "Der Korrekturfaktor konnte nicht gelöscht werden.",
@@ -100,9 +100,9 @@
       },
       "editUnavailable": {
         "title": "Diese gespeicherte Korrektur kann hier nicht bearbeitet werden",
-        "description": "Die gespeicherte Korrektur kann unten eingesehen werden, aber die früheren Bildauswahlen sind nicht verfügbar.",
+        "description": "Die gespeicherte Korrektur kann unten eingesehen werden, aber die früheren Ereignisauswahlen sind nicht verfügbar.",
         "reasonLabel": "Grund",
-        "reason": "Frühere Bildauswahlen sind für diese gespeicherte Korrektur nicht verfügbar.",
+        "reason": "Frühere Ereignisauswahlen sind für diese gespeicherte Korrektur nicht verfügbar.",
         "summaryTitle": "Gespeicherte Korrektur",
         "location": "Ort",
         "basePollen": "Basispollen",
@@ -121,16 +121,16 @@
         "allLocations": "Ort auswählen",
         "basePollen": "Basispollen",
         "allPollens": "Pollen auswählen",
-        "detectedEvents": "Erkannte Bilder",
-        "detectedEventsHint": "Erkannte Bilder erscheinen, nachdem Ort, Basispollen, Zeitraum und eine Diagrammspitze gewählt wurden.",
+        "detectedEvents": "Erkannte Ereignisse",
+        "detectedEventsHint": "Erkannte Ereignisse erscheinen, nachdem Ort, Basispollen, Zeitraum und eine Diagrammspitze gewählt wurden.",
         "detectedEventsLoadingValue": "Wird geladen...",
         "detectedEventsValuePlaceholder": "Diagrammspitze auswählen",
-        "detectedEventsSelectSlice": "Wählen Sie eine Diagrammspitze aus, um deren erkannte Bilder zu prüfen.",
-        "detectedEventsLoading": "Erkannte Bilder werden geladen...",
-        "detectedEventsLoaded": "Erkannte Bilder für die ausgewählte Diagrammspitze gefunden.",
-        "detectedEventsError": "Erkannte Bilder konnten nicht geladen werden.",
-        "detectedEventsMismatchError": "Für diese Diagrammspitze waren keine erkannten Bilder verfügbar.",
-        "detectedEventsLocationMappingError": "Für den ausgewählten Ort \"{location}\" sind keine erkannten Bilder verfügbar.",
+        "detectedEventsSelectSlice": "Wählen Sie eine Diagrammspitze aus, um deren erkannte Ereignisse zu prüfen.",
+        "detectedEventsLoading": "Erkannte Ereignisse werden geladen...",
+        "detectedEventsLoaded": "Erkannte Ereignisse für die ausgewählte Diagrammspitze gefunden.",
+        "detectedEventsError": "Erkannte Ereignisse konnten nicht geladen werden.",
+        "detectedEventsMismatchError": "Für diese Diagrammspitze waren keine erkannten Ereignisse verfügbar.",
+        "detectedEventsLocationMappingError": "Für den ausgewählten Ort \"{location}\" sind keine erkannten Ereignisse verfügbar.",
         "startDate": "Startdatum und Uhrzeit",
         "endDate": "Enddatum und Uhrzeit",
         "startPlaceholder": "Startdatum",
@@ -165,7 +165,7 @@
         "startDateInvalid": "Startdatum/Uhrzeit muss eine gueltige volle Stunde verwenden.",
         "endDateInvalid": "Enddatum/Uhrzeit muss eine gueltige volle Stunde verwenden.",
         "endDateOrder": "Das Enddatum muss nach oder gleich dem Startdatum liegen.",
-        "detectedEventsRequired": "Wählen Sie eine Diagrammspitze mit erkannten Bildern aus.",
+        "detectedEventsRequired": "Wählen Sie eine Diagrammspitze mit erkannten Ereignissen aus.",
         "atLeastOneRow": "Mindestens eine Korrekturzeile ist erforderlich.",
         "exactlyOneBaseRow": "Genau eine Basispollen-Zeile ist erforderlich.",
         "baseRowFirst": "Die Basispollen-Zeile muss die erste Zeile sein.",
@@ -177,27 +177,27 @@
       },
       "distribution": {
         "title": "Korrekturübersicht",
-        "description": "Prüfen Sie die Ergebnisse der ausgewählten Bildprüfung.",
-        "helperText": "Klicken Sie im Prüfbereich auf Bilder, um diese Übersicht zu aktualisieren.",
-        "detectedImages": "Erkannte Bilder",
+        "description": "Prüfen Sie die Ergebnisse der ausgewählten Ereignisprüfung.",
+        "helperText": "Prüfen Sie Ereignisse im Prüfbereich, um diese Übersicht zu aktualisieren.",
+        "detectedImages": "Erkannte Ereignisse",
         "markedAsBasePollen": "Als {basePollen} markiert",
         "markedAsBasePollenFallback": "Als Basispollen markiert",
         "countedAsUnknown": "Als Unbekannt gezählt",
         "correctionMultiplier": "Korrekturmultiplikator",
-        "restoredMultiplierGuidance": "Um sie zu aktualisieren, wählen Sie eine Diagrammspitze aus und prüfen Sie die Bilder erneut.",
+        "restoredMultiplierGuidance": "Um sie zu aktualisieren, wählen Sie eine Diagrammspitze aus und prüfen Sie die Ereignisse erneut.",
         "savedTitle": "Gespeicherte Faktoren",
         "savedDescription": "Diese gespeicherte Korrektur zeigt nur den gespeicherten Multiplikator."
       },
       "totals": {
-        "overAllocatedMessage": "Ausgewählte Bilder überschreiten die erkannten Bilder um {count}."
+        "overAllocatedMessage": "Ausgewählte Ereignisse überschreiten die erkannten Ereignisse um {count}."
       },
       "editHydration": {
         "title": "Gespeicherte Korrektur geladen",
-        "description": "Diese gespeicherte Korrektur wurde geladen. Frühere Bildauswahlen werden nicht gespeichert. Wählen Sie daher eine Diagrammspitze aus, um die Bilder erneut zu prüfen."
+        "description": "Diese gespeicherte Korrektur wurde geladen. Frühere Ereignisauswahlen werden nicht gespeichert. Wählen Sie daher eine Diagrammspitze aus, um die Ereignisse erneut zu prüfen."
       },
       "preview": {
         "title": "Diagrammspitzen",
-        "description": "Wählen Sie eine Spitze im Diagramm aus, um deren erkannte Bilder zu prüfen.",
+        "description": "Wählen Sie eine Spitze im Diagramm aus, um deren erkannte Ereignisse zu prüfen.",
         "loading": "Diagrammspitzen werden geladen...",
         "idle": "Wählen Sie Ort, Basispollen und Zeitraum, um Diagrammspitzen anzuzeigen.",
         "empty": "Für den ausgewählten Zeitraum wurden keine Diagrammspitzen gefunden.",
@@ -217,22 +217,24 @@
         "navigation": {
           "title": "Diagrammnavigation",
           "drillDownMode": "Wählen Sie eine breitere Spitzengruppe aus, um das Diagramm einzugrenzen.",
-          "reviewMode": "Wählen Sie eine Diagrammspitze aus, um deren erkannte Bilder zu prüfen.",
+          "reviewMode": "Wählen Sie eine Diagrammspitze aus, um deren erkannte Ereignisse zu prüfen.",
           "up": "Zum vorherigen Bereich zurück"
         },
         "bucketSelection": {
           "title": "Diagrammauswahl",
           "drillDownDescription": "Wählen Sie eine breitere Spitzengruppe aus, um das Diagramm einzugrenzen, bevor Sie eine Diagrammspitze wählen.",
-          "reviewDescription": "Wählen Sie eine Diagrammspitze aus, um deren erkannte Bilder zu prüfen.",
+          "reviewDescription": "Wählen Sie eine Diagrammspitze aus, um deren erkannte Ereignisse zu prüfen.",
           "drillDownAction": "Hineinnavigieren",
-          "reviewAction": "Erkannte Bilder prüfen"
+          "reviewAction": "Erkannte Ereignisse prüfen",
+          "intervalValue": "{value} Pollen/m³"
         },
         "sliceSelection": {
           "noneSelected": "Noch keine Diagrammspitze ausgewählt.",
-          "selected": "Ausgewählte Diagrammspitze: {slice}"
+          "selected": "Ausgewählte Diagrammspitze: {slice}",
+          "labelWithContext": "{slice} · {pollen}: {value} Pollen/m³"
         },
         "tooltip": {
-          "value": "{value} Pollen/m3"
+          "value": "{value} Pollen/m³"
         },
         "series": {
           "original": "Gemessen",
@@ -240,38 +242,42 @@
         }
       },
       "reviewSummary": {
-        "title": "Bildprüfung",
-        "description": "Öffnen Sie die Bildprüfung für die ausgewählte Diagrammspitze.",
-        "action": "Bilder prüfen",
+        "title": "Ereignisprüfung",
+        "description": "Öffnen Sie den Prüfbereich für die ausgewählte Diagrammspitze.",
+        "action": "Ereignisse prüfen",
         "selectedSlice": "Diagrammspitze",
         "slicePending": "Noch keine Diagrammspitze ausgewählt",
-        "detectedEvents": "Erkannte Bilder",
+        "detectedEvents": "Erkannte Ereignisse",
         "accepted": "Passt zum Basispollen",
         "unknown": "Unbekannt",
         "countPending": "Noch nicht verfugbar",
         "count": "{count, plural, =0 {0 Ereignisse} one {# Ereignis} other {# Ereignisse}}",
-        "readyHint": "Klicken Sie auf die Bilder, die zu {basePollen} passen. Nicht ausgewählte Bilder werden als Unbekannt gezählt."
+        "readyHint": "Prüfen Sie Ereignisse, die zu {basePollen} passen. Nicht ausgewählte Ereignisse werden als Unbekannt gezählt."
       },
       "reviewWorkspace": {
         "eyebrow": "Bildprüfung",
-        "title": "Erkannte Bilder",
+        "title": "Erkannte Ereignisse",
         "description": "Prüfen Sie die Bilder für die ausgewählte Diagrammspitze.",
         "close": "Prüfung schließen",
         "selectedSlice": "Diagrammspitze",
         "slicePending": "Noch keine Diagrammspitze ausgewählt",
         "accepted": "Passt zum Basispollen",
         "unknown": "Unbekannt",
-        "count": "{count, plural, =0 {0 Ereignisse} one {# Ereignis} other {# Ereignisse}}"
+        "count": "{count, plural, =0 {0 Ereignisse} one {# Ereignis} other {# Ereignisse}}",
+        "previousPeak": "Vorherige Spitze",
+        "currentPeak": "Spitze {current} von {total}",
+        "currentPeakPending": "Keine Spitze ausgewählt",
+        "nextPeak": "Nächste Spitze"
       },
       "eventsCarousel": {
-        "title": "Erkannte Bilder",
+        "title": "Erkannte Ereignisse",
         "description": "Prüfen Sie die Bilder für die ausgewählte Diagrammspitze.",
         "count": "{count, plural, =0 {0 Ereignisse} one {# Ereignis} other {# Ereignisse}}",
         "idle": "Wählen Sie Ort, Basispollen und Zeitraum, um Diagrammspitzen zu laden.",
-        "selectSlice": "Wählen Sie eine Diagrammspitze aus, um deren erkannte Bilder zu prüfen.",
-        "empty": "Für die ausgewählte Diagrammspitze wurden keine erkannten Bilder gefunden.",
-        "error": "Erkannte Bilder konnten nicht geladen werden.",
-        "errorMismatch": "Für diese Diagrammspitze waren keine erkannten Bilder verfügbar.",
+        "selectSlice": "Wählen Sie eine Diagrammspitze aus, um deren erkannte Ereignisse zu prüfen.",
+        "empty": "Für die ausgewählte Diagrammspitze wurden keine erkannten Ereignisse gefunden.",
+        "error": "Erkannte Ereignisse konnten nicht geladen werden.",
+        "errorMismatch": "Für diese Diagrammspitze waren keine erkannten Ereignisse verfügbar.",
         "selectionInstruction": "Klicken Sie auf die Bilder, die zu {basePollen} passen.",
         "selectionHint": "Nicht ausgewählte Bilder werden als Unbekannt gezählt.",
         "acceptedCount": "{acceptedCount} von {totalCount} passen zu {basePollen}",

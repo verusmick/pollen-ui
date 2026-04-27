@@ -49,6 +49,7 @@ function normalizeMeasurementPoint(
   return {
     timestamp: from,
     endTimestamp: to,
+    displayTimestamp: from + (to - from) / 2,
     value,
   };
 }
@@ -141,6 +142,12 @@ function getMonthBucketStart(timestamp: number): number {
   return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1) / 1000;
 }
 
+function getNextMonthBucketStart(timestamp: number): number {
+  const date = new Date(timestamp * 1000);
+
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1) / 1000;
+}
+
 function getWeekBucketStart(timestamp: number): number {
   const date = new Date(timestamp * 1000);
   const day = date.getUTCDay();
@@ -162,6 +169,50 @@ function getDayBucketStart(timestamp: number): number {
     date.getUTCMonth(),
     date.getUTCDate()
   ) / 1000;
+}
+
+function getBucketRange(
+  resolution: CorrectionFactorChartResolution,
+  sortedPoints: CorrectionFactorPreviewSourcePoint[]
+): CorrectionFactorChartRange | null {
+  const firstPoint = sortedPoints[0];
+  const lastPoint = sortedPoints[sortedPoints.length - 1];
+
+  if (!firstPoint || !lastPoint) {
+    return null;
+  }
+
+  if (resolution === 'month') {
+    const from = getMonthBucketStart(firstPoint.timestamp);
+
+    return {
+      from,
+      to: getNextMonthBucketStart(from),
+    };
+  }
+
+  if (resolution === 'week') {
+    const from = getWeekBucketStart(firstPoint.timestamp);
+
+    return {
+      from,
+      to: from + 7 * SECONDS_IN_DAY,
+    };
+  }
+
+  if (resolution === 'day') {
+    const from = getDayBucketStart(firstPoint.timestamp);
+
+    return {
+      from,
+      to: from + SECONDS_IN_DAY,
+    };
+  }
+
+  return {
+    from: firstPoint.timestamp,
+    to: lastPoint.endTimestamp,
+  };
 }
 
 function getBucketKey(
@@ -249,8 +300,9 @@ function createPreviewPoint(
   }
 
   const sortedPoints = [...points].sort((left, right) => left.timestamp - right.timestamp);
-  const bucketFrom = sortedPoints[0]?.timestamp;
-  const bucketTo = sortedPoints[sortedPoints.length - 1]?.endTimestamp;
+  const bucketRange = getBucketRange(resolution, sortedPoints);
+  const bucketFrom = bucketRange?.from;
+  const bucketTo = bucketRange?.to;
 
   if (
     typeof bucketFrom !== 'number' ||
@@ -265,11 +317,18 @@ function createPreviewPoint(
     point.value > currentPeak.value ? point : currentPeak
   );
   const isReviewSlice = resolution === 'measurement';
+  const displayedValue = isReviewSlice
+    ? peakPoint.value
+    : sortedPoints.reduce((sum, point) => sum + point.value, 0);
+  const displayTimestamp = isReviewSlice
+    ? peakPoint.displayTimestamp
+    : bucketFrom + (bucketTo - bucketFrom) / 2;
 
   return {
     id: `${resolution}-${bucketFrom}-${bucketTo}`,
     timestamp: bucketFrom,
     endTimestamp: bucketTo,
+    displayTimestamp,
     peakTimestamp: peakPoint.timestamp,
     peakEndTimestamp: peakPoint.endTimestamp,
     axisLabel: formatAxisLabel(resolution, bucketFrom, bucketTo),
@@ -280,8 +339,8 @@ function createPreviewPoint(
       peakPoint.timestamp,
       peakPoint.endTimestamp
     ),
-    originalValue: peakPoint.value,
-    correctedValue: peakPoint.value * basePollenMultiplier,
+    originalValue: displayedValue,
+    correctedValue: displayedValue * basePollenMultiplier,
     resolution,
     isReviewSlice,
     sourcePointsCount: sortedPoints.length,
