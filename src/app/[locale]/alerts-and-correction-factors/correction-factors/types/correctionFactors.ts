@@ -269,12 +269,20 @@ export interface CorrectionFactorPreviewSourcePoint {
   value: number;
 }
 
+export interface CorrectionFactorValidationEventCoordinates {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface CorrectionFactorValidationEvent {
   id: string;
   classification: string;
   datetime: number;
   device: string;
   imageUrl: string;
+  coordinates: CorrectionFactorValidationEventCoordinates | null;
   index: number | null;
 }
 

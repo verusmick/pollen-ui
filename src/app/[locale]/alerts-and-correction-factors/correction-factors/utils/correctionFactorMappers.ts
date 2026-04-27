@@ -5,6 +5,7 @@ import type {
   CorrectionFactorDetail,
   CorrectionFactorFormValues,
   CorrectionFactorRecord,
+  CorrectionFactorValidationEventCoordinates,
   CorrectionFactorValidationEvent,
 } from '../types';
 import { UNKNOWN_POLLEN_CODE } from '../constants';
@@ -28,6 +29,38 @@ function normalizeFiniteNumber(value: unknown): number | null {
   }
 
   return null;
+}
+
+function normalizeValidationEventCoordinates(
+  value: unknown
+): CorrectionFactorValidationEventCoordinates | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const x = normalizeFiniteNumber(record.x);
+  const y = normalizeFiniteNumber(record.y);
+  const width = normalizeFiniteNumber(record.width);
+  const height = normalizeFiniteNumber(record.height);
+
+  if (
+    x === null ||
+    y === null ||
+    width === null ||
+    height === null ||
+    width <= 0 ||
+    height <= 0
+  ) {
+    return null;
+  }
+
+  return {
+    x,
+    y,
+    width,
+    height,
+  };
 }
 
 export function mapApiCorrectionFactorDetail(
@@ -108,6 +141,7 @@ export function mapApiValidationEvent(
   const datetime = normalizeFiniteNumber(record.datetime);
   const device = normalizeString(record.device);
   const index = normalizeFiniteNumber(record.index);
+  const coordinates = normalizeValidationEventCoordinates(record.coordinates);
 
   if (!id || !classification || datetime === null || !device) {
     return null;
@@ -119,6 +153,7 @@ export function mapApiValidationEvent(
     datetime,
     device,
     imageUrl: `${VALIDATION_EVENT_IMAGE_BASE_URL}/${id}/image.png`,
+    coordinates,
     index,
   };
 }

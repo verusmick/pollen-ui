@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useTranslations } from 'next-intl';
 
 import type {
   CorrectionFactorReviewedValidationEvent,
+  CorrectionFactorValidationEventCoordinates,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
 
@@ -17,6 +19,9 @@ interface CorrectionFactorEventCarouselProps {
   onToggleAccepted: (eventId: string) => void;
 }
 
+const INITIAL_EVENT_BATCH_SIZE = 30;
+const EVENT_BATCH_SIZE = 30;
+
 function formatEventDatetime(timestamp: number): string {
   return new Intl.DateTimeFormat(undefined, {
     year: 'numeric',
@@ -25,6 +30,53 @@ function formatEventDatetime(timestamp: number): string {
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(timestamp * 1000));
+}
+
+interface ImageNaturalSize {
+  width: number;
+  height: number;
+}
+
+function clampNumber(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+function buildCroppedImageStyle(
+  imageUrl: string,
+  coordinates: CorrectionFactorValidationEventCoordinates | null,
+  naturalSize: ImageNaturalSize | undefined
+): CSSProperties {
+  const baseStyle: CSSProperties = {
+    backgroundImage: `url(${imageUrl})`,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover',
+  };
+
+  if (!coordinates || !naturalSize) {
+    return baseStyle;
+  }
+
+  const cropWidth = clampNumber(coordinates.width, 1, naturalSize.width);
+  const cropHeight = clampNumber(coordinates.height, 1, naturalSize.height);
+  const cropX = clampNumber(coordinates.x, 0, Math.max(0, naturalSize.width - cropWidth));
+  const cropY = clampNumber(coordinates.y, 0, Math.max(0, naturalSize.height - cropHeight));
+  const positionX =
+    naturalSize.width === cropWidth
+      ? 50
+      : (cropX / (naturalSize.width - cropWidth)) * 100;
+  const positionY =
+    naturalSize.height === cropHeight
+      ? 50
+      : (cropY / (naturalSize.height - cropHeight)) * 100;
+
+  return {
+    ...baseStyle,
+    backgroundPosition: `${positionX}% ${positionY}%`,
+    backgroundSize: `${(naturalSize.width / cropWidth) * 100}% ${
+      (naturalSize.height / cropHeight) * 100
+    }%`,
+  };
 }
 
 export function CorrectionFactorEventCarousel({
@@ -36,16 +88,66 @@ export function CorrectionFactorEventCarousel({
   onToggleAccepted,
 }: CorrectionFactorEventCarouselProps) {
   const t = useTranslations('correctionFactorsPage.form.eventsCarousel');
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [brokenImageIds, setBrokenImageIds] = useState<Record<string, true>>({});
+  const [imageNaturalSizes, setImageNaturalSizes] = useState<
+    Record<string, ImageNaturalSize>
+  >({});
+  const [visibleEventCount, setVisibleEventCount] = useState(
+    INITIAL_EVENT_BATCH_SIZE
+  );
   const acceptedCount = useMemo(
     () =>
       events.filter((event) => event.reviewedPollen === basePollen).length,
     [basePollen, events]
   );
+  const eventImageSetKey = useMemo(
+    () => events.map((event) => `${event.id}:${event.imageUrl}`).join('|'),
+    [events]
+  );
+  const visibleEvents = useMemo(
+    () => events.slice(0, visibleEventCount),
+    [events, visibleEventCount]
+  );
 
   useEffect(() => {
     setBrokenImageIds({});
-  }, [events]);
+    setImageNaturalSizes({});
+    setVisibleEventCount(INITIAL_EVENT_BATCH_SIZE);
+  }, [eventImageSetKey]);
+
+  useEffect(() => {
+    if (status !== 'ready' || visibleEventCount >= events.length) {
+      return;
+    }
+
+    const loadMoreElement = loadMoreRef.current;
+
+    if (!loadMoreElement) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) {
+          return;
+        }
+
+        setVisibleEventCount((currentCount) =>
+          Math.min(currentCount + EVENT_BATCH_SIZE, events.length)
+        );
+      },
+      {
+        rootMargin: '600px 0px',
+      }
+    );
+
+    observer.observe(loadMoreElement);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [events.length, status, visibleEventCount]);
 
   function handleImageError(eventId: string) {
     setBrokenImageIds((current) => {
@@ -56,6 +158,24 @@ export function CorrectionFactorEventCarousel({
       return {
         ...current,
         [eventId]: true,
+      };
+    });
+  }
+
+  function handleImageLoad(eventId: string, width: number, height: number) {
+    setImageNaturalSizes((current) => {
+      const currentSize = current[eventId];
+
+      if (currentSize?.width === width && currentSize.height === height) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [eventId]: {
+          width,
+          height,
+        },
       };
     });
   }
@@ -135,7 +255,7 @@ export function CorrectionFactorEventCarousel({
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {events.map((event, index) => {
+            {visibleEvents.map((event, index) => {
               const isAccepted = event.reviewedPollen === basePollen;
               const isBroken = Boolean(brokenImageIds[event.id]);
 
@@ -164,17 +284,34 @@ export function CorrectionFactorEventCarousel({
                         {t('imageUnavailable')}
                       </div>
                     ) : (
-                      <img
-                        src={event.imageUrl}
-                        alt={t('imageAlt', {
-                          classification: event.classification,
-                          index: index + 1,
-                        })}
+                      <div
+                        aria-hidden="true"
+                        style={buildCroppedImageStyle(
+                          event.imageUrl,
+                          event.coordinates,
+                          imageNaturalSizes[event.id]
+                        )}
                         className={`aspect-square w-full object-cover transition ${
                           isAccepted ? 'opacity-100' : 'opacity-65 group-hover:opacity-90'
                         }`}
-                        onError={() => handleImageError(event.id)}
-                      />
+                      >
+                        <img
+                          src={event.imageUrl}
+                          alt={t('imageAlt', {
+                            classification: event.classification,
+                            index: index + 1,
+                          })}
+                          className="sr-only"
+                          onLoad={(imageEvent) =>
+                            handleImageLoad(
+                              event.id,
+                              imageEvent.currentTarget.naturalWidth,
+                              imageEvent.currentTarget.naturalHeight
+                            )
+                          }
+                          onError={() => handleImageError(event.id)}
+                        />
+                      </div>
                     )}
 
                     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
@@ -204,6 +341,14 @@ export function CorrectionFactorEventCarousel({
               );
             })}
           </div>
+
+          {visibleEventCount < events.length ? (
+            <div
+              ref={loadMoreRef}
+              aria-hidden="true"
+              className="h-8"
+            />
+          ) : null}
         </div>
       ) : null}
     </section>

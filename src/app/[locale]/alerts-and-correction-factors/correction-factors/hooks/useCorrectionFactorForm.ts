@@ -93,6 +93,10 @@ function areReviewedValidationEventsEqual(
         leftEvent.datetime === rightEvent.datetime &&
         leftEvent.device === rightEvent.device &&
         leftEvent.imageUrl === rightEvent.imageUrl &&
+        leftEvent.coordinates?.x === rightEvent.coordinates?.x &&
+        leftEvent.coordinates?.y === rightEvent.coordinates?.y &&
+        leftEvent.coordinates?.width === rightEvent.coordinates?.width &&
+        leftEvent.coordinates?.height === rightEvent.coordinates?.height &&
         leftEvent.index === rightEvent.index &&
         leftEvent.reviewedPollen === rightEvent.reviewedPollen
       );
