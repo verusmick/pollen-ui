@@ -113,6 +113,7 @@ export function mapCorrectionFactorRecordToFormValues(
   return {
     location: record.location,
     basePollen: record.basePollen,
+    ruleEnabled: record.details[0]?.published ?? false,
     startDate: normalizeCorrectionFactorDateTime(record.startDate),
     endDate: normalizeCorrectionFactorDateTime(record.endDate),
     selectedReviewSliceId: null,

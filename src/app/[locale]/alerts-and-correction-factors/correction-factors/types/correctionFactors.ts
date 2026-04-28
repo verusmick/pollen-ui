@@ -167,6 +167,7 @@ export interface CorrectionFactorDistributionRowForm {
 export interface CorrectionFactorFormValues {
   location: string;
   basePollen: CorrectionFactorPollenCode | '';
+  ruleEnabled: boolean;
   startDate: string;
   endDate: string;
   selectedReviewSliceId: string | null;

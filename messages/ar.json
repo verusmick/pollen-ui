@@ -75,8 +75,16 @@
         "location": "الموقع",
         "basePollen": "حبوب اللقاح الأساسية",
         "dateRange": "النطاق الزمني",
+        "correctionMultiplier": "المضاعف",
+        "ruleStatus": "حالة القاعدة",
+        "enabled": "مفعلة",
+        "disabled": "معطلة",
         "actions": "الإجراءات",
-        "edit": "تعديل"
+        "edit": "تعديل",
+        "delete": "حذف",
+        "deleting": "جارٍ الحذف...",
+        "deleteConfirm": "هل أنت متأكد من حذف عامل التصحيح هذا؟",
+        "deleteErrorFallback": "تعذر حذف عامل التصحيح."
       },
       "states": {
         "loading": "جارٍ تحميل عوامل التصحيح...",
@@ -91,6 +99,10 @@
       "editTitle": "تعديل عامل التصحيح",
       "description": "اختر قمة من المخطط وراجع أحداثها المكتشفة لإنشاء تصحيح.",
       "editDescription": "راجع هذا التصحيح المحفوظ. لا يتم حفظ اختيارات الأحداث السابقة، لذا اختر قمة من المخطط لمراجعة الأحداث مرة أخرى عند الحاجة.",
+      "ruleEnabled": "القاعدة مفعلة",
+      "ruleDisabled": "القاعدة معطلة",
+      "ruleEnabledState": "مفعلة",
+      "ruleDisabledState": "معطلة",
       "submitErrorFallback": "تعذر حفظ عامل التصحيح.",
       "updateErrorFallback": "تعذر تحديث عامل التصحيح.",
       "deleteErrorFallback": "تعذر حذف عامل التصحيح.",
@@ -110,7 +122,7 @@
         "detailsTitle": "عوامل محفوظة",
         "pollen": "حبوب اللقاح",
         "multiplier": "عامل محفوظ",
-        "published": "منشور",
+        "published": "حالة القاعدة",
         "yes": "نعم",
         "no": "لا",
         "empty": "لا توجد تفاصيل عوامل محفوظة لهذا التصحيح."

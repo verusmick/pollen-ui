@@ -15,6 +15,7 @@ export const DEFAULT_CORRECTION_FACTOR_FORM_VALUES: CorrectionFactorFormValues =
   {
     location: '',
     basePollen: '',
+    ruleEnabled: true,
     startDate: '',
     endDate: '',
     selectedReviewSliceId: null,

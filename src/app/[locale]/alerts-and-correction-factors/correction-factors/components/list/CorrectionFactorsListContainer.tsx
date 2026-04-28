@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 
 import {
@@ -17,13 +17,17 @@ import { CorrectionFactorsTable } from './CorrectionFactorsTable';
 import {
   getCorrectionFactorLocations,
   getCorrectionFactorPollens,
+  deleteCorrectionFactor,
 } from '@/lib/api/correctionFactors';
 
 export function CorrectionFactorsListContainer() {
   const t = useTranslations('correctionFactorsPage.list.states');
+  const tableT = useTranslations('correctionFactorsPage.list.table');
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<CorrectionFactorListFilters>(
     DEFAULT_CORRECTION_FACTOR_LIST_FILTERS
   );
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const { data = [], isLoading, isFetching, isError, error } =
     useCorrectionFactorsList(filters);
   const {
@@ -66,6 +70,36 @@ export function CorrectionFactorsListContainer() {
       return matchesLocation && matchesPollen && matchesFrom;
     });
   }, [data, filters]);
+  const deleteMutation = useMutation({
+    mutationFn: deleteCorrectionFactor,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: correctionFactorKeys.lists(),
+      });
+      queryClient.removeQueries({
+        queryKey: correctionFactorKeys.lists(),
+        type: 'inactive',
+      });
+    },
+  });
+
+  async function handleDelete(id: string) {
+    setDeleteError(null);
+
+    if (!window.confirm(tableT('deleteConfirm'))) {
+      return;
+    }
+
+    try {
+      await deleteMutation.mutateAsync(id);
+    } catch (error) {
+      setDeleteError(
+        toCorrectionFactorUserFacingError(error, {
+          fallbackMessage: tableT('deleteErrorFallback'),
+        })
+      );
+    }
+  }
 
   return (
     <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
@@ -102,6 +136,12 @@ export function CorrectionFactorsListContainer() {
         </div>
       ) : null}
 
+      {deleteError ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {deleteError}
+        </div>
+      ) : null}
+
       {!isLoading && !isError && filteredData.length === 0 ? (
         <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
           {filters.location || filters.pollen || filters.from
@@ -114,6 +154,10 @@ export function CorrectionFactorsListContainer() {
         <CorrectionFactorsTable
           rows={filteredData}
           locationNamesById={locationNamesById}
+          deletingId={
+            deleteMutation.isPending ? deleteMutation.variables ?? null : null
+          }
+          onDelete={handleDelete}
         />
       ) : null}
     </main>

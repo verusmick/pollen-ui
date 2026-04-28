@@ -75,8 +75,16 @@
         "location": "Ubicación",
         "basePollen": "Polen base",
         "dateRange": "Rango de fechas",
+        "correctionMultiplier": "Multiplicador",
+        "ruleStatus": "Estado de la regla",
+        "enabled": "Habilitada",
+        "disabled": "Deshabilitada",
         "actions": "Acciones",
-        "edit": "Editar"
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "deleting": "Eliminando...",
+        "deleteConfirm": "¿Seguro que desea eliminar este factor de corrección?",
+        "deleteErrorFallback": "No se pudo eliminar el factor de corrección."
       },
       "states": {
         "loading": "Cargando factores de corrección...",
@@ -91,6 +99,10 @@
       "editTitle": "Editar factor de corrección",
       "description": "Seleccione un pico en el gráfico y revise sus eventos detectados para crear una corrección.",
       "editDescription": "Revise esta corrección guardada. Las selecciones previas de eventos no se conservan, así que seleccione un pico en el gráfico para revisar los eventos otra vez si hace falta.",
+      "ruleEnabled": "Regla habilitada",
+      "ruleDisabled": "Regla deshabilitada",
+      "ruleEnabledState": "Habilitada",
+      "ruleDisabledState": "Deshabilitada",
       "submitErrorFallback": "No se pudo guardar el factor de corrección.",
       "updateErrorFallback": "No se pudo actualizar el factor de corrección.",
       "deleteErrorFallback": "No se pudo eliminar el factor de corrección.",
@@ -110,7 +122,7 @@
         "detailsTitle": "Factores guardados",
         "pollen": "Polen",
         "multiplier": "Factor guardado",
-        "published": "Publicado",
+        "published": "Estado de la regla",
         "yes": "Sí",
         "no": "No",
         "empty": "No hay detalles guardados para esta corrección."

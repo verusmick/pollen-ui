@@ -1,10 +1,12 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 interface CorrectionFactorActionsProps {
   mode: 'create' | 'edit';
   saving: boolean;
+  ruleEnabled: boolean;
   deleting?: boolean;
   actionError?: string | null;
   showActionError?: boolean;
@@ -13,12 +15,14 @@ interface CorrectionFactorActionsProps {
   showDelete?: boolean;
   onCancel: () => void;
   onSubmit: () => void;
+  onRuleEnabledChange: (enabled: boolean) => void;
   onDelete?: () => void;
 }
 
 export function CorrectionFactorActions({
   mode,
   saving,
+  ruleEnabled,
   deleting = false,
   actionError,
   showActionError = true,
@@ -27,9 +31,11 @@ export function CorrectionFactorActions({
   showDelete = false,
   onCancel,
   onSubmit,
+  onRuleEnabledChange,
   onDelete,
 }: CorrectionFactorActionsProps) {
   const t = useTranslations('correctionFactorsPage.form.actions');
+  const formT = useTranslations('correctionFactorsPage.form');
   const submitLabel =
     mode === 'edit'
       ? saving
@@ -38,6 +44,11 @@ export function CorrectionFactorActions({
       : saving
         ? t('saving')
         : t('save');
+  const RuleStatusIcon = ruleEnabled ? FiCheckCircle : FiXCircle;
+  const ruleLabel = ruleEnabled ? formT('ruleEnabled') : formT('ruleDisabled');
+  const ruleButtonClassName = ruleEnabled
+    ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 focus-visible:ring-emerald-500'
+    : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 focus-visible:ring-slate-400';
 
   return (
     <div className="space-y-3">
@@ -47,13 +58,23 @@ export function CorrectionFactorActions({
         </div>
       ) : null}
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
         <button
           type="button"
           onClick={onCancel}
           className="w-full rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-background sm:w-auto"
         >
           {t('cancel')}
+        </button>
+        <button
+          type="button"
+          aria-pressed={ruleEnabled}
+          aria-label={ruleLabel}
+          onClick={() => onRuleEnabledChange(!ruleEnabled)}
+          className={`inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto ${ruleButtonClassName}`}
+        >
+          <RuleStatusIcon aria-hidden="true" className="h-4 w-4 shrink-0" />
+          <span>{ruleLabel}</span>
         </button>
         {showDelete && onDelete ? (
           <button

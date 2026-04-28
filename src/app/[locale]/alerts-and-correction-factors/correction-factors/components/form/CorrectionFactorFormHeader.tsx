@@ -7,6 +7,7 @@ import { CorrectionFactorActions } from './CorrectionFactorActions';
 interface CorrectionFactorFormHeaderProps {
   mode: 'create' | 'edit';
   saving: boolean;
+  ruleEnabled: boolean;
   deleting?: boolean;
   actionError?: string | null;
   submitDisabled?: boolean;
@@ -14,12 +15,14 @@ interface CorrectionFactorFormHeaderProps {
   showDelete?: boolean;
   onCancel: () => void;
   onSubmit: () => void;
+  onRuleEnabledChange: (enabled: boolean) => void;
   onDelete?: () => void;
 }
 
 export function CorrectionFactorFormHeader({
   mode,
   saving,
+  ruleEnabled,
   deleting = false,
   actionError,
   submitDisabled = false,
@@ -27,6 +30,7 @@ export function CorrectionFactorFormHeader({
   showDelete = false,
   onCancel,
   onSubmit,
+  onRuleEnabledChange,
   onDelete,
 }: CorrectionFactorFormHeaderProps) {
   const t = useTranslations('correctionFactorsPage.form');
@@ -42,10 +46,11 @@ export function CorrectionFactorFormHeader({
           <p className="max-w-3xl text-sm text-muted-foreground">{description}</p>
         </div>
 
-        <div className="xl:min-w-[360px] xl:max-w-[420px]">
+        <div className="xl:min-w-[360px] xl:max-w-[520px]">
           <CorrectionFactorActions
             mode={mode}
             saving={saving}
+            ruleEnabled={ruleEnabled}
             deleting={deleting}
             actionError={actionError}
             submitDisabled={submitDisabled}
@@ -53,6 +58,7 @@ export function CorrectionFactorFormHeader({
             showDelete={showDelete}
             onCancel={onCancel}
             onSubmit={onSubmit}
+            onRuleEnabledChange={onRuleEnabledChange}
             onDelete={onDelete}
           />
         </div>

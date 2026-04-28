@@ -8,11 +8,15 @@ import { CorrectionFactorsTableRow } from './CorrectionFactorsTableRow';
 interface CorrectionFactorsTableProps {
   rows: CorrectionFactorRecord[];
   locationNamesById?: Record<string, string>;
+  deletingId?: string | null;
+  onDelete: (id: string) => void;
 }
 
 export function CorrectionFactorsTable({
   rows,
   locationNamesById = {},
+  deletingId = null,
+  onDelete,
 }: CorrectionFactorsTableProps) {
   const t = useTranslations('correctionFactorsPage.list.table');
 
@@ -35,6 +39,12 @@ export function CorrectionFactorsTable({
                 {t('dateRange')}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('correctionMultiplier')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('ruleStatus')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t('actions')}
               </th>
             </tr>
@@ -45,6 +55,8 @@ export function CorrectionFactorsTable({
                 key={row.id}
                 record={row}
                 locationName={locationNamesById[row.location] ?? row.location}
+                deleting={deletingId === row.id}
+                onDelete={onDelete}
               />
             ))}
           </tbody>

@@ -143,6 +143,13 @@ export function CorrectionFactorFormContainer({
     selectedReviewSliceFrom: selectedPreviewSliceFrom,
     selectedReviewSliceTo: selectedPreviewSliceTo,
   });
+  const hydratedFormValues = useMemo(
+    () =>
+      detailQuery.data
+        ? mapCorrectionFactorRecordToFormValues(detailQuery.data)
+        : null,
+    [detailQuery.data]
+  );
 
   useEffect(() => {
     form.resetForm();
@@ -160,9 +167,13 @@ export function CorrectionFactorFormContainer({
       return;
     }
 
-    form.replaceValues(mapCorrectionFactorRecordToFormValues(detailQuery.data));
+    if (!hydratedFormValues) {
+      return;
+    }
+
+    form.replaceValues(hydratedFormValues);
     hydratedRecordIdRef.current = detailQuery.data.id;
-  }, [detailQuery.data, form, isEditMode]);
+  }, [detailQuery.data, form, hydratedFormValues, isEditMode]);
 
   useEffect(() => {
     if (!form.values.selectedReviewSliceId) {
@@ -251,10 +262,42 @@ export function CorrectionFactorFormContainer({
     isEditMode && detailQuery.isError ? t('states.loadError') : null;
   const showStoredMultiplierView =
     isEditMode && !form.hasReviewSessionChanges;
+  const hydratedRuleEnabled = detailQuery.data?.details[0]?.published ?? false;
+  const isStoredRecordOtherwiseUnchanged =
+    hydratedFormValues !== null &&
+    form.values.location === hydratedFormValues.location &&
+    form.values.basePollen === hydratedFormValues.basePollen &&
+    form.values.startDate === hydratedFormValues.startDate &&
+    form.values.endDate === hydratedFormValues.endDate &&
+    form.values.multiplierMode === hydratedFormValues.multiplierMode &&
+    form.values.manualMultiplier === hydratedFormValues.manualMultiplier &&
+    form.values.rows.length === hydratedFormValues.rows.length &&
+    form.values.rows.every((row, index) => {
+      const hydratedRow = hydratedFormValues.rows[index];
+
+      return (
+        hydratedRow !== undefined &&
+        row.pollen === hydratedRow.pollen &&
+        row.reviewedEvents === hydratedRow.reviewedEvents &&
+        row.storedMultiplier === hydratedRow.storedMultiplier &&
+        row.isBasePollen === hydratedRow.isBasePollen
+      );
+    });
+  const hasRuleEnabledChanged =
+    isEditMode &&
+    Boolean(detailQuery.data) &&
+    form.values.ruleEnabled !== hydratedRuleEnabled;
+  const canSaveRuleEnabledChange =
+    showStoredMultiplierView &&
+    hasRuleEnabledChanged &&
+    isStoredRecordOtherwiseUnchanged &&
+    Boolean(correctionFactorId) &&
+    !detailQuery.isLoading &&
+    !detailError;
   const submitDisabled =
     saving ||
     deleting ||
-    !form.isValid ||
+    (!form.isValid && !canSaveRuleEnabledChange) ||
     (isEditMode &&
       (!correctionFactorId ||
         detailQuery.isLoading ||
@@ -386,7 +429,7 @@ export function CorrectionFactorFormContainer({
       return;
     }
 
-    if (!form.validate()) {
+    if (!canSaveRuleEnabledChange && !form.validate()) {
       return;
     }
 
@@ -510,6 +553,7 @@ export function CorrectionFactorFormContainer({
       onBasePollenChange={(value) => form.setField('basePollen', value)}
       onStartDateChange={(value) => form.setField('startDate', value)}
       onEndDateChange={(value) => form.setField('endDate', value)}
+      onRuleEnabledChange={(value) => form.setField('ruleEnabled', value)}
       onCancel={() => router.replace(listHref)}
       onSubmit={handleSubmit}
       onDelete={handleDelete}

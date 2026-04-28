@@ -31,6 +31,7 @@ import {
 type TopLevelField =
   | 'location'
   | 'basePollen'
+  | 'ruleEnabled'
   | 'startDate'
   | 'endDate'
   | 'detectedEvents'

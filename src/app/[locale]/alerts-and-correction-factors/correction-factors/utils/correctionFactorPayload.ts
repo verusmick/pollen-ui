@@ -49,7 +49,7 @@ export function buildCorrectionFactorWritePayload(
       details.push({
         pollen: derivedRow.pollen,
         factor_percentage: factorPercentage,
-        published: details.length === 0,
+        published: details.length === 0 ? values.ruleEnabled : false,
       });
 
       return details;

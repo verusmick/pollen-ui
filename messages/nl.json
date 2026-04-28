@@ -75,8 +75,16 @@
         "location": "Locatie",
         "basePollen": "Basispollen",
         "dateRange": "Datumbereik",
+        "correctionMultiplier": "Multiplier",
+        "ruleStatus": "Regelstatus",
+        "enabled": "Ingeschakeld",
+        "disabled": "Uitgeschakeld",
         "actions": "Acties",
-        "edit": "Bewerken"
+        "edit": "Bewerken",
+        "delete": "Verwijderen",
+        "deleting": "Verwijderen...",
+        "deleteConfirm": "Weet u zeker dat u deze correctiefactor wilt verwijderen?",
+        "deleteErrorFallback": "De correctiefactor kon niet worden verwijderd."
       },
       "states": {
         "loading": "Correctiefactoren laden...",
@@ -91,6 +99,10 @@
       "editTitle": "Correctiefactor bewerken",
       "description": "Selecteer een piek in de grafiek en bekijk de gedetecteerde gebeurtenissen om een correctie te maken.",
       "editDescription": "Bekijk deze opgeslagen correctie. Eerdere gebeurtenisselecties worden niet bewaard, dus selecteer een piek in de grafiek om de gebeurtenissen opnieuw te bekijken als dat nodig is.",
+      "ruleEnabled": "Regel ingeschakeld",
+      "ruleDisabled": "Regel uitgeschakeld",
+      "ruleEnabledState": "Ingeschakeld",
+      "ruleDisabledState": "Uitgeschakeld",
       "submitErrorFallback": "De correctiefactor kon niet worden opgeslagen.",
       "updateErrorFallback": "De correctiefactor kon niet worden bijgewerkt.",
       "deleteErrorFallback": "De correctiefactor kon niet worden verwijderd.",
@@ -110,7 +122,7 @@
         "detailsTitle": "Opgeslagen factoren",
         "pollen": "Pollen",
         "multiplier": "Opgeslagen factor",
-        "published": "Gepubliceerd",
+        "published": "Regelstatus",
         "yes": "Ja",
         "no": "Nee",
         "empty": "Er zijn geen opgeslagen factordetails beschikbaar voor deze correctie."

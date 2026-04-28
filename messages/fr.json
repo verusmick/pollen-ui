@@ -75,8 +75,16 @@
         "location": "Emplacement",
         "basePollen": "Pollen de base",
         "dateRange": "Plage de dates",
+        "correctionMultiplier": "Multiplicateur",
+        "ruleStatus": "Statut de la règle",
+        "enabled": "Activée",
+        "disabled": "Désactivée",
         "actions": "Actions",
-        "edit": "Modifier"
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "deleting": "Suppression...",
+        "deleteConfirm": "Voulez-vous vraiment supprimer ce facteur de correction ?",
+        "deleteErrorFallback": "Impossible de supprimer le facteur de correction."
       },
       "states": {
         "loading": "Chargement des facteurs de correction...",
@@ -91,6 +99,10 @@
       "editTitle": "Modifier le facteur de correction",
       "description": "Sélectionnez un pic dans le graphique et examinez ses événements détectés pour créer une correction.",
       "editDescription": "Consultez cette correction enregistrée. Les sélections d’événements précédentes ne sont pas conservées, alors sélectionnez un pic du graphique pour revoir les événements si nécessaire.",
+      "ruleEnabled": "Règle activée",
+      "ruleDisabled": "Règle désactivée",
+      "ruleEnabledState": "Activée",
+      "ruleDisabledState": "Désactivée",
       "submitErrorFallback": "Impossible d’enregistrer le facteur de correction.",
       "updateErrorFallback": "Impossible de mettre à jour le facteur de correction.",
       "deleteErrorFallback": "Impossible de supprimer le facteur de correction.",
@@ -110,7 +122,7 @@
         "detailsTitle": "Facteurs enregistrés",
         "pollen": "Pollen",
         "multiplier": "Facteur enregistré",
-        "published": "Publié",
+        "published": "Statut de la règle",
         "yes": "Oui",
         "no": "Non",
         "empty": "Aucun détail enregistré n’est disponible pour cette correction."

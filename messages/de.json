@@ -75,8 +75,16 @@
         "location": "Ort",
         "basePollen": "Basispollen",
         "dateRange": "Zeitraum",
+        "correctionMultiplier": "Multiplikator",
+        "ruleStatus": "Regelstatus",
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
         "actions": "Aktionen",
-        "edit": "Bearbeiten"
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "deleting": "Wird gelöscht...",
+        "deleteConfirm": "Möchten Sie diesen Korrekturfaktor wirklich löschen?",
+        "deleteErrorFallback": "Der Korrekturfaktor konnte nicht gelöscht werden."
       },
       "states": {
         "loading": "Korrekturfaktoren werden geladen...",
@@ -91,6 +99,10 @@
       "editTitle": "Korrekturfaktor bearbeiten",
       "description": "Wählen Sie eine Diagrammspitze aus und prüfen Sie deren erkannte Ereignisse, um eine Korrektur zu erstellen.",
       "editDescription": "Prüfen Sie diese gespeicherte Korrektur. Frühere Ereignisauswahlen werden nicht gespeichert. Wählen Sie daher bei Bedarf eine Diagrammspitze aus, um die Ereignisse erneut zu prüfen.",
+      "ruleEnabled": "Regel aktiviert",
+      "ruleDisabled": "Regel deaktiviert",
+      "ruleEnabledState": "Aktiviert",
+      "ruleDisabledState": "Deaktiviert",
       "submitErrorFallback": "Der Korrekturfaktor konnte nicht gespeichert werden.",
       "updateErrorFallback": "Der Korrekturfaktor konnte nicht aktualisiert werden.",
       "deleteErrorFallback": "Der Korrekturfaktor konnte nicht gelöscht werden.",
@@ -110,7 +122,7 @@
         "detailsTitle": "Gespeicherte Faktoren",
         "pollen": "Pollen",
         "multiplier": "Gespeicherter Faktor",
-        "published": "Veröffentlicht",
+        "published": "Regelstatus",
         "yes": "Ja",
         "no": "Nein",
         "empty": "Für diese Korrektur sind keine gespeicherten Faktordetails verfügbar."

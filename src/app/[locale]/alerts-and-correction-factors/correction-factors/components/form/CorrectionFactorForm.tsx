@@ -79,6 +79,7 @@ interface CorrectionFactorFormProps {
   onBasePollenChange: (value: string) => void;
   onStartDateChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
+  onRuleEnabledChange: (value: boolean) => void;
   onCancel: () => void;
   onSubmit: () => void;
   onDelete?: () => void;
@@ -146,11 +147,13 @@ export function CorrectionFactorForm({
   onBasePollenChange,
   onStartDateChange,
   onEndDateChange,
+  onRuleEnabledChange,
   onCancel,
   onSubmit,
   onDelete,
 }: CorrectionFactorFormProps) {
   const formT = useTranslations('correctionFactorsPage.form');
+  const listTableT = useTranslations('correctionFactorsPage.list.table');
   const selectedPreviewSlice =
     previewReviewSlices.find((slice) => slice.id === selectedPreviewSliceId) ?? null;
   const selectedPreviewPoint =
@@ -171,6 +174,7 @@ export function CorrectionFactorForm({
       <CorrectionFactorFormHeader
         mode={mode}
         saving={saving}
+        ruleEnabled={values.ruleEnabled}
         deleting={deleting}
         actionError={actionError}
         submitDisabled={submitDisabled}
@@ -178,6 +182,7 @@ export function CorrectionFactorForm({
         showDelete={canDelete}
         onCancel={onCancel}
         onSubmit={onSubmit}
+        onRuleEnabledChange={onRuleEnabledChange}
         onDelete={onDelete}
       />
 
@@ -297,8 +302,8 @@ export function CorrectionFactorForm({
                           </td>
                           <td className="px-4 py-3 text-sm text-muted-foreground">
                             {detail.published
-                              ? formT('editUnavailable.yes')
-                              : formT('editUnavailable.no')}
+                              ? listTableT('enabled')
+                              : listTableT('disabled')}
                           </td>
                         </tr>
                       ))}
