@@ -109,6 +109,7 @@ export function mapCorrectionFactorRecordToFormValues(
   }));
   const baseRow = normalizedRows.find((row) => row.isBasePollen);
   const otherRows = normalizedRows.filter((row) => !row.isBasePollen);
+  const baseStoredMultiplier = baseRow?.storedMultiplier;
 
   return {
     location: record.location,
@@ -119,7 +120,8 @@ export function mapCorrectionFactorRecordToFormValues(
     selectedReviewSliceId: null,
     detectedEvents: null,
     multiplierMode: 'eventBased',
-    manualMultiplier: '',
+    manualMultiplier:
+      typeof baseStoredMultiplier === 'number' ? String(baseStoredMultiplier) : '',
     events: [],
     rows: baseRow
       ? [baseRow, ...otherRows]

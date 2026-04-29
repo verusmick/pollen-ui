@@ -73,7 +73,7 @@ export function validateCorrectionFactorForm(
     errors.endDate = messages.endDateOrder;
   }
 
-  if (values.detectedEvents === null) {
+  if (values.multiplierMode === 'eventBased' && values.detectedEvents === null) {
     errors.detectedEvents = messages.detectedEventsRequired;
   }
 

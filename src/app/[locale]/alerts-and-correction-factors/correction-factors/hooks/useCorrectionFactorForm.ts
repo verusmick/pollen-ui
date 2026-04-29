@@ -660,14 +660,18 @@ export function useCorrectionFactorForm() {
 
       if (multiplierMode === 'manual' && current.manualMultiplier.trim() === '') {
         const currentDerived = buildCorrectionFactorDerivedState(current, 'ratio');
+        const storedBaseMultiplier =
+          current.rows.find((row) => row.isBasePollen)?.storedMultiplier ?? null;
         const baseMultiplier =
+          storedBaseMultiplier ??
           currentDerived.rows.find((row) => row.isBasePollen && !row.isSyntheticUnknown)
-            ?.multiplier ?? 0;
+            ?.multiplier ??
+          0;
 
         return {
           ...current,
           multiplierMode,
-          manualMultiplier: baseMultiplier.toFixed(2),
+          manualMultiplier: String(baseMultiplier),
         };
       }
 

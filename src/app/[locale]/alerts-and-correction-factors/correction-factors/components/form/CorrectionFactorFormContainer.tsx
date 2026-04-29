@@ -260,8 +260,6 @@ export function CorrectionFactorFormContainer({
 
   const detailError =
     isEditMode && detailQuery.isError ? t('states.loadError') : null;
-  const showStoredMultiplierView =
-    isEditMode && !form.hasReviewSessionChanges;
   const hydratedRuleEnabled = detailQuery.data?.details[0]?.published ?? false;
   const isStoredRecordOtherwiseUnchanged =
     hydratedFormValues !== null &&
@@ -283,6 +281,10 @@ export function CorrectionFactorFormContainer({
         row.isBasePollen === hydratedRow.isBasePollen
       );
     });
+  const showStoredMultiplierView =
+    isEditMode &&
+    !form.hasReviewSessionChanges &&
+    isStoredRecordOtherwiseUnchanged;
   const hasRuleEnabledChanged =
     isEditMode &&
     Boolean(detailQuery.data) &&

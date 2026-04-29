@@ -149,10 +149,8 @@ export function CorrectionFactorResultSummary({
   const manualMultiplierError =
     errors.manualMultiplier ?? validationErrors.manualMultiplier;
   const isManualMode = values.multiplierMode === 'manual';
-  const showMultiplierControls =
-    !showStoredMultiplierView || values.detectedEvents !== null;
   const multiplierLabel =
-    isManualMode && !showStoredMultiplierView
+    isManualMode
       ? distributionT('manualCorrectionMultiplier')
       : t('correctionMultiplier');
 
@@ -188,71 +186,69 @@ export function CorrectionFactorResultSummary({
         />
       </div>
 
-      {showMultiplierControls ? (
-        <div className="space-y-2 rounded-md border border-border bg-background p-2.5">
-          <div className="grid grid-cols-2 gap-2">
+      <div className="space-y-2 rounded-md border border-border bg-background p-2.5">
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => onMultiplierModeChange('eventBased')}
+            className={`rounded-md border px-2 py-1.5 text-sm font-medium transition ${
+              !isManualMode
+                ? 'border-sky-600 bg-sky-600 text-white'
+                : 'border-border bg-card text-foreground hover:bg-muted'
+            }`}
+          >
+            {distributionT('eventBasedMode')}
+          </button>
+          <button
+            type="button"
+            onClick={() => onMultiplierModeChange('manual')}
+            className={`rounded-md border px-2 py-1.5 text-sm font-medium transition ${
+              isManualMode
+                ? 'border-amber-600 bg-amber-500 text-white'
+                : 'border-border bg-card text-foreground hover:bg-muted'
+            }`}
+          >
+            {distributionT('manualMode')}
+          </button>
+        </div>
+
+        {isManualMode ? (
+          <label className="block text-sm">
+            <span className="text-muted-foreground">
+              {distributionT('manualMultiplierLabel')}
+            </span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={values.manualMultiplier}
+              onChange={(event) => onManualMultiplierChange(event.target.value)}
+              className={`mt-1 h-10 w-full rounded-md border bg-card px-3 text-foreground ${
+                manualMultiplierError ? 'border-red-300' : 'border-border'
+              }`}
+            />
+            <span className="mt-1 block text-xs text-muted-foreground">
+              {distributionT('manualMultiplierHelp')}
+            </span>
+            {manualMultiplierError ? (
+              <span className="mt-1 block text-xs text-red-600">
+                {manualMultiplierError}
+              </span>
+            ) : null}
             <button
               type="button"
               onClick={() => onMultiplierModeChange('eventBased')}
-              className={`rounded-md border px-2 py-1.5 text-sm font-medium transition ${
-                !isManualMode
-                  ? 'border-sky-600 bg-sky-600 text-white'
-                  : 'border-border bg-card text-foreground hover:bg-muted'
-              }`}
+              className="mt-2 text-sm font-medium text-sky-700 hover:text-sky-900"
             >
-              {distributionT('eventBasedMode')}
+              {distributionT('useEventBasedMultiplier')}
             </button>
-            <button
-              type="button"
-              onClick={() => onMultiplierModeChange('manual')}
-              className={`rounded-md border px-2 py-1.5 text-sm font-medium transition ${
-                isManualMode
-                  ? 'border-amber-600 bg-amber-500 text-white'
-                  : 'border-border bg-card text-foreground hover:bg-muted'
-              }`}
-            >
-              {distributionT('manualMode')}
-            </button>
-          </div>
-
-          {isManualMode ? (
-            <label className="block text-sm">
-              <span className="text-muted-foreground">
-                {distributionT('manualMultiplierLabel')}
-              </span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={values.manualMultiplier}
-                onChange={(event) => onManualMultiplierChange(event.target.value)}
-                className={`mt-1 h-10 w-full rounded-md border bg-card px-3 text-foreground ${
-                  manualMultiplierError ? 'border-red-300' : 'border-border'
-                }`}
-              />
-              <span className="mt-1 block text-xs text-muted-foreground">
-                {distributionT('manualMultiplierHelp')}
-              </span>
-              {manualMultiplierError ? (
-                <span className="mt-1 block text-xs text-red-600">
-                  {manualMultiplierError}
-                </span>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => onMultiplierModeChange('eventBased')}
-                className="mt-2 text-sm font-medium text-sky-700 hover:text-sky-900"
-              >
-                {distributionT('useEventBasedMultiplier')}
-              </button>
-            </label>
-          ) : (
-            <p className="text-xs leading-5 text-muted-foreground">
-              {distributionT('eventBasedModeHelp')}
-            </p>
-          )}
-        </div>
-      ) : null}
+          </label>
+        ) : (
+          <p className="text-xs leading-5 text-muted-foreground">
+            {distributionT('eventBasedModeHelp')}
+          </p>
+        )}
+      </div>
 
       {!showStoredMultiplierView ? (
         <CorrectionFactorTotals
@@ -261,7 +257,7 @@ export function CorrectionFactorResultSummary({
         />
       ) : null}
 
-      {showStoredMultiplierView ? (
+      {showStoredMultiplierView && !isManualMode ? (
         <p className="text-sm text-muted-foreground">
           {distributionT('restoredMultiplierGuidance')}
         </p>
