@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import type {
+  CorrectionFactorFormDerivedState,
   CorrectionFactorReviewedValidationEvent,
   CorrectionFactorReviewSlice,
   CorrectionFactorValidationEventsStatus,
@@ -14,8 +15,11 @@ interface CorrectionFactorReviewWorkspaceProps {
   open: boolean;
   status: CorrectionFactorValidationEventsStatus;
   events: CorrectionFactorReviewedValidationEvent[];
+  detectedEvents: number | null;
+  derived: CorrectionFactorFormDerivedState;
   basePollen: string;
   selectedSliceLabel?: string | null;
+  correctionMultiplier: number;
   reviewSlices: CorrectionFactorReviewSlice[];
   selectedSliceId: string | null;
   idleMessage?: string | null;
@@ -29,8 +33,11 @@ export function CorrectionFactorReviewWorkspace({
   open,
   status,
   events,
+  detectedEvents,
+  derived,
   basePollen,
   selectedSliceLabel = null,
+  correctionMultiplier,
   reviewSlices,
   selectedSliceId,
   idleMessage = null,
@@ -42,10 +49,13 @@ export function CorrectionFactorReviewWorkspace({
   const t = useTranslations('correctionFactorsPage.form.reviewWorkspace');
   const [shouldRender, setShouldRender] = useState(open);
   const [isVisible, setIsVisible] = useState(open);
-  const acceptedCount = events.filter(
-    (event) => event.reviewedPollen === basePollen
-  ).length;
-  const unknownCount = events.length - acceptedCount;
+  const markedAsBasePollenCount =
+    derived.rows.find((row) => row.isBasePollen && !row.isSyntheticUnknown)
+      ?.reviewedEventsNumber ?? 0;
+  const unknownCount = derived.unknownReviewedEvents;
+  const basePollenLabel = basePollen
+    ? t('markedAsBasePollen', { basePollen })
+    : t('markedAsBasePollenFallback');
   const selectedSliceIndex = reviewSlices.findIndex(
     (slice) => slice.id === selectedSliceId
   );
@@ -178,31 +188,51 @@ export function CorrectionFactorReviewWorkspace({
             </button>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="mb-3 rounded-lg border border-border bg-card px-4 py-3">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t('selectedSlice')}
+            </div>
+            <div className="mt-2 text-sm font-medium text-foreground">
+              {selectedSliceLabel ?? t('slicePending')}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-lg border border-border bg-card px-4 py-3">
               <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t('selectedSlice')}
+                {t('detectedEvents')}
               </div>
               <div className="mt-2 text-sm font-medium text-foreground">
-                {selectedSliceLabel ?? t('slicePending')}
+                {detectedEvents === null
+                  ? t('countPending')
+                  : t('count', { count: detectedEvents })}
               </div>
             </div>
 
             <div className="rounded-lg border border-border bg-card px-4 py-3">
               <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t('accepted')}
+                {basePollenLabel}
               </div>
               <div className="mt-2 text-sm font-medium text-foreground">
-                {t('count', { count: acceptedCount })}
+                {t('count', { count: markedAsBasePollenCount })}
               </div>
             </div>
 
             <div className="rounded-lg border border-border bg-card px-4 py-3">
               <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t('unknown')}
+                {t('countedAsUnknown')}
               </div>
               <div className="mt-2 text-sm font-medium text-foreground">
                 {t('count', { count: unknownCount })}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-card px-4 py-3">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('correctionMultiplier')}
+              </div>
+              <div className="mt-2 text-sm font-medium text-foreground">
+                {correctionMultiplier.toFixed(2)}
               </div>
             </div>
           </div>

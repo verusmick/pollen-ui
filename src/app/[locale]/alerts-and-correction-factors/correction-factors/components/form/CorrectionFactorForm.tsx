@@ -19,10 +19,12 @@ import type {
 } from '../../types';
 import { formatCorrectionFactorDateTimeRange } from '../../utils';
 import { CorrectionFactorChartPreview } from './CorrectionFactorChartPreview';
-import { CorrectionFactorDistributionSection } from './CorrectionFactorDistributionSection';
 import { CorrectionFactorFormHeader } from './CorrectionFactorFormHeader';
 import { CorrectionFactorMetaFields } from './CorrectionFactorMetaFields';
-import { CorrectionFactorReviewSummary } from './CorrectionFactorReviewSummary';
+import {
+  CorrectionFactorResultSummary,
+  CorrectionFactorReviewSummary,
+} from './CorrectionFactorReviewSummary';
 import { CorrectionFactorReviewWorkspace } from './CorrectionFactorReviewWorkspace';
 
 interface CorrectionFactorFormProps {
@@ -168,6 +170,15 @@ export function CorrectionFactorForm({
           value: formatValue(selectedPreviewPoint.originalValue),
         })
       : selectedPreviewSlice?.label ?? null;
+  const baseDerivedRow = derived.rows.find(
+    (row) => row.isBasePollen && !row.isSyntheticUnknown
+  );
+  const baseStoredMultiplier =
+    values.rows.find((row) => row.isBasePollen)?.storedMultiplier ?? null;
+  const correctionMultiplier =
+    showStoredMultiplierView && baseStoredMultiplier !== null
+      ? baseStoredMultiplier
+      : (baseDerivedRow?.multiplier ?? 0);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
@@ -342,23 +353,25 @@ export function CorrectionFactorForm({
               onEndDateChange={onEndDateChange}
             />
 
+            <CorrectionFactorResultSummary
+              values={values}
+              detectedEvents={values.detectedEvents}
+              derived={derived}
+              errors={errors}
+              validationErrors={validationErrors}
+              basePollen={values.basePollen}
+              correctionMultiplier={correctionMultiplier}
+              showStoredMultiplierView={showStoredMultiplierView}
+              onMultiplierModeChange={onMultiplierModeChange}
+              onManualMultiplierChange={onManualMultiplierChange}
+            />
+
             {mode === 'edit' ? (
               <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
                 <p className="font-medium">{formT('editHydration.title')}</p>
                 <p className="mt-1">{formT('editHydration.description')}</p>
               </div>
             ) : null}
-
-            <CorrectionFactorDistributionSection
-              values={values}
-              derived={derived}
-              errors={errors}
-              validationErrors={validationErrors}
-              showStoredMultiplierView={showStoredMultiplierView}
-              isEventReviewMode={values.events.length > 0}
-              onMultiplierModeChange={onMultiplierModeChange}
-              onManualMultiplierChange={onManualMultiplierChange}
-            />
           </aside>
 
           <div className="min-w-0 space-y-4">
@@ -376,11 +389,9 @@ export function CorrectionFactorForm({
             />
 
             <CorrectionFactorReviewSummary
-              status={validationEventsStatus}
-              events={validationEvents}
               detectedEvents={values.detectedEvents}
-              basePollen={values.basePollen}
               hasSelectedSlice={selectedPreviewSlice !== null}
+              selectedSliceLabel={selectedPreviewSliceLabel}
               errorMessage={validationEventsError}
               statusText={validationEventsFieldError ?? validationEventsStatusText}
               onOpenReviewWorkspace={onOpenReviewWorkspace}
@@ -393,8 +404,11 @@ export function CorrectionFactorForm({
         open={reviewWorkspaceOpen}
         status={validationEventsStatus}
         events={validationEvents}
+        detectedEvents={values.detectedEvents}
+        derived={derived}
         basePollen={values.basePollen}
         selectedSliceLabel={selectedPreviewSliceLabel}
+        correctionMultiplier={correctionMultiplier}
         reviewSlices={previewReviewSlices}
         selectedSliceId={selectedPreviewSliceId}
         idleMessage={validationEventsIdleMessage}

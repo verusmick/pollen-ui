@@ -61,7 +61,7 @@ export function CorrectionFactorDistributionTable({
       {!showStoredMultiplierView ? (
         <>
           <SummaryMetric
-            label={t('detectedImages')}
+            label={t('detectedEvents')}
             value={detectedEvents ?? 0}
           />
           <SummaryMetric

@@ -17,7 +17,6 @@ interface CorrectionFactorDistributionSectionProps {
   errors: CorrectionFactorFormErrors;
   validationErrors: CorrectionFactorFormErrors;
   showStoredMultiplierView: boolean;
-  isEventReviewMode: boolean;
   onMultiplierModeChange: (mode: CorrectionFactorMultiplierMode) => void;
   onManualMultiplierChange: (value: string) => void;
 }
@@ -28,7 +27,6 @@ export function CorrectionFactorDistributionSection({
   errors,
   validationErrors,
   showStoredMultiplierView,
-  isEventReviewMode,
   onMultiplierModeChange,
   onManualMultiplierChange,
 }: CorrectionFactorDistributionSectionProps) {
@@ -51,11 +49,6 @@ export function CorrectionFactorDistributionSection({
         <div>
           <h2 className="text-base font-semibold text-foreground">{title}</h2>
           <p className="text-sm text-muted-foreground">{description}</p>
-          {!showStoredMultiplierView && isEventReviewMode ? (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t('helperText')}
-            </p>
-          ) : null}
           {showStoredMultiplierView ? (
             <p className="mt-2 text-sm text-muted-foreground">
               {t('restoredMultiplierGuidance')}

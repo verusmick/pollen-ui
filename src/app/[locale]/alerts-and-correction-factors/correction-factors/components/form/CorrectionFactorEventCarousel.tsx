@@ -96,11 +96,6 @@ export function CorrectionFactorEventCarousel({
   const [visibleEventCount, setVisibleEventCount] = useState(
     INITIAL_EVENT_BATCH_SIZE
   );
-  const acceptedCount = useMemo(
-    () =>
-      events.filter((event) => event.reviewedPollen === basePollen).length,
-    [basePollen, events]
-  );
   const eventImageSetKey = useMemo(
     () => events.map((event) => `${event.id}:${event.imageUrl}`).join('|'),
     [events]
@@ -181,32 +176,15 @@ export function CorrectionFactorEventCarousel({
   }
 
   return (
-    <section className="min-h-0 rounded-lg border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-sm font-semibold text-foreground">
-            3
-          </span>
-          <div>
-            <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-end gap-2">
-          <div className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-            {t('count', { count: events.length })}
-          </div>
-        </div>
-      </div>
-
+    <section className="min-h-0">
       {status === 'idle' ? (
-        <div className="mt-4 rounded-lg border border-dashed border-border bg-background px-4 py-8 text-sm text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border bg-background px-4 py-8 text-sm text-muted-foreground">
           {idleMessage ?? t('idle')}
         </div>
       ) : null}
 
       {status === 'loading' ? (
-        <div className="mt-4 space-y-3">
+        <div className="space-y-3">
           <div className="aspect-square w-full animate-pulse rounded-lg bg-muted" />
           <div className="grid grid-cols-4 gap-2">
             {Array.from({ length: 4 }).map((_, index) => (
@@ -222,20 +200,20 @@ export function CorrectionFactorEventCarousel({
       ) : null}
 
       {status === 'error' ? (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-700">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-700">
           <p>{t('error')}</p>
           {errorMessage ? <p className="mt-2">{errorMessage}</p> : null}
         </div>
       ) : null}
 
       {status === 'empty' ? (
-        <div className="mt-4 rounded-lg border border-dashed border-border bg-background px-4 py-8 text-sm text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border bg-background px-4 py-8 text-sm text-muted-foreground">
           {t('empty')}
         </div>
       ) : null}
 
       {status === 'ready' ? (
-        <div className="mt-4 space-y-4">
+        <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-3">
             <div>
               <p className="text-sm font-medium text-foreground">
@@ -244,13 +222,6 @@ export function CorrectionFactorEventCarousel({
               <p className="mt-1 text-sm text-muted-foreground">
                 {t('selectionHint')}
               </p>
-            </div>
-            <div className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-foreground">
-              {t('acceptedCount', {
-                acceptedCount,
-                totalCount: events.length,
-                basePollen,
-              })}
             </div>
           </div>
 
