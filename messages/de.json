@@ -382,7 +382,7 @@
   },
   "messageSystemPage": {
     "title": "Regeln und Benachrichtigungen",
-    "description": "Einfacher API-POC-Bereich fuer Benachrichtigungen, Regeln, Alarme und Benachrichtigungsnachrichten.",
+    "description": "Verwalten Sie Benachrichtigungsversand, Regeln und Nachrichtenprotokolle.",
     "tabs": {
       "notifications": "Benachrichtigungen",
       "rules": "Regeln",
@@ -392,21 +392,21 @@
       "notifications": {
         "title": "Benachrichtigungen",
         "description": "Verwalten Sie Zustelleinstellungen und Empfaenger fuer Benachrichtigungen.",
-        "pending": "Der POC-Bildschirm fuer Benachrichtigungen ist noch ausstehend."
+        "pending": "Der Bildschirm fuer Benachrichtigungen ist noch ausstehend."
       },
       "rules": {
         "title": "Regeln",
         "description": "Verwalten Sie Regeldefinitionen, die Messwerte, Orte und Benachrichtigungen verbinden.",
-        "pending": "Der POC-Bildschirm fuer Regeln ist noch ausstehend."
+        "pending": "Der Bildschirm fuer Regeln ist noch ausstehend."
       },
       "notificationMessages": {
         "title": "Benachrichtigungsnachrichten",
         "description": "Pruefen Sie Nachrichtenprotokolle, die Benachrichtigungen und Messwerten zugeordnet sind.",
-        "pending": "Der POC-Bildschirm fuer Benachrichtigungsnachrichten ist noch ausstehend."
+        "pending": "Der Bildschirm fuer Benachrichtigungsnachrichten ist noch ausstehend."
       }
     },
     "shared": {
-      "pending": "POC-Bildschirm ausstehend",
+      "pending": "Bildschirm ausstehend",
       "loading": "Wird geladen...",
       "error": "Etwas ist schiefgelaufen.",
       "empty": "Keine Eintraege gefunden.",
@@ -415,7 +415,7 @@
     "notifications": {
       "list": {
         "title": "Benachrichtigungen",
-        "description": "Erstellen und verwalten Sie Zustelleinstellungen fuer den Message-System-POC.",
+        "description": "Erstellen und verwalten Sie Benachrichtigungsversand.",
         "newButton": "Neue Benachrichtigung",
         "table": {
           "name": "Name",
@@ -474,7 +474,9 @@
       },
       "options": {
         "frequency": {
-          "immediately": "Sofort"
+          "immediately": "Sofort",
+          "daily_summary": "Taegliche Zusammenfassung",
+          "weekly_summary": "Woechentliche Zusammenfassung"
         },
         "alertTypes": {
           "green": "Gruen",
@@ -486,7 +488,7 @@
     "rules": {
       "list": {
         "title": "Regeln",
-        "description": "Erstellen und verwalten Sie Regeldefinitionen fuer den Message-System-POC.",
+        "description": "Erstellen und verwalten Sie Regeldefinitionen.",
         "newButton": "Neue Regel",
         "table": {
           "name": "Name",
@@ -523,7 +525,6 @@
           "startDate": "Startdatum",
           "endDate": "Enddatum",
           "datePlaceholder": "2026-04-05 00:00:00+00",
-          "dateHelp": "Die Datumsauswahl speichert das Startdatum fuer das Backend als 00:00:00+00 und das Enddatum als 23:59:59+00.",
           "locationIds": "Orts-IDs",
           "locationIdsHelp": "Verwenden Sie komma-getrennte numerische Orts-IDs.",
           "notificationIds": "Benachrichtigungen",
@@ -564,7 +565,7 @@
     "notificationMessages": {
       "list": {
         "title": "Benachrichtigungsnachrichten",
-        "description": "Erstellen und verwalten Sie Nachrichtenprotokolle fuer den Message-System-POC.",
+        "description": "Erstellen und verwalten Sie Benachrichtigungsnachrichten.",
         "newButton": "Neue Nachricht",
         "table": {
           "notification": "Benachrichtigung",
@@ -597,7 +598,7 @@
           "notificationPlaceholder": "Benachrichtigung auswaehlen",
           "creationDate": "Erstellungsdatum",
           "creationDatePlaceholder": "2026-04-05 00:00:00+00",
-          "creationDateHelp": "Waehlen Sie Datum und Uhrzeit. Der Wert wird im Backend-Format gespeichert, zum Beispiel 2026-04-05 00:00:00+00.",
+          "creationDateHelp": "Waehlen Sie Datum und Uhrzeit fuer diese Nachricht.",
           "value": "Wert",
           "description": "Beschreibung"
         },
@@ -637,11 +638,11 @@
     },
     "alerts": {
       "title": "Alarme",
-      "description": "Alarme werden fuer diesen POC mit Korrekturfaktoren gruppiert. Der CRUD-Bildschirm fuer Alarme ist noch ausstehend.",
-      "pending": "Der POC-Bildschirm fuer Alarme ist noch ausstehend.",
+      "description": "Erstellen und verwalten Sie Alarmschwellen zusammen mit Korrekturfaktoren.",
+      "pending": "Der Bildschirm fuer Alarme ist noch ausstehend.",
       "list": {
         "title": "Alarme",
-        "description": "Erstellen und verwalten Sie Alarmschwellen fuer Message-System-Regeln.",
+        "description": "Erstellen und verwalten Sie Alarmschwellen fuer Regeln.",
         "newButton": "Neuer Alarm",
         "table": {
           "rule": "Regel",
@@ -653,7 +654,8 @@
           "delete": "Loeschen",
           "deleting": "Wird geloescht...",
           "deleteConfirm": "Moechten Sie diesen Alarm wirklich loeschen?",
-          "deleteErrorFallback": "Der Alarm konnte nicht geloescht werden."
+          "deleteErrorFallback": "Der Alarm konnte nicht geloescht werden.",
+          "pollenValue": "{value} Pollen/m³"
         },
         "states": {
           "loading": "Alarme werden geladen...",

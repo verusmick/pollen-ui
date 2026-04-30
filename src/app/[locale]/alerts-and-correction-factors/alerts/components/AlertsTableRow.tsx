@@ -17,6 +17,17 @@ function formatNumber(value: number | null): string {
   return typeof value === 'number' && Number.isFinite(value) ? String(value) : '';
 }
 
+function formatPollenValue(
+  value: number | null,
+  formatUnit: (key: 'pollenValue', values: { value: string }) => string
+): string {
+  const formattedValue = formatNumber(value);
+
+  return formattedValue
+    ? formatUnit('pollenValue', { value: formattedValue })
+    : '';
+}
+
 export function AlertsTableRow({
   record,
   ruleNamesById = {},
@@ -37,10 +48,10 @@ export function AlertsTableRow({
         {record.type || sharedT('notAvailable')}
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
-        {formatNumber(record.minValue) || sharedT('notAvailable')}
+        {formatPollenValue(record.minValue, t) || sharedT('notAvailable')}
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
-        {formatNumber(record.maxValue) || sharedT('notAvailable')}
+        {formatPollenValue(record.maxValue, t) || sharedT('notAvailable')}
       </td>
       <td className="px-4 py-3 text-sm">
         <div className="flex items-center gap-3">

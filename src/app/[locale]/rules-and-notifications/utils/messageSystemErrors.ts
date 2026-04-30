@@ -2,9 +2,7 @@ export function toMessageSystemUserFacingError(
   error: unknown,
   options: { fallbackMessage: string }
 ): string {
-  if (error instanceof Error && error.message.trim()) {
-    return error.message;
-  }
+  console.error('Message system request failed', error);
 
   return options.fallbackMessage;
 }

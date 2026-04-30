@@ -382,7 +382,7 @@
   },
   "messageSystemPage": {
     "title": "Rules and Notifications",
-    "description": "Basic API POC area for notifications, rules, alerts, and notification messages.",
+    "description": "Manage notification delivery, rules, and message records.",
     "tabs": {
       "notifications": "Notifications",
       "rules": "Rules",
@@ -392,21 +392,21 @@
       "notifications": {
         "title": "Notifications",
         "description": "Manage notification delivery settings and recipients.",
-        "pending": "The Notifications POC screen is pending."
+        "pending": "The Notifications screen is pending."
       },
       "rules": {
         "title": "Rules",
         "description": "Manage rule definitions that connect measures, locations, and notifications.",
-        "pending": "The Rules POC screen is pending."
+        "pending": "The Rules screen is pending."
       },
       "notificationMessages": {
         "title": "Notification messages",
         "description": "Review notification message records tied to notifications and measures.",
-        "pending": "The Notification messages POC screen is pending."
+        "pending": "The Notification messages screen is pending."
       }
     },
     "shared": {
-      "pending": "POC screen pending",
+      "pending": "Screen pending",
       "loading": "Loading...",
       "error": "Something went wrong.",
       "empty": "No records found.",
@@ -415,7 +415,7 @@
     "notifications": {
       "list": {
         "title": "Notifications",
-        "description": "Create and manage notification delivery settings for the message-system POC.",
+        "description": "Create and manage notification delivery settings.",
         "newButton": "New notification",
         "table": {
           "name": "Name",
@@ -474,7 +474,9 @@
       },
       "options": {
         "frequency": {
-          "immediately": "Immediately"
+          "immediately": "Immediately",
+          "daily_summary": "Daily summary",
+          "weekly_summary": "Weekly summary"
         },
         "alertTypes": {
           "green": "Green",
@@ -486,7 +488,7 @@
     "rules": {
       "list": {
         "title": "Rules",
-        "description": "Create and manage rule definitions for the message-system POC.",
+        "description": "Create and manage rule definitions.",
         "newButton": "New rule",
         "table": {
           "name": "Name",
@@ -523,7 +525,6 @@
           "startDate": "Start date",
           "endDate": "End date",
           "datePlaceholder": "2026-04-05 00:00:00+00",
-          "dateHelp": "The date picker saves the start date as 00:00:00+00 and the end date as 23:59:59+00 for the backend.",
           "locationIds": "Location IDs",
           "locationIdsHelp": "Use comma-separated numeric location IDs.",
           "notificationIds": "Notifications",
@@ -564,7 +565,7 @@
     "notificationMessages": {
       "list": {
         "title": "Notification messages",
-        "description": "Create and manage notification message records for the message-system POC.",
+        "description": "Create and manage notification message records.",
         "newButton": "New message",
         "table": {
           "notification": "Notification",
@@ -597,7 +598,7 @@
           "notificationPlaceholder": "Select a notification",
           "creationDate": "Creation date",
           "creationDatePlaceholder": "2026-04-05 00:00:00+00",
-          "creationDateHelp": "Choose a date and time. The value is saved in the backend format, for example 2026-04-05 00:00:00+00.",
+          "creationDateHelp": "Choose the date and time for this message.",
           "value": "Value",
           "description": "Description"
         },
@@ -637,11 +638,11 @@
     },
     "alerts": {
       "title": "Alerts",
-      "description": "Alerts are grouped with Correction Factors for this POC. The Alerts CRUD screen is pending.",
-      "pending": "The Alerts POC screen is pending.",
+      "description": "Create and manage alert thresholds alongside correction factors.",
+      "pending": "The Alerts screen is pending.",
       "list": {
         "title": "Alerts",
-        "description": "Create and manage alert thresholds for message-system rules.",
+        "description": "Create and manage alert thresholds for rules.",
         "newButton": "New alert",
         "table": {
           "rule": "Rule",
@@ -653,7 +654,8 @@
           "delete": "Delete",
           "deleting": "Deleting...",
           "deleteConfirm": "Are you sure you want to delete this alert?",
-          "deleteErrorFallback": "Failed to delete the alert."
+          "deleteErrorFallback": "Failed to delete the alert.",
+          "pollenValue": "{value} Pollen/m³"
         },
         "states": {
           "loading": "Loading alerts...",

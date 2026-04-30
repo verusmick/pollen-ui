@@ -36,3 +36,6 @@ Slice 6 Alerts CRUD POC is implemented under `/alerts-and-correction-factors/ale
 
 ## Message System - Notification messages CRUD POC
 Slice 7 Notification messages CRUD POC is implemented under `/rules-and-notifications/notification-messages`: list, create, edit, and delete screens use the Slice 2 message-system API foundation, React Query reads/mutations, local form state, and `messageSystemPage.notificationMessages` i18n keys. Notification message notification selection is populated from the Notifications list. All planned message-system POC CRUD screens are now implemented.
+
+## Message System - Pre-review adjustments
+Pre-review cleanup is implemented for the completed message-system POC: client-facing copy no longer exposes POC/backend wording, notification frequency options now include `daily_summary` and `weekly_summary`, Rules start/end dates use `datetime-local` inputs with backend-compatible payload conversion, route-local API error normalization hides raw parse/server details from users while logging them, and Alerts list min/max values display the `Pollen/m³` unit.

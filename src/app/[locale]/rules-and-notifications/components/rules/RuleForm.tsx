@@ -105,7 +105,7 @@ export function RuleForm({
                 {t('fields.startDate')}
               </span>
               <input
-                type="date"
+                type="datetime-local"
                 value={values.startDate}
                 onChange={(event) =>
                   onFieldChange('startDate', event.target.value)
@@ -122,7 +122,7 @@ export function RuleForm({
                 {t('fields.endDate')}
               </span>
               <input
-                type="date"
+                type="datetime-local"
                 value={values.endDate}
                 onChange={(event) =>
                   onFieldChange('endDate', event.target.value)
@@ -134,8 +134,6 @@ export function RuleForm({
               ) : null}
             </label>
           </div>
-
-          <p className="text-xs text-muted-foreground">{t('fields.dateHelp')}</p>
 
           <label className="grid gap-2">
             <span className="text-sm font-medium text-foreground">

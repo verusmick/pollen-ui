@@ -1,7 +1,10 @@
 export type MessageSystemApiId = string | number;
 
 export type MessageSystemAlertType = 'green' | 'yellow' | 'red';
-export type MessageSystemFrequency = 'immediately';
+export type MessageSystemFrequency =
+  | 'immediately'
+  | 'daily_summary'
+  | 'weekly_summary';
 
 export interface ApiNotificationRecord {
   id: MessageSystemApiId;

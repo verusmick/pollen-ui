@@ -382,7 +382,7 @@
   },
   "messageSystemPage": {
     "title": "Regels en meldingen",
-    "description": "Eenvoudig API-POC-gedeelte voor meldingen, regels, alerts en meldingsberichten.",
+    "description": "Beheer meldingsbezorging, regels en berichtrecords.",
     "tabs": {
       "notifications": "Meldingen",
       "rules": "Regels",
@@ -392,21 +392,21 @@
       "notifications": {
         "title": "Meldingen",
         "description": "Beheer bezorginstellingen en ontvangers voor meldingen.",
-        "pending": "Het POC-scherm voor Meldingen is nog in afwachting."
+        "pending": "Het scherm voor Meldingen is nog in afwachting."
       },
       "rules": {
         "title": "Regels",
         "description": "Beheer regeldefinities die metingen, locaties en meldingen verbinden.",
-        "pending": "Het POC-scherm voor Regels is nog in afwachting."
+        "pending": "Het scherm voor Regels is nog in afwachting."
       },
       "notificationMessages": {
         "title": "Meldingsberichten",
         "description": "Bekijk berichtrecords die aan meldingen en metingen zijn gekoppeld.",
-        "pending": "Het POC-scherm voor Meldingsberichten is nog in afwachting."
+        "pending": "Het scherm voor Meldingsberichten is nog in afwachting."
       }
     },
     "shared": {
-      "pending": "POC-scherm in afwachting",
+      "pending": "Scherm in afwachting",
       "loading": "Laden...",
       "error": "Er is iets misgegaan.",
       "empty": "Geen records gevonden.",
@@ -415,7 +415,7 @@
     "notifications": {
       "list": {
         "title": "Meldingen",
-        "description": "Maak en beheer bezorginstellingen voor de message-system POC.",
+        "description": "Maak en beheer bezorginstellingen voor meldingen.",
         "newButton": "Nieuwe melding",
         "table": {
           "name": "Naam",
@@ -474,7 +474,9 @@
       },
       "options": {
         "frequency": {
-          "immediately": "Direct"
+          "immediately": "Direct",
+          "daily_summary": "Dagelijkse samenvatting",
+          "weekly_summary": "Wekelijkse samenvatting"
         },
         "alertTypes": {
           "green": "Groen",
@@ -486,7 +488,7 @@
     "rules": {
       "list": {
         "title": "Regels",
-        "description": "Maak en beheer regeldefinities voor de message-system POC.",
+        "description": "Maak en beheer regeldefinities.",
         "newButton": "Nieuwe regel",
         "table": {
           "name": "Naam",
@@ -523,7 +525,6 @@
           "startDate": "Startdatum",
           "endDate": "Einddatum",
           "datePlaceholder": "2026-04-05 00:00:00+00",
-          "dateHelp": "De datumkiezer slaat de startdatum op als 00:00:00+00 en de einddatum als 23:59:59+00 voor de backend.",
           "locationIds": "Locatie-ID's",
           "locationIdsHelp": "Gebruik komma-gescheiden numerieke locatie-ID's.",
           "notificationIds": "Meldingen",
@@ -564,7 +565,7 @@
     "notificationMessages": {
       "list": {
         "title": "Meldingsberichten",
-        "description": "Maak en beheer berichtrecords voor de message-system POC.",
+        "description": "Maak en beheer meldingsberichten.",
         "newButton": "Nieuw bericht",
         "table": {
           "notification": "Melding",
@@ -597,7 +598,7 @@
           "notificationPlaceholder": "Selecteer een melding",
           "creationDate": "Aanmaakdatum",
           "creationDatePlaceholder": "2026-04-05 00:00:00+00",
-          "creationDateHelp": "Kies een datum en tijd. De waarde wordt opgeslagen in het backend-formaat, bijvoorbeeld 2026-04-05 00:00:00+00.",
+          "creationDateHelp": "Kies de datum en tijd voor dit bericht.",
           "value": "Waarde",
           "description": "Beschrijving"
         },
@@ -637,11 +638,11 @@
     },
     "alerts": {
       "title": "Alerts",
-      "description": "Alerts zijn voor deze POC gegroepeerd met correctiefactoren. Het CRUD-scherm voor Alerts is nog in afwachting.",
-      "pending": "Het POC-scherm voor Alerts is nog in afwachting.",
+      "description": "Maak en beheer alertdrempels samen met correctiefactoren.",
+      "pending": "Het scherm voor Alerts is nog in afwachting.",
       "list": {
         "title": "Alerts",
-        "description": "Maak en beheer alertdrempels voor message-system regels.",
+        "description": "Maak en beheer alertdrempels voor regels.",
         "newButton": "Nieuwe alert",
         "table": {
           "rule": "Regel",
@@ -653,7 +654,8 @@
           "delete": "Verwijderen",
           "deleting": "Verwijderen...",
           "deleteConfirm": "Weet u zeker dat u deze alert wilt verwijderen?",
-          "deleteErrorFallback": "De alert kon niet worden verwijderd."
+          "deleteErrorFallback": "De alert kon niet worden verwijderd.",
+          "pollenValue": "{value} Pollen/m³"
         },
         "states": {
           "loading": "Alerts laden...",

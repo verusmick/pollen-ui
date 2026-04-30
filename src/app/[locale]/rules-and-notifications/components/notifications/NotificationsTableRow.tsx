@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import { Link } from '@/features/i18n/routing';
 
+import { MESSAGE_SYSTEM_FREQUENCIES } from '../../constants';
 import type { NotificationRecord } from '../../types';
 
 interface NotificationsTableRowProps {
@@ -18,16 +19,24 @@ export function NotificationsTableRow({
   onDelete,
 }: NotificationsTableRowProps) {
   const t = useTranslations('messageSystemPage.notifications.list.table');
+  const optionsT = useTranslations('messageSystemPage.notifications.options');
   const sharedT = useTranslations('messageSystemPage.shared');
   const recipients = record.recipients.join(', ') || sharedT('notAvailable');
   const alertTypes = record.alertTypes.join(', ') || sharedT('notAvailable');
+  const frequency = MESSAGE_SYSTEM_FREQUENCIES.includes(
+    record.frequency as (typeof MESSAGE_SYSTEM_FREQUENCIES)[number]
+  )
+    ? optionsT(
+        `frequency.${record.frequency as (typeof MESSAGE_SYSTEM_FREQUENCIES)[number]}`
+      )
+    : record.frequency;
 
   return (
     <tr className="border-b border-border last:border-b-0">
       <td className="px-4 py-3 text-sm text-foreground">{record.name}</td>
       <td className="px-4 py-3 text-sm text-muted-foreground">{recipients}</td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
-        {record.frequency || sharedT('notAvailable')}
+        {frequency || sharedT('notAvailable')}
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
         {alertTypes}

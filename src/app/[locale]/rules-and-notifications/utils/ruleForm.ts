@@ -43,12 +43,25 @@ export function parseRequiredNumber(value: string): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function toDateInputValue(value: string): string {
-  return value.slice(0, 10);
+function toDateTimeInputValue(value: string): string {
+  const trimmedValue = value.trim();
+  const match = trimmedValue.match(
+    /^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})/
+  );
+
+  if (match) {
+    return `${match[1]}T${match[2]}`;
+  }
+
+  return trimmedValue;
 }
 
 function toBackendDateString(value: string, boundary: 'start' | 'end'): string {
   const trimmedValue = value.trim();
+
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(trimmedValue)) {
+    return `${trimmedValue.replace('T', ' ')}:00+00`;
+  }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
     return trimmedValue;
@@ -63,8 +76,8 @@ export function mapRuleRecordToFormValues(record: RuleRecord): RuleFormValues {
   return {
     name: record.name,
     measureId: record.measureId === null ? '' : String(record.measureId),
-    startDate: toDateInputValue(record.startDate),
-    endDate: toDateInputValue(record.endDate),
+    startDate: toDateTimeInputValue(record.startDate),
+    endDate: toDateTimeInputValue(record.endDate),
     locationIdsText: record.locationIds.join(', '),
     notificationId:
       record.notificationIds.length > 0 ? String(record.notificationIds[0]) : '',

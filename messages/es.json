@@ -382,7 +382,7 @@
   },
   "messageSystemPage": {
     "title": "Reglas y notificaciones",
-    "description": "Area POC basica de API para notificaciones, reglas, alertas y mensajes de notificacion.",
+    "description": "Gestione el envio de notificaciones, reglas y registros de mensajes.",
     "tabs": {
       "notifications": "Notificaciones",
       "rules": "Reglas",
@@ -392,21 +392,21 @@
       "notifications": {
         "title": "Notificaciones",
         "description": "Gestione la configuracion de envio y los destinatarios de las notificaciones.",
-        "pending": "La pantalla POC de Notificaciones esta pendiente."
+        "pending": "La pantalla de Notificaciones esta pendiente."
       },
       "rules": {
         "title": "Reglas",
         "description": "Gestione definiciones de reglas que conectan medidas, ubicaciones y notificaciones.",
-        "pending": "La pantalla POC de Reglas esta pendiente."
+        "pending": "La pantalla de Reglas esta pendiente."
       },
       "notificationMessages": {
         "title": "Mensajes de notificacion",
         "description": "Revise registros de mensajes vinculados a notificaciones y medidas.",
-        "pending": "La pantalla POC de Mensajes de notificacion esta pendiente."
+        "pending": "La pantalla de Mensajes de notificacion esta pendiente."
       }
     },
     "shared": {
-      "pending": "Pantalla POC pendiente",
+      "pending": "Pantalla pendiente",
       "loading": "Cargando...",
       "error": "Algo salio mal.",
       "empty": "No se encontraron registros.",
@@ -415,7 +415,7 @@
     "notifications": {
       "list": {
         "title": "Notificaciones",
-        "description": "Cree y gestione configuraciones de envio para el POC del sistema de mensajes.",
+        "description": "Cree y gestione configuraciones de envio de notificaciones.",
         "newButton": "Nueva notificacion",
         "table": {
           "name": "Nombre",
@@ -474,7 +474,9 @@
       },
       "options": {
         "frequency": {
-          "immediately": "Inmediatamente"
+          "immediately": "Inmediatamente",
+          "daily_summary": "Resumen diario",
+          "weekly_summary": "Resumen semanal"
         },
         "alertTypes": {
           "green": "Verde",
@@ -486,7 +488,7 @@
     "rules": {
       "list": {
         "title": "Reglas",
-        "description": "Cree y gestione definiciones de reglas para el POC del sistema de mensajes.",
+        "description": "Cree y gestione definiciones de reglas.",
         "newButton": "Nueva regla",
         "table": {
           "name": "Nombre",
@@ -523,7 +525,6 @@
           "startDate": "Fecha de inicio",
           "endDate": "Fecha de fin",
           "datePlaceholder": "2026-04-05 00:00:00+00",
-          "dateHelp": "El selector de fecha guarda la fecha de inicio como 00:00:00+00 y la fecha de fin como 23:59:59+00 para el backend.",
           "locationIds": "IDs de ubicacion",
           "locationIdsHelp": "Use IDs numericos de ubicacion separados por comas.",
           "notificationIds": "Notificaciones",
@@ -564,7 +565,7 @@
     "notificationMessages": {
       "list": {
         "title": "Mensajes de notificacion",
-        "description": "Cree y gestione registros de mensajes para el POC del sistema de mensajes.",
+        "description": "Cree y gestione registros de mensajes de notificacion.",
         "newButton": "Nuevo mensaje",
         "table": {
           "notification": "Notificacion",
@@ -597,7 +598,7 @@
           "notificationPlaceholder": "Seleccione una notificacion",
           "creationDate": "Fecha de creacion",
           "creationDatePlaceholder": "2026-04-05 00:00:00+00",
-          "creationDateHelp": "Seleccione una fecha y hora. El valor se guarda en el formato del backend, por ejemplo 2026-04-05 00:00:00+00.",
+          "creationDateHelp": "Seleccione la fecha y hora de este mensaje.",
           "value": "Valor",
           "description": "Descripcion"
         },
@@ -637,8 +638,8 @@
     },
     "alerts": {
       "title": "Alertas",
-      "description": "Las alertas se agrupan con los factores de correccion para este POC. La pantalla CRUD de Alertas esta pendiente.",
-      "pending": "La pantalla POC de Alertas esta pendiente.",
+      "description": "Cree y gestione umbrales de alerta junto con factores de correccion.",
+      "pending": "La pantalla de Alertas esta pendiente.",
       "list": {
         "title": "Alertas",
         "description": "Cree y gestione umbrales de alerta para reglas del sistema de mensajes.",
@@ -653,7 +654,8 @@
           "delete": "Eliminar",
           "deleting": "Eliminando...",
           "deleteConfirm": "Seguro que desea eliminar esta alerta?",
-          "deleteErrorFallback": "No se pudo eliminar la alerta."
+          "deleteErrorFallback": "No se pudo eliminar la alerta.",
+          "pollenValue": "{value} Pollen/m³"
         },
         "states": {
           "loading": "Cargando alertas...",
