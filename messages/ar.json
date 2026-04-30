@@ -4,7 +4,13 @@
   },
   "Sidebar": {
     "title": "PollenScience.eu",
-    "maps": "الخرائط"
+    "maps": "الخرائط",
+    "routes": {
+      "forecast": "التوقعات",
+      "nowCasting": "الرصد الحالي",
+      "rulesAndNotifications": "القواعد والإشعارات",
+      "alertsAndCorrectionFactors": "التنبيهات وعوامل التصحيح"
+    }
   },
   "Components": {
     "pollen": "pollen/m³",
@@ -372,6 +378,121 @@
       "statusOpen": "مفتوح",
       "statusResolved": "تم حلها",
       "viewDetails": "عرض التفاصيل"
+    }
+  },
+  "messageSystemPage": {
+    "title": "القواعد والإشعارات",
+    "description": "منطقة تجربة API بسيطة للإشعارات والقواعد والتنبيهات ورسائل الإشعارات.",
+    "tabs": {
+      "notifications": "الإشعارات",
+      "rules": "القواعد",
+      "notificationMessages": "رسائل الإشعارات"
+    },
+    "placeholders": {
+      "notifications": {
+        "title": "الإشعارات",
+        "description": "إدارة إعدادات إرسال الإشعارات والمستلمين.",
+        "pending": "شاشة تجربة الإشعارات قيد الانتظار."
+      },
+      "rules": {
+        "title": "القواعد",
+        "description": "إدارة تعريفات القواعد التي تربط القياسات والمواقع والإشعارات.",
+        "pending": "شاشة تجربة القواعد قيد الانتظار."
+      },
+      "notificationMessages": {
+        "title": "رسائل الإشعارات",
+        "description": "مراجعة سجلات الرسائل المرتبطة بالإشعارات والقياسات.",
+        "pending": "شاشة تجربة رسائل الإشعارات قيد الانتظار."
+      }
+    },
+    "shared": {
+      "pending": "شاشة التجربة قيد الانتظار",
+      "loading": "جار التحميل...",
+      "error": "حدث خطأ ما.",
+      "empty": "لم يتم العثور على سجلات.",
+      "notAvailable": "غير متاح"
+    },
+    "notifications": {
+      "list": {
+        "title": "الإشعارات",
+        "description": "إنشاء وإدارة إعدادات إرسال الإشعارات لتجربة نظام الرسائل.",
+        "newButton": "إشعار جديد",
+        "table": {
+          "name": "الاسم",
+          "recipients": "المستلمون",
+          "frequency": "التكرار",
+          "alertTypes": "أنواع التنبيه",
+          "actions": "الإجراءات",
+          "edit": "تعديل",
+          "delete": "حذف",
+          "deleting": "جار الحذف...",
+          "deleteConfirm": "هل أنت متأكد من حذف هذا الإشعار؟",
+          "deleteErrorFallback": "تعذر حذف الإشعار."
+        },
+        "states": {
+          "loading": "جار تحميل الإشعارات...",
+          "updating": "جار تحديث الإشعارات...",
+          "error": "تعذر تحميل الإشعارات.",
+          "empty": "لم يتم إنشاء أي إشعارات بعد."
+        }
+      },
+      "form": {
+        "createTitle": "إشعار جديد",
+        "editTitle": "تعديل الإشعار",
+        "createDescription": "حدد المستلمين وتكرار الإرسال وأنواع التنبيه لهذا الإشعار.",
+        "editDescription": "حدث المستلمين وتكرار الإرسال وأنواع التنبيه لهذا الإشعار.",
+        "fields": {
+          "name": "الاسم",
+          "recipients": "المستلمون",
+          "recipientsHelp": "استخدم الفواصل أو الأسطر الجديدة للفصل بين المستلمين.",
+          "frequency": "التكرار",
+          "alertTypes": "أنواع التنبيه"
+        },
+        "validation": {
+          "idRequired": "معرف الإشعار مطلوب.",
+          "nameRequired": "الاسم مطلوب.",
+          "recipientsRequired": "مطلوب مستلم واحد على الأقل.",
+          "recipientsInvalid": "يجب أن تبدو المستلمات كعناوين بريد إلكتروني.",
+          "alertTypesRequired": "اختر نوع تنبيه واحدًا على الأقل."
+        },
+        "states": {
+          "loadingDetail": "جار تحميل الإشعار...",
+          "loadError": "تعذر تحميل الإشعار.",
+          "createError": "تعذر إنشاء الإشعار.",
+          "updateError": "تعذر تحديث الإشعار.",
+          "deleteError": "تعذر حذف الإشعار."
+        },
+        "actions": {
+          "cancel": "رجوع",
+          "create": "إنشاء إشعار",
+          "update": "تحديث الإشعار",
+          "saving": "جار الحفظ...",
+          "delete": "حذف الإشعار",
+          "deleting": "جار الحذف...",
+          "deleteConfirm": "هل أنت متأكد من حذف هذا الإشعار؟"
+        }
+      },
+      "options": {
+        "frequency": {
+          "immediately": "فورًا"
+        },
+        "alertTypes": {
+          "green": "أخضر",
+          "yellow": "أصفر",
+          "red": "أحمر"
+        }
+      }
+    }
+  },
+  "alertsAndCorrectionFactorsPage": {
+    "tabs": {
+      "alerts": "التنبيهات",
+      "correctionFactors": "عوامل التصحيح"
+    },
+    "alerts": {
+      "title": "التنبيهات",
+      "description": "تم تجميع التنبيهات مع عوامل التصحيح في هذه التجربة. شاشة CRUD للتنبيهات قيد الانتظار.",
+      "pending": "شاشة تجربة التنبيهات قيد الانتظار."
     }
   }
 }

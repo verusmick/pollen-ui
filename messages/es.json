@@ -4,7 +4,13 @@
   },
   "Sidebar": {
     "title": "PollenScience.eu",
-    "maps": "Mapas"
+    "maps": "Mapas",
+    "routes": {
+      "forecast": "Prevision",
+      "nowCasting": "Nowcasting",
+      "rulesAndNotifications": "Reglas y notificaciones",
+      "alertsAndCorrectionFactors": "Alertas y factores de correccion"
+    }
   },
   "Components": {
     "pollen": "pollen/m³",
@@ -372,6 +378,121 @@
       "statusOpen": "Abierta",
       "statusResolved": "Resuelta",
       "viewDetails": "Ver detalles"
+    }
+  },
+  "messageSystemPage": {
+    "title": "Reglas y notificaciones",
+    "description": "Area POC basica de API para notificaciones, reglas, alertas y mensajes de notificacion.",
+    "tabs": {
+      "notifications": "Notificaciones",
+      "rules": "Reglas",
+      "notificationMessages": "Mensajes de notificacion"
+    },
+    "placeholders": {
+      "notifications": {
+        "title": "Notificaciones",
+        "description": "Gestione la configuracion de envio y los destinatarios de las notificaciones.",
+        "pending": "La pantalla POC de Notificaciones esta pendiente."
+      },
+      "rules": {
+        "title": "Reglas",
+        "description": "Gestione definiciones de reglas que conectan medidas, ubicaciones y notificaciones.",
+        "pending": "La pantalla POC de Reglas esta pendiente."
+      },
+      "notificationMessages": {
+        "title": "Mensajes de notificacion",
+        "description": "Revise registros de mensajes vinculados a notificaciones y medidas.",
+        "pending": "La pantalla POC de Mensajes de notificacion esta pendiente."
+      }
+    },
+    "shared": {
+      "pending": "Pantalla POC pendiente",
+      "loading": "Cargando...",
+      "error": "Algo salio mal.",
+      "empty": "No se encontraron registros.",
+      "notAvailable": "No disponible"
+    },
+    "notifications": {
+      "list": {
+        "title": "Notificaciones",
+        "description": "Cree y gestione configuraciones de envio para el POC del sistema de mensajes.",
+        "newButton": "Nueva notificacion",
+        "table": {
+          "name": "Nombre",
+          "recipients": "Destinatarios",
+          "frequency": "Frecuencia",
+          "alertTypes": "Tipos de alerta",
+          "actions": "Acciones",
+          "edit": "Editar",
+          "delete": "Eliminar",
+          "deleting": "Eliminando...",
+          "deleteConfirm": "Seguro que desea eliminar esta notificacion?",
+          "deleteErrorFallback": "No se pudo eliminar la notificacion."
+        },
+        "states": {
+          "loading": "Cargando notificaciones...",
+          "updating": "Actualizando notificaciones...",
+          "error": "No se pudieron cargar las notificaciones.",
+          "empty": "Todavia no se han creado notificaciones."
+        }
+      },
+      "form": {
+        "createTitle": "Nueva notificacion",
+        "editTitle": "Editar notificacion",
+        "createDescription": "Defina destinatarios, frecuencia de envio y tipos de alerta para esta notificacion.",
+        "editDescription": "Actualice los destinatarios, la frecuencia de envio y los tipos de alerta de esta notificacion.",
+        "fields": {
+          "name": "Nombre",
+          "recipients": "Destinatarios",
+          "recipientsHelp": "Use comas o lineas nuevas para separar destinatarios.",
+          "frequency": "Frecuencia",
+          "alertTypes": "Tipos de alerta"
+        },
+        "validation": {
+          "idRequired": "El id de notificacion es obligatorio.",
+          "nameRequired": "El nombre es obligatorio.",
+          "recipientsRequired": "Se requiere al menos un destinatario.",
+          "recipientsInvalid": "Los destinatarios deben parecer direcciones de correo.",
+          "alertTypesRequired": "Seleccione al menos un tipo de alerta."
+        },
+        "states": {
+          "loadingDetail": "Cargando notificacion...",
+          "loadError": "No se pudo cargar la notificacion.",
+          "createError": "No se pudo crear la notificacion.",
+          "updateError": "No se pudo actualizar la notificacion.",
+          "deleteError": "No se pudo eliminar la notificacion."
+        },
+        "actions": {
+          "cancel": "Volver",
+          "create": "Crear notificacion",
+          "update": "Actualizar notificacion",
+          "saving": "Guardando...",
+          "delete": "Eliminar notificacion",
+          "deleting": "Eliminando...",
+          "deleteConfirm": "Seguro que desea eliminar esta notificacion?"
+        }
+      },
+      "options": {
+        "frequency": {
+          "immediately": "Inmediatamente"
+        },
+        "alertTypes": {
+          "green": "Verde",
+          "yellow": "Amarillo",
+          "red": "Rojo"
+        }
+      }
+    }
+  },
+  "alertsAndCorrectionFactorsPage": {
+    "tabs": {
+      "alerts": "Alertas",
+      "correctionFactors": "Factores de correccion"
+    },
+    "alerts": {
+      "title": "Alertas",
+      "description": "Las alertas se agrupan con los factores de correccion para este POC. La pantalla CRUD de Alertas esta pendiente.",
+      "pending": "La pantalla POC de Alertas esta pendiente."
     }
   }
 }

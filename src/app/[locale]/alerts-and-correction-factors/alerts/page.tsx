@@ -1,25 +1,20 @@
-'use client';
-import { useTranslations } from 'next-intl';
-import { FiltersBar, AlertsList } from '../components';
+import { getTranslations } from 'next-intl/server';
 
-export default function AlertsPage() {
-  const t = useTranslations('alertsPage');
+export default async function AlertsPage() {
+  const t = await getTranslations('alertsAndCorrectionFactorsPage.alerts');
+
   return (
-    <main>
-      {/* <div style={{ marginTop: 12 }}>
-        <button onClick={() => switchLocale('en')}>EN</button>
-        <button onClick={() => switchLocale('es')}>ES</button>
-        <button onClick={() => switchLocale('fr')}>FR</button>
-      </div>
+    <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
+      <header className="space-y-1">
+        <h1 className="text-lg font-semibold text-foreground">{t('title')}</h1>
+        <p className="max-w-3xl text-sm text-muted-foreground">
+          {t('description')}
+        </p>
+      </header>
 
-      <h2>{t('message_loading')}</h2> */}
-
-      <div className="flex flex-col h-full bg-background text-foreground">
-        <div className="p-4 space-y-4 overflow-hidden">
-          <FiltersBar />
-          <AlertsList />
-        </div>
-      </div>
+      <section className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+        {t('pending')}
+      </section>
     </main>
   );
 }

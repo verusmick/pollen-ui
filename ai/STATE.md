@@ -18,3 +18,12 @@ Foundation/data scaffolding is implemented. Remaining backend dependencies are c
 
 ## Message System - POC API foundation
 Slice 2 API foundation is implemented for notifications, rules, alerts, and notification messages: internal proxy routes, typed `src/lib/api/messageSystem.ts` helpers, route-local types/constants/hooks/utils, and the kebab-case internal `/api/notification-messages` proxy forwarding to upstream `/api/notificationMessages`. No CRUD screens, UI routes, or i18n message files have been implemented yet.
+
+## Message System - POC route shell
+Slice 3 route shell is implemented: `/rules-and-notifications` redirects to `/rules-and-notifications/notifications`, route-local tabs link to notifications, rules, alerts, and notification messages, and each module has an i18n-backed placeholder list page. `messageSystemPage` keys were added to all supported locale files. CRUD screens and UI API calls are still not implemented.
+
+## Message System - Notifications CRUD POC
+Slice 4 Notifications CRUD POC is implemented: notifications list, create, edit, and delete screens use the Slice 2 API foundation, React Query reads/mutations, local form state, and `messageSystemPage.notifications` i18n keys. Rules, alerts, and notification messages CRUD screens remain placeholders.
+
+## Route grouping adjustment - Alerts with Correction Factors
+Alerts are now grouped in the UI under `/alerts-and-correction-factors/alerts` next to Correction Factors. Rules and Notifications tabs now include only notifications, rules, and notification messages. The message-system API contract still owns Alerts endpoints, but Alerts CRUD should be implemented under the Alerts and Correction Factors route group.

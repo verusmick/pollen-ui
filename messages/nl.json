@@ -4,7 +4,13 @@
   },
   "Sidebar": {
     "title": "PollenScience.eu",
-    "maps": "Kaarten"
+    "maps": "Kaarten",
+    "routes": {
+      "forecast": "Voorspelling",
+      "nowCasting": "Nowcasting",
+      "rulesAndNotifications": "Regels en meldingen",
+      "alertsAndCorrectionFactors": "Alerts en correctiefactoren"
+    }
   },
   "Components": {
     "pollen": "pollen/m³",
@@ -372,6 +378,121 @@
       "statusOpen": "Open",
       "statusResolved": "Opgelost",
       "viewDetails": "Bekijk details"
+    }
+  },
+  "messageSystemPage": {
+    "title": "Regels en meldingen",
+    "description": "Eenvoudig API-POC-gedeelte voor meldingen, regels, alerts en meldingsberichten.",
+    "tabs": {
+      "notifications": "Meldingen",
+      "rules": "Regels",
+      "notificationMessages": "Meldingsberichten"
+    },
+    "placeholders": {
+      "notifications": {
+        "title": "Meldingen",
+        "description": "Beheer bezorginstellingen en ontvangers voor meldingen.",
+        "pending": "Het POC-scherm voor Meldingen is nog in afwachting."
+      },
+      "rules": {
+        "title": "Regels",
+        "description": "Beheer regeldefinities die metingen, locaties en meldingen verbinden.",
+        "pending": "Het POC-scherm voor Regels is nog in afwachting."
+      },
+      "notificationMessages": {
+        "title": "Meldingsberichten",
+        "description": "Bekijk berichtrecords die aan meldingen en metingen zijn gekoppeld.",
+        "pending": "Het POC-scherm voor Meldingsberichten is nog in afwachting."
+      }
+    },
+    "shared": {
+      "pending": "POC-scherm in afwachting",
+      "loading": "Laden...",
+      "error": "Er is iets misgegaan.",
+      "empty": "Geen records gevonden.",
+      "notAvailable": "Niet beschikbaar"
+    },
+    "notifications": {
+      "list": {
+        "title": "Meldingen",
+        "description": "Maak en beheer bezorginstellingen voor de message-system POC.",
+        "newButton": "Nieuwe melding",
+        "table": {
+          "name": "Naam",
+          "recipients": "Ontvangers",
+          "frequency": "Frequentie",
+          "alertTypes": "Alerttypen",
+          "actions": "Acties",
+          "edit": "Bewerken",
+          "delete": "Verwijderen",
+          "deleting": "Verwijderen...",
+          "deleteConfirm": "Weet u zeker dat u deze melding wilt verwijderen?",
+          "deleteErrorFallback": "De melding kon niet worden verwijderd."
+        },
+        "states": {
+          "loading": "Meldingen laden...",
+          "updating": "Meldingen bijwerken...",
+          "error": "Meldingen konden niet worden geladen.",
+          "empty": "Er zijn nog geen meldingen gemaakt."
+        }
+      },
+      "form": {
+        "createTitle": "Nieuwe melding",
+        "editTitle": "Melding bewerken",
+        "createDescription": "Definieer ontvangers, bezorgfrequentie en alerttypen voor deze melding.",
+        "editDescription": "Werk ontvangers, bezorgfrequentie en alerttypen voor deze melding bij.",
+        "fields": {
+          "name": "Naam",
+          "recipients": "Ontvangers",
+          "recipientsHelp": "Gebruik komma's of nieuwe regels om ontvangers te scheiden.",
+          "frequency": "Frequentie",
+          "alertTypes": "Alerttypen"
+        },
+        "validation": {
+          "idRequired": "Meldings-id is vereist.",
+          "nameRequired": "Naam is vereist.",
+          "recipientsRequired": "Minstens een ontvanger is vereist.",
+          "recipientsInvalid": "Ontvangers moeten op e-mailadressen lijken.",
+          "alertTypesRequired": "Selecteer minstens een alerttype."
+        },
+        "states": {
+          "loadingDetail": "Melding laden...",
+          "loadError": "De melding kon niet worden geladen.",
+          "createError": "De melding kon niet worden gemaakt.",
+          "updateError": "De melding kon niet worden bijgewerkt.",
+          "deleteError": "De melding kon niet worden verwijderd."
+        },
+        "actions": {
+          "cancel": "Terug",
+          "create": "Melding maken",
+          "update": "Melding bijwerken",
+          "saving": "Opslaan...",
+          "delete": "Melding verwijderen",
+          "deleting": "Verwijderen...",
+          "deleteConfirm": "Weet u zeker dat u deze melding wilt verwijderen?"
+        }
+      },
+      "options": {
+        "frequency": {
+          "immediately": "Direct"
+        },
+        "alertTypes": {
+          "green": "Groen",
+          "yellow": "Geel",
+          "red": "Rood"
+        }
+      }
+    }
+  },
+  "alertsAndCorrectionFactorsPage": {
+    "tabs": {
+      "alerts": "Alerts",
+      "correctionFactors": "Correctiefactoren"
+    },
+    "alerts": {
+      "title": "Alerts",
+      "description": "Alerts zijn voor deze POC gegroepeerd met correctiefactoren. Het CRUD-scherm voor Alerts is nog in afwachting.",
+      "pending": "Het POC-scherm voor Alerts is nog in afwachting."
     }
   }
 }

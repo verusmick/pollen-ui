@@ -4,7 +4,13 @@
   },
   "Sidebar": {
     "title": "PollenScience.eu",
-    "maps": "Maps"
+    "maps": "Maps",
+    "routes": {
+      "forecast": "Forecast",
+      "nowCasting": "Nowcasting",
+      "rulesAndNotifications": "Rules and Notifications",
+      "alertsAndCorrectionFactors": "Alerts and Correction Factors"
+    }
   },
   "Components": {
     "pollen": "pollen/m³",
@@ -372,6 +378,121 @@
       "statusOpen": "Open",
       "statusResolved": "Resolved",
       "viewDetails": "View Details"
+    }
+  },
+  "messageSystemPage": {
+    "title": "Rules and Notifications",
+    "description": "Basic API POC area for notifications, rules, alerts, and notification messages.",
+    "tabs": {
+      "notifications": "Notifications",
+      "rules": "Rules",
+      "notificationMessages": "Notification messages"
+    },
+    "placeholders": {
+      "notifications": {
+        "title": "Notifications",
+        "description": "Manage notification delivery settings and recipients.",
+        "pending": "The Notifications POC screen is pending."
+      },
+      "rules": {
+        "title": "Rules",
+        "description": "Manage rule definitions that connect measures, locations, and notifications.",
+        "pending": "The Rules POC screen is pending."
+      },
+      "notificationMessages": {
+        "title": "Notification messages",
+        "description": "Review notification message records tied to notifications and measures.",
+        "pending": "The Notification messages POC screen is pending."
+      }
+    },
+    "shared": {
+      "pending": "POC screen pending",
+      "loading": "Loading...",
+      "error": "Something went wrong.",
+      "empty": "No records found.",
+      "notAvailable": "Not available"
+    },
+    "notifications": {
+      "list": {
+        "title": "Notifications",
+        "description": "Create and manage notification delivery settings for the message-system POC.",
+        "newButton": "New notification",
+        "table": {
+          "name": "Name",
+          "recipients": "Recipients",
+          "frequency": "Frequency",
+          "alertTypes": "Alert types",
+          "actions": "Actions",
+          "edit": "Edit",
+          "delete": "Delete",
+          "deleting": "Deleting...",
+          "deleteConfirm": "Are you sure you want to delete this notification?",
+          "deleteErrorFallback": "Failed to delete the notification."
+        },
+        "states": {
+          "loading": "Loading notifications...",
+          "updating": "Updating notifications...",
+          "error": "Failed to load notifications.",
+          "empty": "No notifications have been created yet."
+        }
+      },
+      "form": {
+        "createTitle": "New notification",
+        "editTitle": "Edit notification",
+        "createDescription": "Define recipients, delivery frequency, and alert types for this notification.",
+        "editDescription": "Update the recipients, delivery frequency, and alert types for this notification.",
+        "fields": {
+          "name": "Name",
+          "recipients": "Recipients",
+          "recipientsHelp": "Use commas or new lines to separate recipients.",
+          "frequency": "Frequency",
+          "alertTypes": "Alert types"
+        },
+        "validation": {
+          "idRequired": "Notification id is required.",
+          "nameRequired": "Name is required.",
+          "recipientsRequired": "At least one recipient is required.",
+          "recipientsInvalid": "Recipients must look like email addresses.",
+          "alertTypesRequired": "Select at least one alert type."
+        },
+        "states": {
+          "loadingDetail": "Loading notification...",
+          "loadError": "Failed to load the notification.",
+          "createError": "Failed to create the notification.",
+          "updateError": "Failed to update the notification.",
+          "deleteError": "Failed to delete the notification."
+        },
+        "actions": {
+          "cancel": "Back",
+          "create": "Create notification",
+          "update": "Update notification",
+          "saving": "Saving...",
+          "delete": "Delete notification",
+          "deleting": "Deleting...",
+          "deleteConfirm": "Are you sure you want to delete this notification?"
+        }
+      },
+      "options": {
+        "frequency": {
+          "immediately": "Immediately"
+        },
+        "alertTypes": {
+          "green": "Green",
+          "yellow": "Yellow",
+          "red": "Red"
+        }
+      }
+    }
+  },
+  "alertsAndCorrectionFactorsPage": {
+    "tabs": {
+      "alerts": "Alerts",
+      "correctionFactors": "Correction Factors"
+    },
+    "alerts": {
+      "title": "Alerts",
+      "description": "Alerts are grouped with Correction Factors for this POC. The Alerts CRUD screen is pending.",
+      "pending": "The Alerts POC screen is pending."
     }
   }
 }

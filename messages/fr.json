@@ -4,7 +4,13 @@
   },
   "Sidebar": {
     "title": "PollenScience.eu",
-    "maps": "Cartes"
+    "maps": "Cartes",
+    "routes": {
+      "forecast": "Prevision",
+      "nowCasting": "Nowcasting",
+      "rulesAndNotifications": "Regles et notifications",
+      "alertsAndCorrectionFactors": "Alertes et facteurs de correction"
+    }
   },
   "Components": {
     "pollen": "pollen/m³",
@@ -372,6 +378,121 @@
       "statusOpen": "Ouvert",
       "statusResolved": "Résolu",
       "viewDetails": "Voir les détails"
+    }
+  },
+  "messageSystemPage": {
+    "title": "Regles et notifications",
+    "description": "Zone POC API simple pour les notifications, les regles, les alertes et les messages de notification.",
+    "tabs": {
+      "notifications": "Notifications",
+      "rules": "Regles",
+      "notificationMessages": "Messages de notification"
+    },
+    "placeholders": {
+      "notifications": {
+        "title": "Notifications",
+        "description": "Gerer les parametres d'envoi et les destinataires des notifications.",
+        "pending": "L'ecran POC Notifications est en attente."
+      },
+      "rules": {
+        "title": "Regles",
+        "description": "Gerer les definitions de regles qui relient mesures, emplacements et notifications.",
+        "pending": "L'ecran POC Regles est en attente."
+      },
+      "notificationMessages": {
+        "title": "Messages de notification",
+        "description": "Consulter les messages rattaches aux notifications et aux mesures.",
+        "pending": "L'ecran POC Messages de notification est en attente."
+      }
+    },
+    "shared": {
+      "pending": "Ecran POC en attente",
+      "loading": "Chargement...",
+      "error": "Une erreur est survenue.",
+      "empty": "Aucun enregistrement trouve.",
+      "notAvailable": "Non disponible"
+    },
+    "notifications": {
+      "list": {
+        "title": "Notifications",
+        "description": "Creer et gerer les parametres d'envoi pour le POC du systeme de messages.",
+        "newButton": "Nouvelle notification",
+        "table": {
+          "name": "Nom",
+          "recipients": "Destinataires",
+          "frequency": "Frequence",
+          "alertTypes": "Types d'alerte",
+          "actions": "Actions",
+          "edit": "Modifier",
+          "delete": "Supprimer",
+          "deleting": "Suppression...",
+          "deleteConfirm": "Voulez-vous vraiment supprimer cette notification ?",
+          "deleteErrorFallback": "La notification n'a pas pu etre supprimee."
+        },
+        "states": {
+          "loading": "Chargement des notifications...",
+          "updating": "Mise a jour des notifications...",
+          "error": "Les notifications n'ont pas pu etre chargees.",
+          "empty": "Aucune notification n'a encore ete creee."
+        }
+      },
+      "form": {
+        "createTitle": "Nouvelle notification",
+        "editTitle": "Modifier la notification",
+        "createDescription": "Definir les destinataires, la frequence d'envoi et les types d'alerte pour cette notification.",
+        "editDescription": "Mettre a jour les destinataires, la frequence d'envoi et les types d'alerte de cette notification.",
+        "fields": {
+          "name": "Nom",
+          "recipients": "Destinataires",
+          "recipientsHelp": "Utilisez des virgules ou de nouvelles lignes pour separer les destinataires.",
+          "frequency": "Frequence",
+          "alertTypes": "Types d'alerte"
+        },
+        "validation": {
+          "idRequired": "L'id de notification est requis.",
+          "nameRequired": "Le nom est requis.",
+          "recipientsRequired": "Au moins un destinataire est requis.",
+          "recipientsInvalid": "Les destinataires doivent ressembler a des adresses e-mail.",
+          "alertTypesRequired": "Selectionnez au moins un type d'alerte."
+        },
+        "states": {
+          "loadingDetail": "Chargement de la notification...",
+          "loadError": "La notification n'a pas pu etre chargee.",
+          "createError": "La notification n'a pas pu etre creee.",
+          "updateError": "La notification n'a pas pu etre mise a jour.",
+          "deleteError": "La notification n'a pas pu etre supprimee."
+        },
+        "actions": {
+          "cancel": "Retour",
+          "create": "Creer la notification",
+          "update": "Mettre a jour la notification",
+          "saving": "Enregistrement...",
+          "delete": "Supprimer la notification",
+          "deleting": "Suppression...",
+          "deleteConfirm": "Voulez-vous vraiment supprimer cette notification ?"
+        }
+      },
+      "options": {
+        "frequency": {
+          "immediately": "Immediatement"
+        },
+        "alertTypes": {
+          "green": "Vert",
+          "yellow": "Jaune",
+          "red": "Rouge"
+        }
+      }
+    }
+  },
+  "alertsAndCorrectionFactorsPage": {
+    "tabs": {
+      "alerts": "Alertes",
+      "correctionFactors": "Facteurs de correction"
+    },
+    "alerts": {
+      "title": "Alertes",
+      "description": "Les alertes sont regroupees avec les facteurs de correction pour ce POC. L'ecran CRUD Alertes est en attente.",
+      "pending": "L'ecran POC Alertes est en attente."
     }
   }
 }

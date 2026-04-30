@@ -18,12 +18,21 @@ export function Sidebar({
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const routes = [
-    { label: 'Forecast', href: '/forecast' },
-    { label: 'Nowcasting', href: '/now-casting' },
-    { label: 'Rules And Notifications', href: '/rules-and-notifications' },
+    { label: t('routes.forecast'), href: '/forecast', match: '/forecast' },
     {
-      label: 'Alerts And Correction Factors',
-      href: '/alerts-and-correction-factors/correction-factors',
+      label: t('routes.nowCasting'),
+      href: '/now-casting',
+      match: '/now-casting',
+    },
+    {
+      label: t('routes.rulesAndNotifications'),
+      href: '/rules-and-notifications/notifications',
+      match: '/rules-and-notifications',
+    },
+    {
+      label: t('routes.alertsAndCorrectionFactors'),
+      href: '/alerts-and-correction-factors/alerts',
+      match: '/alerts-and-correction-factors',
     },
   ];
 
@@ -53,9 +62,9 @@ export function Sidebar({
 
             <nav className="flex-1">
               <ul className="space-y-2">
-                {routes.map(({ label, href }) => {
+                {routes.map(({ label, href, match }) => {
                   const isActive =
-                    pathname === href || pathname.startsWith(`${href}/`);
+                    pathname === match || pathname.startsWith(`${match}/`);
 
                   return (
                     <li key={href}>

@@ -1,14 +1,16 @@
 'use client';
 import { ReactNode } from 'react';
 import { Link, usePathname } from '@/features/i18n/routing';
+import { useTranslations } from 'next-intl';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const t = useTranslations('alertsAndCorrectionFactorsPage.tabs');
 
   const tabs = [
-    { label: 'Alerts', href: '/alerts-and-correction-factors/alerts' },
+    { label: t('alerts'), href: '/alerts-and-correction-factors/alerts' },
     {
-      label: 'Correction Factors',
+      label: t('correctionFactors'),
       href: '/alerts-and-correction-factors/correction-factors',
     },
   ];
@@ -23,7 +25,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="flex h-full min-h-0 flex-col bg-background text-foreground">
       <nav className="flex border-b border-border px-4 pt-4">
         {tabs.map(({ href, label }) => {
-          const active = pathname?.endsWith(href);
+          const active = pathname === href || pathname?.startsWith(`${href}/`);
           return (
             <Link key={href} href={href} className={linkClasses(active)}>
               {label}

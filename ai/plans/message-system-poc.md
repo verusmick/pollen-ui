@@ -67,7 +67,9 @@ Reuse these patterns:
 
 ## Recommended Route Structure
 
-Use the existing placeholder route as the route root:
+Use `rules-and-notifications` for notifications, rules, and notification
+messages. Alerts remain part of the message-system API contract, but the UI
+groups Alerts with Correction Factors.
 
 ```text
 src/app/[locale]/rules-and-notifications/
@@ -87,13 +89,6 @@ src/app/[locale]/rules-and-notifications/
     [ruleId]/
       edit/
         page.tsx
-  alerts/
-    page.tsx
-    new/
-      page.tsx
-    [alertId]/
-      edit/
-        page.tsx
   notification-messages/
     page.tsx
     new/
@@ -110,10 +105,23 @@ Recommended behavior:
 - `layout.tsx` should provide simple tabs for:
   - Notifications
   - Rules
-  - Alerts
   - Notification messages
 - Tabs must use `next-intl`.
 - Do not use Figma as source of truth for this POC.
+
+Alerts UI route:
+
+```text
+src/app/[locale]/alerts-and-correction-factors/
+  alerts/
+    page.tsx
+  correction-factors/
+    page.tsx
+```
+
+The Alerts CRUD slice should use the message-system API foundation, but its
+screen belongs under `/alerts-and-correction-factors/alerts` so users see Alerts
+next to Correction Factors.
 
 ## Recommended Route-Local File Structure
 
@@ -137,11 +145,6 @@ src/app/[locale]/rules-and-notifications/
       RulesTable.tsx
       RuleFormContainer.tsx
       RuleForm.tsx
-    alerts/
-      AlertsListContainer.tsx
-      AlertsTable.tsx
-      AlertFormContainer.tsx
-      AlertForm.tsx
     notification-messages/
       NotificationMessagesListContainer.tsx
       NotificationMessagesTable.tsx
@@ -485,8 +488,11 @@ Implementation must add a new namespace to every supported file under
     "shared": {},
     "notifications": {},
     "rules": {},
-    "alerts": {},
     "notificationMessages": {}
+  },
+  "alertsAndCorrectionFactorsPage": {
+    "tabs": {},
+    "alerts": {}
   }
 }
 ```
@@ -511,10 +517,10 @@ messageSystemPage.notifications.list.*
 messageSystemPage.notifications.form.*
 messageSystemPage.rules.list.*
 messageSystemPage.rules.form.*
-messageSystemPage.alerts.list.*
-messageSystemPage.alerts.form.*
 messageSystemPage.notificationMessages.list.*
 messageSystemPage.notificationMessages.form.*
+alertsAndCorrectionFactorsPage.tabs.*
+alertsAndCorrectionFactorsPage.alerts.*
 ```
 
 Also replace hardcoded user-facing strings in touched files, especially:
@@ -592,6 +598,12 @@ Implement:
 - edit form
 - delete behavior
 - rule option loading from rules
+
+Route:
+
+- `/alerts-and-correction-factors/alerts`
+
+Do not place Alerts screens under `/rules-and-notifications`.
 
 ### Slice 7 - Notification Messages CRUD
 
@@ -679,9 +691,7 @@ src/app/[locale]/rules-and-notifications/notifications/[notificationId]/edit/pag
 src/app/[locale]/rules-and-notifications/rules/page.tsx
 src/app/[locale]/rules-and-notifications/rules/new/page.tsx
 src/app/[locale]/rules-and-notifications/rules/[ruleId]/edit/page.tsx
-src/app/[locale]/rules-and-notifications/alerts/page.tsx
-src/app/[locale]/rules-and-notifications/alerts/new/page.tsx
-src/app/[locale]/rules-and-notifications/alerts/[alertId]/edit/page.tsx
+src/app/[locale]/alerts-and-correction-factors/alerts/page.tsx
 src/app/[locale]/rules-and-notifications/notification-messages/page.tsx
 src/app/[locale]/rules-and-notifications/notification-messages/new/page.tsx
 src/app/[locale]/rules-and-notifications/notification-messages/[notificationMessageId]/edit/page.tsx

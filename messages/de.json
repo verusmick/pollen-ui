@@ -4,7 +4,13 @@
   },
   "Sidebar": {
     "title": "PollenScience.eu",
-    "maps": "Karten"
+    "maps": "Karten",
+    "routes": {
+      "forecast": "Vorhersage",
+      "nowCasting": "Nowcasting",
+      "rulesAndNotifications": "Regeln und Benachrichtigungen",
+      "alertsAndCorrectionFactors": "Alarme und Korrekturfaktoren"
+    }
   },
   "Components": {
     "pollen": "pollen/m³",
@@ -372,6 +378,121 @@
       "statusOpen": "Offen",
       "statusResolved": "Behoben",
       "viewDetails": "Details anzeigen"
+    }
+  },
+  "messageSystemPage": {
+    "title": "Regeln und Benachrichtigungen",
+    "description": "Einfacher API-POC-Bereich fuer Benachrichtigungen, Regeln, Alarme und Benachrichtigungsnachrichten.",
+    "tabs": {
+      "notifications": "Benachrichtigungen",
+      "rules": "Regeln",
+      "notificationMessages": "Benachrichtigungsnachrichten"
+    },
+    "placeholders": {
+      "notifications": {
+        "title": "Benachrichtigungen",
+        "description": "Verwalten Sie Zustelleinstellungen und Empfaenger fuer Benachrichtigungen.",
+        "pending": "Der POC-Bildschirm fuer Benachrichtigungen ist noch ausstehend."
+      },
+      "rules": {
+        "title": "Regeln",
+        "description": "Verwalten Sie Regeldefinitionen, die Messwerte, Orte und Benachrichtigungen verbinden.",
+        "pending": "Der POC-Bildschirm fuer Regeln ist noch ausstehend."
+      },
+      "notificationMessages": {
+        "title": "Benachrichtigungsnachrichten",
+        "description": "Pruefen Sie Nachrichtenprotokolle, die Benachrichtigungen und Messwerten zugeordnet sind.",
+        "pending": "Der POC-Bildschirm fuer Benachrichtigungsnachrichten ist noch ausstehend."
+      }
+    },
+    "shared": {
+      "pending": "POC-Bildschirm ausstehend",
+      "loading": "Wird geladen...",
+      "error": "Etwas ist schiefgelaufen.",
+      "empty": "Keine Eintraege gefunden.",
+      "notAvailable": "Nicht verfuegbar"
+    },
+    "notifications": {
+      "list": {
+        "title": "Benachrichtigungen",
+        "description": "Erstellen und verwalten Sie Zustelleinstellungen fuer den Message-System-POC.",
+        "newButton": "Neue Benachrichtigung",
+        "table": {
+          "name": "Name",
+          "recipients": "Empfaenger",
+          "frequency": "Frequenz",
+          "alertTypes": "Alarmtypen",
+          "actions": "Aktionen",
+          "edit": "Bearbeiten",
+          "delete": "Loeschen",
+          "deleting": "Wird geloescht...",
+          "deleteConfirm": "Moechten Sie diese Benachrichtigung wirklich loeschen?",
+          "deleteErrorFallback": "Die Benachrichtigung konnte nicht geloescht werden."
+        },
+        "states": {
+          "loading": "Benachrichtigungen werden geladen...",
+          "updating": "Benachrichtigungen werden aktualisiert...",
+          "error": "Benachrichtigungen konnten nicht geladen werden.",
+          "empty": "Es wurden noch keine Benachrichtigungen erstellt."
+        }
+      },
+      "form": {
+        "createTitle": "Neue Benachrichtigung",
+        "editTitle": "Benachrichtigung bearbeiten",
+        "createDescription": "Definieren Sie Empfaenger, Zustellfrequenz und Alarmtypen fuer diese Benachrichtigung.",
+        "editDescription": "Aktualisieren Sie Empfaenger, Zustellfrequenz und Alarmtypen fuer diese Benachrichtigung.",
+        "fields": {
+          "name": "Name",
+          "recipients": "Empfaenger",
+          "recipientsHelp": "Trennen Sie Empfaenger mit Kommas oder neuen Zeilen.",
+          "frequency": "Frequenz",
+          "alertTypes": "Alarmtypen"
+        },
+        "validation": {
+          "idRequired": "Benachrichtigungs-ID ist erforderlich.",
+          "nameRequired": "Name ist erforderlich.",
+          "recipientsRequired": "Mindestens ein Empfaenger ist erforderlich.",
+          "recipientsInvalid": "Empfaenger muessen wie E-Mail-Adressen aussehen.",
+          "alertTypesRequired": "Waehlen Sie mindestens einen Alarmtyp."
+        },
+        "states": {
+          "loadingDetail": "Benachrichtigung wird geladen...",
+          "loadError": "Die Benachrichtigung konnte nicht geladen werden.",
+          "createError": "Die Benachrichtigung konnte nicht erstellt werden.",
+          "updateError": "Die Benachrichtigung konnte nicht aktualisiert werden.",
+          "deleteError": "Die Benachrichtigung konnte nicht geloescht werden."
+        },
+        "actions": {
+          "cancel": "Zurueck",
+          "create": "Benachrichtigung erstellen",
+          "update": "Benachrichtigung aktualisieren",
+          "saving": "Wird gespeichert...",
+          "delete": "Benachrichtigung loeschen",
+          "deleting": "Wird geloescht...",
+          "deleteConfirm": "Moechten Sie diese Benachrichtigung wirklich loeschen?"
+        }
+      },
+      "options": {
+        "frequency": {
+          "immediately": "Sofort"
+        },
+        "alertTypes": {
+          "green": "Gruen",
+          "yellow": "Gelb",
+          "red": "Rot"
+        }
+      }
+    }
+  },
+  "alertsAndCorrectionFactorsPage": {
+    "tabs": {
+      "alerts": "Alarme",
+      "correctionFactors": "Korrekturfaktoren"
+    },
+    "alerts": {
+      "title": "Alarme",
+      "description": "Alarme werden fuer diesen POC mit Korrekturfaktoren gruppiert. Der CRUD-Bildschirm fuer Alarme ist noch ausstehend.",
+      "pending": "Der POC-Bildschirm fuer Alarme ist noch ausstehend."
     }
   }
 }
