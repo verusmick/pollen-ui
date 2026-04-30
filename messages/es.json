@@ -482,6 +482,84 @@
           "red": "Rojo"
         }
       }
+    },
+    "rules": {
+      "list": {
+        "title": "Reglas",
+        "description": "Cree y gestione definiciones de reglas para el POC del sistema de mensajes.",
+        "newButton": "Nueva regla",
+        "table": {
+          "name": "Nombre",
+          "measureId": "ID de medida",
+          "startDate": "Fecha de inicio",
+          "endDate": "Fecha de fin",
+          "locationIds": "IDs de ubicacion",
+          "notificationIds": "Notificaciones",
+          "enabledState": "Habilitada",
+          "actions": "Acciones",
+          "enabled": "Habilitada",
+          "disabled": "Deshabilitada",
+          "edit": "Editar",
+          "delete": "Eliminar",
+          "deleting": "Eliminando...",
+          "deleteConfirm": "Seguro que desea eliminar esta regla?",
+          "deleteErrorFallback": "No se pudo eliminar la regla."
+        },
+        "states": {
+          "loading": "Cargando reglas...",
+          "updating": "Actualizando reglas...",
+          "error": "No se pudieron cargar las reglas.",
+          "empty": "Todavia no se han creado reglas."
+        }
+      },
+      "form": {
+        "createTitle": "Nueva regla",
+        "editTitle": "Editar regla",
+        "createDescription": "Defina la medida, ubicaciones, notificaciones y rango de fechas para esta regla.",
+        "editDescription": "Actualice la medida, ubicaciones, notificaciones y rango de fechas de esta regla.",
+        "fields": {
+          "name": "Nombre",
+          "measureId": "ID de medida",
+          "startDate": "Fecha de inicio",
+          "endDate": "Fecha de fin",
+          "datePlaceholder": "2026-04-05 00:00:00+00",
+          "dateHelp": "El selector de fecha guarda la fecha de inicio como 00:00:00+00 y la fecha de fin como 23:59:59+00 para el backend.",
+          "locationIds": "IDs de ubicacion",
+          "locationIdsHelp": "Use IDs numericos de ubicacion separados por comas.",
+          "notificationIds": "Notificaciones",
+          "description": "Descripcion",
+          "enabled": "Habilitada",
+          "notificationPlaceholder": "Seleccione una notificacion"
+        },
+        "validation": {
+          "idRequired": "El id de regla es obligatorio.",
+          "nameRequired": "El nombre es obligatorio.",
+          "measureIdRequired": "El ID de medida debe ser un numero valido.",
+          "startDateRequired": "La fecha de inicio es obligatoria.",
+          "endDateRequired": "La fecha de fin es obligatoria.",
+          "locationIdsRequired": "Ingrese al menos un ID numerico de ubicacion.",
+          "notificationIdsRequired": "Seleccione al menos una notificacion."
+        },
+        "states": {
+          "loadingDetail": "Cargando regla...",
+          "loadError": "No se pudo cargar la regla.",
+          "createError": "No se pudo crear la regla.",
+          "updateError": "No se pudo actualizar la regla.",
+          "deleteError": "No se pudo eliminar la regla.",
+          "loadingNotifications": "Cargando notificaciones...",
+          "notificationsLoadError": "No se pudieron cargar las notificaciones.",
+          "noNotifications": "Cree una notificacion antes de asignarla a una regla."
+        },
+        "actions": {
+          "cancel": "Volver",
+          "create": "Crear regla",
+          "update": "Actualizar regla",
+          "saving": "Guardando...",
+          "delete": "Eliminar regla",
+          "deleting": "Eliminando...",
+          "deleteConfirm": "Seguro que desea eliminar esta regla?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

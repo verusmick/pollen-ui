@@ -1,0 +1,91 @@
+import type { ApiRuleWriteRequest, RuleRecord } from '../types';
+
+export interface RuleFormValues {
+  name: string;
+  measureId: string;
+  startDate: string;
+  endDate: string;
+  locationIdsText: string;
+  notificationId: string;
+  description: string;
+  enabled: boolean;
+}
+
+export interface RuleFormErrors {
+  name?: string;
+  measureId?: string;
+  startDate?: string;
+  endDate?: string;
+  locationIds?: string;
+  notificationIds?: string;
+}
+
+export const DEFAULT_RULE_FORM_VALUES: RuleFormValues = {
+  name: '',
+  measureId: '',
+  startDate: '',
+  endDate: '',
+  locationIdsText: '',
+  notificationId: '',
+  description: '',
+  enabled: true,
+};
+
+export function parseNumericList(value: string): number[] {
+  return value
+    .split(/[\n,]+/)
+    .map((item) => Number(item.trim()))
+    .filter((item) => Number.isFinite(item));
+}
+
+export function parseRequiredNumber(value: string): number | null {
+  const parsed = Number(value.trim());
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function toDateInputValue(value: string): string {
+  return value.slice(0, 10);
+}
+
+function toBackendDateString(value: string, boundary: 'start' | 'end'): string {
+  const trimmedValue = value.trim();
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  return boundary === 'start'
+    ? `${trimmedValue} 00:00:00+00`
+    : `${trimmedValue} 23:59:59+00`;
+}
+
+export function mapRuleRecordToFormValues(record: RuleRecord): RuleFormValues {
+  return {
+    name: record.name,
+    measureId: record.measureId === null ? '' : String(record.measureId),
+    startDate: toDateInputValue(record.startDate),
+    endDate: toDateInputValue(record.endDate),
+    locationIdsText: record.locationIds.join(', '),
+    notificationId:
+      record.notificationIds.length > 0 ? String(record.notificationIds[0]) : '',
+    description: record.description,
+    enabled: record.enabled,
+  };
+}
+
+export function buildRuleWritePayload(
+  values: RuleFormValues,
+  id?: string
+): ApiRuleWriteRequest {
+  return {
+    ...(id ? { id } : {}),
+    name: values.name.trim(),
+    measure_id: Number(values.measureId.trim()),
+    start_date: toBackendDateString(values.startDate, 'start'),
+    end_date: toBackendDateString(values.endDate, 'end'),
+    location_ids: parseNumericList(values.locationIdsText),
+    notification_ids: [Number(values.notificationId)],
+    description: values.description.trim(),
+    enabled: values.enabled,
+  };
+}

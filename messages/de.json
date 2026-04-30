@@ -482,6 +482,84 @@
           "red": "Rot"
         }
       }
+    },
+    "rules": {
+      "list": {
+        "title": "Regeln",
+        "description": "Erstellen und verwalten Sie Regeldefinitionen fuer den Message-System-POC.",
+        "newButton": "Neue Regel",
+        "table": {
+          "name": "Name",
+          "measureId": "Messwert-ID",
+          "startDate": "Startdatum",
+          "endDate": "Enddatum",
+          "locationIds": "Orts-IDs",
+          "notificationIds": "Benachrichtigungen",
+          "enabledState": "Aktiviert",
+          "actions": "Aktionen",
+          "enabled": "Aktiviert",
+          "disabled": "Deaktiviert",
+          "edit": "Bearbeiten",
+          "delete": "Loeschen",
+          "deleting": "Wird geloescht...",
+          "deleteConfirm": "Moechten Sie diese Regel wirklich loeschen?",
+          "deleteErrorFallback": "Die Regel konnte nicht geloescht werden."
+        },
+        "states": {
+          "loading": "Regeln werden geladen...",
+          "updating": "Regeln werden aktualisiert...",
+          "error": "Regeln konnten nicht geladen werden.",
+          "empty": "Es wurden noch keine Regeln erstellt."
+        }
+      },
+      "form": {
+        "createTitle": "Neue Regel",
+        "editTitle": "Regel bearbeiten",
+        "createDescription": "Definieren Sie Messwert, Orte, Benachrichtigungen und Zeitraum fuer diese Regel.",
+        "editDescription": "Aktualisieren Sie Messwert, Orte, Benachrichtigungen und Zeitraum fuer diese Regel.",
+        "fields": {
+          "name": "Name",
+          "measureId": "Messwert-ID",
+          "startDate": "Startdatum",
+          "endDate": "Enddatum",
+          "datePlaceholder": "2026-04-05 00:00:00+00",
+          "dateHelp": "Die Datumsauswahl speichert das Startdatum fuer das Backend als 00:00:00+00 und das Enddatum als 23:59:59+00.",
+          "locationIds": "Orts-IDs",
+          "locationIdsHelp": "Verwenden Sie komma-getrennte numerische Orts-IDs.",
+          "notificationIds": "Benachrichtigungen",
+          "description": "Beschreibung",
+          "enabled": "Aktiviert",
+          "notificationPlaceholder": "Benachrichtigung auswaehlen"
+        },
+        "validation": {
+          "idRequired": "Regel-ID ist erforderlich.",
+          "nameRequired": "Name ist erforderlich.",
+          "measureIdRequired": "Messwert-ID muss eine gueltige Zahl sein.",
+          "startDateRequired": "Startdatum ist erforderlich.",
+          "endDateRequired": "Enddatum ist erforderlich.",
+          "locationIdsRequired": "Geben Sie mindestens eine numerische Orts-ID ein.",
+          "notificationIdsRequired": "Waehlen Sie mindestens eine Benachrichtigung."
+        },
+        "states": {
+          "loadingDetail": "Regel wird geladen...",
+          "loadError": "Die Regel konnte nicht geladen werden.",
+          "createError": "Die Regel konnte nicht erstellt werden.",
+          "updateError": "Die Regel konnte nicht aktualisiert werden.",
+          "deleteError": "Die Regel konnte nicht geloescht werden.",
+          "loadingNotifications": "Benachrichtigungen werden geladen...",
+          "notificationsLoadError": "Benachrichtigungen konnten nicht geladen werden.",
+          "noNotifications": "Erstellen Sie eine Benachrichtigung, bevor Sie sie einer Regel zuweisen."
+        },
+        "actions": {
+          "cancel": "Zurueck",
+          "create": "Regel erstellen",
+          "update": "Regel aktualisieren",
+          "saving": "Wird gespeichert...",
+          "delete": "Regel loeschen",
+          "deleting": "Wird geloescht...",
+          "deleteConfirm": "Moechten Sie diese Regel wirklich loeschen?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

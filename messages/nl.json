@@ -482,6 +482,84 @@
           "red": "Rood"
         }
       }
+    },
+    "rules": {
+      "list": {
+        "title": "Regels",
+        "description": "Maak en beheer regeldefinities voor de message-system POC.",
+        "newButton": "Nieuwe regel",
+        "table": {
+          "name": "Naam",
+          "measureId": "Meting-ID",
+          "startDate": "Startdatum",
+          "endDate": "Einddatum",
+          "locationIds": "Locatie-ID's",
+          "notificationIds": "Meldingen",
+          "enabledState": "Ingeschakeld",
+          "actions": "Acties",
+          "enabled": "Ingeschakeld",
+          "disabled": "Uitgeschakeld",
+          "edit": "Bewerken",
+          "delete": "Verwijderen",
+          "deleting": "Verwijderen...",
+          "deleteConfirm": "Weet u zeker dat u deze regel wilt verwijderen?",
+          "deleteErrorFallback": "De regel kon niet worden verwijderd."
+        },
+        "states": {
+          "loading": "Regels laden...",
+          "updating": "Regels bijwerken...",
+          "error": "Regels konden niet worden geladen.",
+          "empty": "Er zijn nog geen regels gemaakt."
+        }
+      },
+      "form": {
+        "createTitle": "Nieuwe regel",
+        "editTitle": "Regel bewerken",
+        "createDescription": "Definieer de meting, locaties, meldingen en datumbereik voor deze regel.",
+        "editDescription": "Werk de meting, locaties, meldingen en datumbereik voor deze regel bij.",
+        "fields": {
+          "name": "Naam",
+          "measureId": "Meting-ID",
+          "startDate": "Startdatum",
+          "endDate": "Einddatum",
+          "datePlaceholder": "2026-04-05 00:00:00+00",
+          "dateHelp": "De datumkiezer slaat de startdatum op als 00:00:00+00 en de einddatum als 23:59:59+00 voor de backend.",
+          "locationIds": "Locatie-ID's",
+          "locationIdsHelp": "Gebruik komma-gescheiden numerieke locatie-ID's.",
+          "notificationIds": "Meldingen",
+          "description": "Beschrijving",
+          "enabled": "Ingeschakeld",
+          "notificationPlaceholder": "Selecteer een melding"
+        },
+        "validation": {
+          "idRequired": "Regel-id is vereist.",
+          "nameRequired": "Naam is vereist.",
+          "measureIdRequired": "Meting-ID moet een geldig getal zijn.",
+          "startDateRequired": "Startdatum is vereist.",
+          "endDateRequired": "Einddatum is vereist.",
+          "locationIdsRequired": "Voer minstens een numerieke locatie-ID in.",
+          "notificationIdsRequired": "Selecteer minstens een melding."
+        },
+        "states": {
+          "loadingDetail": "Regel laden...",
+          "loadError": "De regel kon niet worden geladen.",
+          "createError": "De regel kon niet worden gemaakt.",
+          "updateError": "De regel kon niet worden bijgewerkt.",
+          "deleteError": "De regel kon niet worden verwijderd.",
+          "loadingNotifications": "Meldingen laden...",
+          "notificationsLoadError": "Meldingen konden niet worden geladen.",
+          "noNotifications": "Maak een melding voordat u deze aan een regel koppelt."
+        },
+        "actions": {
+          "cancel": "Terug",
+          "create": "Regel maken",
+          "update": "Regel bijwerken",
+          "saving": "Opslaan...",
+          "delete": "Regel verwijderen",
+          "deleting": "Verwijderen...",
+          "deleteConfirm": "Weet u zeker dat u deze regel wilt verwijderen?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

@@ -482,6 +482,84 @@
           "red": "Rouge"
         }
       }
+    },
+    "rules": {
+      "list": {
+        "title": "Regles",
+        "description": "Creer et gerer les definitions de regles pour le POC du systeme de messages.",
+        "newButton": "Nouvelle regle",
+        "table": {
+          "name": "Nom",
+          "measureId": "ID de mesure",
+          "startDate": "Date de debut",
+          "endDate": "Date de fin",
+          "locationIds": "IDs d'emplacement",
+          "notificationIds": "Notifications",
+          "enabledState": "Activee",
+          "actions": "Actions",
+          "enabled": "Activee",
+          "disabled": "Desactivee",
+          "edit": "Modifier",
+          "delete": "Supprimer",
+          "deleting": "Suppression...",
+          "deleteConfirm": "Voulez-vous vraiment supprimer cette regle ?",
+          "deleteErrorFallback": "La regle n'a pas pu etre supprimee."
+        },
+        "states": {
+          "loading": "Chargement des regles...",
+          "updating": "Mise a jour des regles...",
+          "error": "Les regles n'ont pas pu etre chargees.",
+          "empty": "Aucune regle n'a encore ete creee."
+        }
+      },
+      "form": {
+        "createTitle": "Nouvelle regle",
+        "editTitle": "Modifier la regle",
+        "createDescription": "Definir la mesure, les emplacements, les notifications et la plage de dates pour cette regle.",
+        "editDescription": "Mettre a jour la mesure, les emplacements, les notifications et la plage de dates de cette regle.",
+        "fields": {
+          "name": "Nom",
+          "measureId": "ID de mesure",
+          "startDate": "Date de debut",
+          "endDate": "Date de fin",
+          "datePlaceholder": "2026-04-05 00:00:00+00",
+          "dateHelp": "Le selecteur de date enregistre la date de debut en 00:00:00+00 et la date de fin en 23:59:59+00 pour le backend.",
+          "locationIds": "IDs d'emplacement",
+          "locationIdsHelp": "Utilisez des IDs numeriques separes par des virgules.",
+          "notificationIds": "Notifications",
+          "description": "Description",
+          "enabled": "Activee",
+          "notificationPlaceholder": "Selectionner une notification"
+        },
+        "validation": {
+          "idRequired": "L'id de regle est requis.",
+          "nameRequired": "Le nom est requis.",
+          "measureIdRequired": "L'ID de mesure doit etre un nombre valide.",
+          "startDateRequired": "La date de debut est requise.",
+          "endDateRequired": "La date de fin est requise.",
+          "locationIdsRequired": "Saisissez au moins un ID numerique d'emplacement.",
+          "notificationIdsRequired": "Selectionnez au moins une notification."
+        },
+        "states": {
+          "loadingDetail": "Chargement de la regle...",
+          "loadError": "La regle n'a pas pu etre chargee.",
+          "createError": "La regle n'a pas pu etre creee.",
+          "updateError": "La regle n'a pas pu etre mise a jour.",
+          "deleteError": "La regle n'a pas pu etre supprimee.",
+          "loadingNotifications": "Chargement des notifications...",
+          "notificationsLoadError": "Les notifications n'ont pas pu etre chargees.",
+          "noNotifications": "Creez une notification avant de l'assigner a une regle."
+        },
+        "actions": {
+          "cancel": "Retour",
+          "create": "Creer la regle",
+          "update": "Mettre a jour la regle",
+          "saving": "Enregistrement...",
+          "delete": "Supprimer la regle",
+          "deleting": "Suppression...",
+          "deleteConfirm": "Voulez-vous vraiment supprimer cette regle ?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

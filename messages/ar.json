@@ -482,6 +482,84 @@
           "red": "أحمر"
         }
       }
+    },
+    "rules": {
+      "list": {
+        "title": "القواعد",
+        "description": "إنشاء وإدارة تعريفات القواعد لتجربة نظام الرسائل.",
+        "newButton": "قاعدة جديدة",
+        "table": {
+          "name": "الاسم",
+          "measureId": "معرف القياس",
+          "startDate": "تاريخ البداية",
+          "endDate": "تاريخ النهاية",
+          "locationIds": "معرفات المواقع",
+          "notificationIds": "الإشعارات",
+          "enabledState": "مفعلة",
+          "actions": "الإجراءات",
+          "enabled": "مفعلة",
+          "disabled": "معطلة",
+          "edit": "تعديل",
+          "delete": "حذف",
+          "deleting": "جار الحذف...",
+          "deleteConfirm": "هل أنت متأكد من حذف هذه القاعدة؟",
+          "deleteErrorFallback": "تعذر حذف القاعدة."
+        },
+        "states": {
+          "loading": "جار تحميل القواعد...",
+          "updating": "جار تحديث القواعد...",
+          "error": "تعذر تحميل القواعد.",
+          "empty": "لم يتم إنشاء أي قواعد بعد."
+        }
+      },
+      "form": {
+        "createTitle": "قاعدة جديدة",
+        "editTitle": "تعديل القاعدة",
+        "createDescription": "حدد القياس والمواقع والإشعارات ونطاق التاريخ لهذه القاعدة.",
+        "editDescription": "حدث القياس والمواقع والإشعارات ونطاق التاريخ لهذه القاعدة.",
+        "fields": {
+          "name": "الاسم",
+          "measureId": "معرف القياس",
+          "startDate": "تاريخ البداية",
+          "endDate": "تاريخ النهاية",
+          "datePlaceholder": "2026-04-05 00:00:00+00",
+          "dateHelp": "يحفظ منتقي التاريخ تاريخ البداية كـ 00:00:00+00 وتاريخ النهاية كـ 23:59:59+00 للخادم.",
+          "locationIds": "معرفات المواقع",
+          "locationIdsHelp": "استخدم معرفات مواقع رقمية مفصولة بفواصل.",
+          "notificationIds": "الإشعارات",
+          "description": "الوصف",
+          "enabled": "مفعلة",
+          "notificationPlaceholder": "اختر إشعارًا"
+        },
+        "validation": {
+          "idRequired": "معرف القاعدة مطلوب.",
+          "nameRequired": "الاسم مطلوب.",
+          "measureIdRequired": "يجب أن يكون معرف القياس رقمًا صالحًا.",
+          "startDateRequired": "تاريخ البداية مطلوب.",
+          "endDateRequired": "تاريخ النهاية مطلوب.",
+          "locationIdsRequired": "أدخل معرف موقع رقمي واحدًا على الأقل.",
+          "notificationIdsRequired": "اختر إشعارًا واحدًا على الأقل."
+        },
+        "states": {
+          "loadingDetail": "جار تحميل القاعدة...",
+          "loadError": "تعذر تحميل القاعدة.",
+          "createError": "تعذر إنشاء القاعدة.",
+          "updateError": "تعذر تحديث القاعدة.",
+          "deleteError": "تعذر حذف القاعدة.",
+          "loadingNotifications": "جار تحميل الإشعارات...",
+          "notificationsLoadError": "تعذر تحميل الإشعارات.",
+          "noNotifications": "أنشئ إشعارًا قبل تعيينه إلى قاعدة."
+        },
+        "actions": {
+          "cancel": "رجوع",
+          "create": "إنشاء قاعدة",
+          "update": "تحديث القاعدة",
+          "saving": "جار الحفظ...",
+          "delete": "حذف القاعدة",
+          "deleting": "جار الحذف...",
+          "deleteConfirm": "هل أنت متأكد من حذف هذه القاعدة؟"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

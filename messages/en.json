@@ -482,6 +482,84 @@
           "red": "Red"
         }
       }
+    },
+    "rules": {
+      "list": {
+        "title": "Rules",
+        "description": "Create and manage rule definitions for the message-system POC.",
+        "newButton": "New rule",
+        "table": {
+          "name": "Name",
+          "measureId": "Measure ID",
+          "startDate": "Start date",
+          "endDate": "End date",
+          "locationIds": "Location IDs",
+          "notificationIds": "Notifications",
+          "enabledState": "Enabled",
+          "actions": "Actions",
+          "enabled": "Enabled",
+          "disabled": "Disabled",
+          "edit": "Edit",
+          "delete": "Delete",
+          "deleting": "Deleting...",
+          "deleteConfirm": "Are you sure you want to delete this rule?",
+          "deleteErrorFallback": "Failed to delete the rule."
+        },
+        "states": {
+          "loading": "Loading rules...",
+          "updating": "Updating rules...",
+          "error": "Failed to load rules.",
+          "empty": "No rules have been created yet."
+        }
+      },
+      "form": {
+        "createTitle": "New rule",
+        "editTitle": "Edit rule",
+        "createDescription": "Define the measure, locations, notifications, and date range for this rule.",
+        "editDescription": "Update the measure, locations, notifications, and date range for this rule.",
+        "fields": {
+          "name": "Name",
+          "measureId": "Measure ID",
+          "startDate": "Start date",
+          "endDate": "End date",
+          "datePlaceholder": "2026-04-05 00:00:00+00",
+          "dateHelp": "The date picker saves the start date as 00:00:00+00 and the end date as 23:59:59+00 for the backend.",
+          "locationIds": "Location IDs",
+          "locationIdsHelp": "Use comma-separated numeric location IDs.",
+          "notificationIds": "Notifications",
+          "description": "Description",
+          "enabled": "Enabled",
+          "notificationPlaceholder": "Select a notification"
+        },
+        "validation": {
+          "idRequired": "Rule id is required.",
+          "nameRequired": "Name is required.",
+          "measureIdRequired": "Measure ID must be a valid number.",
+          "startDateRequired": "Start date is required.",
+          "endDateRequired": "End date is required.",
+          "locationIdsRequired": "Enter at least one numeric location ID.",
+          "notificationIdsRequired": "Select at least one notification."
+        },
+        "states": {
+          "loadingDetail": "Loading rule...",
+          "loadError": "Failed to load the rule.",
+          "createError": "Failed to create the rule.",
+          "updateError": "Failed to update the rule.",
+          "deleteError": "Failed to delete the rule.",
+          "loadingNotifications": "Loading notifications...",
+          "notificationsLoadError": "Failed to load notifications.",
+          "noNotifications": "Create a notification before assigning it to a rule."
+        },
+        "actions": {
+          "cancel": "Back",
+          "create": "Create rule",
+          "update": "Update rule",
+          "saving": "Saving...",
+          "delete": "Delete rule",
+          "deleting": "Deleting...",
+          "deleteConfirm": "Are you sure you want to delete this rule?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

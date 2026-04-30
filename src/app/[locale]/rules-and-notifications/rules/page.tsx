@@ -1,5 +1,5 @@
-import { MessageSystemPlaceholder } from '../components';
+import { RulesListContainer } from '../components';
 
 export default function RulesPage() {
-  return <MessageSystemPlaceholder module="rules" />;
+  return <RulesListContainer />;
 }

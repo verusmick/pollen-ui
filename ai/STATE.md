@@ -27,3 +27,6 @@ Slice 4 Notifications CRUD POC is implemented: notifications list, create, edit,
 
 ## Route grouping adjustment - Alerts with Correction Factors
 Alerts are now grouped in the UI under `/alerts-and-correction-factors/alerts` next to Correction Factors. Rules and Notifications tabs now include only notifications, rules, and notification messages. The message-system API contract still owns Alerts endpoints, but Alerts CRUD should be implemented under the Alerts and Correction Factors route group.
+
+## Message System - Rules CRUD POC
+Slice 5 Rules CRUD POC is implemented under `/rules-and-notifications/rules`: list, create, edit, and delete screens use the Slice 2 API foundation, React Query reads/mutations, local form state, and `messageSystemPage.rules` i18n keys. Rule notification selection is populated from the Notifications list. Alerts and notification messages CRUD screens remain unimplemented.
