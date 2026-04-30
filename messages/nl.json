@@ -560,6 +560,74 @@
           "deleteConfirm": "Weet u zeker dat u deze regel wilt verwijderen?"
         }
       }
+    },
+    "notificationMessages": {
+      "list": {
+        "title": "Meldingsberichten",
+        "description": "Maak en beheer berichtrecords voor de message-system POC.",
+        "newButton": "Nieuw bericht",
+        "table": {
+          "notification": "Melding",
+          "measureId": "Meting-ID",
+          "creationDate": "Aanmaakdatum",
+          "value": "Waarde",
+          "description": "Beschrijving",
+          "actions": "Acties",
+          "edit": "Bewerken",
+          "delete": "Verwijderen",
+          "deleting": "Verwijderen...",
+          "deleteConfirm": "Weet u zeker dat u dit meldingsbericht wilt verwijderen?",
+          "deleteErrorFallback": "Het meldingsbericht kon niet worden verwijderd."
+        },
+        "states": {
+          "loading": "Meldingsberichten laden...",
+          "updating": "Meldingsberichten bijwerken...",
+          "error": "Meldingsberichten konden niet worden geladen.",
+          "empty": "Er zijn nog geen meldingsberichten gemaakt."
+        }
+      },
+      "form": {
+        "createTitle": "Nieuw meldingsbericht",
+        "editTitle": "Meldingsbericht bewerken",
+        "createDescription": "Definieer de melding, meting, tijdstempel en waarde voor dit bericht.",
+        "editDescription": "Werk de melding, meting, tijdstempel en waarde voor dit bericht bij.",
+        "fields": {
+          "measureId": "Meting-ID",
+          "notificationId": "Melding",
+          "notificationPlaceholder": "Selecteer een melding",
+          "creationDate": "Aanmaakdatum",
+          "creationDatePlaceholder": "2026-04-05 00:00:00+00",
+          "creationDateHelp": "Kies een datum en tijd. De waarde wordt opgeslagen in het backend-formaat, bijvoorbeeld 2026-04-05 00:00:00+00.",
+          "value": "Waarde",
+          "description": "Beschrijving"
+        },
+        "validation": {
+          "idRequired": "Meldingsbericht-id is vereist.",
+          "measureIdRequired": "Meting-ID moet een geldig getal zijn.",
+          "notificationIdRequired": "Selecteer een melding.",
+          "creationDateRequired": "Aanmaakdatum is vereist.",
+          "valueRequired": "Waarde moet een geldig getal zijn."
+        },
+        "states": {
+          "loadingDetail": "Meldingsbericht laden...",
+          "loadError": "Het meldingsbericht kon niet worden geladen.",
+          "createError": "Het meldingsbericht kon niet worden gemaakt.",
+          "updateError": "Het meldingsbericht kon niet worden bijgewerkt.",
+          "deleteError": "Het meldingsbericht kon niet worden verwijderd.",
+          "loadingNotifications": "Meldingen laden...",
+          "notificationsLoadError": "Meldingen konden niet worden geladen.",
+          "noNotifications": "Maak een melding voordat u deze aan een bericht koppelt."
+        },
+        "actions": {
+          "cancel": "Terug",
+          "create": "Bericht maken",
+          "update": "Bericht bijwerken",
+          "saving": "Opslaan...",
+          "delete": "Bericht verwijderen",
+          "deleting": "Verwijderen...",
+          "deleteConfirm": "Weet u zeker dat u dit meldingsbericht wilt verwijderen?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

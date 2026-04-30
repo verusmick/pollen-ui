@@ -560,6 +560,74 @@
           "deleteConfirm": "Voulez-vous vraiment supprimer cette regle ?"
         }
       }
+    },
+    "notificationMessages": {
+      "list": {
+        "title": "Messages de notification",
+        "description": "Creer et gerer les messages pour le POC du systeme de messages.",
+        "newButton": "Nouveau message",
+        "table": {
+          "notification": "Notification",
+          "measureId": "ID de mesure",
+          "creationDate": "Date de creation",
+          "value": "Valeur",
+          "description": "Description",
+          "actions": "Actions",
+          "edit": "Modifier",
+          "delete": "Supprimer",
+          "deleting": "Suppression...",
+          "deleteConfirm": "Voulez-vous vraiment supprimer ce message de notification ?",
+          "deleteErrorFallback": "Le message de notification n'a pas pu etre supprime."
+        },
+        "states": {
+          "loading": "Chargement des messages de notification...",
+          "updating": "Mise a jour des messages de notification...",
+          "error": "Les messages de notification n'ont pas pu etre charges.",
+          "empty": "Aucun message de notification n'a encore ete cree."
+        }
+      },
+      "form": {
+        "createTitle": "Nouveau message de notification",
+        "editTitle": "Modifier le message de notification",
+        "createDescription": "Definir la notification, la mesure, l'horodatage et la valeur de ce message.",
+        "editDescription": "Mettre a jour la notification, la mesure, l'horodatage et la valeur de ce message.",
+        "fields": {
+          "measureId": "ID de mesure",
+          "notificationId": "Notification",
+          "notificationPlaceholder": "Selectionner une notification",
+          "creationDate": "Date de creation",
+          "creationDatePlaceholder": "2026-04-05 00:00:00+00",
+          "creationDateHelp": "Selectionnez une date et une heure. La valeur est enregistree au format backend, par exemple 2026-04-05 00:00:00+00.",
+          "value": "Valeur",
+          "description": "Description"
+        },
+        "validation": {
+          "idRequired": "L'id du message de notification est requis.",
+          "measureIdRequired": "L'ID de mesure doit etre un nombre valide.",
+          "notificationIdRequired": "Selectionnez une notification.",
+          "creationDateRequired": "La date de creation est requise.",
+          "valueRequired": "La valeur doit etre un nombre valide."
+        },
+        "states": {
+          "loadingDetail": "Chargement du message de notification...",
+          "loadError": "Le message de notification n'a pas pu etre charge.",
+          "createError": "Le message de notification n'a pas pu etre cree.",
+          "updateError": "Le message de notification n'a pas pu etre mis a jour.",
+          "deleteError": "Le message de notification n'a pas pu etre supprime.",
+          "loadingNotifications": "Chargement des notifications...",
+          "notificationsLoadError": "Les notifications n'ont pas pu etre chargees.",
+          "noNotifications": "Creez une notification avant de l'assigner a un message."
+        },
+        "actions": {
+          "cancel": "Retour",
+          "create": "Creer le message",
+          "update": "Mettre a jour le message",
+          "saving": "Enregistrement...",
+          "delete": "Supprimer le message",
+          "deleting": "Suppression...",
+          "deleteConfirm": "Voulez-vous vraiment supprimer ce message de notification ?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

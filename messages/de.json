@@ -560,6 +560,74 @@
           "deleteConfirm": "Moechten Sie diese Regel wirklich loeschen?"
         }
       }
+    },
+    "notificationMessages": {
+      "list": {
+        "title": "Benachrichtigungsnachrichten",
+        "description": "Erstellen und verwalten Sie Nachrichtenprotokolle fuer den Message-System-POC.",
+        "newButton": "Neue Nachricht",
+        "table": {
+          "notification": "Benachrichtigung",
+          "measureId": "Messwert-ID",
+          "creationDate": "Erstellungsdatum",
+          "value": "Wert",
+          "description": "Beschreibung",
+          "actions": "Aktionen",
+          "edit": "Bearbeiten",
+          "delete": "Loeschen",
+          "deleting": "Wird geloescht...",
+          "deleteConfirm": "Moechten Sie diese Benachrichtigungsnachricht wirklich loeschen?",
+          "deleteErrorFallback": "Die Benachrichtigungsnachricht konnte nicht geloescht werden."
+        },
+        "states": {
+          "loading": "Benachrichtigungsnachrichten werden geladen...",
+          "updating": "Benachrichtigungsnachrichten werden aktualisiert...",
+          "error": "Benachrichtigungsnachrichten konnten nicht geladen werden.",
+          "empty": "Es wurden noch keine Benachrichtigungsnachrichten erstellt."
+        }
+      },
+      "form": {
+        "createTitle": "Neue Benachrichtigungsnachricht",
+        "editTitle": "Benachrichtigungsnachricht bearbeiten",
+        "createDescription": "Definieren Sie Benachrichtigung, Messwert, Zeitstempel und Wert fuer diese Nachricht.",
+        "editDescription": "Aktualisieren Sie Benachrichtigung, Messwert, Zeitstempel und Wert fuer diese Nachricht.",
+        "fields": {
+          "measureId": "Messwert-ID",
+          "notificationId": "Benachrichtigung",
+          "notificationPlaceholder": "Benachrichtigung auswaehlen",
+          "creationDate": "Erstellungsdatum",
+          "creationDatePlaceholder": "2026-04-05 00:00:00+00",
+          "creationDateHelp": "Waehlen Sie Datum und Uhrzeit. Der Wert wird im Backend-Format gespeichert, zum Beispiel 2026-04-05 00:00:00+00.",
+          "value": "Wert",
+          "description": "Beschreibung"
+        },
+        "validation": {
+          "idRequired": "Benachrichtigungsnachricht-ID ist erforderlich.",
+          "measureIdRequired": "Messwert-ID muss eine gueltige Zahl sein.",
+          "notificationIdRequired": "Waehlen Sie eine Benachrichtigung.",
+          "creationDateRequired": "Erstellungsdatum ist erforderlich.",
+          "valueRequired": "Wert muss eine gueltige Zahl sein."
+        },
+        "states": {
+          "loadingDetail": "Benachrichtigungsnachricht wird geladen...",
+          "loadError": "Die Benachrichtigungsnachricht konnte nicht geladen werden.",
+          "createError": "Die Benachrichtigungsnachricht konnte nicht erstellt werden.",
+          "updateError": "Die Benachrichtigungsnachricht konnte nicht aktualisiert werden.",
+          "deleteError": "Die Benachrichtigungsnachricht konnte nicht geloescht werden.",
+          "loadingNotifications": "Benachrichtigungen werden geladen...",
+          "notificationsLoadError": "Benachrichtigungen konnten nicht geladen werden.",
+          "noNotifications": "Erstellen Sie eine Benachrichtigung, bevor Sie sie einer Nachricht zuweisen."
+        },
+        "actions": {
+          "cancel": "Zurueck",
+          "create": "Nachricht erstellen",
+          "update": "Nachricht aktualisieren",
+          "saving": "Wird gespeichert...",
+          "delete": "Nachricht loeschen",
+          "deleting": "Wird geloescht...",
+          "deleteConfirm": "Moechten Sie diese Benachrichtigungsnachricht wirklich loeschen?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

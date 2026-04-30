@@ -33,3 +33,6 @@ Slice 5 Rules CRUD POC is implemented under `/rules-and-notifications/rules`: li
 
 ## Message System - Alerts CRUD POC
 Slice 6 Alerts CRUD POC is implemented under `/alerts-and-correction-factors/alerts`: list, create, edit, and delete screens use the Slice 2 message-system API foundation, React Query reads/mutations, local form state, and `alertsAndCorrectionFactorsPage.alerts` i18n keys. Alert rule selection is populated from the Rules list. Notification messages CRUD remains unimplemented.
+
+## Message System - Notification messages CRUD POC
+Slice 7 Notification messages CRUD POC is implemented under `/rules-and-notifications/notification-messages`: list, create, edit, and delete screens use the Slice 2 message-system API foundation, React Query reads/mutations, local form state, and `messageSystemPage.notificationMessages` i18n keys. Notification message notification selection is populated from the Notifications list. All planned message-system POC CRUD screens are now implemented.

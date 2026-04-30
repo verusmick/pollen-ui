@@ -560,6 +560,74 @@
           "deleteConfirm": "Seguro que desea eliminar esta regla?"
         }
       }
+    },
+    "notificationMessages": {
+      "list": {
+        "title": "Mensajes de notificacion",
+        "description": "Cree y gestione registros de mensajes para el POC del sistema de mensajes.",
+        "newButton": "Nuevo mensaje",
+        "table": {
+          "notification": "Notificacion",
+          "measureId": "ID de medida",
+          "creationDate": "Fecha de creacion",
+          "value": "Valor",
+          "description": "Descripcion",
+          "actions": "Acciones",
+          "edit": "Editar",
+          "delete": "Eliminar",
+          "deleting": "Eliminando...",
+          "deleteConfirm": "Seguro que desea eliminar este mensaje de notificacion?",
+          "deleteErrorFallback": "No se pudo eliminar el mensaje de notificacion."
+        },
+        "states": {
+          "loading": "Cargando mensajes de notificacion...",
+          "updating": "Actualizando mensajes de notificacion...",
+          "error": "No se pudieron cargar los mensajes de notificacion.",
+          "empty": "Todavia no se han creado mensajes de notificacion."
+        }
+      },
+      "form": {
+        "createTitle": "Nuevo mensaje de notificacion",
+        "editTitle": "Editar mensaje de notificacion",
+        "createDescription": "Defina la notificacion, medida, fecha y valor de este mensaje.",
+        "editDescription": "Actualice la notificacion, medida, fecha y valor de este mensaje.",
+        "fields": {
+          "measureId": "ID de medida",
+          "notificationId": "Notificacion",
+          "notificationPlaceholder": "Seleccione una notificacion",
+          "creationDate": "Fecha de creacion",
+          "creationDatePlaceholder": "2026-04-05 00:00:00+00",
+          "creationDateHelp": "Seleccione una fecha y hora. El valor se guarda en el formato del backend, por ejemplo 2026-04-05 00:00:00+00.",
+          "value": "Valor",
+          "description": "Descripcion"
+        },
+        "validation": {
+          "idRequired": "El id del mensaje de notificacion es obligatorio.",
+          "measureIdRequired": "El ID de medida debe ser un numero valido.",
+          "notificationIdRequired": "Seleccione una notificacion.",
+          "creationDateRequired": "La fecha de creacion es obligatoria.",
+          "valueRequired": "El valor debe ser un numero valido."
+        },
+        "states": {
+          "loadingDetail": "Cargando mensaje de notificacion...",
+          "loadError": "No se pudo cargar el mensaje de notificacion.",
+          "createError": "No se pudo crear el mensaje de notificacion.",
+          "updateError": "No se pudo actualizar el mensaje de notificacion.",
+          "deleteError": "No se pudo eliminar el mensaje de notificacion.",
+          "loadingNotifications": "Cargando notificaciones...",
+          "notificationsLoadError": "No se pudieron cargar las notificaciones.",
+          "noNotifications": "Cree una notificacion antes de asignarla a un mensaje."
+        },
+        "actions": {
+          "cancel": "Volver",
+          "create": "Crear mensaje",
+          "update": "Actualizar mensaje",
+          "saving": "Guardando...",
+          "delete": "Eliminar mensaje",
+          "deleting": "Eliminando...",
+          "deleteConfirm": "Seguro que desea eliminar este mensaje de notificacion?"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

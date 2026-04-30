@@ -560,6 +560,74 @@
           "deleteConfirm": "هل أنت متأكد من حذف هذه القاعدة؟"
         }
       }
+    },
+    "notificationMessages": {
+      "list": {
+        "title": "رسائل الإشعارات",
+        "description": "إنشاء وإدارة سجلات رسائل الإشعارات لتجربة نظام الرسائل.",
+        "newButton": "رسالة جديدة",
+        "table": {
+          "notification": "الإشعار",
+          "measureId": "معرف القياس",
+          "creationDate": "تاريخ الإنشاء",
+          "value": "القيمة",
+          "description": "الوصف",
+          "actions": "الإجراءات",
+          "edit": "تعديل",
+          "delete": "حذف",
+          "deleting": "جار الحذف...",
+          "deleteConfirm": "هل أنت متأكد من حذف رسالة الإشعار هذه؟",
+          "deleteErrorFallback": "تعذر حذف رسالة الإشعار."
+        },
+        "states": {
+          "loading": "جار تحميل رسائل الإشعارات...",
+          "updating": "جار تحديث رسائل الإشعارات...",
+          "error": "تعذر تحميل رسائل الإشعارات.",
+          "empty": "لم يتم إنشاء أي رسائل إشعار بعد."
+        }
+      },
+      "form": {
+        "createTitle": "رسالة إشعار جديدة",
+        "editTitle": "تعديل رسالة الإشعار",
+        "createDescription": "حدد الإشعار والقياس والطابع الزمني والقيمة لهذه الرسالة.",
+        "editDescription": "حدث الإشعار والقياس والطابع الزمني والقيمة لهذه الرسالة.",
+        "fields": {
+          "measureId": "معرف القياس",
+          "notificationId": "الإشعار",
+          "notificationPlaceholder": "اختر إشعارًا",
+          "creationDate": "تاريخ الإنشاء",
+          "creationDatePlaceholder": "2026-04-05 00:00:00+00",
+          "creationDateHelp": "اختر التاريخ والوقت. يتم حفظ القيمة بتنسيق الخادم، مثل 2026-04-05 00:00:00+00.",
+          "value": "القيمة",
+          "description": "الوصف"
+        },
+        "validation": {
+          "idRequired": "معرف رسالة الإشعار مطلوب.",
+          "measureIdRequired": "يجب أن يكون معرف القياس رقمًا صالحًا.",
+          "notificationIdRequired": "اختر إشعارًا.",
+          "creationDateRequired": "تاريخ الإنشاء مطلوب.",
+          "valueRequired": "يجب أن تكون القيمة رقمًا صالحًا."
+        },
+        "states": {
+          "loadingDetail": "جار تحميل رسالة الإشعار...",
+          "loadError": "تعذر تحميل رسالة الإشعار.",
+          "createError": "تعذر إنشاء رسالة الإشعار.",
+          "updateError": "تعذر تحديث رسالة الإشعار.",
+          "deleteError": "تعذر حذف رسالة الإشعار.",
+          "loadingNotifications": "جار تحميل الإشعارات...",
+          "notificationsLoadError": "تعذر تحميل الإشعارات.",
+          "noNotifications": "أنشئ إشعارًا قبل تعيينه إلى رسالة."
+        },
+        "actions": {
+          "cancel": "رجوع",
+          "create": "إنشاء رسالة",
+          "update": "تحديث الرسالة",
+          "saving": "جار الحفظ...",
+          "delete": "حذف الرسالة",
+          "deleting": "جار الحذف...",
+          "deleteConfirm": "هل أنت متأكد من حذف رسالة الإشعار هذه؟"
+        }
+      }
     }
   },
   "alertsAndCorrectionFactorsPage": {

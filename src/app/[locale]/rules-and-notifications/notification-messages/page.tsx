@@ -1,5 +1,5 @@
-import { MessageSystemPlaceholder } from '../components';
+import { NotificationMessagesListContainer } from '../components';
 
 export default function NotificationMessagesPage() {
-  return <MessageSystemPlaceholder module="notificationMessages" />;
+  return <NotificationMessagesListContainer />;
 }
