@@ -570,7 +570,77 @@
     "alerts": {
       "title": "Alerts",
       "description": "Alerts zijn voor deze POC gegroepeerd met correctiefactoren. Het CRUD-scherm voor Alerts is nog in afwachting.",
-      "pending": "Het POC-scherm voor Alerts is nog in afwachting."
+      "pending": "Het POC-scherm voor Alerts is nog in afwachting.",
+      "list": {
+        "title": "Alerts",
+        "description": "Maak en beheer alertdrempels voor message-system regels.",
+        "newButton": "Nieuwe alert",
+        "table": {
+          "rule": "Regel",
+          "type": "Type",
+          "minValue": "Min. waarde",
+          "maxValue": "Max. waarde",
+          "actions": "Acties",
+          "edit": "Bewerken",
+          "delete": "Verwijderen",
+          "deleting": "Verwijderen...",
+          "deleteConfirm": "Weet u zeker dat u deze alert wilt verwijderen?",
+          "deleteErrorFallback": "De alert kon niet worden verwijderd."
+        },
+        "states": {
+          "loading": "Alerts laden...",
+          "updating": "Alerts bijwerken...",
+          "error": "Alerts konden niet worden geladen.",
+          "empty": "Er zijn nog geen alerts gemaakt."
+        }
+      },
+      "form": {
+        "createTitle": "Nieuwe alert",
+        "editTitle": "Alert bewerken",
+        "createDescription": "Definieer de regel, het alerttype en het drempelbereik voor deze alert.",
+        "editDescription": "Werk de regel, het alerttype en het drempelbereik voor deze alert bij.",
+        "fields": {
+          "ruleId": "Regel",
+          "rulePlaceholder": "Selecteer een regel",
+          "type": "Alerttype",
+          "typePlaceholder": "Selecteer een alerttype",
+          "minValue": "Min. waarde",
+          "maxValue": "Max. waarde"
+        },
+        "validation": {
+          "idRequired": "Alert-id is vereist.",
+          "ruleIdRequired": "Selecteer een regel.",
+          "typeRequired": "Selecteer een geldig alerttype.",
+          "minValueRequired": "Min. waarde moet een geldig getal zijn.",
+          "maxValueRequired": "Max. waarde moet een geldig getal zijn."
+        },
+        "states": {
+          "loadingDetail": "Alert laden...",
+          "loadError": "De alert kon niet worden geladen.",
+          "createError": "De alert kon niet worden gemaakt.",
+          "updateError": "De alert kon niet worden bijgewerkt.",
+          "deleteError": "De alert kon niet worden verwijderd.",
+          "loadingRules": "Regels laden...",
+          "rulesLoadError": "Regels konden niet worden geladen.",
+          "noRules": "Maak een regel voordat u er een alert aan koppelt."
+        },
+        "actions": {
+          "cancel": "Terug",
+          "create": "Alert maken",
+          "update": "Alert bijwerken",
+          "saving": "Opslaan...",
+          "delete": "Alert verwijderen",
+          "deleting": "Verwijderen...",
+          "deleteConfirm": "Weet u zeker dat u deze alert wilt verwijderen?"
+        }
+      },
+      "options": {
+        "alertTypes": {
+          "green": "Groen",
+          "yellow": "Geel",
+          "red": "Rood"
+        }
+      }
     }
   }
 }

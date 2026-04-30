@@ -570,7 +570,77 @@
     "alerts": {
       "title": "Alertas",
       "description": "Las alertas se agrupan con los factores de correccion para este POC. La pantalla CRUD de Alertas esta pendiente.",
-      "pending": "La pantalla POC de Alertas esta pendiente."
+      "pending": "La pantalla POC de Alertas esta pendiente.",
+      "list": {
+        "title": "Alertas",
+        "description": "Cree y gestione umbrales de alerta para reglas del sistema de mensajes.",
+        "newButton": "Nueva alerta",
+        "table": {
+          "rule": "Regla",
+          "type": "Tipo",
+          "minValue": "Valor minimo",
+          "maxValue": "Valor maximo",
+          "actions": "Acciones",
+          "edit": "Editar",
+          "delete": "Eliminar",
+          "deleting": "Eliminando...",
+          "deleteConfirm": "Seguro que desea eliminar esta alerta?",
+          "deleteErrorFallback": "No se pudo eliminar la alerta."
+        },
+        "states": {
+          "loading": "Cargando alertas...",
+          "updating": "Actualizando alertas...",
+          "error": "No se pudieron cargar las alertas.",
+          "empty": "Todavia no se han creado alertas."
+        }
+      },
+      "form": {
+        "createTitle": "Nueva alerta",
+        "editTitle": "Editar alerta",
+        "createDescription": "Defina la regla, el tipo de alerta y el rango de umbral para esta alerta.",
+        "editDescription": "Actualice la regla, el tipo de alerta y el rango de umbral de esta alerta.",
+        "fields": {
+          "ruleId": "Regla",
+          "rulePlaceholder": "Seleccione una regla",
+          "type": "Tipo de alerta",
+          "typePlaceholder": "Seleccione un tipo de alerta",
+          "minValue": "Valor minimo",
+          "maxValue": "Valor maximo"
+        },
+        "validation": {
+          "idRequired": "El id de alerta es obligatorio.",
+          "ruleIdRequired": "Seleccione una regla.",
+          "typeRequired": "Seleccione un tipo de alerta valido.",
+          "minValueRequired": "El valor minimo debe ser un numero valido.",
+          "maxValueRequired": "El valor maximo debe ser un numero valido."
+        },
+        "states": {
+          "loadingDetail": "Cargando alerta...",
+          "loadError": "No se pudo cargar la alerta.",
+          "createError": "No se pudo crear la alerta.",
+          "updateError": "No se pudo actualizar la alerta.",
+          "deleteError": "No se pudo eliminar la alerta.",
+          "loadingRules": "Cargando reglas...",
+          "rulesLoadError": "No se pudieron cargar las reglas.",
+          "noRules": "Cree una regla antes de asignar una alerta."
+        },
+        "actions": {
+          "cancel": "Volver",
+          "create": "Crear alerta",
+          "update": "Actualizar alerta",
+          "saving": "Guardando...",
+          "delete": "Eliminar alerta",
+          "deleting": "Eliminando...",
+          "deleteConfirm": "Seguro que desea eliminar esta alerta?"
+        }
+      },
+      "options": {
+        "alertTypes": {
+          "green": "Verde",
+          "yellow": "Amarillo",
+          "red": "Rojo"
+        }
+      }
     }
   }
 }

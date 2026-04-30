@@ -570,7 +570,77 @@
     "alerts": {
       "title": "Alertes",
       "description": "Les alertes sont regroupees avec les facteurs de correction pour ce POC. L'ecran CRUD Alertes est en attente.",
-      "pending": "L'ecran POC Alertes est en attente."
+      "pending": "L'ecran POC Alertes est en attente.",
+      "list": {
+        "title": "Alertes",
+        "description": "Creer et gerer les seuils d'alerte pour les regles du systeme de messages.",
+        "newButton": "Nouvelle alerte",
+        "table": {
+          "rule": "Regle",
+          "type": "Type",
+          "minValue": "Valeur min.",
+          "maxValue": "Valeur max.",
+          "actions": "Actions",
+          "edit": "Modifier",
+          "delete": "Supprimer",
+          "deleting": "Suppression...",
+          "deleteConfirm": "Voulez-vous vraiment supprimer cette alerte ?",
+          "deleteErrorFallback": "L'alerte n'a pas pu etre supprimee."
+        },
+        "states": {
+          "loading": "Chargement des alertes...",
+          "updating": "Mise a jour des alertes...",
+          "error": "Les alertes n'ont pas pu etre chargees.",
+          "empty": "Aucune alerte n'a encore ete creee."
+        }
+      },
+      "form": {
+        "createTitle": "Nouvelle alerte",
+        "editTitle": "Modifier l'alerte",
+        "createDescription": "Definir la regle, le type d'alerte et la plage de seuil pour cette alerte.",
+        "editDescription": "Mettre a jour la regle, le type d'alerte et la plage de seuil de cette alerte.",
+        "fields": {
+          "ruleId": "Regle",
+          "rulePlaceholder": "Selectionner une regle",
+          "type": "Type d'alerte",
+          "typePlaceholder": "Selectionner un type d'alerte",
+          "minValue": "Valeur min.",
+          "maxValue": "Valeur max."
+        },
+        "validation": {
+          "idRequired": "L'id d'alerte est requis.",
+          "ruleIdRequired": "Selectionnez une regle.",
+          "typeRequired": "Selectionnez un type d'alerte valide.",
+          "minValueRequired": "La valeur min. doit etre un nombre valide.",
+          "maxValueRequired": "La valeur max. doit etre un nombre valide."
+        },
+        "states": {
+          "loadingDetail": "Chargement de l'alerte...",
+          "loadError": "L'alerte n'a pas pu etre chargee.",
+          "createError": "L'alerte n'a pas pu etre creee.",
+          "updateError": "L'alerte n'a pas pu etre mise a jour.",
+          "deleteError": "L'alerte n'a pas pu etre supprimee.",
+          "loadingRules": "Chargement des regles...",
+          "rulesLoadError": "Les regles n'ont pas pu etre chargees.",
+          "noRules": "Creez une regle avant de lui assigner une alerte."
+        },
+        "actions": {
+          "cancel": "Retour",
+          "create": "Creer l'alerte",
+          "update": "Mettre a jour l'alerte",
+          "saving": "Enregistrement...",
+          "delete": "Supprimer l'alerte",
+          "deleting": "Suppression...",
+          "deleteConfirm": "Voulez-vous vraiment supprimer cette alerte ?"
+        }
+      },
+      "options": {
+        "alertTypes": {
+          "green": "Vert",
+          "yellow": "Jaune",
+          "red": "Rouge"
+        }
+      }
     }
   }
 }

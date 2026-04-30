@@ -570,7 +570,77 @@
     "alerts": {
       "title": "Alerts",
       "description": "Alerts are grouped with Correction Factors for this POC. The Alerts CRUD screen is pending.",
-      "pending": "The Alerts POC screen is pending."
+      "pending": "The Alerts POC screen is pending.",
+      "list": {
+        "title": "Alerts",
+        "description": "Create and manage alert thresholds for message-system rules.",
+        "newButton": "New alert",
+        "table": {
+          "rule": "Rule",
+          "type": "Type",
+          "minValue": "Min value",
+          "maxValue": "Max value",
+          "actions": "Actions",
+          "edit": "Edit",
+          "delete": "Delete",
+          "deleting": "Deleting...",
+          "deleteConfirm": "Are you sure you want to delete this alert?",
+          "deleteErrorFallback": "Failed to delete the alert."
+        },
+        "states": {
+          "loading": "Loading alerts...",
+          "updating": "Updating alerts...",
+          "error": "Failed to load alerts.",
+          "empty": "No alerts have been created yet."
+        }
+      },
+      "form": {
+        "createTitle": "New alert",
+        "editTitle": "Edit alert",
+        "createDescription": "Define the rule, alert type, and threshold range for this alert.",
+        "editDescription": "Update the rule, alert type, and threshold range for this alert.",
+        "fields": {
+          "ruleId": "Rule",
+          "rulePlaceholder": "Select a rule",
+          "type": "Alert type",
+          "typePlaceholder": "Select an alert type",
+          "minValue": "Min value",
+          "maxValue": "Max value"
+        },
+        "validation": {
+          "idRequired": "Alert id is required.",
+          "ruleIdRequired": "Select a rule.",
+          "typeRequired": "Select a valid alert type.",
+          "minValueRequired": "Min value must be a valid number.",
+          "maxValueRequired": "Max value must be a valid number."
+        },
+        "states": {
+          "loadingDetail": "Loading alert...",
+          "loadError": "Failed to load the alert.",
+          "createError": "Failed to create the alert.",
+          "updateError": "Failed to update the alert.",
+          "deleteError": "Failed to delete the alert.",
+          "loadingRules": "Loading rules...",
+          "rulesLoadError": "Failed to load rules.",
+          "noRules": "Create a rule before assigning an alert."
+        },
+        "actions": {
+          "cancel": "Back",
+          "create": "Create alert",
+          "update": "Update alert",
+          "saving": "Saving...",
+          "delete": "Delete alert",
+          "deleting": "Deleting...",
+          "deleteConfirm": "Are you sure you want to delete this alert?"
+        }
+      },
+      "options": {
+        "alertTypes": {
+          "green": "Green",
+          "yellow": "Yellow",
+          "red": "Red"
+        }
+      }
     }
   }
 }

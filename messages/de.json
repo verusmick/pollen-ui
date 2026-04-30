@@ -570,7 +570,77 @@
     "alerts": {
       "title": "Alarme",
       "description": "Alarme werden fuer diesen POC mit Korrekturfaktoren gruppiert. Der CRUD-Bildschirm fuer Alarme ist noch ausstehend.",
-      "pending": "Der POC-Bildschirm fuer Alarme ist noch ausstehend."
+      "pending": "Der POC-Bildschirm fuer Alarme ist noch ausstehend.",
+      "list": {
+        "title": "Alarme",
+        "description": "Erstellen und verwalten Sie Alarmschwellen fuer Message-System-Regeln.",
+        "newButton": "Neuer Alarm",
+        "table": {
+          "rule": "Regel",
+          "type": "Typ",
+          "minValue": "Mindestwert",
+          "maxValue": "Hoechstwert",
+          "actions": "Aktionen",
+          "edit": "Bearbeiten",
+          "delete": "Loeschen",
+          "deleting": "Wird geloescht...",
+          "deleteConfirm": "Moechten Sie diesen Alarm wirklich loeschen?",
+          "deleteErrorFallback": "Der Alarm konnte nicht geloescht werden."
+        },
+        "states": {
+          "loading": "Alarme werden geladen...",
+          "updating": "Alarme werden aktualisiert...",
+          "error": "Alarme konnten nicht geladen werden.",
+          "empty": "Es wurden noch keine Alarme erstellt."
+        }
+      },
+      "form": {
+        "createTitle": "Neuer Alarm",
+        "editTitle": "Alarm bearbeiten",
+        "createDescription": "Definieren Sie Regel, Alarmtyp und Schwellenbereich fuer diesen Alarm.",
+        "editDescription": "Aktualisieren Sie Regel, Alarmtyp und Schwellenbereich fuer diesen Alarm.",
+        "fields": {
+          "ruleId": "Regel",
+          "rulePlaceholder": "Regel auswaehlen",
+          "type": "Alarmtyp",
+          "typePlaceholder": "Alarmtyp auswaehlen",
+          "minValue": "Mindestwert",
+          "maxValue": "Hoechstwert"
+        },
+        "validation": {
+          "idRequired": "Alarm-ID ist erforderlich.",
+          "ruleIdRequired": "Waehlen Sie eine Regel.",
+          "typeRequired": "Waehlen Sie einen gueltigen Alarmtyp.",
+          "minValueRequired": "Mindestwert muss eine gueltige Zahl sein.",
+          "maxValueRequired": "Hoechstwert muss eine gueltige Zahl sein."
+        },
+        "states": {
+          "loadingDetail": "Alarm wird geladen...",
+          "loadError": "Der Alarm konnte nicht geladen werden.",
+          "createError": "Der Alarm konnte nicht erstellt werden.",
+          "updateError": "Der Alarm konnte nicht aktualisiert werden.",
+          "deleteError": "Der Alarm konnte nicht geloescht werden.",
+          "loadingRules": "Regeln werden geladen...",
+          "rulesLoadError": "Regeln konnten nicht geladen werden.",
+          "noRules": "Erstellen Sie eine Regel, bevor Sie einen Alarm zuweisen."
+        },
+        "actions": {
+          "cancel": "Zurueck",
+          "create": "Alarm erstellen",
+          "update": "Alarm aktualisieren",
+          "saving": "Wird gespeichert...",
+          "delete": "Alarm loeschen",
+          "deleting": "Wird geloescht...",
+          "deleteConfirm": "Moechten Sie diesen Alarm wirklich loeschen?"
+        }
+      },
+      "options": {
+        "alertTypes": {
+          "green": "Gruen",
+          "yellow": "Gelb",
+          "red": "Rot"
+        }
+      }
     }
   }
 }
