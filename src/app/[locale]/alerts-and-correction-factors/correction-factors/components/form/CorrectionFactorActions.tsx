@@ -9,6 +9,7 @@ interface CorrectionFactorActionsProps {
   ruleEnabled: boolean;
   deleting?: boolean;
   actionError?: string | null;
+  validationHint?: string | null;
   showActionError?: boolean;
   submitDisabled?: boolean;
   deleteDisabled?: boolean;
@@ -25,6 +26,7 @@ export function CorrectionFactorActions({
   ruleEnabled,
   deleting = false,
   actionError,
+  validationHint = null,
   showActionError = true,
   submitDisabled = false,
   deleteDisabled = false,
@@ -56,6 +58,12 @@ export function CorrectionFactorActions({
         <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {actionError}
         </div>
+      ) : null}
+
+      {!actionError && validationHint ? (
+        <p className="text-right text-xs text-muted-foreground">
+          {validationHint}
+        </p>
       ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">

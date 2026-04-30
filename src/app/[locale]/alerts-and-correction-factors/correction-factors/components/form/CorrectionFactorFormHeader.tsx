@@ -10,6 +10,7 @@ interface CorrectionFactorFormHeaderProps {
   ruleEnabled: boolean;
   deleting?: boolean;
   actionError?: string | null;
+  validationHint?: string | null;
   submitDisabled?: boolean;
   deleteDisabled?: boolean;
   showDelete?: boolean;
@@ -25,6 +26,7 @@ export function CorrectionFactorFormHeader({
   ruleEnabled,
   deleting = false,
   actionError,
+  validationHint = null,
   submitDisabled = false,
   deleteDisabled = false,
   showDelete = false,
@@ -53,6 +55,7 @@ export function CorrectionFactorFormHeader({
             ruleEnabled={ruleEnabled}
             deleting={deleting}
             actionError={actionError}
+            validationHint={validationHint}
             submitDisabled={submitDisabled}
             deleteDisabled={deleteDisabled}
             showDelete={showDelete}

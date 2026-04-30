@@ -23,7 +23,6 @@ import {
   buildCorrectionFactorDerivedState,
   didCorrectionFactorRangeChange,
   hasCorrectionFactorFormErrors,
-  listCorrectionFactorFormErrors,
   toMeasurementPreviewRange,
   validateCorrectionFactorForm,
 } from '../utils';
@@ -271,10 +270,6 @@ export function useCorrectionFactorForm() {
     [validationMessages, values]
   );
   const isValid = !hasCorrectionFactorFormErrors(validationErrors);
-  const validationSummary = useMemo(
-    () => listCorrectionFactorFormErrors(validationErrors),
-    [validationErrors]
-  );
   const chartNavigation = useMemo<CorrectionFactorChartNavigationState>(() => {
     const visibleRange =
       chartRangeStack[chartRangeStack.length - 1] ?? rootChartRange ?? null;
@@ -753,9 +748,9 @@ export function useCorrectionFactorForm() {
     chartNavigation,
     allowedPollenOptions,
     hasReviewSessionChanges,
+    hasValidated,
     isValid,
     validationErrors,
-    validationSummary,
     setField,
     addRow,
     removeRow,

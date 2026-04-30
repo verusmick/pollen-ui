@@ -166,8 +166,8 @@
         "optionsLoadError": "Ce champ n'a pas pu charger ses options."
       },
       "validationSummary": {
-        "title": "Complétez les champs obligatoires avant d’enregistrer",
-        "description": "L’action d’enregistrement reste désactivée tant que le formulaire n’est pas valide."
+        "title": "Certains champs nécessitent votre attention",
+        "description": "Complétez les champs obligatoires pour continuer."
       },
       "validation": {
         "locationRequired": "L'emplacement est requis.",

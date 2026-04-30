@@ -166,8 +166,8 @@
         "optionsLoadError": "Für dieses Feld konnten die Optionen nicht geladen werden."
       },
       "validationSummary": {
-        "title": "Vervollständigen Sie die Pflichtfelder vor dem Speichern",
-        "description": "Die Speicheraktion bleibt deaktiviert, bis das Formular gültig ist."
+        "title": "Einige Felder erfordern Aufmerksamkeit",
+        "description": "Füllen Sie die Pflichtfelder aus, um fortzufahren."
       },
       "validation": {
         "locationRequired": "Ort ist erforderlich.",

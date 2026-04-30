@@ -166,8 +166,8 @@
         "optionsLoadError": "Dit veld kon de opties niet laden."
       },
       "validationSummary": {
-        "title": "Vul de verplichte velden in voordat u opslaat",
-        "description": "De opslagactie blijft uitgeschakeld totdat het formulier geldig is."
+        "title": "Sommige velden hebben aandacht nodig",
+        "description": "Vul de verplichte velden in om door te gaan."
       },
       "validation": {
         "locationRequired": "Locatie is verplicht.",

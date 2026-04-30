@@ -166,8 +166,8 @@
         "optionsLoadError": "This field could not load its options."
       },
       "validationSummary": {
-        "title": "Complete required fields before saving",
-        "description": "The save action stays disabled until the form is valid."
+        "title": "Some fields need attention",
+        "description": "Complete the required fields to continue."
       },
       "validation": {
         "locationRequired": "Location is required.",

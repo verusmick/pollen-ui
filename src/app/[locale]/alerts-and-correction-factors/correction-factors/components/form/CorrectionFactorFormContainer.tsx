@@ -427,6 +427,11 @@ export function CorrectionFactorFormContainer({
   async function handleSubmit() {
     setActionError(null);
 
+    if (!canSaveRuleEnabledChange && !form.isValid) {
+      form.validate();
+      return;
+    }
+
     if (submitDisabled) {
       return;
     }
@@ -506,7 +511,7 @@ export function CorrectionFactorFormContainer({
       values={form.values}
       errors={form.errors}
       validationErrors={form.validationErrors}
-      validationSummary={form.validationSummary}
+      hasValidated={form.hasValidated}
       isFormValid={form.isValid}
       derived={form.derived}
       locationOptions={locationOptions}

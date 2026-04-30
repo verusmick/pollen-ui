@@ -166,8 +166,8 @@
         "optionsLoadError": "Este campo no pudo cargar sus opciones."
       },
       "validationSummary": {
-        "title": "Complete los campos obligatorios antes de guardar",
-        "description": "La acción de guardar permanece deshabilitada hasta que el formulario sea válido."
+        "title": "Algunos campos requieren atención",
+        "description": "Complete los campos obligatorios para continuar."
       },
       "validation": {
         "locationRequired": "La ubicación es obligatoria.",
