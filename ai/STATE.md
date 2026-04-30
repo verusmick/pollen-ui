@@ -15,3 +15,6 @@ Foundation/data scaffolding is implemented. Remaining backend dependencies are c
 - Validation-event images and detected counts are sourced from `https://validation.pollenscience.eu/resources/q`
 - Validation location names are now enriched from `https://validation.pollenscience.eu/resources/locations`
 - Correction-factor locations are matched against validation locations by canonical name, device alias, and normalized name comparison; unresolved locations still block validation-event loading with a field-level error
+
+## Message System - POC API foundation
+Slice 2 API foundation is implemented for notifications, rules, alerts, and notification messages: internal proxy routes, typed `src/lib/api/messageSystem.ts` helpers, route-local types/constants/hooks/utils, and the kebab-case internal `/api/notification-messages` proxy forwarding to upstream `/api/notificationMessages`. No CRUD screens, UI routes, or i18n message files have been implemented yet.
