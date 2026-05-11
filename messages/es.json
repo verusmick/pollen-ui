@@ -104,7 +104,7 @@
       "title": "Factor de corrección",
       "editTitle": "Editar factor de corrección",
       "description": "Seleccione un pico en el gráfico y revise sus eventos detectados para crear una corrección.",
-      "editDescription": "Revise esta corrección guardada. Las selecciones previas de eventos no se conservan, así que seleccione un pico en el gráfico para revisar los eventos otra vez si hace falta.",
+      "editDescription": "Revise esta corrección guardada. Los picos y las imágenes guardados se restauran cuando están disponibles.",
       "ruleEnabled": "Regla habilitada",
       "ruleDisabled": "Regla deshabilitada",
       "ruleEnabledState": "Habilitada",
@@ -208,7 +208,7 @@
         "savedDescription": "Esta corrección guardada muestra solo el multiplicador almacenado.",
         "eventBasedMode": "Según eventos",
         "manualMode": "Anulación manual",
-        "manualActiveNotice": "La anulación manual está activa. Las selecciones de eventos siguen visibles, pero el multiplicador guardado usa el valor manual.",
+        "manualActiveNotice": "La anulación manual está activa. Puede seleccionar un pico del gráfico como referencia, pero la revisión de eventos está deshabilitada y las imágenes seleccionadas no se guardarán.",
         "manualMultiplierLabel": "Multiplicador manual",
         "manualMultiplierHelp": "Introduzca el multiplicador final que se guardará para el polen base.",
         "useEventBasedMultiplier": "Usar multiplicador según eventos",
@@ -220,7 +220,7 @@
       },
       "editHydration": {
         "title": "Corrección guardada cargada",
-        "description": "Se cargó esta corrección guardada. Las selecciones previas de eventos no se conservan, así que seleccione un pico en el gráfico para revisar los eventos otra vez."
+        "description": "Se cargó esta corrección guardada. Los picos y las imágenes guardados se restauran cuando están disponibles; seleccione un pico en el gráfico para revisar eventos nuevos si hace falta."
       },
       "preview": {
         "title": "Picos del gráfico",

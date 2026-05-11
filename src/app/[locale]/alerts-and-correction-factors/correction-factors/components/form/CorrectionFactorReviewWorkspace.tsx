@@ -15,6 +15,7 @@ interface CorrectionFactorReviewWorkspaceProps {
   open: boolean;
   status: CorrectionFactorValidationEventsStatus;
   events: CorrectionFactorReviewedValidationEvent[];
+  acceptedEventIds?: string[];
   detectedEvents: number | null;
   derived: CorrectionFactorFormDerivedState;
   basePollen: string;
@@ -33,6 +34,7 @@ export function CorrectionFactorReviewWorkspace({
   open,
   status,
   events,
+  acceptedEventIds = [],
   detectedEvents,
   derived,
   basePollen,
@@ -243,6 +245,7 @@ export function CorrectionFactorReviewWorkspace({
             status={status}
             events={events}
             basePollen={basePollen}
+            acceptedEventIds={acceptedEventIds}
             idleMessage={idleMessage}
             errorMessage={errorMessage}
             onToggleAccepted={onToggleAccepted}

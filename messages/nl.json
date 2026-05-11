@@ -104,7 +104,7 @@
       "title": "Correctiefactor",
       "editTitle": "Correctiefactor bewerken",
       "description": "Selecteer een piek in de grafiek en bekijk de gedetecteerde gebeurtenissen om een correctie te maken.",
-      "editDescription": "Bekijk deze opgeslagen correctie. Eerdere gebeurtenisselecties worden niet bewaard, dus selecteer een piek in de grafiek om de gebeurtenissen opnieuw te bekijken als dat nodig is.",
+      "editDescription": "Bekijk deze opgeslagen correctie. Opgeslagen pieken en beeldselecties worden hersteld wanneer ze beschikbaar zijn.",
       "ruleEnabled": "Regel ingeschakeld",
       "ruleDisabled": "Regel uitgeschakeld",
       "ruleEnabledState": "Ingeschakeld",
@@ -208,7 +208,7 @@
         "savedDescription": "Deze opgeslagen correctie toont alleen de opgeslagen multiplier.",
         "eventBasedMode": "Op gebeurtenissen gebaseerd",
         "manualMode": "Handmatige override",
-        "manualActiveNotice": "Handmatige override is actief. Gebeurtenisselecties blijven zichtbaar, maar de opgeslagen multiplier gebruikt de handmatige waarde.",
+        "manualActiveNotice": "Handmatige override is actief. U kunt een grafiekpiek als referentie selecteren, maar gebeurteniscontrole is uitgeschakeld en geselecteerde afbeeldingen worden niet opgeslagen.",
         "manualMultiplierLabel": "Handmatige multiplier",
         "manualMultiplierHelp": "Voer de definitieve multiplier in die voor het basispollen wordt opgeslagen.",
         "useEventBasedMultiplier": "Gebeurtenis-multiplier gebruiken",
@@ -220,7 +220,7 @@
       },
       "editHydration": {
         "title": "Opgeslagen correctie geladen",
-        "description": "Deze opgeslagen correctie is geladen. Eerdere gebeurtenisselecties worden niet bewaard, dus selecteer een grafiekpiek om de gebeurtenissen opnieuw te bekijken."
+        "description": "Deze opgeslagen correctie is geladen. Opgeslagen pieken en beeldselecties worden hersteld wanneer ze beschikbaar zijn; selecteer zo nodig een grafiekpiek om nieuwe gebeurtenissen te bekijken."
       },
       "preview": {
         "title": "Grafiekpieken",

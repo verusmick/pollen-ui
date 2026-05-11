@@ -6,7 +6,7 @@ const CORRECTION_FACTOR_DATE_TIME_PATTERN =
 const CORRECTION_FACTOR_INPUT_DATE_TIME_PATTERN =
   /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/;
 const CORRECTION_FACTOR_API_DATE_TIME_PATTERN =
-  /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?(?:Z|[+-]\d{2}(?::?\d{2})?)?$/;
+  /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?(Z|[+-]\d{2}(?::?\d{2})?)?$/;
 
 function padNumber(value: number): string {
   return String(value).padStart(2, '0');
@@ -35,6 +35,25 @@ function buildCorrectionFactorDateTimeValue(
   hour: number
 ): string {
   return `${year}-${padNumber(month)}-${padNumber(day)}T${padNumber(hour)}:00`;
+}
+
+function normalizeApiDateTimeOffset(value: string | undefined): string {
+  if (!value || value === 'Z') {
+    return 'Z';
+  }
+
+  const sign = value[0];
+  const offset = value.slice(1);
+
+  if (offset.includes(':')) {
+    return `${sign}${offset}`;
+  }
+
+  if (offset.length === 2) {
+    return `${sign}${offset}:00`;
+  }
+
+  return `${sign}${offset.slice(0, 2)}:${offset.slice(2, 4)}`;
 }
 
 export function isCorrectionFactorTimeOption(
@@ -243,10 +262,43 @@ export function toCorrectionFactorUnixTimestamp(value: string): number | null {
   return Math.floor(Date.UTC(year, month - 1, day, hour, minute, 0) / 1000);
 }
 
+export function toCorrectionFactorUnixTimestampFromApiDateTime(
+  value: string
+): number | null {
+  const match = CORRECTION_FACTOR_API_DATE_TIME_PATTERN.exec(value.trim());
+
+  if (!match) {
+    const parsedDate = new Date(value);
+
+    return Number.isNaN(parsedDate.getTime())
+      ? null
+      : Math.floor(parsedDate.getTime() / 1000);
+  }
+
+  const isoValue = `${match[1]}-${match[2]}-${match[3]}T${match[4]}:${match[5]}:${
+    match[6] ?? '00'
+  }${normalizeApiDateTimeOffset(match[7])}`;
+  const parsedDate = new Date(isoValue);
+
+  return Number.isNaN(parsedDate.getTime())
+    ? null
+    : Math.floor(parsedDate.getTime() / 1000);
+}
+
 export function toCorrectionFactorApiDateTime(value: string): string | null {
   const timestamp = toCorrectionFactorUnixTimestamp(value);
 
   if (timestamp === null) {
+    return null;
+  }
+
+  return toCorrectionFactorApiDateTimeFromUnixTimestamp(timestamp);
+}
+
+export function toCorrectionFactorApiDateTimeFromUnixTimestamp(
+  timestamp: number
+): string | null {
+  if (!Number.isFinite(timestamp)) {
     return null;
   }
 

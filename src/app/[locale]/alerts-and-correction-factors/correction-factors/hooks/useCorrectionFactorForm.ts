@@ -15,6 +15,7 @@ import type {
   CorrectionFactorFormErrors,
   CorrectionFactorFormValues,
   CorrectionFactorMultiplierMode,
+  CorrectionFactorPeak,
   CorrectionFactorReviewedValidationEvent,
   CorrectionFactorSelectablePollen,
   CorrectionFactorValidationEvent,
@@ -113,11 +114,18 @@ function withReviewedPollen(
   const reviewedPollenById = new Map(
     currentEvents.map((event) => [event.id, event.reviewedPollen])
   );
+  const eventIds = new Set(events.map((event) => event.id));
+  const restoredEvents = currentEvents.filter(
+    (event) => !eventIds.has(event.id)
+  );
 
-  return events.map((event) => ({
-    ...event,
-    reviewedPollen: reviewedPollenById.get(event.id) ?? UNKNOWN_POLLEN_CODE,
-  }));
+  return [
+    ...events.map((event) => ({
+      ...event,
+      reviewedPollen: reviewedPollenById.get(event.id) ?? UNKNOWN_POLLEN_CODE,
+    })),
+    ...restoredEvents,
+  ].sort((left, right) => left.datetime - right.datetime);
 }
 
 function buildAllowedPollenOptions(
@@ -203,6 +211,81 @@ function syncRowsFromReviewedEvents(
   };
 }
 
+function mergeRestoredReviewedEvents(
+  currentEvents: CorrectionFactorReviewedValidationEvent[],
+  restoredEvents: CorrectionFactorReviewedValidationEvent[],
+  shouldRestoreExistingAssignments: boolean
+): {
+  events: CorrectionFactorReviewedValidationEvent[];
+  changed: boolean;
+} {
+  const restoredEventsById = new Map(
+    restoredEvents.map((event) => [event.id, event])
+  );
+  let changed = false;
+
+  const nextEvents = currentEvents.map((event) => {
+    const restoredEvent = restoredEventsById.get(event.id);
+
+    if (!restoredEvent) {
+      return event;
+    }
+
+    restoredEventsById.delete(event.id);
+
+    if (!shouldRestoreExistingAssignments) {
+      return event;
+    }
+
+    const nextEvent = {
+      ...event,
+      imageUrl: event.imageUrl || restoredEvent.imageUrl,
+      coordinates: event.coordinates ?? restoredEvent.coordinates,
+      index: event.index ?? restoredEvent.index,
+      reviewedPollen: restoredEvent.reviewedPollen,
+    };
+
+    if (
+      nextEvent.imageUrl !== event.imageUrl ||
+      nextEvent.coordinates !== event.coordinates ||
+      nextEvent.index !== event.index ||
+      nextEvent.reviewedPollen !== event.reviewedPollen
+    ) {
+      changed = true;
+    }
+
+    return nextEvent;
+  });
+  const missingRestoredEvents = Array.from(restoredEventsById.values());
+
+  if (missingRestoredEvents.length > 0) {
+    changed = true;
+  }
+
+  return {
+    events: [...nextEvents, ...missingRestoredEvents].sort(
+      (left, right) => left.datetime - right.datetime
+    ),
+    changed,
+  };
+}
+
+function clearStoredMultipliers(
+  values: CorrectionFactorFormValues
+): CorrectionFactorFormValues {
+  return {
+    ...values,
+    rows: values.rows.map((row) =>
+      row.storedMultiplier === undefined || row.storedMultiplier === null
+        ? row
+        : {
+            ...row,
+            storedMultiplier: null,
+          }
+    ),
+  };
+}
+
 function clearSelectedReviewSlice(
   values: CorrectionFactorFormValues
 ): CorrectionFactorFormValues {
@@ -214,6 +297,49 @@ function clearSelectedReviewSlice(
     ...values,
     selectedReviewSliceId: null,
   };
+}
+
+function clearReviewScopeData(
+  values: CorrectionFactorFormValues
+): CorrectionFactorFormValues {
+  const valuesWithoutSelectedReviewSlice = clearSelectedReviewSlice(values);
+
+  if (
+    valuesWithoutSelectedReviewSlice.events.length === 0 &&
+    valuesWithoutSelectedReviewSlice.peaks.length === 0
+  ) {
+    return valuesWithoutSelectedReviewSlice;
+  }
+
+  return {
+    ...valuesWithoutSelectedReviewSlice,
+    events: [],
+    peaks: [],
+  };
+}
+
+function buildInitialChartRangeStack(
+  values: CorrectionFactorFormValues
+): CorrectionFactorChartRange[] {
+  const rootRange = toMeasurementPreviewRange(values.startDate, values.endDate);
+  const selectedPeak = values.peaks.find(
+    (peak) => peak.id === values.selectedReviewSliceId
+  );
+
+  if (!selectedPeak) {
+    return rootRange ? [rootRange] : [];
+  }
+
+  const peakRange = {
+    from: selectedPeak.startTimestamp,
+    to: selectedPeak.endTimestamp,
+  };
+
+  if (!rootRange) {
+    return [peakRange];
+  }
+
+  return [rootRange, peakRange];
 }
 
 export function useCorrectionFactorForm() {
@@ -393,15 +519,15 @@ export function useCorrectionFactorForm() {
         field === 'startDate' ||
         field === 'endDate'
       ) {
-        const nextWithoutSelectedReviewSlice = clearSelectedReviewSlice(next);
+        const nextWithoutReviewScopeData = clearReviewScopeData(next);
 
         if (field === 'basePollen') {
           return syncRowsFromReviewedEvents(
-            syncBaseRow(nextWithoutSelectedReviewSlice)
+            syncBaseRow(nextWithoutReviewScopeData)
           );
         }
 
-        return nextWithoutSelectedReviewSlice;
+        return nextWithoutReviewScopeData;
       }
 
       return next;
@@ -546,6 +672,35 @@ export function useCorrectionFactorForm() {
     });
   }
 
+  function restoreReviewedEvents(
+    restoredEvents: CorrectionFactorReviewedValidationEvent[]
+  ) {
+    if (restoredEvents.length === 0) {
+      return;
+    }
+
+    setValues((current) => {
+      if (!current.basePollen) {
+        return current;
+      }
+
+      const { events, changed } = mergeRestoredReviewedEvents(
+        current.events,
+        restoredEvents,
+        !hasReviewSessionChanges
+      );
+
+      if (!changed) {
+        return current;
+      }
+
+      return syncRowsFromReviewedEvents({
+        ...current,
+        events,
+      });
+    });
+  }
+
   function updateEventReviewedPollen(
     eventId: string,
     reviewedPollen: CorrectionFactorSelectablePollen
@@ -578,10 +733,12 @@ export function useCorrectionFactorForm() {
         return current;
       }
 
-      return syncRowsFromReviewedEvents({
-        ...current,
-        events: nextEvents,
-      });
+      return syncRowsFromReviewedEvents(
+        clearStoredMultipliers({
+          ...current,
+          events: nextEvents,
+        })
+      );
     });
     setHasReviewSessionChanges(true);
     clearRowsError();
@@ -620,10 +777,12 @@ export function useCorrectionFactorForm() {
         return current;
       }
 
-      return syncRowsFromReviewedEvents({
-        ...current,
-        events: nextEvents,
-      });
+      return syncRowsFromReviewedEvents(
+        clearStoredMultipliers({
+          ...current,
+          events: nextEvents,
+        })
+      );
     });
     setHasReviewSessionChanges(true);
     clearRowsError();
@@ -639,6 +798,39 @@ export function useCorrectionFactorForm() {
       return {
         ...current,
         selectedReviewSliceId,
+      };
+    });
+  }
+
+  function setSelectedReviewPeak(peak: CorrectionFactorPeak) {
+    setValues((current) => {
+      const existingPeak = current.peaks.find(
+        (candidate) => candidate.id === peak.id
+      );
+
+      if (
+        existingPeak &&
+        existingPeak.pollen === peak.pollen &&
+        existingPeak.location === peak.location &&
+        existingPeak.startDate === peak.startDate &&
+        existingPeak.endDate === peak.endDate &&
+        existingPeak.value === peak.value
+      ) {
+        return current;
+      }
+
+      return {
+        ...current,
+        peaks: existingPeak
+          ? current.peaks.map((candidate) =>
+              candidate.id === peak.id
+                ? {
+                    ...peak,
+                    images: candidate.images,
+                  }
+                : candidate
+            )
+          : [...current.peaks, peak],
       };
     });
   }
@@ -719,7 +911,7 @@ export function useCorrectionFactorForm() {
 
   function replaceValues(nextValues: CorrectionFactorFormValues) {
     setValues(nextValues);
-    setChartRangeStack([]);
+    setChartRangeStack(buildInitialChartRangeStack(nextValues));
     setHasReviewSessionChanges(false);
     setHasValidated(false);
     setErrors(EMPTY_CORRECTION_FACTOR_FORM_ERRORS);
@@ -757,9 +949,11 @@ export function useCorrectionFactorForm() {
     updateRowPollen,
     updateRowReviewedEvents,
     replaceValidationEvents,
+    restoreReviewedEvents,
     updateEventReviewedPollen,
     toggleEventAccepted,
     setSelectedReviewSliceId,
+    setSelectedReviewPeak,
     setMultiplierMode,
     updateManualMultiplier,
     drillDownToRange,

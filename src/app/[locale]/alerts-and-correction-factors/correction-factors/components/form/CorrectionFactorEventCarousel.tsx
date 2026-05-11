@@ -14,6 +14,7 @@ interface CorrectionFactorEventCarouselProps {
   status: CorrectionFactorValidationEventsStatus;
   events: CorrectionFactorReviewedValidationEvent[];
   basePollen: string;
+  acceptedEventIds?: string[];
   idleMessage?: string | null;
   errorMessage?: string | null;
   onToggleAccepted: (eventId: string) => void;
@@ -83,6 +84,7 @@ export function CorrectionFactorEventCarousel({
   status,
   events,
   basePollen,
+  acceptedEventIds = [],
   idleMessage = null,
   errorMessage = null,
   onToggleAccepted,
@@ -103,6 +105,10 @@ export function CorrectionFactorEventCarousel({
   const visibleEvents = useMemo(
     () => events.slice(0, visibleEventCount),
     [events, visibleEventCount]
+  );
+  const acceptedEventIdSet = useMemo(
+    () => new Set(acceptedEventIds),
+    [acceptedEventIds]
   );
 
   useEffect(() => {
@@ -227,7 +233,9 @@ export function CorrectionFactorEventCarousel({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {visibleEvents.map((event, index) => {
-              const isAccepted = event.reviewedPollen === basePollen;
+              const isAccepted =
+                event.reviewedPollen === basePollen ||
+                acceptedEventIdSet.has(event.id);
               const isBroken = Boolean(brokenImageIds[event.id]);
 
               return (

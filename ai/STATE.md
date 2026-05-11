@@ -1,11 +1,13 @@
 ## Correction Factors - active backend dependencies
-Foundation/data scaffolding is implemented. Remaining backend dependencies are centered on event-level review persistence, payload parity, and preview sourcing:
+Foundation/data scaffolding is implemented. Backend support now includes persisted reviewed peak/image data through the correction-factor `peaks` key. Remaining backend dependencies are centered on payload parity details and preview sourcing:
 - GET /api/correctionFactors/:id exists and returns stored detail multipliers
 - New review source of truth is per validation-event reviewed classification; correction-table counts and multipliers are derived from event assignments
 - The review workflow is now adaptive drill-down: the selected date range defines the root chart range, broad bucket clicks narrow the visible range, and only final-granularity review slices can load validation-event images
 - Do not preload validation-event images for the full date range; the validation-event request needs final-review-slice timestamps from the chart selection
-- Current correction-factor detail payloads do not restore per-event reviewed classifications from stored multipliers
-- Current correction-factor detail payloads also do not restore the original drill-down path or the originally reviewed final slice
+- Correction-factor responses can now return persisted selected peaks and reviewed images via `peaks`; frontend API/domain mappers normalize that shape, edit mode hydrates the first persisted peak deterministically for v1, and event-based write payloads include reviewed peak images when form state has them
+- Manual override mode is intentionally independent from event review: chart peak selection remains available as reference, the correction result shows only the manual multiplier, the review panel is disabled, and write payloads do not persist selected peak/images
+- Stored detail multipliers alone still do not restore per-event reviewed classifications
+- Full multi-peak edit restoration remains a future UI workflow concern; v1 restores the first persisted peak and its selected images
 - Avoid reintroducing manual reviewed-count inputs as a fallback; event images default to `UNKNOWN` until event-level assignments are available or reviewed
 - Need confirmation how `UNKNOWN` is encoded in payloads and whether `UNKNOWN` details are omitted
 - factor_percentage appears to be ratio-based (0..1) from current GET samples

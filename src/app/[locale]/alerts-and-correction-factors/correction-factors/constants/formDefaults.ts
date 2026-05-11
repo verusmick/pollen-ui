@@ -23,6 +23,7 @@ export const DEFAULT_CORRECTION_FACTOR_FORM_VALUES: CorrectionFactorFormValues =
     multiplierMode: 'eventBased',
     manualMultiplier: '',
     events: [],
+    peaks: [],
     rows: [],
   };
 

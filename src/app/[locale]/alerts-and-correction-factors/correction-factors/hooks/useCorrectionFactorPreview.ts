@@ -82,16 +82,41 @@ export function useCorrectionFactorPreview({
   });
 
   const sourcePoints = (previewQuery.data ?? []) as CorrectionFactorPreviewSourcePoint[];
+  const sourcePointsWithPersistedPeaks = useMemo(() => {
+    if (values.peaks.length === 0) {
+      return sourcePoints;
+    }
+
+    const sourcePointKeys = new Set(
+      sourcePoints.map((point) => `${point.timestamp}-${point.endTimestamp}`)
+    );
+    const persistedSourcePoints = values.peaks
+      .filter(
+        (peak) =>
+          !sourcePointKeys.has(`${peak.startTimestamp}-${peak.endTimestamp}`)
+      )
+      .map((peak) => ({
+        timestamp: peak.startTimestamp,
+        endTimestamp: peak.endTimestamp,
+        displayTimestamp:
+          peak.startTimestamp + (peak.endTimestamp - peak.startTimestamp) / 2,
+        value: peak.value,
+      }));
+
+    return [...sourcePoints, ...persistedSourcePoints].sort(
+      (left, right) => left.timestamp - right.timestamp
+    );
+  }, [sourcePoints, values.peaks]);
   const series = useMemo(
     () =>
-      sourcePoints.length > 0 && resolvedVisibleRange
+      sourcePointsWithPersistedPeaks.length > 0 && resolvedVisibleRange
         ? buildCorrectionFactorPreviewSeries(
-            sourcePoints,
+            sourcePointsWithPersistedPeaks,
             resolvedVisibleRange,
             basePollenMultiplier
           )
         : null,
-    [basePollenMultiplier, resolvedVisibleRange, sourcePoints]
+    [basePollenMultiplier, resolvedVisibleRange, sourcePointsWithPersistedPeaks]
   );
   const reviewSlices = useMemo(
     () => buildCorrectionFactorReviewSlices(series),
@@ -107,7 +132,7 @@ export function useCorrectionFactorPreview({
     };
   }
 
-  if (previewQuery.isLoading || previewQuery.isFetching) {
+  if ((previewQuery.isLoading || previewQuery.isFetching) && !series) {
     return {
       status: 'loading',
       series: null,
@@ -116,7 +141,7 @@ export function useCorrectionFactorPreview({
     };
   }
 
-  if (previewQuery.isError) {
+  if (previewQuery.isError && !series) {
     return {
       status: 'error',
       series: null,

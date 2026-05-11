@@ -104,7 +104,7 @@
       "title": "Correction Factor",
       "editTitle": "Edit Correction Factor",
       "description": "Select a chart peak and review its detected events to create a correction.",
-      "editDescription": "Review this saved correction. Previous event selections are not stored, so select a chart peak to review the events again if needed.",
+      "editDescription": "Review this saved correction. Stored peak and image selections are restored when available.",
       "ruleEnabled": "Rule enabled",
       "ruleDisabled": "Rule disabled",
       "ruleEnabledState": "Enabled",
@@ -208,7 +208,7 @@
         "savedDescription": "This saved correction shows the stored multiplier only.",
         "eventBasedMode": "Event-based",
         "manualMode": "Manual override",
-        "manualActiveNotice": "Manual override is active. Event selections remain visible, but the saved multiplier uses the manual value.",
+        "manualActiveNotice": "Manual override is active. You can select a chart peak as reference, but event review is disabled and selected images will not be saved.",
         "manualMultiplierLabel": "Manual multiplier",
         "manualMultiplierHelp": "Enter the final multiplier to save for the base pollen.",
         "useEventBasedMultiplier": "Use event-based multiplier",
@@ -220,7 +220,7 @@
       },
       "editHydration": {
         "title": "Saved correction loaded",
-        "description": "This saved correction was loaded. Previous event selections are not stored, so select a chart peak to review the events again."
+        "description": "This saved correction was loaded. Stored peak and image selections are restored when available; select a chart peak to review new events if needed."
       },
       "preview": {
         "title": "Chart peaks",

@@ -43,10 +43,12 @@ interface CorrectionFactorFormProps {
   pollensError?: string | null;
   validationEventsStatus: CorrectionFactorValidationEventsStatus;
   validationEvents: CorrectionFactorReviewedValidationEvent[];
+  validationAcceptedEventIds?: string[];
   validationEventsIdleMessage?: string | null;
   validationEventsError?: string | null;
   validationEventsStatusText?: string | null;
   validationEventsFieldError?: string | null;
+  validationEventsDisabledReason?: string | null;
   onToggleValidationEventAccepted: (eventId: string) => void;
   reviewWorkspaceOpen: boolean;
   onOpenReviewWorkspace: () => void;
@@ -111,10 +113,12 @@ export function CorrectionFactorForm({
   pollensError = null,
   validationEventsStatus,
   validationEvents,
+  validationAcceptedEventIds = [],
   validationEventsIdleMessage = null,
   validationEventsError = null,
   validationEventsStatusText = null,
   validationEventsFieldError = null,
+  validationEventsDisabledReason = null,
   onToggleValidationEventAccepted,
   reviewWorkspaceOpen,
   onOpenReviewWorkspace,
@@ -395,6 +399,7 @@ export function CorrectionFactorForm({
               selectedSliceLabel={selectedPreviewSliceLabel}
               errorMessage={validationEventsError}
               statusText={validationEventsFieldError ?? validationEventsStatusText}
+              disabledReason={validationEventsDisabledReason}
               onOpenReviewWorkspace={onOpenReviewWorkspace}
             />
           </div>
@@ -405,6 +410,7 @@ export function CorrectionFactorForm({
         open={reviewWorkspaceOpen}
         status={validationEventsStatus}
         events={validationEvents}
+        acceptedEventIds={validationAcceptedEventIds}
         detectedEvents={values.detectedEvents}
         derived={derived}
         basePollen={values.basePollen}

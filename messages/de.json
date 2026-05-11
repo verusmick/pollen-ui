@@ -104,7 +104,7 @@
       "title": "Korrekturfaktor",
       "editTitle": "Korrekturfaktor bearbeiten",
       "description": "Wählen Sie eine Diagrammspitze aus und prüfen Sie deren erkannte Ereignisse, um eine Korrektur zu erstellen.",
-      "editDescription": "Prüfen Sie diese gespeicherte Korrektur. Frühere Ereignisauswahlen werden nicht gespeichert. Wählen Sie daher bei Bedarf eine Diagrammspitze aus, um die Ereignisse erneut zu prüfen.",
+      "editDescription": "Prüfen Sie diese gespeicherte Korrektur. Gespeicherte Spitzen und Bildauswahlen werden wiederhergestellt, wenn sie verfügbar sind.",
       "ruleEnabled": "Regel aktiviert",
       "ruleDisabled": "Regel deaktiviert",
       "ruleEnabledState": "Aktiviert",
@@ -208,7 +208,7 @@
         "savedDescription": "Diese gespeicherte Korrektur zeigt nur den gespeicherten Multiplikator.",
         "eventBasedMode": "Ereignisbasiert",
         "manualMode": "Manuelle Überschreibung",
-        "manualActiveNotice": "Die manuelle Überschreibung ist aktiv. Ereignisauswahlen bleiben sichtbar, aber der gespeicherte Multiplikator verwendet den manuellen Wert.",
+        "manualActiveNotice": "Die manuelle Überschreibung ist aktiv. Sie können eine Diagrammspitze als Referenz auswählen, aber die Ereignisprüfung ist deaktiviert und ausgewählte Bilder werden nicht gespeichert.",
         "manualMultiplierLabel": "Manueller Multiplikator",
         "manualMultiplierHelp": "Geben Sie den endgültigen Multiplikator ein, der für den Basispollen gespeichert wird.",
         "useEventBasedMultiplier": "Ereignisbasierten Multiplikator verwenden",
@@ -220,7 +220,7 @@
       },
       "editHydration": {
         "title": "Gespeicherte Korrektur geladen",
-        "description": "Diese gespeicherte Korrektur wurde geladen. Frühere Ereignisauswahlen werden nicht gespeichert. Wählen Sie daher eine Diagrammspitze aus, um die Ereignisse erneut zu prüfen."
+        "description": "Diese gespeicherte Korrektur wurde geladen. Gespeicherte Spitzen und Bildauswahlen werden wiederhergestellt, wenn sie verfügbar sind; wählen Sie bei Bedarf eine Diagrammspitze aus, um neue Ereignisse zu prüfen."
       },
       "preview": {
         "title": "Diagrammspitzen",

@@ -16,6 +16,7 @@ interface CorrectionFactorReviewSummaryProps {
   selectedSliceLabel?: string | null;
   statusText?: string | null;
   errorMessage?: string | null;
+  disabledReason?: string | null;
   onOpenReviewWorkspace: () => void;
 }
 
@@ -71,12 +72,17 @@ export function CorrectionFactorReviewSummary({
   selectedSliceLabel = null,
   statusText = null,
   errorMessage = null,
+  disabledReason = null,
   onOpenReviewWorkspace,
 }: CorrectionFactorReviewSummaryProps) {
   const t = useTranslations('correctionFactorsPage.form.reviewSummary');
   const isReviewWorkspaceDisabled =
-    !hasSelectedSlice || detectedEvents === null || detectedEvents <= 0;
-  const shouldShowStatusText = statusText && isReviewWorkspaceDisabled;
+    Boolean(disabledReason) ||
+    !hasSelectedSlice ||
+    detectedEvents === null ||
+    detectedEvents <= 0;
+  const reviewStatusText = disabledReason ?? statusText;
+  const shouldShowStatusText = reviewStatusText && isReviewWorkspaceDisabled;
 
   return (
     <section className="rounded-lg border border-border bg-card p-4">
@@ -118,7 +124,7 @@ export function CorrectionFactorReviewSummary({
         </div>
       ) : shouldShowStatusText ? (
         <div className="mt-3 rounded-md border border-border bg-background px-3 py-2 text-sm text-muted-foreground">
-          {statusText}
+          {reviewStatusText}
         </div>
       ) : null}
     </section>
@@ -162,23 +168,27 @@ export function CorrectionFactorResultSummary({
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <ReviewMetric
-          label={t('detectedEvents')}
-          value={
-            detectedEvents === null
-              ? t('countPending')
-              : t('count', { count: detectedEvents })
-          }
-        />
-        <ReviewMetric
-          label={basePollenLabel}
-          value={t('count', { count: markedAsBasePollenCount })}
-        />
-        <ReviewMetric
-          label={t('unknown')}
-          value={t('count', { count: unknownCount })}
-        />
+      <div className={`grid gap-2 ${isManualMode ? 'grid-cols-1' : 'grid-cols-2'}`}>
+        {!isManualMode ? (
+          <>
+            <ReviewMetric
+              label={t('detectedEvents')}
+              value={
+                detectedEvents === null
+                  ? t('countPending')
+                  : t('count', { count: detectedEvents })
+              }
+            />
+            <ReviewMetric
+              label={basePollenLabel}
+              value={t('count', { count: markedAsBasePollenCount })}
+            />
+            <ReviewMetric
+              label={t('unknown')}
+              value={t('count', { count: unknownCount })}
+            />
+          </>
+        ) : null}
         <ReviewMetric
           label={multiplierLabel}
           value={correctionMultiplier.toFixed(2)}
@@ -250,7 +260,7 @@ export function CorrectionFactorResultSummary({
         )}
       </div>
 
-      {!showStoredMultiplierView ? (
+      {!showStoredMultiplierView && !isManualMode ? (
         <CorrectionFactorTotals
           derived={derived}
           tableError={errors.rows ?? validationErrors.rows}

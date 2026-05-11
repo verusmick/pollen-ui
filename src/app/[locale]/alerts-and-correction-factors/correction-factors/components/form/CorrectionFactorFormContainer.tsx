@@ -23,6 +23,8 @@ import {
 import {
   buildCorrectionFactorWritePayload,
   mapCorrectionFactorRecordToFormValues,
+  mapPeakImageToReviewedValidationEvent,
+  toCorrectionFactorApiDateTimeFromUnixTimestamp,
   toCorrectionFactorUserFacingError,
 } from '../../utils';
 import { CorrectionFactorForm } from './CorrectionFactorForm';
@@ -49,6 +51,7 @@ export function CorrectionFactorFormContainer({
   const pendingAutoOpenSliceIdRef = useRef<string | null>(null);
   const previousSelectedSliceIdRef = useRef<string | null>(null);
   const form = useCorrectionFactorForm();
+  const isManualOverrideMode = form.values.multiplierMode === 'manual';
   const detailQuery = useCorrectionFactorDetail(
     isEditMode ? correctionFactorId : undefined
   );
@@ -95,6 +98,15 @@ export function CorrectionFactorFormContainer({
     derived: form.derived,
     visibleRange: form.chartNavigation.visibleRange,
   });
+  const selectedPersistedPeak = useMemo(
+    () =>
+      form.values.selectedReviewSliceId
+        ? (form.values.peaks.find(
+            (peak) => peak.id === form.values.selectedReviewSliceId
+          ) ?? null)
+        : null,
+    [form.values.peaks, form.values.selectedReviewSliceId]
+  );
   const selectedPreviewSlice = useMemo(() => {
     if (!form.values.selectedReviewSliceId) {
       return null;
@@ -113,6 +125,7 @@ export function CorrectionFactorFormContainer({
         from: point.timestamp,
         to: point.endTimestamp,
         label: point.label,
+        value: point.originalValue,
       };
     }
 
@@ -127,21 +140,83 @@ export function CorrectionFactorFormContainer({
         from: slice.from,
         to: slice.to,
         label: slice.label,
+        value: null,
+      };
+    }
+
+    if (selectedPersistedPeak) {
+      return {
+        id: selectedPersistedPeak.id,
+        from: selectedPersistedPeak.startTimestamp,
+        to: selectedPersistedPeak.endTimestamp,
+        label: `${selectedPersistedPeak.startDate} - ${selectedPersistedPeak.endDate}`,
+        value: selectedPersistedPeak.value,
       };
     }
 
     return null;
-  }, [form.values.selectedReviewSliceId, preview.reviewSlices, preview.series]);
+  }, [
+    form.values.selectedReviewSliceId,
+    preview.reviewSlices,
+    preview.series,
+    selectedPersistedPeak,
+  ]);
   const hasSelectedPreviewSlice = selectedPreviewSlice !== null;
+  const hasRestoredSelectedPeakImages =
+    selectedPersistedPeak !== null && selectedPersistedPeak.images.length > 0;
+  const restoredSelectedPeakEvents = useMemo(
+    () =>
+      selectedPersistedPeak && form.values.basePollen
+        ? selectedPersistedPeak.images.map((image) =>
+            mapPeakImageToReviewedValidationEvent(image, form.values.basePollen)
+          )
+        : [],
+    [form.values.basePollen, selectedPersistedPeak]
+  );
+  const hasRestoredSelectedEvents = restoredSelectedPeakEvents.length > 0;
+  const restoredAcceptedEventIds = useMemo(
+    () =>
+      restoredSelectedPeakEvents
+        .map((event) => event.id)
+        .filter((eventId) => {
+          const currentEvent = form.values.events.find(
+            (event) => event.id === eventId
+          );
+
+          return (
+            !currentEvent || currentEvent.reviewedPollen === form.values.basePollen
+          );
+        }),
+    [form.values.basePollen, form.values.events, restoredSelectedPeakEvents]
+  );
+  const previewReviewSlices = useMemo(() => {
+    if (
+      !selectedPersistedPeak ||
+      preview.reviewSlices.some((slice) => slice.id === selectedPersistedPeak.id)
+    ) {
+      return preview.reviewSlices;
+    }
+
+    return [
+      {
+        id: selectedPersistedPeak.id,
+        from: selectedPersistedPeak.startTimestamp,
+        to: selectedPersistedPeak.endTimestamp,
+        peakTimestamp: selectedPersistedPeak.startTimestamp,
+        label: `${selectedPersistedPeak.startDate} - ${selectedPersistedPeak.endDate}`,
+      },
+      ...preview.reviewSlices,
+    ];
+  }, [preview.reviewSlices, selectedPersistedPeak]);
   const selectedPreviewSliceId = selectedPreviewSlice?.id ?? null;
   const selectedPreviewSliceFrom = selectedPreviewSlice?.from ?? null;
   const selectedPreviewSliceTo = selectedPreviewSlice?.to ?? null;
   const validationEvents = useCorrectionFactorValidationEvents({
     location: validationLocation,
     basePollen: form.values.basePollen,
-    selectedReviewSliceId: selectedPreviewSliceId,
-    selectedReviewSliceFrom: selectedPreviewSliceFrom,
-    selectedReviewSliceTo: selectedPreviewSliceTo,
+    selectedReviewSliceId: isManualOverrideMode ? null : selectedPreviewSliceId,
+    selectedReviewSliceFrom: isManualOverrideMode ? null : selectedPreviewSliceFrom,
+    selectedReviewSliceTo: isManualOverrideMode ? null : selectedPreviewSliceTo,
   });
   const hydratedFormValues = useMemo(
     () =>
@@ -186,7 +261,10 @@ export function CorrectionFactorFormContainer({
     if (
       previousSelectedSliceIdRef.current !== form.values.selectedReviewSliceId
     ) {
-      pendingAutoOpenSliceIdRef.current = form.values.selectedReviewSliceId;
+      pendingAutoOpenSliceIdRef.current =
+        isManualOverrideMode || (isEditMode && selectedPersistedPeak)
+          ? null
+          : form.values.selectedReviewSliceId;
       previousSelectedSliceIdRef.current = form.values.selectedReviewSliceId;
     }
 
@@ -196,7 +274,62 @@ export function CorrectionFactorFormContainer({
 
     pendingAutoOpenSliceIdRef.current = null;
     form.setSelectedReviewSliceId(null);
-  }, [form, form.values.selectedReviewSliceId, selectedPreviewSlice]);
+  }, [
+    form,
+    form.values.selectedReviewSliceId,
+    isEditMode,
+    isManualOverrideMode,
+    selectedPersistedPeak,
+    selectedPreviewSlice,
+  ]);
+
+  useEffect(() => {
+    if (!isManualOverrideMode) {
+      return;
+    }
+
+    pendingAutoOpenSliceIdRef.current = null;
+    setReviewWorkspaceOpen(false);
+  }, [isManualOverrideMode]);
+
+  useEffect(() => {
+    if (
+      !selectedPreviewSlice ||
+      selectedPreviewSlice.value === null ||
+      !form.values.basePollen ||
+      !form.values.location
+    ) {
+      return;
+    }
+
+    const startDate = toCorrectionFactorApiDateTimeFromUnixTimestamp(
+      selectedPreviewSlice.from
+    );
+    const endDate = toCorrectionFactorApiDateTimeFromUnixTimestamp(
+      selectedPreviewSlice.to
+    );
+
+    if (!startDate || !endDate) {
+      return;
+    }
+
+    form.setSelectedReviewPeak({
+      id: selectedPreviewSlice.id,
+      pollen: form.values.basePollen,
+      location: form.values.location,
+      startDate,
+      endDate,
+      startTimestamp: selectedPreviewSlice.from,
+      endTimestamp: selectedPreviewSlice.to,
+      value: selectedPreviewSlice.value,
+      images: [],
+    });
+  }, [
+    form,
+    form.values.basePollen,
+    form.values.location,
+    selectedPreviewSlice,
+  ]);
 
   useEffect(() => {
     const pendingSliceId = pendingAutoOpenSliceIdRef.current;
@@ -229,11 +362,34 @@ export function CorrectionFactorFormContainer({
   ]);
 
   useEffect(() => {
-    if (
-      validationEvents.status === 'ready' ||
-      validationEvents.status === 'empty'
-    ) {
+    if (isManualOverrideMode) {
+      return;
+    }
+
+    if (validationEvents.status === 'ready') {
       form.replaceValidationEvents(validationEvents.events, {
+        syncRows: !isEditMode || hasRestoredSelectedPeakImages,
+      });
+
+      const detectedEvents = Math.max(
+        validationEvents.detectedEvents ?? 0,
+        validationEvents.events.length,
+        form.values.events.length
+      );
+
+      if (form.values.detectedEvents !== detectedEvents) {
+        form.setField('detectedEvents', detectedEvents);
+      }
+
+      return;
+    }
+
+    if (validationEvents.status === 'empty' && hasRestoredSelectedEvents) {
+      return;
+    }
+
+    if (validationEvents.status === 'empty') {
+      form.replaceValidationEvents([], {
         syncRows: !isEditMode,
       });
 
@@ -241,6 +397,10 @@ export function CorrectionFactorFormContainer({
         form.setField('detectedEvents', validationEvents.detectedEvents);
       }
 
+      return;
+    }
+
+    if (hasRestoredSelectedEvents) {
       return;
     }
 
@@ -253,10 +413,21 @@ export function CorrectionFactorFormContainer({
     }
   }, [
     form,
+    hasRestoredSelectedEvents,
+    hasRestoredSelectedPeakImages,
+    isManualOverrideMode,
     validationEvents.detectedEvents,
     validationEvents.events,
     validationEvents.status,
   ]);
+
+  useEffect(() => {
+    if (!isEditMode || restoredSelectedPeakEvents.length === 0) {
+      return;
+    }
+
+    form.restoreReviewedEvents(restoredSelectedPeakEvents);
+  }, [form, isEditMode, restoredSelectedPeakEvents]);
 
   const detailError =
     isEditMode && detailQuery.isError ? t('states.loadError') : null;
@@ -326,6 +497,8 @@ export function CorrectionFactorFormContainer({
     Boolean(form.values.endDate);
   const validationEventsStatusText = validationLocationMappingError
     ? null
+    : hasRestoredSelectedEvents
+      ? t('meta.detectedEventsLoaded')
     : !isDateRangeSelectionComplete
       ? t('meta.detectedEventsHint')
       : !hasSelectedPreviewSlice
@@ -336,7 +509,9 @@ export function CorrectionFactorFormContainer({
             ? t('meta.detectedEventsLoaded')
             : null;
   const validationEventsError = validationLocationMappingError
-    ? validationLocationMappingError
+    ? hasRestoredSelectedEvents
+      ? null
+      : validationLocationMappingError
     : validationEvents.status === 'error'
       ? toCorrectionFactorUserFacingError(validationEvents.error, {
           fallbackMessage: t('meta.detectedEventsError'),
@@ -344,7 +519,11 @@ export function CorrectionFactorFormContainer({
         })
       : null;
   const carouselValidationStatus = validationLocationMappingError
-    ? 'error'
+    ? hasRestoredSelectedEvents
+      ? 'ready'
+      : 'error'
+    : hasRestoredSelectedEvents
+      ? 'ready'
     : validationEvents.status;
   const carouselIdleMessage =
     isDateRangeSelectionComplete && !hasSelectedPreviewSlice
@@ -367,6 +546,12 @@ export function CorrectionFactorFormContainer({
 
   function handleSelectReviewSlice(sliceId: string) {
     form.setSelectedReviewSliceId(sliceId);
+
+    if (isManualOverrideMode) {
+      setReviewWorkspaceOpen(false);
+      return;
+    }
+
     setReviewWorkspaceOpen(true);
   }
 
@@ -522,13 +707,23 @@ export function CorrectionFactorFormContainer({
       pollensError={pollenOptionsError}
       validationEventsStatus={carouselValidationStatus}
       validationEvents={form.values.events}
+      validationAcceptedEventIds={restoredAcceptedEventIds}
       validationEventsIdleMessage={carouselIdleMessage}
       validationEventsError={carouselValidationError}
       validationEventsStatusText={validationEventsStatusText}
       validationEventsFieldError={validationEventsError}
-      onToggleValidationEventAccepted={form.toggleEventAccepted}
+      validationEventsDisabledReason={
+        isManualOverrideMode ? t('distribution.manualActiveNotice') : null
+      }
+      onToggleValidationEventAccepted={
+        isManualOverrideMode ? () => undefined : form.toggleEventAccepted
+      }
       reviewWorkspaceOpen={reviewWorkspaceOpen}
-      onOpenReviewWorkspace={() => setReviewWorkspaceOpen(true)}
+      onOpenReviewWorkspace={() => {
+        if (!isManualOverrideMode) {
+          setReviewWorkspaceOpen(true);
+        }
+      }}
       onCloseReviewWorkspace={() => setReviewWorkspaceOpen(false)}
       onSelectReviewSlice={handleSelectReviewSlice}
       onMultiplierModeChange={form.setMultiplierMode}
@@ -548,7 +743,7 @@ export function CorrectionFactorFormContainer({
       basePollen={form.values.basePollen}
       previewStatus={preview.status}
       previewSeries={preview.series}
-      previewReviewSlices={preview.reviewSlices}
+      previewReviewSlices={previewReviewSlices}
       selectedPreviewSliceId={form.values.selectedReviewSliceId}
       previewVisibleRange={form.chartNavigation.visibleRange}
       previewCanDrillUp={form.chartNavigation.canDrillUp}

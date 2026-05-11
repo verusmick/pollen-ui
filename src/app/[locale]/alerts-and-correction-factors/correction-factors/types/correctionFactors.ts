@@ -7,6 +7,27 @@ export interface ApiCorrectionFactorDetail {
   published: boolean;
 }
 
+export interface ApiCorrectionFactorPeakImage {
+  pollen: string;
+  location: string;
+  datetime: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  _id: string;
+  index: number | null;
+}
+
+export interface ApiCorrectionFactorPeak {
+  pollen: string;
+  location: string;
+  start_date: string;
+  end_date: string;
+  value: number;
+  images: ApiCorrectionFactorPeakImage[];
+}
+
 export interface ApiCorrectionFactorRecord {
   id: CorrectionFactorApiId;
   start_date: string;
@@ -14,6 +35,7 @@ export interface ApiCorrectionFactorRecord {
   pollen: string;
   location: string;
   correction_factor_details: ApiCorrectionFactorDetail[];
+  peaks?: ApiCorrectionFactorPeak[];
 }
 
 export type ApiCorrectionFactorsListResponse = ApiCorrectionFactorRecord[];
@@ -30,6 +52,7 @@ export interface ApiCorrectionFactorWriteRequest {
   pollen: string;
   location: string;
   correction_factor_details: ApiCorrectionFactorDetail[];
+  peaks?: ApiCorrectionFactorPeak[];
 }
 
 export interface ApiCorrectionFactorWriteSuccessResponse {
@@ -139,6 +162,28 @@ export interface CorrectionFactorDetail {
   published: boolean;
 }
 
+export interface CorrectionFactorPeakImage {
+  id: string;
+  pollen: CorrectionFactorSelectablePollen;
+  location: string;
+  datetime: string;
+  timestamp: number;
+  coordinates: CorrectionFactorValidationEventCoordinates;
+  index: number | null;
+}
+
+export interface CorrectionFactorPeak {
+  id: string;
+  pollen: CorrectionFactorSelectablePollen;
+  location: string;
+  startDate: string;
+  endDate: string;
+  startTimestamp: number;
+  endTimestamp: number;
+  value: number;
+  images: CorrectionFactorPeakImage[];
+}
+
 export interface CorrectionFactorRecord {
   id: CorrectionFactorId;
   location: string;
@@ -146,6 +191,7 @@ export interface CorrectionFactorRecord {
   startDate: string;
   endDate: string;
   details: CorrectionFactorDetail[];
+  peaks: CorrectionFactorPeak[];
 }
 
 export interface CorrectionFactorListFilters {
@@ -175,6 +221,7 @@ export interface CorrectionFactorFormValues {
   multiplierMode: CorrectionFactorMultiplierMode;
   manualMultiplier: string;
   events: CorrectionFactorReviewedValidationEvent[];
+  peaks: CorrectionFactorPeak[];
   rows: CorrectionFactorDistributionRowForm[];
 }
 

@@ -37,6 +37,24 @@ function scaleFactor(
   return ratio;
 }
 
+function getRestoredEventBasedMultiplier(
+  values: CorrectionFactorFormValues,
+  row: CorrectionFactorFormValues['rows'][number]
+): number | null {
+  if (
+    values.multiplierMode !== 'eventBased' ||
+    (!row.isBasePollen && row.reviewedEvents.trim() !== '') ||
+    (row.reviewedEvents.trim() !== '' && values.events.length === 0)
+  ) {
+    return null;
+  }
+
+  return typeof row.storedMultiplier === 'number' &&
+    Number.isFinite(row.storedMultiplier)
+    ? row.storedMultiplier
+    : null;
+}
+
 export function buildCorrectionFactorDerivedRows(
   values: CorrectionFactorFormValues,
   factorPercentageScale: CorrectionFactorPercentageScale
@@ -50,9 +68,15 @@ export function buildCorrectionFactorDerivedRows(
     const isManualBaseMultiplier =
       values.multiplierMode === 'manual' && row.isBasePollen;
     const manualMultiplier = toManualMultiplier(values.manualMultiplier);
+    const restoredEventBasedMultiplier = getRestoredEventBasedMultiplier(
+      values,
+      row
+    );
     const multiplier =
       isManualBaseMultiplier && manualMultiplier !== null
         ? scaleFactor(manualMultiplier, factorPercentageScale)
+        : restoredEventBasedMultiplier !== null
+          ? restoredEventBasedMultiplier
         : scaleFactor(eventBasedRatio, factorPercentageScale);
 
     return {

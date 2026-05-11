@@ -104,7 +104,7 @@
       "title": "Facteur de correction",
       "editTitle": "Modifier le facteur de correction",
       "description": "Sélectionnez un pic dans le graphique et examinez ses événements détectés pour créer une correction.",
-      "editDescription": "Consultez cette correction enregistrée. Les sélections d’événements précédentes ne sont pas conservées, alors sélectionnez un pic du graphique pour revoir les événements si nécessaire.",
+      "editDescription": "Consultez cette correction enregistrée. Les pics et images enregistrés sont restaurés lorsqu'ils sont disponibles.",
       "ruleEnabled": "Règle activée",
       "ruleDisabled": "Règle désactivée",
       "ruleEnabledState": "Activée",
@@ -208,7 +208,7 @@
         "savedDescription": "Cette correction enregistree affiche uniquement le multiplicateur stocke.",
         "eventBasedMode": "Basé sur les événements",
         "manualMode": "Remplacement manuel",
-        "manualActiveNotice": "Le remplacement manuel est actif. Les sélections d’événements restent visibles, mais le multiplicateur enregistré utilise la valeur manuelle.",
+        "manualActiveNotice": "Le remplacement manuel est actif. Vous pouvez sélectionner un pic du graphique comme référence, mais la revue des événements est désactivée et les images sélectionnées ne seront pas enregistrées.",
         "manualMultiplierLabel": "Multiplicateur manuel",
         "manualMultiplierHelp": "Saisissez le multiplicateur final à enregistrer pour le pollen de base.",
         "useEventBasedMultiplier": "Utiliser le multiplicateur basé sur les événements",
@@ -220,7 +220,7 @@
       },
       "editHydration": {
         "title": "Correction enregistrée chargée",
-        "description": "Cette correction enregistrée a été chargée. Les sélections d’événements précédentes ne sont pas conservées, alors sélectionnez un pic du graphique pour revoir les événements."
+        "description": "Cette correction enregistrée a été chargée. Les pics et images enregistrés sont restaurés lorsqu'ils sont disponibles ; sélectionnez un pic du graphique pour revoir de nouveaux événements si nécessaire."
       },
       "preview": {
         "title": "Pics du graphique",

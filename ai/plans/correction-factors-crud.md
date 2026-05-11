@@ -51,7 +51,8 @@ This document defines architecture and skeletons only, not full implementation.
     - unselected image = `UNKNOWN`
 16. Keep additional pollen-classification support possible in types and utilities, but do not let that future flexibility drive the v1 UI.
 17. Treat event assignments as the editable review source of truth for event-based correction. Reviewed counts and unknown counts remain derived outputs.
-18. Allow an explicit manual multiplier override mode. In event-based mode the base-pollen multiplier is derived from event assignments; in manual mode the saved base-pollen multiplier comes from the user-entered value while event selections remain visible review context.
+18. Allow an explicit manual multiplier override mode. In event-based mode the base-pollen multiplier is derived from event assignments; in manual mode the saved base-pollen multiplier comes from the user-entered value, chart peak selection remains available as reference, event-derived counts are hidden from the correction result, event review is disabled, and selected peak/images are not persisted.
+19. The correction-factor backend now supports persisted reviewed peak/image data through a top-level `peaks` key. API/domain types, mappers, and payload builders should preserve `correction_factor_details` behavior while including selected peak metadata and reviewed images when available.
 
 ## Route Integration
 
@@ -249,10 +250,11 @@ Avoid competing sources of truth by separating editable state from queried sourc
 - final review-slice selection is a separate local UI state value, typically `selectedReviewSliceId`
 - review-slice validation events come from React Query for the selected final-granularity slice only
 - reviewed event assignments are the editable review state and should be keyed by `eventId`
+- persisted peak metadata and reviewed images are serialized through the backend `peaks` payload/response key
 - detected-event counts, reviewed counts, unknown counts, and summary rows are derived from queried review-slice events plus reviewed assignments
 - correction multiplier source is explicit:
   - event-based mode derives it from reviewed assignments
-  - manual mode saves the user-entered override value
+  - manual mode saves the user-entered override value and does not persist reviewed peak/images
 
 Do not keep:
 

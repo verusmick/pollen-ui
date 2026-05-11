@@ -1,12 +1,109 @@
 import type {
   ApiCorrectionFactorDetail,
+  ApiCorrectionFactorPeak,
+  ApiCorrectionFactorPeakImage,
   ApiCorrectionFactorWriteRequest,
+  CorrectionFactorPeak,
+  CorrectionFactorPeakImage,
   CorrectionFactorFormValues,
   CorrectionFactorPayloadBuildOptions,
+  CorrectionFactorReviewedValidationEvent,
 } from '../types';
 import { UNKNOWN_POLLEN_CODE } from '../constants';
 import { buildCorrectionFactorDerivedState } from './correctionFactorMath';
-import { toCorrectionFactorApiDateTime } from './correctionFactorDateTime';
+import {
+  toCorrectionFactorApiDateTime,
+  toCorrectionFactorApiDateTimeFromUnixTimestamp,
+} from './correctionFactorDateTime';
+
+function toPeakApiDateTime(value: string): string {
+  return toCorrectionFactorApiDateTime(value) ?? value;
+}
+
+function mapPeakImageToApi(
+  image: CorrectionFactorPeakImage
+): ApiCorrectionFactorPeakImage {
+  return {
+    pollen: image.pollen,
+    location: image.location,
+    datetime: image.datetime,
+    x: image.coordinates.x,
+    y: image.coordinates.y,
+    width: image.coordinates.width,
+    height: image.coordinates.height,
+    _id: image.id,
+    index: image.index,
+  };
+}
+
+function mapReviewedEventToPeakImage(
+  event: CorrectionFactorReviewedValidationEvent,
+  values: CorrectionFactorFormValues
+): CorrectionFactorPeakImage | null {
+  if (
+    event.reviewedPollen === UNKNOWN_POLLEN_CODE ||
+    !event.coordinates ||
+    !values.location
+  ) {
+    return null;
+  }
+
+  const datetime = toCorrectionFactorApiDateTimeFromUnixTimestamp(event.datetime);
+
+  if (!datetime) {
+    return null;
+  }
+
+  return {
+    id: event.id,
+    pollen: event.reviewedPollen,
+    location: values.location,
+    datetime,
+    timestamp: event.datetime,
+    coordinates: event.coordinates,
+    index: event.index,
+  };
+}
+
+function getPeakImagesForPayload(
+  peak: CorrectionFactorPeak,
+  values: CorrectionFactorFormValues
+): CorrectionFactorPeakImage[] {
+  if (peak.id !== values.selectedReviewSliceId || values.events.length === 0) {
+    return peak.images;
+  }
+
+  return values.events
+    .map((event) => mapReviewedEventToPeakImage(event, values))
+    .filter(
+      (
+        image: CorrectionFactorPeakImage | null
+      ): image is CorrectionFactorPeakImage => image !== null
+    );
+}
+
+function buildCorrectionFactorPeaks(
+  values: CorrectionFactorFormValues
+): ApiCorrectionFactorPeak[] {
+  return values.peaks.reduce<ApiCorrectionFactorPeak[]>((peaks, peak) => {
+    const images = getPeakImagesForPayload(peak, values);
+
+    if (images.length === 0) {
+      return peaks;
+    }
+
+    peaks.push({
+      pollen: peak.pollen,
+      location: peak.location,
+      start_date: toPeakApiDateTime(peak.startDate),
+      end_date: toPeakApiDateTime(peak.endDate),
+      value: peak.value,
+      images: images.map(mapPeakImageToApi),
+    });
+
+    return peaks;
+  }, []);
+}
 
 export function buildCorrectionFactorWritePayload(
   values: CorrectionFactorFormValues,
@@ -62,11 +159,27 @@ export function buildCorrectionFactorWritePayload(
     // Current UI behavior keeps Unknown as an implicit remainder and omits it from payloads.
   }
 
-  return {
+  const payload: ApiCorrectionFactorWriteRequest = {
     start_date: startDate,
     end_date: endDate,
     pollen: values.basePollen,
     location: values.location,
     correction_factor_details: correctionFactorDetails,
   };
+
+  if (values.multiplierMode === 'manual') {
+    if (values.peaks.length > 0) {
+      payload.peaks = [];
+    }
+
+    return payload;
+  }
+
+  const peaks = buildCorrectionFactorPeaks(values);
+
+  if (peaks.length > 0) {
+    payload.peaks = peaks;
+  }
+
+  return payload;
 }
