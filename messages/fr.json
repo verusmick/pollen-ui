@@ -382,11 +382,10 @@
   },
   "messageSystemPage": {
     "title": "Regles et notifications",
-    "description": "Gerer l'envoi des notifications, les regles et les messages.",
+    "description": "Gerer la diffusion des notifications et les regles.",
     "tabs": {
       "notifications": "Notifications",
-      "rules": "Regles",
-      "notificationMessages": "Messages de notification"
+      "rules": "Regles"
     },
     "placeholders": {
       "notifications": {
@@ -398,11 +397,6 @@
         "title": "Regles",
         "description": "Gerer les definitions de regles qui relient mesures, emplacements et notifications.",
         "pending": "L'ecran Regles est en attente."
-      },
-      "notificationMessages": {
-        "title": "Messages de notification",
-        "description": "Consulter les messages rattaches aux notifications et aux mesures.",
-        "pending": "L'ecran Messages de notification est en attente."
       }
     },
     "shared": {
@@ -561,74 +555,6 @@
           "deleteConfirm": "Voulez-vous vraiment supprimer cette regle ?"
         }
       }
-    },
-    "notificationMessages": {
-      "list": {
-        "title": "Messages de notification",
-        "description": "Creer et gerer les messages de notification.",
-        "newButton": "Nouveau message",
-        "table": {
-          "notification": "Notification",
-          "measureId": "ID de mesure",
-          "creationDate": "Date de creation",
-          "value": "Valeur",
-          "description": "Description",
-          "actions": "Actions",
-          "edit": "Modifier",
-          "delete": "Supprimer",
-          "deleting": "Suppression...",
-          "deleteConfirm": "Voulez-vous vraiment supprimer ce message de notification ?",
-          "deleteErrorFallback": "Le message de notification n'a pas pu etre supprime."
-        },
-        "states": {
-          "loading": "Chargement des messages de notification...",
-          "updating": "Mise a jour des messages de notification...",
-          "error": "Les messages de notification n'ont pas pu etre charges.",
-          "empty": "Aucun message de notification n'a encore ete cree."
-        }
-      },
-      "form": {
-        "createTitle": "Nouveau message de notification",
-        "editTitle": "Modifier le message de notification",
-        "createDescription": "Definir la notification, la mesure, l'horodatage et la valeur de ce message.",
-        "editDescription": "Mettre a jour la notification, la mesure, l'horodatage et la valeur de ce message.",
-        "fields": {
-          "measureId": "ID de mesure",
-          "notificationId": "Notification",
-          "notificationPlaceholder": "Selectionner une notification",
-          "creationDate": "Date de creation",
-          "creationDatePlaceholder": "2026-04-05 00:00:00+00",
-          "creationDateHelp": "Selectionnez la date et l'heure de ce message.",
-          "value": "Valeur",
-          "description": "Description"
-        },
-        "validation": {
-          "idRequired": "L'id du message de notification est requis.",
-          "measureIdRequired": "L'ID de mesure doit etre un nombre valide.",
-          "notificationIdRequired": "Selectionnez une notification.",
-          "creationDateRequired": "La date de creation est requise.",
-          "valueRequired": "La valeur doit etre un nombre valide."
-        },
-        "states": {
-          "loadingDetail": "Chargement du message de notification...",
-          "loadError": "Le message de notification n'a pas pu etre charge.",
-          "createError": "Le message de notification n'a pas pu etre cree.",
-          "updateError": "Le message de notification n'a pas pu etre mis a jour.",
-          "deleteError": "Le message de notification n'a pas pu etre supprime.",
-          "loadingNotifications": "Chargement des notifications...",
-          "notificationsLoadError": "Les notifications n'ont pas pu etre chargees.",
-          "noNotifications": "Creez une notification avant de l'assigner a un message."
-        },
-        "actions": {
-          "cancel": "Retour",
-          "create": "Creer le message",
-          "update": "Mettre a jour le message",
-          "saving": "Enregistrement...",
-          "delete": "Supprimer le message",
-          "deleting": "Suppression...",
-          "deleteConfirm": "Voulez-vous vraiment supprimer ce message de notification ?"
-        }
-      }
     }
   },
   "alertsAndCorrectionFactorsPage": {
@@ -638,77 +564,65 @@
     },
     "alerts": {
       "title": "Alertes",
-      "description": "Creer et gerer les seuils d'alerte avec les facteurs de correction.",
-      "pending": "L'ecran Alertes est en attente.",
+      "description": "Consultez les alertes et mettez a jour leur statut.",
       "list": {
         "title": "Alertes",
-        "description": "Creer et gerer les seuils d'alerte pour les regles du systeme de messages.",
-        "newButton": "Nouvelle alerte",
+        "description": "Consultez les alertes et mettez a jour leur statut.",
         "table": {
+          "status": "Statut",
+          "creationDate": "Creee",
+          "pollen": "Pollen",
+          "location": "Emplacement",
+          "value": "Valeur",
+          "notification": "Notification",
           "rule": "Regle",
-          "type": "Type",
-          "minValue": "Valeur min.",
-          "maxValue": "Valeur max.",
+          "alert": "Alerte",
           "actions": "Actions",
-          "edit": "Modifier",
-          "delete": "Supprimer",
-          "deleting": "Suppression...",
-          "deleteConfirm": "Voulez-vous vraiment supprimer cette alerte ?",
-          "deleteErrorFallback": "L'alerte n'a pas pu etre supprimee.",
-          "pollenValue": "{value} Pollen/m³"
+          "editStatus": "Modifier le statut"
         },
         "states": {
           "loading": "Chargement des alertes...",
           "updating": "Mise a jour des alertes...",
-          "error": "Les alertes n'ont pas pu etre chargees.",
-          "empty": "Aucune alerte n'a encore ete creee."
+          "error": "Impossible de charger les alertes.",
+          "empty": "Aucune alerte disponible pour le moment."
         }
       },
       "form": {
-        "createTitle": "Nouvelle alerte",
-        "editTitle": "Modifier l'alerte",
-        "createDescription": "Definir la regle, le type d'alerte et la plage de seuil pour cette alerte.",
-        "editDescription": "Mettre a jour la regle, le type d'alerte et la plage de seuil de cette alerte.",
+        "editTitle": "Details de l'alerte",
+        "editDescription": "Consultez les details de l'alerte et mettez a jour son statut.",
+        "details": {
+          "notification": "Notification",
+          "rule": "Regle",
+          "alertType": "Type d'alerte",
+          "alertRange": "Plage d'alerte",
+          "pollen": "Pollen",
+          "location": "Emplacement",
+          "value": "Valeur",
+          "creationDate": "Creee",
+          "description": "Description"
+        },
         "fields": {
-          "ruleId": "Regle",
-          "rulePlaceholder": "Selectionner une regle",
-          "type": "Type d'alerte",
-          "typePlaceholder": "Selectionner un type d'alerte",
-          "minValue": "Valeur min.",
-          "maxValue": "Valeur max."
+          "status": "Statut"
         },
         "validation": {
-          "idRequired": "L'id d'alerte est requis.",
-          "ruleIdRequired": "Selectionnez une regle.",
-          "typeRequired": "Selectionnez un type d'alerte valide.",
-          "minValueRequired": "La valeur min. doit etre un nombre valide.",
-          "maxValueRequired": "La valeur max. doit etre un nombre valide."
+          "idRequired": "L'id de l'alerte est requis.",
+          "statusRequired": "Selectionnez un statut."
         },
         "states": {
           "loadingDetail": "Chargement de l'alerte...",
-          "loadError": "L'alerte n'a pas pu etre chargee.",
-          "createError": "L'alerte n'a pas pu etre creee.",
-          "updateError": "L'alerte n'a pas pu etre mise a jour.",
-          "deleteError": "L'alerte n'a pas pu etre supprimee.",
-          "loadingRules": "Chargement des regles...",
-          "rulesLoadError": "Les regles n'ont pas pu etre chargees.",
-          "noRules": "Creez une regle avant de lui assigner une alerte."
+          "loadError": "Impossible de charger l'alerte.",
+          "updateError": "Impossible de mettre a jour le statut de l'alerte."
         },
         "actions": {
           "cancel": "Retour",
-          "create": "Creer l'alerte",
-          "update": "Mettre a jour l'alerte",
-          "saving": "Enregistrement...",
-          "delete": "Supprimer l'alerte",
-          "deleting": "Suppression...",
-          "deleteConfirm": "Voulez-vous vraiment supprimer cette alerte ?"
-        }
-      },
-      "options": {
-        "alertTypes": {
-          "green": "Vert",
-          "yellow": "Jaune",
-          "red": "Rouge"
+          "update": "Mettre a jour le statut",
+          "saving": "Enregistrement..."
+        },
+        "options": {
+          "status": {
+            "RESOLVED": "Resolue",
+            "UNRESOLVED": "Non resolue"
+          }
         }
       }
     }

@@ -1,5 +1,5 @@
-import { AlertFormContainer } from '../components';
+import { redirect } from 'next/navigation';
 
 export default function NewAlertPage() {
-  return <AlertFormContainer key="create-alert" />;
+  redirect('/alerts-and-correction-factors/alerts');
 }

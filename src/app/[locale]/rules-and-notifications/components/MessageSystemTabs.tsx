@@ -12,10 +12,6 @@ const TABS = [
     key: 'rules',
     href: '/rules-and-notifications/rules',
   },
-  {
-    key: 'notificationMessages',
-    href: '/rules-and-notifications/notification-messages',
-  },
 ] as const;
 
 export function MessageSystemTabs() {

@@ -1,5 +1,5 @@
-import { NotificationMessageFormContainer } from '../../components';
+import { redirect } from 'next/navigation';
 
 export default function NewNotificationMessagePage() {
-  return <NotificationMessageFormContainer key="create-notification-message" />;
+  redirect('/alerts-and-correction-factors/alerts');
 }

@@ -2,22 +2,15 @@
 
 import { useTranslations } from 'next-intl';
 
-import type { AlertRecord } from '@/app/[locale]/rules-and-notifications/types';
+import type { NotificationMessageRecord } from '@/app/[locale]/rules-and-notifications/types';
+
 import { AlertsTableRow } from './AlertsTableRow';
 
 interface AlertsTableProps {
-  rows: AlertRecord[];
-  ruleNamesById?: Record<string, string>;
-  deletingId?: string | null;
-  onDelete: (id: string) => void;
+  rows: NotificationMessageRecord[];
 }
 
-export function AlertsTable({
-  rows,
-  ruleNamesById = {},
-  deletingId = null,
-  onDelete,
-}: AlertsTableProps) {
+export function AlertsTable({ rows }: AlertsTableProps) {
   const t = useTranslations('alertsAndCorrectionFactorsPage.alerts.list.table');
 
   return (
@@ -27,16 +20,28 @@ export function AlertsTable({
           <thead className="bg-background">
             <tr className="border-b border-border text-left">
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('status')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('creationDate')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('pollen')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('location')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('value')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('notification')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t('rule')}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('type')}
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('minValue')}
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('maxValue')}
+                {t('alert')}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t('actions')}
@@ -45,13 +50,7 @@ export function AlertsTable({
           </thead>
           <tbody>
             {rows.map((row) => (
-              <AlertsTableRow
-                key={row.id}
-                record={row}
-                ruleNamesById={ruleNamesById}
-                deleting={deletingId === row.id}
-                onDelete={onDelete}
-              />
+              <AlertsTableRow key={row.id} record={row} />
             ))}
           </tbody>
         </table>

@@ -47,3 +47,6 @@ Documentation has been realigned to the new Postman export: `/api/alerts` is dep
 
 ## Message System - API foundation realignment
 API foundation has been realigned for the new message-system contract: rule types/helpers now target `pollen`, `locations`, generated `intervals`, `notification_ids`, embedded `alerts`, `description`, and `enabled`; notification messages include rule/alert/pollen/location/status fields and have a status-only update helper; pollen/location option helpers and hooks use `/api/pollen` and `/api/locations`. Deprecated `/api/alerts` helpers and legacy notification-message write helpers remain only as transitional support for the old screens until the Rules UI and Alerts UI remap slices remove them.
+
+## Message System - Alerts UI remap
+Navigation has been remapped so Rules and Notifications exposes only Notifications and Rules, while Alerts under Alerts and Correction Factors is backed by notification messages. The Alerts list now reads notification-message records and the Alerts edit route is status-only using `updateNotificationMessageStatus`; create/delete/trigger actions are not exposed. Old notification-message routes and the old Alerts create route redirect to the remapped Alerts experience. Correction Factors behavior remains unchanged.

@@ -382,11 +382,10 @@
   },
   "messageSystemPage": {
     "title": "Reglas y notificaciones",
-    "description": "Gestione el envio de notificaciones, reglas y registros de mensajes.",
+    "description": "Gestiona la entrega de notificaciones y reglas.",
     "tabs": {
       "notifications": "Notificaciones",
-      "rules": "Reglas",
-      "notificationMessages": "Mensajes de notificacion"
+      "rules": "Reglas"
     },
     "placeholders": {
       "notifications": {
@@ -398,11 +397,6 @@
         "title": "Reglas",
         "description": "Gestione definiciones de reglas que conectan medidas, ubicaciones y notificaciones.",
         "pending": "La pantalla de Reglas esta pendiente."
-      },
-      "notificationMessages": {
-        "title": "Mensajes de notificacion",
-        "description": "Revise registros de mensajes vinculados a notificaciones y medidas.",
-        "pending": "La pantalla de Mensajes de notificacion esta pendiente."
       }
     },
     "shared": {
@@ -561,74 +555,6 @@
           "deleteConfirm": "Seguro que desea eliminar esta regla?"
         }
       }
-    },
-    "notificationMessages": {
-      "list": {
-        "title": "Mensajes de notificacion",
-        "description": "Cree y gestione registros de mensajes de notificacion.",
-        "newButton": "Nuevo mensaje",
-        "table": {
-          "notification": "Notificacion",
-          "measureId": "ID de medida",
-          "creationDate": "Fecha de creacion",
-          "value": "Valor",
-          "description": "Descripcion",
-          "actions": "Acciones",
-          "edit": "Editar",
-          "delete": "Eliminar",
-          "deleting": "Eliminando...",
-          "deleteConfirm": "Seguro que desea eliminar este mensaje de notificacion?",
-          "deleteErrorFallback": "No se pudo eliminar el mensaje de notificacion."
-        },
-        "states": {
-          "loading": "Cargando mensajes de notificacion...",
-          "updating": "Actualizando mensajes de notificacion...",
-          "error": "No se pudieron cargar los mensajes de notificacion.",
-          "empty": "Todavia no se han creado mensajes de notificacion."
-        }
-      },
-      "form": {
-        "createTitle": "Nuevo mensaje de notificacion",
-        "editTitle": "Editar mensaje de notificacion",
-        "createDescription": "Defina la notificacion, medida, fecha y valor de este mensaje.",
-        "editDescription": "Actualice la notificacion, medida, fecha y valor de este mensaje.",
-        "fields": {
-          "measureId": "ID de medida",
-          "notificationId": "Notificacion",
-          "notificationPlaceholder": "Seleccione una notificacion",
-          "creationDate": "Fecha de creacion",
-          "creationDatePlaceholder": "2026-04-05 00:00:00+00",
-          "creationDateHelp": "Seleccione la fecha y hora de este mensaje.",
-          "value": "Valor",
-          "description": "Descripcion"
-        },
-        "validation": {
-          "idRequired": "El id del mensaje de notificacion es obligatorio.",
-          "measureIdRequired": "El ID de medida debe ser un numero valido.",
-          "notificationIdRequired": "Seleccione una notificacion.",
-          "creationDateRequired": "La fecha de creacion es obligatoria.",
-          "valueRequired": "El valor debe ser un numero valido."
-        },
-        "states": {
-          "loadingDetail": "Cargando mensaje de notificacion...",
-          "loadError": "No se pudo cargar el mensaje de notificacion.",
-          "createError": "No se pudo crear el mensaje de notificacion.",
-          "updateError": "No se pudo actualizar el mensaje de notificacion.",
-          "deleteError": "No se pudo eliminar el mensaje de notificacion.",
-          "loadingNotifications": "Cargando notificaciones...",
-          "notificationsLoadError": "No se pudieron cargar las notificaciones.",
-          "noNotifications": "Cree una notificacion antes de asignarla a un mensaje."
-        },
-        "actions": {
-          "cancel": "Volver",
-          "create": "Crear mensaje",
-          "update": "Actualizar mensaje",
-          "saving": "Guardando...",
-          "delete": "Eliminar mensaje",
-          "deleting": "Eliminando...",
-          "deleteConfirm": "Seguro que desea eliminar este mensaje de notificacion?"
-        }
-      }
     }
   },
   "alertsAndCorrectionFactorsPage": {
@@ -638,77 +564,65 @@
     },
     "alerts": {
       "title": "Alertas",
-      "description": "Cree y gestione umbrales de alerta junto con factores de correccion.",
-      "pending": "La pantalla de Alertas esta pendiente.",
+      "description": "Revisa alertas y actualiza su estado.",
       "list": {
         "title": "Alertas",
-        "description": "Cree y gestione umbrales de alerta para reglas del sistema de mensajes.",
-        "newButton": "Nueva alerta",
+        "description": "Revisa alertas y actualiza su estado.",
         "table": {
+          "status": "Estado",
+          "creationDate": "Creada",
+          "pollen": "Polen",
+          "location": "Ubicacion",
+          "value": "Valor",
+          "notification": "Notificacion",
           "rule": "Regla",
-          "type": "Tipo",
-          "minValue": "Valor minimo",
-          "maxValue": "Valor maximo",
+          "alert": "Alerta",
           "actions": "Acciones",
-          "edit": "Editar",
-          "delete": "Eliminar",
-          "deleting": "Eliminando...",
-          "deleteConfirm": "Seguro que desea eliminar esta alerta?",
-          "deleteErrorFallback": "No se pudo eliminar la alerta.",
-          "pollenValue": "{value} Pollen/m³"
+          "editStatus": "Editar estado"
         },
         "states": {
           "loading": "Cargando alertas...",
           "updating": "Actualizando alertas...",
           "error": "No se pudieron cargar las alertas.",
-          "empty": "Todavia no se han creado alertas."
+          "empty": "Aun no hay alertas disponibles."
         }
       },
       "form": {
-        "createTitle": "Nueva alerta",
-        "editTitle": "Editar alerta",
-        "createDescription": "Defina la regla, el tipo de alerta y el rango de umbral para esta alerta.",
-        "editDescription": "Actualice la regla, el tipo de alerta y el rango de umbral de esta alerta.",
+        "editTitle": "Detalles de la alerta",
+        "editDescription": "Revisa los detalles de la alerta y actualiza su estado.",
+        "details": {
+          "notification": "Notificacion",
+          "rule": "Regla",
+          "alertType": "Tipo de alerta",
+          "alertRange": "Rango de alerta",
+          "pollen": "Polen",
+          "location": "Ubicacion",
+          "value": "Valor",
+          "creationDate": "Creada",
+          "description": "Descripcion"
+        },
         "fields": {
-          "ruleId": "Regla",
-          "rulePlaceholder": "Seleccione una regla",
-          "type": "Tipo de alerta",
-          "typePlaceholder": "Seleccione un tipo de alerta",
-          "minValue": "Valor minimo",
-          "maxValue": "Valor maximo"
+          "status": "Estado"
         },
         "validation": {
-          "idRequired": "El id de alerta es obligatorio.",
-          "ruleIdRequired": "Seleccione una regla.",
-          "typeRequired": "Seleccione un tipo de alerta valido.",
-          "minValueRequired": "El valor minimo debe ser un numero valido.",
-          "maxValueRequired": "El valor maximo debe ser un numero valido."
+          "idRequired": "El id de la alerta es obligatorio.",
+          "statusRequired": "Selecciona un estado."
         },
         "states": {
           "loadingDetail": "Cargando alerta...",
           "loadError": "No se pudo cargar la alerta.",
-          "createError": "No se pudo crear la alerta.",
-          "updateError": "No se pudo actualizar la alerta.",
-          "deleteError": "No se pudo eliminar la alerta.",
-          "loadingRules": "Cargando reglas...",
-          "rulesLoadError": "No se pudieron cargar las reglas.",
-          "noRules": "Cree una regla antes de asignar una alerta."
+          "updateError": "No se pudo actualizar el estado de la alerta."
         },
         "actions": {
           "cancel": "Volver",
-          "create": "Crear alerta",
-          "update": "Actualizar alerta",
-          "saving": "Guardando...",
-          "delete": "Eliminar alerta",
-          "deleting": "Eliminando...",
-          "deleteConfirm": "Seguro que desea eliminar esta alerta?"
-        }
-      },
-      "options": {
-        "alertTypes": {
-          "green": "Verde",
-          "yellow": "Amarillo",
-          "red": "Rojo"
+          "update": "Actualizar estado",
+          "saving": "Guardando..."
+        },
+        "options": {
+          "status": {
+            "RESOLVED": "Resuelta",
+            "UNRESOLVED": "Sin resolver"
+          }
         }
       }
     }

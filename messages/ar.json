@@ -382,11 +382,10 @@
   },
   "messageSystemPage": {
     "title": "القواعد والإشعارات",
-    "description": "إدارة إرسال الإشعارات والقواعد وسجلات الرسائل.",
+    "description": "ادارة تسليم الاشعارات والقواعد.",
     "tabs": {
       "notifications": "الإشعارات",
-      "rules": "القواعد",
-      "notificationMessages": "رسائل الإشعارات"
+      "rules": "القواعد"
     },
     "placeholders": {
       "notifications": {
@@ -398,11 +397,6 @@
         "title": "القواعد",
         "description": "إدارة تعريفات القواعد التي تربط القياسات والمواقع والإشعارات.",
         "pending": "شاشة القواعد قيد الانتظار."
-      },
-      "notificationMessages": {
-        "title": "رسائل الإشعارات",
-        "description": "مراجعة سجلات الرسائل المرتبطة بالإشعارات والقياسات.",
-        "pending": "شاشة رسائل الإشعارات قيد الانتظار."
       }
     },
     "shared": {
@@ -561,74 +555,6 @@
           "deleteConfirm": "هل أنت متأكد من حذف هذه القاعدة؟"
         }
       }
-    },
-    "notificationMessages": {
-      "list": {
-        "title": "رسائل الإشعارات",
-        "description": "إنشاء وإدارة سجلات رسائل الإشعارات.",
-        "newButton": "رسالة جديدة",
-        "table": {
-          "notification": "الإشعار",
-          "measureId": "معرف القياس",
-          "creationDate": "تاريخ الإنشاء",
-          "value": "القيمة",
-          "description": "الوصف",
-          "actions": "الإجراءات",
-          "edit": "تعديل",
-          "delete": "حذف",
-          "deleting": "جار الحذف...",
-          "deleteConfirm": "هل أنت متأكد من حذف رسالة الإشعار هذه؟",
-          "deleteErrorFallback": "تعذر حذف رسالة الإشعار."
-        },
-        "states": {
-          "loading": "جار تحميل رسائل الإشعارات...",
-          "updating": "جار تحديث رسائل الإشعارات...",
-          "error": "تعذر تحميل رسائل الإشعارات.",
-          "empty": "لم يتم إنشاء أي رسائل إشعار بعد."
-        }
-      },
-      "form": {
-        "createTitle": "رسالة إشعار جديدة",
-        "editTitle": "تعديل رسالة الإشعار",
-        "createDescription": "حدد الإشعار والقياس والطابع الزمني والقيمة لهذه الرسالة.",
-        "editDescription": "حدث الإشعار والقياس والطابع الزمني والقيمة لهذه الرسالة.",
-        "fields": {
-          "measureId": "معرف القياس",
-          "notificationId": "الإشعار",
-          "notificationPlaceholder": "اختر إشعارًا",
-          "creationDate": "تاريخ الإنشاء",
-          "creationDatePlaceholder": "2026-04-05 00:00:00+00",
-          "creationDateHelp": "اختر تاريخ ووقت هذه الرسالة.",
-          "value": "القيمة",
-          "description": "الوصف"
-        },
-        "validation": {
-          "idRequired": "معرف رسالة الإشعار مطلوب.",
-          "measureIdRequired": "يجب أن يكون معرف القياس رقمًا صالحًا.",
-          "notificationIdRequired": "اختر إشعارًا.",
-          "creationDateRequired": "تاريخ الإنشاء مطلوب.",
-          "valueRequired": "يجب أن تكون القيمة رقمًا صالحًا."
-        },
-        "states": {
-          "loadingDetail": "جار تحميل رسالة الإشعار...",
-          "loadError": "تعذر تحميل رسالة الإشعار.",
-          "createError": "تعذر إنشاء رسالة الإشعار.",
-          "updateError": "تعذر تحديث رسالة الإشعار.",
-          "deleteError": "تعذر حذف رسالة الإشعار.",
-          "loadingNotifications": "جار تحميل الإشعارات...",
-          "notificationsLoadError": "تعذر تحميل الإشعارات.",
-          "noNotifications": "أنشئ إشعارًا قبل تعيينه إلى رسالة."
-        },
-        "actions": {
-          "cancel": "رجوع",
-          "create": "إنشاء رسالة",
-          "update": "تحديث الرسالة",
-          "saving": "جار الحفظ...",
-          "delete": "حذف الرسالة",
-          "deleting": "جار الحذف...",
-          "deleteConfirm": "هل أنت متأكد من حذف رسالة الإشعار هذه؟"
-        }
-      }
     }
   },
   "alertsAndCorrectionFactorsPage": {
@@ -638,77 +564,65 @@
     },
     "alerts": {
       "title": "التنبيهات",
-      "description": "إنشاء وإدارة حدود التنبيه بجانب عوامل التصحيح.",
-      "pending": "شاشة التنبيهات قيد الانتظار.",
+      "description": "راجع التنبيهات وقم بتحديث حالتها.",
       "list": {
         "title": "التنبيهات",
-        "description": "إنشاء وإدارة حدود التنبيه للقواعد.",
-        "newButton": "تنبيه جديد",
+        "description": "راجع التنبيهات وقم بتحديث حالتها.",
         "table": {
+          "status": "الحالة",
+          "creationDate": "تاريخ الانشاء",
+          "pollen": "حبوب اللقاح",
+          "location": "الموقع",
+          "value": "القيمة",
+          "notification": "الاشعار",
           "rule": "القاعدة",
-          "type": "النوع",
-          "minValue": "القيمة الدنيا",
-          "maxValue": "القيمة العليا",
-          "actions": "الإجراءات",
-          "edit": "تعديل",
-          "delete": "حذف",
-          "deleting": "جار الحذف...",
-          "deleteConfirm": "هل أنت متأكد من حذف هذا التنبيه؟",
-          "deleteErrorFallback": "تعذر حذف التنبيه.",
-          "pollenValue": "{value} Pollen/m³"
+          "alert": "التنبيه",
+          "actions": "الاجراءات",
+          "editStatus": "تعديل الحالة"
         },
         "states": {
           "loading": "جار تحميل التنبيهات...",
           "updating": "جار تحديث التنبيهات...",
           "error": "تعذر تحميل التنبيهات.",
-          "empty": "لم يتم إنشاء أي تنبيهات بعد."
+          "empty": "لا توجد تنبيهات متاحة بعد."
         }
       },
       "form": {
-        "createTitle": "تنبيه جديد",
-        "editTitle": "تعديل التنبيه",
-        "createDescription": "حدد القاعدة ونوع التنبيه ونطاق الحد لهذا التنبيه.",
-        "editDescription": "حدث القاعدة ونوع التنبيه ونطاق الحد لهذا التنبيه.",
+        "editTitle": "تفاصيل التنبيه",
+        "editDescription": "راجع تفاصيل التنبيه وقم بتحديث حالته.",
+        "details": {
+          "notification": "الاشعار",
+          "rule": "القاعدة",
+          "alertType": "نوع التنبيه",
+          "alertRange": "نطاق التنبيه",
+          "pollen": "حبوب اللقاح",
+          "location": "الموقع",
+          "value": "القيمة",
+          "creationDate": "تاريخ الانشاء",
+          "description": "الوصف"
+        },
         "fields": {
-          "ruleId": "القاعدة",
-          "rulePlaceholder": "اختر قاعدة",
-          "type": "نوع التنبيه",
-          "typePlaceholder": "اختر نوع تنبيه",
-          "minValue": "القيمة الدنيا",
-          "maxValue": "القيمة العليا"
+          "status": "الحالة"
         },
         "validation": {
           "idRequired": "معرف التنبيه مطلوب.",
-          "ruleIdRequired": "اختر قاعدة.",
-          "typeRequired": "اختر نوع تنبيه صالحًا.",
-          "minValueRequired": "يجب أن تكون القيمة الدنيا رقمًا صالحًا.",
-          "maxValueRequired": "يجب أن تكون القيمة العليا رقمًا صالحًا."
+          "statusRequired": "اختر حالة."
         },
         "states": {
           "loadingDetail": "جار تحميل التنبيه...",
           "loadError": "تعذر تحميل التنبيه.",
-          "createError": "تعذر إنشاء التنبيه.",
-          "updateError": "تعذر تحديث التنبيه.",
-          "deleteError": "تعذر حذف التنبيه.",
-          "loadingRules": "جار تحميل القواعد...",
-          "rulesLoadError": "تعذر تحميل القواعد.",
-          "noRules": "أنشئ قاعدة قبل تعيين تنبيه لها."
+          "updateError": "تعذر تحديث حالة التنبيه."
         },
         "actions": {
           "cancel": "رجوع",
-          "create": "إنشاء تنبيه",
-          "update": "تحديث التنبيه",
-          "saving": "جار الحفظ...",
-          "delete": "حذف التنبيه",
-          "deleting": "جار الحذف...",
-          "deleteConfirm": "هل أنت متأكد من حذف هذا التنبيه؟"
-        }
-      },
-      "options": {
-        "alertTypes": {
-          "green": "أخضر",
-          "yellow": "أصفر",
-          "red": "أحمر"
+          "update": "تحديث الحالة",
+          "saving": "جار الحفظ..."
+        },
+        "options": {
+          "status": {
+            "RESOLVED": "تم الحل",
+            "UNRESOLVED": "غير محلول"
+          }
         }
       }
     }

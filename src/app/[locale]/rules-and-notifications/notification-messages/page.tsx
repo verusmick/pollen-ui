@@ -1,5 +1,5 @@
-import { NotificationMessagesListContainer } from '../components';
+import { redirect } from 'next/navigation';
 
 export default function NotificationMessagesPage() {
-  return <NotificationMessagesListContainer />;
+  redirect('/alerts-and-correction-factors/alerts');
 }

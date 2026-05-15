@@ -2,58 +2,80 @@
 
 import { useTranslations } from 'next-intl';
 
-import { MESSAGE_SYSTEM_ALERT_TYPES } from '@/app/[locale]/rules-and-notifications/constants';
-import type { RuleRecord } from '@/app/[locale]/rules-and-notifications/types';
-
-import type { AlertFormErrors, AlertFormValues } from '../utils';
+import { MESSAGE_SYSTEM_NOTIFICATION_MESSAGE_STATUSES } from '@/app/[locale]/rules-and-notifications/constants';
+import type {
+  MessageSystemNotificationMessageStatus,
+  NotificationMessageRecord,
+} from '@/app/[locale]/rules-and-notifications/types';
 
 interface AlertFormProps {
-  mode: 'create' | 'edit';
-  values: AlertFormValues;
-  errors: AlertFormErrors;
-  ruleOptions: RuleRecord[];
-  ruleOptionsLoading?: boolean;
-  ruleOptionsError?: string | null;
+  record?: NotificationMessageRecord;
+  status: MessageSystemNotificationMessageStatus;
+  statusError?: string | null;
   saving?: boolean;
-  deleting?: boolean;
   actionError?: string | null;
-  onFieldChange: <K extends keyof AlertFormValues>(
-    field: K,
-    value: AlertFormValues[K]
-  ) => void;
+  onStatusChange: (status: string) => void;
   onSubmit: () => void;
-  onDelete?: () => void;
   onCancel: () => void;
 }
 
+function formatNumber(value: number | null | undefined): string {
+  return typeof value === 'number' && Number.isFinite(value) ? String(value) : '';
+}
+
+function getNamedValue(value: unknown): string {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return '';
+  }
+
+  const record = value as Record<string, unknown>;
+  const candidate = record.name ?? record.label ?? record.type ?? record.id;
+
+  return typeof candidate === 'string' || typeof candidate === 'number'
+    ? String(candidate)
+    : '';
+}
+
+function getAlertDetail(value: unknown, key: string): string {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return '';
+  }
+
+  const record = value as Record<string, unknown>;
+  const candidate = record[key];
+
+  return typeof candidate === 'string' || typeof candidate === 'number'
+    ? String(candidate)
+    : '';
+}
+
 export function AlertForm({
-  mode,
-  values,
-  errors,
-  ruleOptions,
-  ruleOptionsLoading = false,
-  ruleOptionsError = null,
+  record,
+  status,
+  statusError = null,
   saving = false,
-  deleting = false,
   actionError = null,
-  onFieldChange,
+  onStatusChange,
   onSubmit,
-  onDelete,
   onCancel,
 }: AlertFormProps) {
   const t = useTranslations('alertsAndCorrectionFactorsPage.alerts.form');
-  const optionsT = useTranslations('alertsAndCorrectionFactorsPage.alerts.options');
-  const isEditMode = mode === 'edit';
+  const sharedT = useTranslations('messageSystemPage.shared');
+  const unavailable = sharedT('notAvailable');
+  const notificationLabel =
+    getNamedValue(record?.notification) || record?.notificationId || unavailable;
+  const ruleLabel = getNamedValue(record?.rule) || record?.ruleId || unavailable;
+  const alertType = getAlertDetail(record?.alert, 'type') || unavailable;
+  const alertMin = getAlertDetail(record?.alert, 'min_value') || unavailable;
+  const alertMax = getAlertDetail(record?.alert, 'max_value') || unavailable;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
       <header className="space-y-1">
         <h1 className="text-lg font-semibold text-foreground">
-          {isEditMode ? t('editTitle') : t('createTitle')}
+          {t('editTitle')}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          {isEditMode ? t('editDescription') : t('createDescription')}
-        </p>
+        <p className="text-sm text-muted-foreground">{t('editDescription')}</p>
       </header>
 
       {actionError ? (
@@ -70,149 +92,113 @@ export function AlertForm({
         }}
       >
         <div className="grid gap-5">
-          <fieldset className="grid gap-2">
-            <legend className="text-sm font-medium text-foreground">
-              {t('fields.ruleId')}
-            </legend>
-
-            {ruleOptionsLoading ? (
-              <div className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">
-                {t('states.loadingRules')}
-              </div>
-            ) : null}
-
-            {ruleOptionsError ? (
-              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                {ruleOptionsError}
-              </div>
-            ) : null}
-
-            {!ruleOptionsLoading && ruleOptions.length > 0 ? (
-              <select
-                value={values.ruleId}
-                onChange={(event) => onFieldChange('ruleId', event.target.value)}
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-              >
-                <option value="">{t('fields.rulePlaceholder')}</option>
-                {ruleOptions.map((rule) => {
-                  const numericId = Number(rule.id);
-
-                  return (
-                    <option
-                      key={rule.id}
-                      value={rule.id}
-                      disabled={!Number.isFinite(numericId)}
-                    >
-                      {rule.name}
-                    </option>
-                  );
-                })}
-              </select>
-            ) : null}
-
-            {!ruleOptionsLoading && ruleOptions.length === 0 ? (
-              <div className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">
-                {t('states.noRules')}
-              </div>
-            ) : null}
-
-            {errors.ruleId ? (
-              <span className="text-sm text-red-700">{errors.ruleId}</span>
-            ) : null}
-          </fieldset>
+          <dl className="grid gap-4 rounded-md border border-border bg-background p-4 md:grid-cols-2">
+            <div>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.notification')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {notificationLabel}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.rule')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">{ruleLabel}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.alertType')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">{alertType}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.alertRange')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {alertMin} - {alertMax}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.pollen')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {record?.pollen || unavailable}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.location')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {record?.location || unavailable}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.value')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {formatNumber(record?.value) || unavailable}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.creationDate')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {record?.creationDate || unavailable}
+              </dd>
+            </div>
+            <div className="md:col-span-2">
+              <dt className="text-xs font-medium uppercase text-muted-foreground">
+                {t('details.description')}
+              </dt>
+              <dd className="mt-1 text-sm text-foreground">
+                {record?.description || unavailable}
+              </dd>
+            </div>
+          </dl>
 
           <label className="grid gap-2">
             <span className="text-sm font-medium text-foreground">
-              {t('fields.type')}
+              {t('fields.status')}
             </span>
             <select
-              value={values.type}
-              onChange={(event) => onFieldChange('type', event.target.value)}
+              value={status}
+              onChange={(event) => onStatusChange(event.target.value)}
               className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
             >
-              <option value="">{t('fields.typePlaceholder')}</option>
-              {MESSAGE_SYSTEM_ALERT_TYPES.map((alertType) => (
-                <option key={alertType} value={alertType}>
-                  {optionsT(`alertTypes.${alertType}`)}
+              {MESSAGE_SYSTEM_NOTIFICATION_MESSAGE_STATUSES.map((option) => (
+                <option key={option} value={option}>
+                  {t(`options.status.${option}`)}
                 </option>
               ))}
             </select>
-            {errors.type ? (
-              <span className="text-sm text-red-700">{errors.type}</span>
+            {statusError ? (
+              <span className="text-sm text-red-700">{statusError}</span>
             ) : null}
           </label>
 
-          <div className="grid gap-5 md:grid-cols-2">
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-foreground">
-                {t('fields.minValue')}
-              </span>
-              <input
-                type="number"
-                step="any"
-                value={values.minValue}
-                onChange={(event) =>
-                  onFieldChange('minValue', event.target.value)
-                }
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-              />
-              {errors.minValue ? (
-                <span className="text-sm text-red-700">{errors.minValue}</span>
-              ) : null}
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-foreground">
-                {t('fields.maxValue')}
-              </span>
-              <input
-                type="number"
-                step="any"
-                value={values.maxValue}
-                onChange={(event) =>
-                  onFieldChange('maxValue', event.target.value)
-                }
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-              />
-              {errors.maxValue ? (
-                <span className="text-sm text-red-700">{errors.maxValue}</span>
-              ) : null}
-            </label>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={onCancel}
-                disabled={saving || deleting}
-                className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-background disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {t('actions.cancel')}
-              </button>
-              <button
-                type="submit"
-                disabled={saving || deleting}
-                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {saving
-                  ? t('actions.saving')
-                  : isEditMode
-                    ? t('actions.update')
-                    : t('actions.create')}
-              </button>
-            </div>
-
-            {isEditMode && onDelete ? (
-              <button
-                type="button"
-                onClick={onDelete}
-                disabled={saving || deleting}
-                className="rounded-md border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {deleting ? t('actions.deleting') : t('actions.delete')}
-              </button>
-            ) : null}
+          <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={saving}
+              className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-background disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {t('actions.cancel')}
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {saving ? t('actions.saving') : t('actions.update')}
+            </button>
           </div>
         </div>
       </form>

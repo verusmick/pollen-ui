@@ -1,4 +1,4 @@
-import { NotificationMessageFormContainer } from '../../../components';
+import { redirect } from 'next/navigation';
 
 interface EditNotificationMessagePageProps {
   params: Promise<{
@@ -11,11 +11,5 @@ export default async function EditNotificationMessagePage({
 }: EditNotificationMessagePageProps) {
   const { notificationMessageId } = await params;
 
-  return (
-    <NotificationMessageFormContainer
-      key={notificationMessageId}
-      mode="edit"
-      notificationMessageId={notificationMessageId}
-    />
-  );
+  redirect(`/alerts-and-correction-factors/alerts/${notificationMessageId}/edit`);
 }
