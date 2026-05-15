@@ -271,8 +271,10 @@ export async function listPollens(): Promise<MessageSystemOption[]> {
 
 export async function listLocations(): Promise<MessageSystemOption[]> {
   const response = await requestJson<unknown>(LOCATIONS_BASE_URL);
-  return normalizeMessageSystemStringOptions(response, [
-    'locations',
-    'location',
-  ]);
+  return normalizeMessageSystemStringOptions(
+    response,
+    ['locations', 'location'],
+    ['id', 'code', 'value', 'name', 'label'],
+    ['name', 'label', 'id', 'code', 'value']
+  );
 }

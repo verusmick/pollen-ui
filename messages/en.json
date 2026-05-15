@@ -482,15 +482,14 @@
     "rules": {
       "list": {
         "title": "Rules",
-        "description": "Create and manage rule definitions.",
+        "description": "Create and manage pollen evaluation rules.",
         "newButton": "New rule",
         "table": {
           "name": "Name",
-          "measureId": "Measure ID",
-          "startDate": "Start date",
-          "endDate": "End date",
-          "locationIds": "Location IDs",
+          "pollen": "Pollen",
+          "locations": "Locations",
           "notificationIds": "Notifications",
+          "alerts": "Alerts",
           "enabledState": "Enabled",
           "actions": "Actions",
           "enabled": "Enabled",
@@ -511,29 +510,41 @@
       "form": {
         "createTitle": "New rule",
         "editTitle": "Edit rule",
-        "createDescription": "Define the measure, locations, notifications, and date range for this rule.",
-        "editDescription": "Update the measure, locations, notifications, and date range for this rule.",
+        "createDescription": "Define pollen, locations, notifications, flight period, and alert thresholds for this rule.",
+        "editDescription": "Update pollen, locations, notifications, flight period, and alert thresholds for this rule.",
         "fields": {
           "name": "Name",
-          "measureId": "Measure ID",
-          "startDate": "Start date",
-          "endDate": "End date",
-          "datePlaceholder": "2026-04-05 00:00:00+00",
-          "locationIds": "Location IDs",
-          "locationIdsHelp": "Use comma-separated numeric location IDs.",
+          "pollen": "Pollen",
+          "pollenPlaceholder": "Select pollen",
+          "locations": "Locations",
           "notificationIds": "Notifications",
+          "flightPeriod": "Pollen flight period",
+          "flightStart": "Flight period start",
+          "flightEnd": "Flight period end",
+          "generatedIntervals": "{count} evaluation intervals will be generated outside this flight period.",
+          "generatedIntervalsHelp": "Evaluation intervals are generated from the selected flight period.",
+          "alerts": "Alert thresholds",
+          "alertType": "Type",
+          "alertMinValue": "Min value",
+          "alertMaxValue": "Max value",
           "description": "Description",
           "enabled": "Enabled",
-          "notificationPlaceholder": "Select a notification"
+          "locationPlaceholder": "Select a location"
         },
         "validation": {
           "idRequired": "Rule id is required.",
           "nameRequired": "Name is required.",
-          "measureIdRequired": "Measure ID must be a valid number.",
-          "startDateRequired": "Start date is required.",
-          "endDateRequired": "End date is required.",
-          "locationIdsRequired": "Enter at least one numeric location ID.",
-          "notificationIdsRequired": "Select at least one notification."
+          "pollenRequired": "Select pollen.",
+          "locationsRequired": "Select at least one location.",
+          "notificationIdsRequired": "Select at least one notification.",
+          "flightStartRequired": "Flight period start is required.",
+          "flightEndRequired": "Flight period end is required.",
+          "flightPeriodInvalid": "Choose a valid flight period within one calendar year.",
+          "generatedIntervalsRequired": "The flight period must leave at least one evaluation interval in the year.",
+          "alertsRequired": "Add at least one alert threshold.",
+          "alertTypeRequired": "Select a valid alert type.",
+          "alertMinRequired": "Min value must be numeric.",
+          "alertMaxRequired": "Max value must be numeric."
         },
         "states": {
           "loadingDetail": "Loading rule...",
@@ -543,7 +554,13 @@
           "deleteError": "Failed to delete the rule.",
           "loadingNotifications": "Loading notifications...",
           "notificationsLoadError": "Failed to load notifications.",
-          "noNotifications": "Create a notification before assigning it to a rule."
+          "noNotifications": "Create a notification before assigning it to a rule.",
+          "loadingPollen": "Loading pollen...",
+          "pollenLoadError": "Failed to load pollen.",
+          "noPollen": "No pollen options are available.",
+          "loadingLocations": "Loading locations...",
+          "locationsLoadError": "Failed to load locations.",
+          "noLocations": "No locations are available."
         },
         "actions": {
           "cancel": "Back",
@@ -552,7 +569,9 @@
           "saving": "Saving...",
           "delete": "Delete rule",
           "deleting": "Deleting...",
-          "deleteConfirm": "Are you sure you want to delete this rule?"
+          "deleteConfirm": "Are you sure you want to delete this rule?",
+          "addAlert": "Add alert",
+          "removeAlert": "Remove"
         }
       }
     }

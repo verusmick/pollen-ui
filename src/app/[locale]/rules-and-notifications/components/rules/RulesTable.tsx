@@ -7,6 +7,7 @@ import { RulesTableRow } from './RulesTableRow';
 
 interface RulesTableProps {
   rows: RuleRecord[];
+  locationNamesById?: Record<string, string>;
   notificationNamesById?: Record<string, string>;
   deletingId?: string | null;
   onDelete: (id: string) => void;
@@ -14,6 +15,7 @@ interface RulesTableProps {
 
 export function RulesTable({
   rows,
+  locationNamesById = {},
   notificationNamesById = {},
   deletingId = null,
   onDelete,
@@ -30,19 +32,16 @@ export function RulesTable({
                 {t('name')}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('measureId')}
+                {t('pollen')}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('startDate')}
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('endDate')}
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t('locationIds')}
+                {t('locations')}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t('notificationIds')}
+              </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('alerts')}
               </th>
               <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t('enabledState')}
@@ -57,6 +56,7 @@ export function RulesTable({
               <RulesTableRow
                 key={row.id}
                 record={row}
+                locationNamesById={locationNamesById}
                 notificationNamesById={notificationNamesById}
                 deleting={deletingId === row.id}
                 onDelete={onDelete}

@@ -176,7 +176,9 @@ export function mapApiNotificationMessageRecords(
 
 export function normalizeMessageSystemStringOptions(
   payload: unknown,
-  collectionNames: string[]
+  collectionNames: string[],
+  valueFieldNames = ['value', 'code', 'name', 'id', 'label'],
+  labelFieldNames = ['label', 'name', 'code', 'id', 'value']
 ): MessageSystemOption[] {
   const candidates: unknown[][] = [];
 
@@ -216,9 +218,17 @@ export function normalizeMessageSystemStringOptions(
         }
 
         const record = item as Record<string, unknown>;
-        const rawValue =
-          record.value ?? record.code ?? record.name ?? record.id ?? record.label;
-        const rawLabel = record.label ?? record.name ?? record.code ?? rawValue;
+        const rawValue = valueFieldNames
+          .map((fieldName) => record[fieldName])
+          .find(
+            (value) => typeof value === 'string' || typeof value === 'number'
+          );
+        const rawLabel =
+          labelFieldNames
+            .map((fieldName) => record[fieldName])
+            .find(
+              (value) => typeof value === 'string' || typeof value === 'number'
+            ) ?? rawValue;
 
         if (
           (typeof rawValue !== 'string' && typeof rawValue !== 'number') ||

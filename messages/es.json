@@ -482,23 +482,22 @@
     "rules": {
       "list": {
         "title": "Reglas",
-        "description": "Cree y gestione definiciones de reglas.",
+        "description": "Crea y gestiona reglas de evaluacion de polen.",
         "newButton": "Nueva regla",
         "table": {
           "name": "Nombre",
-          "measureId": "ID de medida",
-          "startDate": "Fecha de inicio",
-          "endDate": "Fecha de fin",
-          "locationIds": "IDs de ubicacion",
+          "pollen": "Polen",
+          "locations": "Ubicaciones",
           "notificationIds": "Notificaciones",
-          "enabledState": "Habilitada",
+          "alerts": "Alertas",
+          "enabledState": "Activa",
           "actions": "Acciones",
-          "enabled": "Habilitada",
-          "disabled": "Deshabilitada",
+          "enabled": "Activa",
+          "disabled": "Inactiva",
           "edit": "Editar",
           "delete": "Eliminar",
           "deleting": "Eliminando...",
-          "deleteConfirm": "Seguro que desea eliminar esta regla?",
+          "deleteConfirm": "¿Seguro que desea eliminar esta regla?",
           "deleteErrorFallback": "No se pudo eliminar la regla."
         },
         "states": {
@@ -511,29 +510,41 @@
       "form": {
         "createTitle": "Nueva regla",
         "editTitle": "Editar regla",
-        "createDescription": "Defina la medida, ubicaciones, notificaciones y rango de fechas para esta regla.",
-        "editDescription": "Actualice la medida, ubicaciones, notificaciones y rango de fechas de esta regla.",
+        "createDescription": "Define polen, ubicaciones, notificaciones, periodo de vuelo y umbrales de alerta para esta regla.",
+        "editDescription": "Actualiza polen, ubicaciones, notificaciones, periodo de vuelo y umbrales de alerta para esta regla.",
         "fields": {
           "name": "Nombre",
-          "measureId": "ID de medida",
-          "startDate": "Fecha de inicio",
-          "endDate": "Fecha de fin",
-          "datePlaceholder": "2026-04-05 00:00:00+00",
-          "locationIds": "IDs de ubicacion",
-          "locationIdsHelp": "Use IDs numericos de ubicacion separados por comas.",
+          "pollen": "Polen",
+          "pollenPlaceholder": "Seleccione polen",
+          "locations": "Ubicaciones",
           "notificationIds": "Notificaciones",
+          "flightPeriod": "Periodo de vuelo del polen",
+          "flightStart": "Inicio del periodo de vuelo",
+          "flightEnd": "Fin del periodo de vuelo",
+          "generatedIntervals": "Se generaran {count} intervalos de evaluacion fuera de este periodo.",
+          "generatedIntervalsHelp": "Los intervalos de evaluacion se generan a partir del periodo de vuelo seleccionado.",
+          "alerts": "Umbrales de alerta",
+          "alertType": "Tipo",
+          "alertMinValue": "Valor minimo",
+          "alertMaxValue": "Valor maximo",
           "description": "Descripcion",
-          "enabled": "Habilitada",
-          "notificationPlaceholder": "Seleccione una notificacion"
+          "enabled": "Activa",
+          "locationPlaceholder": "Seleccione una ubicacion"
         },
         "validation": {
-          "idRequired": "El id de regla es obligatorio.",
+          "idRequired": "El id de la regla es obligatorio.",
           "nameRequired": "El nombre es obligatorio.",
-          "measureIdRequired": "El ID de medida debe ser un numero valido.",
-          "startDateRequired": "La fecha de inicio es obligatoria.",
-          "endDateRequired": "La fecha de fin es obligatoria.",
-          "locationIdsRequired": "Ingrese al menos un ID numerico de ubicacion.",
-          "notificationIdsRequired": "Seleccione al menos una notificacion."
+          "pollenRequired": "Seleccione polen.",
+          "locationsRequired": "Seleccione al menos una ubicacion.",
+          "notificationIdsRequired": "Seleccione al menos una notificacion.",
+          "flightStartRequired": "El inicio del periodo de vuelo es obligatorio.",
+          "flightEndRequired": "El fin del periodo de vuelo es obligatorio.",
+          "flightPeriodInvalid": "Elija un periodo de vuelo valido dentro de un mismo ano calendario.",
+          "generatedIntervalsRequired": "El periodo de vuelo debe dejar al menos un intervalo de evaluacion en el ano.",
+          "alertsRequired": "Agregue al menos un umbral de alerta.",
+          "alertTypeRequired": "Seleccione un tipo de alerta valido.",
+          "alertMinRequired": "El valor minimo debe ser numerico.",
+          "alertMaxRequired": "El valor maximo debe ser numerico."
         },
         "states": {
           "loadingDetail": "Cargando regla...",
@@ -543,7 +554,13 @@
           "deleteError": "No se pudo eliminar la regla.",
           "loadingNotifications": "Cargando notificaciones...",
           "notificationsLoadError": "No se pudieron cargar las notificaciones.",
-          "noNotifications": "Cree una notificacion antes de asignarla a una regla."
+          "noNotifications": "Cree una notificacion antes de asignarla a una regla.",
+          "loadingPollen": "Cargando polen...",
+          "pollenLoadError": "No se pudo cargar el polen.",
+          "noPollen": "No hay opciones de polen disponibles.",
+          "loadingLocations": "Cargando ubicaciones...",
+          "locationsLoadError": "No se pudieron cargar las ubicaciones.",
+          "noLocations": "No hay ubicaciones disponibles."
         },
         "actions": {
           "cancel": "Volver",
@@ -552,7 +569,9 @@
           "saving": "Guardando...",
           "delete": "Eliminar regla",
           "deleting": "Eliminando...",
-          "deleteConfirm": "Seguro que desea eliminar esta regla?"
+          "deleteConfirm": "¿Seguro que desea eliminar esta regla?",
+          "addAlert": "Agregar alerta",
+          "removeAlert": "Quitar"
         }
       }
     }

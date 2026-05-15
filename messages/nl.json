@@ -482,15 +482,14 @@
     "rules": {
       "list": {
         "title": "Regels",
-        "description": "Maak en beheer regeldefinities.",
+        "description": "Maak en beheer pollen-evaluatieregels.",
         "newButton": "Nieuwe regel",
         "table": {
           "name": "Naam",
-          "measureId": "Meting-ID",
-          "startDate": "Startdatum",
-          "endDate": "Einddatum",
-          "locationIds": "Locatie-ID's",
+          "pollen": "Pollen",
+          "locations": "Locaties",
           "notificationIds": "Meldingen",
+          "alerts": "Waarschuwingen",
           "enabledState": "Ingeschakeld",
           "actions": "Acties",
           "enabled": "Ingeschakeld",
@@ -499,7 +498,7 @@
           "delete": "Verwijderen",
           "deleting": "Verwijderen...",
           "deleteConfirm": "Weet u zeker dat u deze regel wilt verwijderen?",
-          "deleteErrorFallback": "De regel kon niet worden verwijderd."
+          "deleteErrorFallback": "Regel verwijderen is mislukt."
         },
         "states": {
           "loading": "Regels laden...",
@@ -511,39 +510,57 @@
       "form": {
         "createTitle": "Nieuwe regel",
         "editTitle": "Regel bewerken",
-        "createDescription": "Definieer de meting, locaties, meldingen en datumbereik voor deze regel.",
-        "editDescription": "Werk de meting, locaties, meldingen en datumbereik voor deze regel bij.",
+        "createDescription": "Definieer pollen, locaties, meldingen, vliegperiode en waarschuwingsdrempels voor deze regel.",
+        "editDescription": "Werk pollen, locaties, meldingen, vliegperiode en waarschuwingsdrempels voor deze regel bij.",
         "fields": {
           "name": "Naam",
-          "measureId": "Meting-ID",
-          "startDate": "Startdatum",
-          "endDate": "Einddatum",
-          "datePlaceholder": "2026-04-05 00:00:00+00",
-          "locationIds": "Locatie-ID's",
-          "locationIdsHelp": "Gebruik komma-gescheiden numerieke locatie-ID's.",
+          "pollen": "Pollen",
+          "pollenPlaceholder": "Selecteer pollen",
+          "locations": "Locaties",
           "notificationIds": "Meldingen",
+          "flightPeriod": "Pollenvliegperiode",
+          "flightStart": "Begin vliegperiode",
+          "flightEnd": "Einde vliegperiode",
+          "generatedIntervals": "{count} evaluatie-intervallen worden buiten deze vliegperiode gegenereerd.",
+          "generatedIntervalsHelp": "Evaluatie-intervallen worden gegenereerd op basis van de geselecteerde vliegperiode.",
+          "alerts": "Waarschuwingsdrempels",
+          "alertType": "Type",
+          "alertMinValue": "Minimale waarde",
+          "alertMaxValue": "Maximale waarde",
           "description": "Beschrijving",
           "enabled": "Ingeschakeld",
-          "notificationPlaceholder": "Selecteer een melding"
+          "locationPlaceholder": "Selecteer een locatie"
         },
         "validation": {
-          "idRequired": "Regel-id is vereist.",
-          "nameRequired": "Naam is vereist.",
-          "measureIdRequired": "Meting-ID moet een geldig getal zijn.",
-          "startDateRequired": "Startdatum is vereist.",
-          "endDateRequired": "Einddatum is vereist.",
-          "locationIdsRequired": "Voer minstens een numerieke locatie-ID in.",
-          "notificationIdsRequired": "Selecteer minstens een melding."
+          "idRequired": "Regel-id is verplicht.",
+          "nameRequired": "Naam is verplicht.",
+          "pollenRequired": "Selecteer pollen.",
+          "locationsRequired": "Selecteer minstens een locatie.",
+          "notificationIdsRequired": "Selecteer minstens een melding.",
+          "flightStartRequired": "Begin van de vliegperiode is verplicht.",
+          "flightEndRequired": "Einde van de vliegperiode is verplicht.",
+          "flightPeriodInvalid": "Kies een geldige vliegperiode binnen een kalenderjaar.",
+          "generatedIntervalsRequired": "De vliegperiode moet minstens een evaluatie-interval in het jaar overlaten.",
+          "alertsRequired": "Voeg minstens een waarschuwingsdrempel toe.",
+          "alertTypeRequired": "Selecteer een geldig waarschuwingstype.",
+          "alertMinRequired": "Minimale waarde moet numeriek zijn.",
+          "alertMaxRequired": "Maximale waarde moet numeriek zijn."
         },
         "states": {
           "loadingDetail": "Regel laden...",
-          "loadError": "De regel kon niet worden geladen.",
-          "createError": "De regel kon niet worden gemaakt.",
-          "updateError": "De regel kon niet worden bijgewerkt.",
-          "deleteError": "De regel kon niet worden verwijderd.",
+          "loadError": "Regel laden is mislukt.",
+          "createError": "Regel maken is mislukt.",
+          "updateError": "Regel bijwerken is mislukt.",
+          "deleteError": "Regel verwijderen is mislukt.",
           "loadingNotifications": "Meldingen laden...",
-          "notificationsLoadError": "Meldingen konden niet worden geladen.",
-          "noNotifications": "Maak een melding voordat u deze aan een regel koppelt."
+          "notificationsLoadError": "Meldingen laden is mislukt.",
+          "noNotifications": "Maak een melding voordat u die aan een regel koppelt.",
+          "loadingPollen": "Pollen laden...",
+          "pollenLoadError": "Pollen laden is mislukt.",
+          "noPollen": "Geen pollenopties beschikbaar.",
+          "loadingLocations": "Locaties laden...",
+          "locationsLoadError": "Locaties laden is mislukt.",
+          "noLocations": "Geen locaties beschikbaar."
         },
         "actions": {
           "cancel": "Terug",
@@ -552,7 +569,9 @@
           "saving": "Opslaan...",
           "delete": "Regel verwijderen",
           "deleting": "Verwijderen...",
-          "deleteConfirm": "Weet u zeker dat u deze regel wilt verwijderen?"
+          "deleteConfirm": "Weet u zeker dat u deze regel wilt verwijderen?",
+          "addAlert": "Waarschuwing toevoegen",
+          "removeAlert": "Verwijderen"
         }
       }
     }

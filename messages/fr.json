@@ -482,24 +482,23 @@
     "rules": {
       "list": {
         "title": "Regles",
-        "description": "Creer et gerer les definitions de regles.",
+        "description": "Creer et gerer les regles d'evaluation du pollen.",
         "newButton": "Nouvelle regle",
         "table": {
           "name": "Nom",
-          "measureId": "ID de mesure",
-          "startDate": "Date de debut",
-          "endDate": "Date de fin",
-          "locationIds": "IDs d'emplacement",
+          "pollen": "Pollen",
+          "locations": "Emplacements",
           "notificationIds": "Notifications",
-          "enabledState": "Activee",
+          "alerts": "Alertes",
+          "enabledState": "Active",
           "actions": "Actions",
-          "enabled": "Activee",
-          "disabled": "Desactivee",
+          "enabled": "Active",
+          "disabled": "Inactive",
           "edit": "Modifier",
           "delete": "Supprimer",
           "deleting": "Suppression...",
           "deleteConfirm": "Voulez-vous vraiment supprimer cette regle ?",
-          "deleteErrorFallback": "La regle n'a pas pu etre supprimee."
+          "deleteErrorFallback": "Impossible de supprimer la regle."
         },
         "states": {
           "loading": "Chargement des regles...",
@@ -511,39 +510,57 @@
       "form": {
         "createTitle": "Nouvelle regle",
         "editTitle": "Modifier la regle",
-        "createDescription": "Definir la mesure, les emplacements, les notifications et la plage de dates pour cette regle.",
-        "editDescription": "Mettre a jour la mesure, les emplacements, les notifications et la plage de dates de cette regle.",
+        "createDescription": "Definissez le pollen, les emplacements, les notifications, la periode de vol et les seuils d alerte pour cette regle.",
+        "editDescription": "Mettez a jour le pollen, les emplacements, les notifications, la periode de vol et les seuils d alerte pour cette regle.",
         "fields": {
           "name": "Nom",
-          "measureId": "ID de mesure",
-          "startDate": "Date de debut",
-          "endDate": "Date de fin",
-          "datePlaceholder": "2026-04-05 00:00:00+00",
-          "locationIds": "IDs d'emplacement",
-          "locationIdsHelp": "Utilisez des IDs numeriques separes par des virgules.",
+          "pollen": "Pollen",
+          "pollenPlaceholder": "Selectionner le pollen",
+          "locations": "Emplacements",
           "notificationIds": "Notifications",
+          "flightPeriod": "Periode de vol du pollen",
+          "flightStart": "Debut de la periode de vol",
+          "flightEnd": "Fin de la periode de vol",
+          "generatedIntervals": "{count} intervalles d evaluation seront generes hors de cette periode.",
+          "generatedIntervalsHelp": "Les intervalles d evaluation sont generes a partir de la periode de vol selectionnee.",
+          "alerts": "Seuils d alerte",
+          "alertType": "Type",
+          "alertMinValue": "Valeur min.",
+          "alertMaxValue": "Valeur max.",
           "description": "Description",
-          "enabled": "Activee",
-          "notificationPlaceholder": "Selectionner une notification"
+          "enabled": "Active",
+          "locationPlaceholder": "Selectionner un emplacement"
         },
         "validation": {
-          "idRequired": "L'id de regle est requis.",
+          "idRequired": "L id de la regle est requis.",
           "nameRequired": "Le nom est requis.",
-          "measureIdRequired": "L'ID de mesure doit etre un nombre valide.",
-          "startDateRequired": "La date de debut est requise.",
-          "endDateRequired": "La date de fin est requise.",
-          "locationIdsRequired": "Saisissez au moins un ID numerique d'emplacement.",
-          "notificationIdsRequired": "Selectionnez au moins une notification."
+          "pollenRequired": "Selectionnez le pollen.",
+          "locationsRequired": "Selectionnez au moins un emplacement.",
+          "notificationIdsRequired": "Selectionnez au moins une notification.",
+          "flightStartRequired": "Le debut de la periode de vol est requis.",
+          "flightEndRequired": "La fin de la periode de vol est requise.",
+          "flightPeriodInvalid": "Choisissez une periode de vol valide dans une meme annee civile.",
+          "generatedIntervalsRequired": "La periode de vol doit laisser au moins un intervalle d evaluation dans l annee.",
+          "alertsRequired": "Ajoutez au moins un seuil d alerte.",
+          "alertTypeRequired": "Selectionnez un type d alerte valide.",
+          "alertMinRequired": "La valeur min. doit etre numerique.",
+          "alertMaxRequired": "La valeur max. doit etre numerique."
         },
         "states": {
           "loadingDetail": "Chargement de la regle...",
-          "loadError": "La regle n'a pas pu etre chargee.",
-          "createError": "La regle n'a pas pu etre creee.",
-          "updateError": "La regle n'a pas pu etre mise a jour.",
-          "deleteError": "La regle n'a pas pu etre supprimee.",
+          "loadError": "Impossible de charger la regle.",
+          "createError": "Impossible de creer la regle.",
+          "updateError": "Impossible de mettre a jour la regle.",
+          "deleteError": "Impossible de supprimer la regle.",
           "loadingNotifications": "Chargement des notifications...",
-          "notificationsLoadError": "Les notifications n'ont pas pu etre chargees.",
-          "noNotifications": "Creez une notification avant de l'assigner a une regle."
+          "notificationsLoadError": "Impossible de charger les notifications.",
+          "noNotifications": "Creez une notification avant de l assigner a une regle.",
+          "loadingPollen": "Chargement du pollen...",
+          "pollenLoadError": "Impossible de charger le pollen.",
+          "noPollen": "Aucune option de pollen disponible.",
+          "loadingLocations": "Chargement des emplacements...",
+          "locationsLoadError": "Impossible de charger les emplacements.",
+          "noLocations": "Aucun emplacement disponible."
         },
         "actions": {
           "cancel": "Retour",
@@ -552,7 +569,9 @@
           "saving": "Enregistrement...",
           "delete": "Supprimer la regle",
           "deleting": "Suppression...",
-          "deleteConfirm": "Voulez-vous vraiment supprimer cette regle ?"
+          "deleteConfirm": "Voulez-vous vraiment supprimer cette regle ?",
+          "addAlert": "Ajouter une alerte",
+          "removeAlert": "Retirer"
         }
       }
     }

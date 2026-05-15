@@ -7,15 +7,27 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/features/i18n/routing';
 import { createRule, deleteRule, updateRule } from '@/lib/api/messageSystem';
 
-import { messageSystemKeys } from '../../constants';
-import { useNotificationsList, useRuleDetail } from '../../hooks';
-import type { RuleFormErrors, RuleFormValues } from '../../utils';
+import {
+  MESSAGE_SYSTEM_ALERT_TYPES,
+  messageSystemKeys,
+} from '../../constants';
+import {
+  useLocationOptions,
+  useNotificationsList,
+  usePollenOptions,
+  useRuleDetail,
+} from '../../hooks';
+import type {
+  RuleAlertFormErrors,
+  RuleFormErrors,
+  RuleFormValues,
+} from '../../utils';
 import {
   buildRuleWritePayload,
+  DEFAULT_RULE_ALERT_FORM_VALUES,
   DEFAULT_RULE_FORM_VALUES,
+  generateRuleIntervalsFromFlightPeriod,
   mapRuleRecordToFormValues,
-  parseNumericList,
-  parseRequiredNumber,
   toMessageSystemUserFacingError,
 } from '../../utils';
 import { RuleForm } from './RuleForm';
@@ -41,6 +53,8 @@ export function RuleFormContainer({
   const [actionError, setActionError] = useState<string | null>(null);
   const detailQuery = useRuleDetail(isEditMode ? ruleId : undefined);
   const notificationsQuery = useNotificationsList();
+  const pollenOptionsQuery = usePollenOptions();
+  const locationOptionsQuery = useLocationOptions();
   const hydratedValues = useMemo(
     () => (detailQuery.data ? mapRuleRecordToFormValues(detailQuery.data) : null),
     [detailQuery.data]
@@ -117,47 +131,131 @@ export function RuleFormContainer({
         fallbackMessage: t('states.notificationsLoadError'),
       })
     : null;
+  const pollenOptionsError = pollenOptionsQuery.isError
+    ? toMessageSystemUserFacingError(pollenOptionsQuery.error, {
+        fallbackMessage: t('states.pollenLoadError'),
+      })
+    : null;
+  const locationOptionsError = locationOptionsQuery.isError
+    ? toMessageSystemUserFacingError(locationOptionsQuery.error, {
+        fallbackMessage: t('states.locationsLoadError'),
+      })
+    : null;
+
+  function clearFieldError(field: keyof RuleFormErrors) {
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  }
 
   function setField<K extends keyof RuleFormValues>(
     field: K,
     value: RuleFormValues[K]
   ) {
     setValues((current) => ({ ...current, [field]: value }));
-    setErrors((current) => ({
+    clearFieldError(field as keyof RuleFormErrors);
+
+    if (field === 'flightStart' || field === 'flightEnd') {
+      clearFieldError('flightPeriod');
+    }
+  }
+
+  function setAlertField(
+    index: number,
+    field: keyof RuleFormValues['alerts'][number],
+    value: string
+  ) {
+    setValues((current) => ({
       ...current,
-      [field]: undefined,
-      ...(field === 'notificationId' ? { notificationIds: undefined } : {}),
+      alerts: current.alerts.map((alert, alertIndex) =>
+        alertIndex === index ? { ...alert, [field]: value } : alert
+      ),
+    }));
+    setErrors((current) => {
+      const alertRows = [...(current.alertRows ?? [])];
+      alertRows[index] = { ...alertRows[index], [field]: undefined };
+      return { ...current, alerts: undefined, alertRows };
+    });
+  }
+
+  function addAlert() {
+    setValues((current) => ({
+      ...current,
+      alerts: [...current.alerts, { ...DEFAULT_RULE_ALERT_FORM_VALUES }],
+    }));
+    clearFieldError('alerts');
+  }
+
+  function removeAlert(index: number) {
+    setValues((current) => ({
+      ...current,
+      alerts: current.alerts.filter((_, alertIndex) => alertIndex !== index),
     }));
   }
 
   function validateForm(): RuleFormErrors {
     const nextErrors: RuleFormErrors = {};
-    const measureId = parseRequiredNumber(values.measureId);
-    const locationIds = parseNumericList(values.locationIdsText);
-    const notificationId = parseRequiredNumber(values.notificationId);
+    const intervals = generateRuleIntervalsFromFlightPeriod(
+      values.flightStart,
+      values.flightEnd
+    );
 
     if (!values.name.trim()) {
       nextErrors.name = t('validation.nameRequired');
     }
 
-    if (measureId === null) {
-      nextErrors.measureId = t('validation.measureIdRequired');
+    if (!values.pollen) {
+      nextErrors.pollen = t('validation.pollenRequired');
     }
 
-    if (!values.startDate.trim()) {
-      nextErrors.startDate = t('validation.startDateRequired');
+    if (values.locations.length === 0) {
+      nextErrors.locations = t('validation.locationsRequired');
     }
 
-    if (!values.endDate.trim()) {
-      nextErrors.endDate = t('validation.endDateRequired');
-    }
-
-    if (locationIds.length === 0) {
-      nextErrors.locationIds = t('validation.locationIdsRequired');
-    }
-
-    if (notificationId === null) {
+    if (values.notificationIds.length === 0) {
       nextErrors.notificationIds = t('validation.notificationIdsRequired');
+    }
+
+    if (!values.flightStart.trim()) {
+      nextErrors.flightStart = t('validation.flightStartRequired');
+    }
+
+    if (!values.flightEnd.trim()) {
+      nextErrors.flightEnd = t('validation.flightEndRequired');
+    }
+
+    if (values.flightStart.trim() && values.flightEnd.trim()) {
+      if (!intervals) {
+        nextErrors.flightPeriod = t('validation.flightPeriodInvalid');
+      } else if (intervals.length === 0) {
+        nextErrors.flightPeriod = t('validation.generatedIntervalsRequired');
+      }
+    }
+
+    if (values.alerts.length === 0) {
+      nextErrors.alerts = t('validation.alertsRequired');
+    }
+
+    const alertRows = values.alerts.map((alert) => {
+      const rowErrors: RuleAlertFormErrors = {};
+      const minValue = Number(alert.minValue.trim());
+      const maxValue = Number(alert.maxValue.trim());
+
+      if (!MESSAGE_SYSTEM_ALERT_TYPES.some((type) => type === alert.type)) {
+        rowErrors.type = t('validation.alertTypeRequired');
+      }
+
+      if (!Number.isFinite(minValue)) {
+        rowErrors.minValue = t('validation.alertMinRequired');
+      }
+
+      if (!Number.isFinite(maxValue)) {
+        rowErrors.maxValue = t('validation.alertMaxRequired');
+      }
+
+      return rowErrors;
+    });
+
+    if (alertRows.some((row) => Object.keys(row).length > 0)) {
+      nextErrors.alertRows = alertRows;
     }
 
     return nextErrors;
@@ -173,7 +271,7 @@ export function RuleFormContainer({
     }
 
     try {
-      const payload = buildRuleWritePayload(values, ruleId);
+      const payload = buildRuleWritePayload(values);
 
       if (isEditMode) {
         await updateMutation.mutateAsync(payload);
@@ -240,10 +338,19 @@ export function RuleFormContainer({
       notificationOptions={notificationsQuery.data ?? []}
       notificationOptionsLoading={notificationsQuery.isLoading}
       notificationOptionsError={notificationsError}
+      pollenOptions={pollenOptionsQuery.data ?? []}
+      pollenOptionsLoading={pollenOptionsQuery.isLoading}
+      pollenOptionsError={pollenOptionsError}
+      locationOptions={locationOptionsQuery.data ?? []}
+      locationOptionsLoading={locationOptionsQuery.isLoading}
+      locationOptionsError={locationOptionsError}
       saving={saving}
       deleting={deleting}
       actionError={actionError}
       onFieldChange={setField}
+      onAlertFieldChange={setAlertField}
+      onAddAlert={addAlert}
+      onRemoveAlert={removeAlert}
       onSubmit={handleSubmit}
       onDelete={isEditMode ? handleDelete : undefined}
       onCancel={() => router.push(listHref)}

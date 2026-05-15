@@ -50,3 +50,6 @@ API foundation has been realigned for the new message-system contract: rule type
 
 ## Message System - Alerts UI remap
 Navigation has been remapped so Rules and Notifications exposes only Notifications and Rules, while Alerts under Alerts and Correction Factors is backed by notification messages. The Alerts list now reads notification-message records and the Alerts edit route is status-only using `updateNotificationMessageStatus`; create/delete/trigger actions are not exposed. Old notification-message routes and the old Alerts create route redirect to the remapped Alerts experience. Correction Factors behavior remains unchanged.
+
+## Message System - Rules form realignment
+Rules CRUD UI has been realigned to the new rule contract: list rows show pollen, locations, notifications, embedded alert summaries, and enabled state; create/edit forms load pollen and location options, collect notification ids, generate evaluation intervals outside the selected pollen flight period, and submit embedded alert thresholds in the rule payload. The form no longer sends `measure_id`, `location_ids`, or top-level `start_date`/`end_date`; edit mode infers the flight period only when existing intervals match the supported outside-period pattern.

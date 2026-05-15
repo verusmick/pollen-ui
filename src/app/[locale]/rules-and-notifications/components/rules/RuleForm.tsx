@@ -2,8 +2,10 @@
 
 import { useTranslations } from 'next-intl';
 
-import type { NotificationRecord } from '../../types';
+import { MESSAGE_SYSTEM_ALERT_TYPES } from '../../constants';
+import type { MessageSystemOption, NotificationRecord } from '../../types';
 import type { RuleFormErrors, RuleFormValues } from '../../utils';
+import { generateRuleIntervalsFromFlightPeriod } from '../../utils';
 
 interface RuleFormProps {
   mode: 'create' | 'edit';
@@ -12,6 +14,12 @@ interface RuleFormProps {
   notificationOptions: NotificationRecord[];
   notificationOptionsLoading?: boolean;
   notificationOptionsError?: string | null;
+  pollenOptions: MessageSystemOption[];
+  pollenOptionsLoading?: boolean;
+  pollenOptionsError?: string | null;
+  locationOptions: MessageSystemOption[];
+  locationOptionsLoading?: boolean;
+  locationOptionsError?: string | null;
   saving?: boolean;
   deleting?: boolean;
   actionError?: string | null;
@@ -19,9 +27,22 @@ interface RuleFormProps {
     field: K,
     value: RuleFormValues[K]
   ) => void;
+  onAlertFieldChange: (
+    index: number,
+    field: keyof RuleFormValues['alerts'][number],
+    value: string
+  ) => void;
+  onAddAlert: () => void;
+  onRemoveAlert: (index: number) => void;
   onSubmit: () => void;
   onDelete?: () => void;
   onCancel: () => void;
+}
+
+function toggleValue(values: string[], value: string): string[] {
+  return values.includes(value)
+    ? values.filter((item) => item !== value)
+    : [...values, value];
 }
 
 export function RuleForm({
@@ -31,16 +52,30 @@ export function RuleForm({
   notificationOptions,
   notificationOptionsLoading = false,
   notificationOptionsError = null,
+  pollenOptions,
+  pollenOptionsLoading = false,
+  pollenOptionsError = null,
+  locationOptions,
+  locationOptionsLoading = false,
+  locationOptionsError = null,
   saving = false,
   deleting = false,
   actionError = null,
   onFieldChange,
+  onAlertFieldChange,
+  onAddAlert,
+  onRemoveAlert,
   onSubmit,
   onDelete,
   onCancel,
 }: RuleFormProps) {
   const t = useTranslations('messageSystemPage.rules.form');
+  const optionsT = useTranslations('messageSystemPage.notifications.options');
   const isEditMode = mode === 'edit';
+  const generatedIntervals = generateRuleIntervalsFromFlightPeriod(
+    values.flightStart,
+    values.flightEnd
+  );
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
@@ -82,78 +117,96 @@ export function RuleForm({
             ) : null}
           </label>
 
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-foreground">
-              {t('fields.measureId')}
-            </span>
-            <input
-              type="number"
-              value={values.measureId}
-              onChange={(event) =>
-                onFieldChange('measureId', event.target.value)
-              }
-              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-            />
-            {errors.measureId ? (
-              <span className="text-sm text-red-700">{errors.measureId}</span>
+          <fieldset className="grid gap-2">
+            <legend className="text-sm font-medium text-foreground">
+              {t('fields.pollen')}
+            </legend>
+
+            {pollenOptionsLoading ? (
+              <div className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">
+                {t('states.loadingPollen')}
+              </div>
             ) : null}
-          </label>
 
-          <div className="grid gap-5 md:grid-cols-2">
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-foreground">
-                {t('fields.startDate')}
-              </span>
-              <input
-                type="datetime-local"
-                value={values.startDate}
-                onChange={(event) =>
-                  onFieldChange('startDate', event.target.value)
-                }
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-              />
-              {errors.startDate ? (
-                <span className="text-sm text-red-700">{errors.startDate}</span>
-              ) : null}
-            </label>
-
-            <label className="grid gap-2">
-              <span className="text-sm font-medium text-foreground">
-                {t('fields.endDate')}
-              </span>
-              <input
-                type="datetime-local"
-                value={values.endDate}
-                onChange={(event) =>
-                  onFieldChange('endDate', event.target.value)
-                }
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-              />
-              {errors.endDate ? (
-                <span className="text-sm text-red-700">{errors.endDate}</span>
-              ) : null}
-            </label>
-          </div>
-
-          <label className="grid gap-2">
-            <span className="text-sm font-medium text-foreground">
-              {t('fields.locationIds')}
-            </span>
-            <input
-              type="text"
-              value={values.locationIdsText}
-              onChange={(event) =>
-                onFieldChange('locationIdsText', event.target.value)
-              }
-              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-            />
-            <span className="text-xs text-muted-foreground">
-              {t('fields.locationIdsHelp')}
-            </span>
-            {errors.locationIds ? (
-              <span className="text-sm text-red-700">{errors.locationIds}</span>
+            {pollenOptionsError ? (
+              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                {pollenOptionsError}
+              </div>
             ) : null}
-          </label>
+
+            <select
+              value={values.pollen}
+              onChange={(event) => onFieldChange('pollen', event.target.value)}
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+            >
+              <option value="">{t('fields.pollenPlaceholder')}</option>
+              {pollenOptions.map((option) => (
+                <option key={option.id} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
+            {!pollenOptionsLoading && pollenOptions.length === 0 ? (
+              <div className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">
+                {t('states.noPollen')}
+              </div>
+            ) : null}
+
+            {errors.pollen ? (
+              <span className="text-sm text-red-700">{errors.pollen}</span>
+            ) : null}
+          </fieldset>
+
+          <fieldset className="grid gap-2">
+            <legend className="text-sm font-medium text-foreground">
+              {t('fields.locations')}
+            </legend>
+
+            {locationOptionsLoading ? (
+              <div className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">
+                {t('states.loadingLocations')}
+              </div>
+            ) : null}
+
+            {locationOptionsError ? (
+              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                {locationOptionsError}
+              </div>
+            ) : null}
+
+            {locationOptions.length > 0 ? (
+              <div className="grid gap-2">
+                <select
+                  value={values.locations[0] ?? ''}
+                  onChange={(event) =>
+                    onFieldChange(
+                      'locations',
+                      event.target.value ? [event.target.value] : []
+                    )
+                  }
+                  className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                >
+                  <option value="">{t('fields.locationPlaceholder')}</option>
+                  {locationOptions.map((option) => (
+                    <option key={option.id} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+
+            {!locationOptionsLoading && locationOptions.length === 0 ? (
+              <div className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">
+                {t('states.noLocations')}
+              </div>
+            ) : null}
+
+            {errors.locations ? (
+              <span className="text-sm text-red-700">{errors.locations}</span>
+            ) : null}
+          </fieldset>
 
           <fieldset className="grid gap-2">
             <legend className="text-sm font-medium text-foreground">
@@ -172,29 +225,33 @@ export function RuleForm({
               </div>
             ) : null}
 
-            {!notificationOptionsLoading && notificationOptions.length > 0 ? (
-              <select
-                value={values.notificationId}
-                onChange={(event) =>
-                  onFieldChange('notificationId', event.target.value)
-                }
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-              >
-                <option value="">{t('fields.notificationPlaceholder')}</option>
+            {notificationOptions.length > 0 ? (
+              <div className="grid gap-2 rounded-md border border-border bg-background p-3 md:grid-cols-2">
                 {notificationOptions.map((notification) => {
                   const numericId = Number(notification.id);
+                  const disabled = !Number.isFinite(numericId);
 
                   return (
-                    <option
+                    <label
                       key={notification.id}
-                      value={notification.id}
-                      disabled={!Number.isFinite(numericId)}
+                      className="inline-flex items-center gap-2 text-sm text-foreground"
                     >
-                      {notification.name}
-                    </option>
+                      <input
+                        type="checkbox"
+                        checked={values.notificationIds.includes(notification.id)}
+                        disabled={disabled}
+                        onChange={() =>
+                          onFieldChange(
+                            'notificationIds',
+                            toggleValue(values.notificationIds, notification.id)
+                          )
+                        }
+                      />
+                      <span>{notification.name}</span>
+                    </label>
                   );
                 })}
-              </select>
+              </div>
             ) : null}
 
             {!notificationOptionsLoading && notificationOptions.length === 0 ? (
@@ -208,6 +265,179 @@ export function RuleForm({
                 {errors.notificationIds}
               </span>
             ) : null}
+          </fieldset>
+
+          <fieldset className="grid gap-3">
+            <legend className="text-sm font-medium text-foreground">
+              {t('fields.flightPeriod')}
+            </legend>
+            <div className="grid gap-5 md:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="text-sm text-foreground">
+                  {t('fields.flightStart')}
+                </span>
+                <input
+                  type="datetime-local"
+                  step="1"
+                  value={values.flightStart}
+                  onChange={(event) =>
+                    onFieldChange('flightStart', event.target.value)
+                  }
+                  className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                />
+                {errors.flightStart ? (
+                  <span className="text-sm text-red-700">
+                    {errors.flightStart}
+                  </span>
+                ) : null}
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-sm text-foreground">
+                  {t('fields.flightEnd')}
+                </span>
+                <input
+                  type="datetime-local"
+                  step="1"
+                  value={values.flightEnd}
+                  onChange={(event) =>
+                    onFieldChange('flightEnd', event.target.value)
+                  }
+                  className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                />
+                {errors.flightEnd ? (
+                  <span className="text-sm text-red-700">{errors.flightEnd}</span>
+                ) : null}
+              </label>
+            </div>
+
+            {errors.flightPeriod ? (
+              <span className="text-sm text-red-700">{errors.flightPeriod}</span>
+            ) : null}
+
+            {errors.flightPeriod ? null : errors.flightStart || errors.flightEnd ? null : (
+              <div className="rounded-md border border-border bg-background p-3 text-xs text-muted-foreground">
+                {generatedIntervals && generatedIntervals.length > 0
+                  ? t('fields.generatedIntervals', {
+                      count: generatedIntervals.length,
+                    })
+                  : t('fields.generatedIntervalsHelp')}
+              </div>
+            )}
+          </fieldset>
+
+          <fieldset className="grid gap-3">
+            <div className="flex items-center justify-between gap-3">
+              <legend className="text-sm font-medium text-foreground">
+                {t('fields.alerts')}
+              </legend>
+              <button
+                type="button"
+                onClick={onAddAlert}
+                className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-background"
+              >
+                {t('actions.addAlert')}
+              </button>
+            </div>
+
+            {errors.alerts ? (
+              <span className="text-sm text-red-700">{errors.alerts}</span>
+            ) : null}
+
+            <div className="grid gap-3">
+              {values.alerts.map((alert, index) => {
+                const rowErrors = errors.alertRows?.[index] ?? {};
+
+                return (
+                  <div
+                    key={index}
+                    className="grid gap-3 rounded-md border border-border bg-background p-3 md:grid-cols-[1fr_1fr_1fr_auto]"
+                  >
+                    <label className="grid gap-2">
+                      <span className="text-sm text-foreground">
+                        {t('fields.alertType')}
+                      </span>
+                      <select
+                        value={alert.type}
+                        onChange={(event) =>
+                          onAlertFieldChange(index, 'type', event.target.value)
+                        }
+                        className="rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                      >
+                        {MESSAGE_SYSTEM_ALERT_TYPES.map((alertType) => (
+                          <option key={alertType} value={alertType}>
+                            {optionsT(`alertTypes.${alertType}`)}
+                          </option>
+                        ))}
+                      </select>
+                      {rowErrors.type ? (
+                        <span className="text-sm text-red-700">
+                          {rowErrors.type}
+                        </span>
+                      ) : null}
+                    </label>
+
+                    <label className="grid gap-2">
+                      <span className="text-sm text-foreground">
+                        {t('fields.alertMinValue')}
+                      </span>
+                      <input
+                        type="number"
+                        step="any"
+                        value={alert.minValue}
+                        onChange={(event) =>
+                          onAlertFieldChange(
+                            index,
+                            'minValue',
+                            event.target.value
+                          )
+                        }
+                        className="rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                      />
+                      {rowErrors.minValue ? (
+                        <span className="text-sm text-red-700">
+                          {rowErrors.minValue}
+                        </span>
+                      ) : null}
+                    </label>
+
+                    <label className="grid gap-2">
+                      <span className="text-sm text-foreground">
+                        {t('fields.alertMaxValue')}
+                      </span>
+                      <input
+                        type="number"
+                        step="any"
+                        value={alert.maxValue}
+                        onChange={(event) =>
+                          onAlertFieldChange(
+                            index,
+                            'maxValue',
+                            event.target.value
+                          )
+                        }
+                        className="rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                      />
+                      {rowErrors.maxValue ? (
+                        <span className="text-sm text-red-700">
+                          {rowErrors.maxValue}
+                        </span>
+                      ) : null}
+                    </label>
+
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={() => onRemoveAlert(index)}
+                        className="rounded-md border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-card"
+                      >
+                        {t('actions.removeAlert')}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </fieldset>
 
           <label className="grid gap-2">

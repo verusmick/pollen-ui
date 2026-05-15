@@ -8,12 +8,16 @@ import type { RuleRecord } from '../../types';
 
 interface RulesTableRowProps {
   record: RuleRecord;
+  locationNamesById?: Record<string, string>;
   notificationNamesById?: Record<string, string>;
   deleting?: boolean;
   onDelete: (id: string) => void;
 }
 
-function formatList(values: number[], namesById?: Record<string, string>): string {
+function formatList(
+  values: Array<number | string>,
+  namesById?: Record<string, string>
+): string {
   if (values.length === 0) {
     return '';
   }
@@ -25,36 +29,40 @@ function formatList(values: number[], namesById?: Record<string, string>): strin
 
 export function RulesTableRow({
   record,
+  locationNamesById = {},
   notificationNamesById = {},
   deleting = false,
   onDelete,
 }: RulesTableRowProps) {
   const t = useTranslations('messageSystemPage.rules.list.table');
   const sharedT = useTranslations('messageSystemPage.shared');
-  const locationIds =
-    formatList(record.locationIds) || sharedT('notAvailable');
+  const locations =
+    formatList(record.locations, locationNamesById) || sharedT('notAvailable');
   const notificationIds =
     formatList(record.notificationIds, notificationNamesById) ||
     sharedT('notAvailable');
+  const alerts =
+    record.alerts
+      .map((alert) => {
+        const minValue = alert.minValue ?? sharedT('notAvailable');
+        const maxValue = alert.maxValue ?? sharedT('notAvailable');
+        return `${alert.type}: ${minValue} - ${maxValue}`;
+      })
+      .join(', ') || sharedT('notAvailable');
 
   return (
     <tr className="border-b border-border last:border-b-0">
       <td className="px-4 py-3 text-sm text-foreground">{record.name}</td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
-        {record.measureId ?? sharedT('notAvailable')}
+        {record.pollen || sharedT('notAvailable')}
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
-        {record.startDate || sharedT('notAvailable')}
-      </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground">
-        {record.endDate || sharedT('notAvailable')}
-      </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground">
-        {locationIds}
+        {locations}
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
         {notificationIds}
       </td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">{alerts}</td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
         {record.enabled ? t('enabled') : t('disabled')}
       </td>

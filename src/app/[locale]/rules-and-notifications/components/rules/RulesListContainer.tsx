@@ -7,7 +7,11 @@ import { useTranslations } from 'next-intl';
 import { deleteRule } from '@/lib/api/messageSystem';
 
 import { messageSystemKeys } from '../../constants';
-import { useNotificationsList, useRulesList } from '../../hooks';
+import {
+  useLocationOptions,
+  useNotificationsList,
+  useRulesList,
+} from '../../hooks';
 import { toMessageSystemUserFacingError } from '../../utils';
 import { RulesHeader } from './RulesHeader';
 import { RulesTable } from './RulesTable';
@@ -19,6 +23,7 @@ export function RulesListContainer() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const { data = [], isLoading, isFetching, isError, error } = useRulesList();
   const { data: notifications = [] } = useNotificationsList();
+  const { data: locations = [] } = useLocationOptions();
   const notificationNamesById = useMemo(
     () =>
       notifications.reduce<Record<string, string>>((acc, notification) => {
@@ -26,6 +31,15 @@ export function RulesListContainer() {
         return acc;
       }, {}),
     [notifications]
+  );
+  const locationNamesById = useMemo(
+    () =>
+      locations.reduce<Record<string, string>>((acc, location) => {
+        acc[location.value] = location.label;
+        acc[location.id] = location.label;
+        return acc;
+      }, {}),
+    [locations]
   );
   const deleteMutation = useMutation({
     mutationFn: deleteRule,
@@ -97,6 +111,7 @@ export function RulesListContainer() {
       {!isLoading && !isError && data.length > 0 ? (
         <RulesTable
           rows={data}
+          locationNamesById={locationNamesById}
           notificationNamesById={notificationNamesById}
           deletingId={
             deleteMutation.isPending ? deleteMutation.variables ?? null : null
