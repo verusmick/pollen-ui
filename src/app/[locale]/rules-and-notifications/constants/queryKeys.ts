@@ -30,4 +30,8 @@ export const messageSystemKeys = {
     [...messageSystemKeys.notificationMessages(), 'detail'] as const,
   notificationMessageDetail: (id: string) =>
     [...messageSystemKeys.notificationMessageDetails(), id] as const,
+
+  options: () => [...messageSystemKeys.all, 'options'] as const,
+  pollenOptions: () => [...messageSystemKeys.options(), 'pollen'] as const,
+  locationOptions: () => [...messageSystemKeys.options(), 'locations'] as const,
 };

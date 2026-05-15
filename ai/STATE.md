@@ -44,3 +44,6 @@ Pre-review cleanup is implemented for the completed message-system POC: client-f
 
 ## Message System - API realignment pending implementation
 Documentation has been realigned to the new Postman export: `/api/alerts` is deprecated, Rules now own embedded alerts and use `pollen`, `locations`, `notification_ids`, generated `intervals`, `description`, and `enabled`, and the Alerts UI should be backed by `/api/notificationMessages` with list plus status edit only. Notification message create UI and trigger UI are out of scope for the next implementation pass; Correction Factors remain unchanged.
+
+## Message System - API foundation realignment
+API foundation has been realigned for the new message-system contract: rule types/helpers now target `pollen`, `locations`, generated `intervals`, `notification_ids`, embedded `alerts`, `description`, and `enabled`; notification messages include rule/alert/pollen/location/status fields and have a status-only update helper; pollen/location option helpers and hooks use `/api/pollen` and `/api/locations`. Deprecated `/api/alerts` helpers and legacy notification-message write helpers remain only as transitional support for the old screens until the Rules UI and Alerts UI remap slices remove them.

@@ -5,6 +5,13 @@ export type MessageSystemFrequency =
   | 'immediately'
   | 'daily_summary'
   | 'weekly_summary';
+export type MessageSystemNotificationMessageStatus = 'RESOLVED' | 'UNRESOLVED';
+
+export interface MessageSystemOption {
+  id: string;
+  label: string;
+  value: string;
+}
 
 export interface ApiNotificationRecord {
   id: MessageSystemApiId;
@@ -22,14 +29,26 @@ export interface ApiNotificationWriteRequest {
   alert_types: string[];
 }
 
+export interface ApiRuleInterval {
+  start_date: string;
+  end_date: string;
+}
+
+export interface ApiRuleEmbeddedAlert {
+  id?: MessageSystemApiId;
+  type: MessageSystemAlertType | string;
+  min_value: number;
+  max_value: number;
+}
+
 export interface ApiRuleRecord {
   id: MessageSystemApiId;
   name: string;
-  measure_id: number;
-  start_date: string;
-  end_date: string;
-  location_ids: number[];
+  pollen: string;
+  intervals: ApiRuleInterval[];
+  locations: string[];
   notification_ids: number[];
+  alerts: ApiRuleEmbeddedAlert[];
   description: string;
   enabled: boolean;
 }
@@ -37,15 +56,19 @@ export interface ApiRuleRecord {
 export interface ApiRuleWriteRequest {
   id?: MessageSystemApiId;
   name: string;
-  measure_id: number;
-  start_date: string;
-  end_date: string;
-  location_ids: number[];
+  pollen: string;
+  intervals: ApiRuleInterval[];
+  locations: string[];
   notification_ids: number[];
+  alerts: ApiRuleEmbeddedAlert[];
   description: string;
   enabled: boolean;
 }
 
+/**
+ * @deprecated `/api/alerts` is deprecated. New Alerts UI work should use
+ * notification messages instead.
+ */
 export interface ApiAlertRecord {
   id: MessageSystemApiId;
   rule_id: number;
@@ -54,6 +77,10 @@ export interface ApiAlertRecord {
   max_value: number;
 }
 
+/**
+ * @deprecated `/api/alerts` is deprecated. New Alerts UI work should use
+ * notification messages instead.
+ */
 export interface ApiAlertWriteRequest {
   id?: MessageSystemApiId;
   rule_id: number;
@@ -64,14 +91,30 @@ export interface ApiAlertWriteRequest {
 
 export interface ApiNotificationMessageRecord {
   id: MessageSystemApiId;
-  measure_id: number;
-  notification_id: number;
+  notification_id: MessageSystemApiId;
+  rule_id: MessageSystemApiId;
+  alert_id: MessageSystemApiId;
   creation_date: string;
+  pollen: string;
+  location: string;
   value: number;
   description: string;
+  status: MessageSystemNotificationMessageStatus | string;
+  notification?: unknown;
+  rule?: unknown;
+  alert?: unknown;
 }
 
-export interface ApiNotificationMessageWriteRequest {
+export interface ApiNotificationMessageStatusWriteRequest {
+  status: MessageSystemNotificationMessageStatus | string;
+}
+
+/**
+ * @deprecated Notification messages are backend-generated. This legacy shape is
+ * retained only so the old, not-yet-remapped UI keeps compiling until the Alerts
+ * UI migration slice removes it.
+ */
+export interface ApiNotificationMessageLegacyWriteRequest {
   id?: MessageSystemApiId;
   measure_id: number;
   notification_id: number;
@@ -98,15 +141,31 @@ export interface NotificationRecord {
 export interface RuleRecord {
   id: MessageSystemId;
   name: string;
-  measureId: number | null;
-  startDate: string;
-  endDate: string;
-  locationIds: number[];
+  pollen: string;
+  intervals: ApiRuleInterval[];
+  locations: string[];
   notificationIds: number[];
+  alerts: RuleEmbeddedAlertRecord[];
   description: string;
   enabled: boolean;
+  /** @deprecated Temporary compatibility for the old Rules UI. */
+  measureId: number | null;
+  /** @deprecated Temporary compatibility for the old Rules UI. */
+  startDate: string;
+  /** @deprecated Temporary compatibility for the old Rules UI. */
+  endDate: string;
+  /** @deprecated Temporary compatibility for the old Rules UI. */
+  locationIds: number[];
 }
 
+export interface RuleEmbeddedAlertRecord {
+  id?: MessageSystemId;
+  type: string;
+  minValue: number | null;
+  maxValue: number | null;
+}
+
+/** @deprecated `/api/alerts` is deprecated. */
 export interface AlertRecord {
   id: MessageSystemId;
   ruleId: number | null;
@@ -117,9 +176,18 @@ export interface AlertRecord {
 
 export interface NotificationMessageRecord {
   id: MessageSystemId;
-  measureId: number | null;
-  notificationId: number | null;
+  notificationId: MessageSystemId;
+  ruleId: MessageSystemId;
+  alertId: MessageSystemId;
   creationDate: string;
+  pollen: string;
+  location: string;
   value: number | null;
   description: string;
+  status: string;
+  notification?: unknown;
+  rule?: unknown;
+  alert?: unknown;
+  /** @deprecated Temporary compatibility for the old Notification Messages UI. */
+  measureId: number | null;
 }

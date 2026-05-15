@@ -2,18 +2,23 @@ import type {
   ApiAlertRecord,
   ApiAlertWriteRequest,
   ApiMessageSystemDeleteResponse,
+  ApiNotificationMessageLegacyWriteRequest,
   ApiNotificationMessageRecord,
-  ApiNotificationMessageWriteRequest,
+  ApiNotificationMessageStatusWriteRequest,
   ApiNotificationRecord,
   ApiNotificationWriteRequest,
   ApiRuleRecord,
   ApiRuleWriteRequest,
+  MessageSystemOption,
 } from '@/app/[locale]/rules-and-notifications/types';
+import { normalizeMessageSystemStringOptions } from '@/app/[locale]/rules-and-notifications/utils/messageSystemMappers';
 
 const NOTIFICATIONS_BASE_URL = '/api/notifications';
 const RULES_BASE_URL = '/api/rules';
 const ALERTS_BASE_URL = '/api/alerts';
 const NOTIFICATION_MESSAGES_BASE_URL = '/api/notification-messages';
+const POLLEN_BASE_URL = '/api/pollen';
+const LOCATIONS_BASE_URL = '/api/locations';
 
 async function requestJson<T>(input: string, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);
@@ -130,14 +135,26 @@ export async function deleteRule(
   });
 }
 
+/**
+ * @deprecated `/api/alerts` is deprecated. New Alerts UI work should use
+ * notification messages instead.
+ */
 export async function listAlerts(): Promise<ApiAlertRecord[]> {
   return requestJson<ApiAlertRecord[]>(ALERTS_BASE_URL);
 }
 
+/**
+ * @deprecated `/api/alerts` is deprecated. New Alerts UI work should use
+ * notification messages instead.
+ */
 export async function getAlert(id: string): Promise<ApiAlertRecord> {
   return requestJson<ApiAlertRecord>(`${ALERTS_BASE_URL}/${id}`);
 }
 
+/**
+ * @deprecated `/api/alerts` is deprecated. New Alerts UI work should use
+ * notification messages instead.
+ */
 export async function createAlert(
   payload: ApiAlertWriteRequest
 ): Promise<ApiAlertRecord> {
@@ -147,6 +164,10 @@ export async function createAlert(
   );
 }
 
+/**
+ * @deprecated `/api/alerts` is deprecated. New Alerts UI work should use
+ * notification messages instead.
+ */
 export async function updateAlert(
   id: string,
   payload: ApiAlertWriteRequest
@@ -157,6 +178,10 @@ export async function updateAlert(
   );
 }
 
+/**
+ * @deprecated `/api/alerts` is deprecated. New Alerts UI work should use
+ * notification messages instead.
+ */
 export async function deleteAlert(
   id: string
 ): Promise<ApiMessageSystemDeleteResponse> {
@@ -184,8 +209,23 @@ export async function getNotificationMessage(
   );
 }
 
+export async function updateNotificationMessageStatus(
+  id: string,
+  payload: ApiNotificationMessageStatusWriteRequest
+): Promise<ApiNotificationMessageRecord> {
+  return requestJson<ApiNotificationMessageRecord>(
+    `${NOTIFICATION_MESSAGES_BASE_URL}/${id}`,
+    jsonRequestInit('PUT', { status: payload.status })
+  );
+}
+
+/**
+ * @deprecated Notification messages are backend-generated. This helper remains
+ * only for the old notification-messages screen until the Alerts UI remap
+ * removes that route.
+ */
 export async function createNotificationMessage(
-  payload: ApiNotificationMessageWriteRequest
+  payload: ApiNotificationMessageLegacyWriteRequest
 ): Promise<ApiNotificationMessageRecord> {
   return requestJson<ApiNotificationMessageRecord>(
     NOTIFICATION_MESSAGES_BASE_URL,
@@ -193,9 +233,14 @@ export async function createNotificationMessage(
   );
 }
 
+/**
+ * @deprecated Use `updateNotificationMessageStatus` for new work. This legacy
+ * full-update helper remains only for the old notification-messages screen
+ * until the Alerts UI remap removes that route.
+ */
 export async function updateNotificationMessage(
   id: string,
-  payload: ApiNotificationMessageWriteRequest
+  payload: ApiNotificationMessageLegacyWriteRequest
 ): Promise<ApiNotificationMessageRecord> {
   return requestJson<ApiNotificationMessageRecord>(
     `${NOTIFICATION_MESSAGES_BASE_URL}/${id}`,
@@ -203,6 +248,11 @@ export async function updateNotificationMessage(
   );
 }
 
+/**
+ * @deprecated Notification messages are generated records. Delete remains only
+ * for the old notification-messages screen until the Alerts UI remap removes
+ * that route.
+ */
 export async function deleteNotificationMessage(
   id: string
 ): Promise<ApiMessageSystemDeleteResponse> {
@@ -212,4 +262,17 @@ export async function deleteNotificationMessage(
       method: 'DELETE',
     }
   );
+}
+
+export async function listPollens(): Promise<MessageSystemOption[]> {
+  const response = await requestJson<unknown>(POLLEN_BASE_URL);
+  return normalizeMessageSystemStringOptions(response, ['pollen', 'pollens']);
+}
+
+export async function listLocations(): Promise<MessageSystemOption[]> {
+  const response = await requestJson<unknown>(LOCATIONS_BASE_URL);
+  return normalizeMessageSystemStringOptions(response, [
+    'locations',
+    'location',
+  ]);
 }

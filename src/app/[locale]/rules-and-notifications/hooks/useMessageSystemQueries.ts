@@ -8,8 +8,10 @@ import {
   getNotificationMessage,
   getRule,
   listAlerts,
+  listLocations,
   listNotificationMessages,
   listNotifications,
+  listPollens,
   listRules,
 } from '@/lib/api/messageSystem';
 
@@ -19,6 +21,7 @@ import {
 } from '../constants';
 import type {
   AlertRecord,
+  MessageSystemOption,
   NotificationMessageRecord,
   NotificationRecord,
   RuleRecord,
@@ -111,6 +114,22 @@ export function useAlertDetail(id?: string) {
       return mapApiAlertRecord(response);
     },
     enabled: Boolean(id),
+    staleTime: MESSAGE_SYSTEM_QUERY_STALE_TIME_MS,
+  });
+}
+
+export function usePollenOptions() {
+  return useQuery<MessageSystemOption[]>({
+    queryKey: messageSystemKeys.pollenOptions(),
+    queryFn: listPollens,
+    staleTime: MESSAGE_SYSTEM_QUERY_STALE_TIME_MS,
+  });
+}
+
+export function useLocationOptions() {
+  return useQuery<MessageSystemOption[]>({
+    queryKey: messageSystemKeys.locationOptions(),
+    queryFn: listLocations,
     staleTime: MESSAGE_SYSTEM_QUERY_STALE_TIME_MS,
   });
 }

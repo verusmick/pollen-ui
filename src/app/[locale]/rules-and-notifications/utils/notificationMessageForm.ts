@@ -1,5 +1,5 @@
 import type {
-  ApiNotificationMessageWriteRequest,
+  ApiNotificationMessageLegacyWriteRequest,
   NotificationMessageRecord,
 } from '../types';
 
@@ -79,7 +79,7 @@ export function mapNotificationMessageRecordToFormValues(
 export function buildNotificationMessageWritePayload(
   values: NotificationMessageFormValues,
   id?: string
-): ApiNotificationMessageWriteRequest {
+): ApiNotificationMessageLegacyWriteRequest {
   return {
     ...(id ? { id } : {}),
     measure_id: Number(values.measureId.trim()),

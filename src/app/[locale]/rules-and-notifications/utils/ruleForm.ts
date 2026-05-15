@@ -1,4 +1,8 @@
-import type { ApiRuleWriteRequest, RuleRecord } from '../types';
+import type {
+  ApiRuleEmbeddedAlert,
+  ApiRuleWriteRequest,
+  RuleRecord,
+} from '../types';
 
 export interface RuleFormValues {
   name: string;
@@ -90,14 +94,21 @@ export function buildRuleWritePayload(
   values: RuleFormValues,
   id?: string
 ): ApiRuleWriteRequest {
+  const startDate = toBackendDateString(values.startDate, 'start');
+  const endDate = toBackendDateString(values.endDate, 'end');
+  const locations = parseNumericList(values.locationIdsText).map((locationId) =>
+    String(locationId)
+  );
+  const alerts: ApiRuleEmbeddedAlert[] = [];
+
   return {
     ...(id ? { id } : {}),
     name: values.name.trim(),
-    measure_id: Number(values.measureId.trim()),
-    start_date: toBackendDateString(values.startDate, 'start'),
-    end_date: toBackendDateString(values.endDate, 'end'),
-    location_ids: parseNumericList(values.locationIdsText),
+    pollen: values.measureId.trim(),
+    intervals: [{ start_date: startDate, end_date: endDate }],
+    locations,
     notification_ids: [Number(values.notificationId)],
+    alerts,
     description: values.description.trim(),
     enabled: values.enabled,
   };
