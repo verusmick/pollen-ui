@@ -41,3 +41,6 @@ Slice 7 Notification messages CRUD POC is implemented under `/rules-and-notifica
 
 ## Message System - Pre-review adjustments
 Pre-review cleanup is implemented for the completed message-system POC: client-facing copy no longer exposes POC/backend wording, notification frequency options now include `daily_summary` and `weekly_summary`, Rules start/end dates use `datetime-local` inputs with backend-compatible payload conversion, route-local API error normalization hides raw parse/server details from users while logging them, and Alerts list min/max values display the `Pollen/m³` unit.
+
+## Message System - API realignment pending implementation
+Documentation has been realigned to the new Postman export: `/api/alerts` is deprecated, Rules now own embedded alerts and use `pollen`, `locations`, `notification_ids`, generated `intervals`, `description`, and `enabled`, and the Alerts UI should be backed by `/api/notificationMessages` with list plus status edit only. Notification message create UI and trigger UI are out of scope for the next implementation pass; Correction Factors remain unchanged.
