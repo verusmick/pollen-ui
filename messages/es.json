@@ -489,7 +489,7 @@
           "pollen": "Polen",
           "locations": "Ubicaciones",
           "notificationIds": "Notificaciones",
-          "alerts": "Alertas",
+          "alerts": "Umbrales de alerta",
           "enabledState": "Activa",
           "actions": "Acciones",
           "enabled": "Activa",
@@ -521,15 +521,17 @@
           "flightPeriod": "Periodo de vuelo del polen",
           "flightStart": "Inicio del periodo de vuelo",
           "flightEnd": "Fin del periodo de vuelo",
-          "generatedIntervals": "Se generaran {count} intervalos de evaluacion fuera de este periodo.",
-          "generatedIntervalsHelp": "Los intervalos de evaluacion se generan a partir del periodo de vuelo seleccionado.",
+          "generatedIntervals": "Un intervalo de evaluacion usara este periodo de vuelo.",
+          "generatedIntervalsHelp": "Seleccione el mes y dia para el periodo de vuelo.",
           "alerts": "Umbrales de alerta",
           "alertType": "Tipo",
-          "alertMinValue": "Valor minimo",
-          "alertMaxValue": "Valor maximo",
+          "alertMinValue": "Valor minimo (Pollen/m³)",
+          "alertMaxValue": "Valor maximo (Pollen/m³)",
           "description": "Descripcion",
           "enabled": "Activa",
-          "locationPlaceholder": "Seleccione una ubicacion"
+          "locationPlaceholder": "Seleccione una ubicacion",
+          "monthPlaceholder": "Mes",
+          "dayPlaceholder": "Dia"
         },
         "validation": {
           "idRequired": "El id de la regla es obligatorio.",
@@ -539,8 +541,7 @@
           "notificationIdsRequired": "Seleccione al menos una notificacion.",
           "flightStartRequired": "El inicio del periodo de vuelo es obligatorio.",
           "flightEndRequired": "El fin del periodo de vuelo es obligatorio.",
-          "flightPeriodInvalid": "Elija un periodo de vuelo valido dentro de un mismo ano calendario.",
-          "generatedIntervalsRequired": "El periodo de vuelo debe dejar al menos un intervalo de evaluacion en el ano.",
+          "flightPeriodInvalid": "Elija un inicio y fin validos para el periodo de vuelo.",
           "alertsRequired": "Agregue al menos un umbral de alerta.",
           "alertTypeRequired": "Seleccione un tipo de alerta valido.",
           "alertMinRequired": "El valor minimo debe ser numerico.",
@@ -597,7 +598,8 @@
           "rule": "Regla",
           "alert": "Alerta",
           "actions": "Acciones",
-          "editStatus": "Editar estado"
+          "editStatus": "Editar estado",
+          "triggerRange": "Rango de activación"
         },
         "states": {
           "loading": "Cargando alertas...",
@@ -613,12 +615,12 @@
           "notification": "Notificacion",
           "rule": "Regla",
           "alertType": "Tipo de alerta",
-          "alertRange": "Rango de alerta",
           "pollen": "Polen",
           "location": "Ubicacion",
           "value": "Valor",
           "creationDate": "Creada",
-          "description": "Descripcion"
+          "description": "Descripcion",
+          "triggerRange": "Rango de activación"
         },
         "fields": {
           "status": "Estado"

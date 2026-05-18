@@ -363,18 +363,18 @@ Form fields:
 
 - `name`: text input
 - `pollen`: dropdown from `/api/pollen`
-- pollen flight period: simple start/end date inputs, plus target year if
-  useful
+- pollen flight period: month/day start and end selectors
 - `locations`: multi-select/checklist from `/api/locations`
 - `notification_ids`: multi-select/checklist from Notifications
-- `alerts`: repeatable embedded alert rows with type, min value, and max value
+- `alerts`: repeatable embedded alert rows with type, min concentration, and max
+  concentration
 - `description`: textarea
 - `enabled`: checkbox
 
 Rules form behavior:
 
-- Users set the pollen flight period in the UI.
-- Frontend generates `intervals` from that period.
+- Users set the pollen flight period month/day in the UI.
+- Frontend sends exactly one `intervals` item using fixed year 2000.
 - Embedded alerts can be added and removed inside the Rules form.
 - Rules payload sends `locations: string[]`, not `location_ids`.
 - Rules payload sends `pollen`, not `measure_id`.
@@ -441,30 +441,28 @@ Recommended simple v1:
 
 - User selects pollen, locations, notifications, embedded alerts, and a pollen
   flight period.
-- The flight period is captured as start and end dates for a single target
-  year.
+- The flight period is captured as start and end month/day values.
 - The frontend validates that the end date is not before the start date.
-- The frontend generates one interval matching the chosen flight period.
+- The frontend generates one interval matching the chosen flight period with
+  fixed year 2000, because the API ignores the year and this supports Feb 29.
 - The generated interval is sent as:
 
 ```json
 {
   "intervals": [
     {
-      "start_date": "2026-04-05 00:00:00+00",
-      "end_date": "2026-04-10 23:59:59+00"
+      "start_date": "2000-04-05 00:00:00+00",
+      "end_date": "2000-04-10 23:59:59+00"
     }
   ]
 }
 ```
 
-Document this as the initial assumption because the phrase "remaining
-evaluation intervals for the year around that period" still needs product/API
-clarification.
+This supersedes the earlier outside-period interval assumption for the active
+Rules form.
 
 Potential later expansions:
 
-- generate before/during/after intervals for the selected year
 - split the flight period into weekly or monthly intervals
 - generate rolling evaluation windows
 - allow year-crossing flight periods

@@ -1,9 +1,10 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/features/i18n/routing';
 
+import { MESSAGE_SYSTEM_ALERT_TYPES } from '../../constants';
 import type { RuleRecord } from '../../types';
 
 interface RulesTableRowProps {
@@ -27,6 +28,31 @@ function formatList(
     .join(', ');
 }
 
+function formatNumber(value: number | null, locale: string): string {
+  return value === null
+    ? ''
+    : new Intl.NumberFormat(locale, { maximumFractionDigits: 6 }).format(value);
+}
+
+function isKnownAlertType(
+  value: string
+): value is (typeof MESSAGE_SYSTEM_ALERT_TYPES)[number] {
+  return MESSAGE_SYSTEM_ALERT_TYPES.some((type) => type === value);
+}
+
+function getAlertTypeChipClass(type: string): string {
+  switch (type) {
+    case 'green':
+      return 'border-green-500/30 bg-green-500/10 text-green-800';
+    case 'yellow':
+      return 'border-yellow-500/30 bg-yellow-500/10 text-yellow-800';
+    case 'red':
+      return 'border-red-500/30 bg-red-500/10 text-red-800';
+    default:
+      return 'border-border bg-background text-foreground';
+  }
+}
+
 export function RulesTableRow({
   record,
   locationNamesById = {},
@@ -34,21 +60,15 @@ export function RulesTableRow({
   deleting = false,
   onDelete,
 }: RulesTableRowProps) {
+  const locale = useLocale();
   const t = useTranslations('messageSystemPage.rules.list.table');
   const sharedT = useTranslations('messageSystemPage.shared');
+  const optionsT = useTranslations('messageSystemPage.notifications.options');
   const locations =
     formatList(record.locations, locationNamesById) || sharedT('notAvailable');
   const notificationIds =
     formatList(record.notificationIds, notificationNamesById) ||
     sharedT('notAvailable');
-  const alerts =
-    record.alerts
-      .map((alert) => {
-        const minValue = alert.minValue ?? sharedT('notAvailable');
-        const maxValue = alert.maxValue ?? sharedT('notAvailable');
-        return `${alert.type}: ${minValue} - ${maxValue}`;
-      })
-      .join(', ') || sharedT('notAvailable');
 
   return (
     <tr className="border-b border-border last:border-b-0">
@@ -62,7 +82,39 @@ export function RulesTableRow({
       <td className="px-4 py-3 text-sm text-muted-foreground">
         {notificationIds}
       </td>
-      <td className="px-4 py-3 text-sm text-muted-foreground">{alerts}</td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">
+        {record.alerts.length > 0 ? (
+          <div className="grid gap-1">
+            {record.alerts.map((alert, index) => {
+              const minValue =
+                formatNumber(alert.minValue, locale) || sharedT('notAvailable');
+              const maxValue =
+                formatNumber(alert.maxValue, locale) || sharedT('notAvailable');
+
+              return (
+                <div
+                  key={alert.id ?? `${alert.type}-${index}`}
+                  className={`inline-flex w-fit items-center rounded-md border px-2 py-1 text-xs ${getAlertTypeChipClass(
+                    alert.type
+                  )}`}
+                >
+                  <span className="font-medium">
+                    {isKnownAlertType(alert.type)
+                      ? optionsT(`alertTypes.${alert.type}`)
+                      : alert.type || sharedT('notAvailable')}
+                  </span>
+                  <span className="mx-1 text-muted-foreground">·</span>
+                  <span>
+                    {minValue}-{maxValue} Pollen/m³
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          sharedT('notAvailable')
+        )}
+      </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
         {record.enabled ? t('enabled') : t('disabled')}
       </td>

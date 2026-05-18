@@ -1,11 +1,11 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { MESSAGE_SYSTEM_ALERT_TYPES } from '../../constants';
 import type { MessageSystemOption, NotificationRecord } from '../../types';
 import type { RuleFormErrors, RuleFormValues } from '../../utils';
-import { generateRuleIntervalsFromFlightPeriod } from '../../utils';
 
 interface RuleFormProps {
   mode: 'create' | 'edit';
@@ -45,6 +45,41 @@ function toggleValue(values: string[], value: string): string[] {
     : [...values, value];
 }
 
+function parseMonthDay(value: string): { month: string; day: string } {
+  const [month = '', day = ''] = value.split('-');
+
+  return {
+    month,
+    day,
+  };
+}
+
+function updateMonthDayValue(
+  value: string,
+  part: 'month' | 'day',
+  nextValue: string
+): string {
+  const current = parseMonthDay(value);
+  const month = part === 'month' ? nextValue : current.month;
+  const currentDay = part === 'day' ? nextValue : current.day;
+  const dayOptions = getDayOptions(month);
+  const day = dayOptions.includes(currentDay) ? currentDay : '';
+
+  return month || day ? `${month}-${day}` : '';
+}
+
+function getDayOptions(month: string): string[] {
+  const monthNumber = Number(month);
+  const dayCount =
+    Number.isInteger(monthNumber) && monthNumber >= 1 && monthNumber <= 12
+      ? new Date(Date.UTC(2000, monthNumber, 0)).getUTCDate()
+      : 31;
+
+  return Array.from({ length: dayCount }, (_, index) =>
+    String(index + 1).padStart(2, '0')
+  );
+}
+
 export function RuleForm({
   mode,
   values,
@@ -69,13 +104,28 @@ export function RuleForm({
   onDelete,
   onCancel,
 }: RuleFormProps) {
+  const locale = useLocale();
   const t = useTranslations('messageSystemPage.rules.form');
   const optionsT = useTranslations('messageSystemPage.notifications.options');
   const isEditMode = mode === 'edit';
-  const generatedIntervals = generateRuleIntervalsFromFlightPeriod(
-    values.flightStart,
-    values.flightEnd
+  const monthOptions = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, index) => {
+        const month = index + 1;
+        const value = String(month).padStart(2, '0');
+        const label = new Intl.DateTimeFormat(locale, {
+          month: 'long',
+          timeZone: 'UTC',
+        }).format(new Date(Date.UTC(2000, index, 1)));
+
+        return { value, label };
+      }),
+    [locale]
   );
+  const flightStartParts = parseMonthDay(values.flightStart);
+  const flightEndParts = parseMonthDay(values.flightEnd);
+  const flightStartDayOptions = getDayOptions(flightStartParts.month);
+  const flightEndDayOptions = getDayOptions(flightEndParts.month);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
@@ -176,24 +226,25 @@ export function RuleForm({
             ) : null}
 
             {locationOptions.length > 0 ? (
-              <div className="grid gap-2">
-                <select
-                  value={values.locations[0] ?? ''}
-                  onChange={(event) =>
-                    onFieldChange(
-                      'locations',
-                      event.target.value ? [event.target.value] : []
-                    )
-                  }
-                  className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-                >
-                  <option value="">{t('fields.locationPlaceholder')}</option>
-                  {locationOptions.map((option) => (
-                    <option key={option.id} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+              <div className="grid max-h-32 gap-2 overflow-y-auto rounded-md border border-border bg-background p-3 md:grid-cols-2">
+                {locationOptions.map((option) => (
+                  <label
+                    key={option.id}
+                    className="inline-flex items-center gap-2 text-sm text-foreground"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={values.locations.includes(option.value)}
+                      onChange={() =>
+                        onFieldChange(
+                          'locations',
+                          toggleValue(values.locations, option.value)
+                        )
+                      }
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
               </div>
             ) : null}
 
@@ -276,15 +327,50 @@ export function RuleForm({
                 <span className="text-sm text-foreground">
                   {t('fields.flightStart')}
                 </span>
-                <input
-                  type="datetime-local"
-                  step="1"
-                  value={values.flightStart}
-                  onChange={(event) =>
-                    onFieldChange('flightStart', event.target.value)
-                  }
-                  className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={flightStartParts.month}
+                    onChange={(event) =>
+                      onFieldChange(
+                        'flightStart',
+                        updateMonthDayValue(
+                          values.flightStart,
+                          'month',
+                          event.target.value
+                        )
+                      )
+                    }
+                    className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                  >
+                    <option value="">{t('fields.monthPlaceholder')}</option>
+                    {monthOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={flightStartParts.day}
+                    onChange={(event) =>
+                      onFieldChange(
+                        'flightStart',
+                        updateMonthDayValue(
+                          values.flightStart,
+                          'day',
+                          event.target.value
+                        )
+                      )
+                    }
+                    className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                  >
+                    <option value="">{t('fields.dayPlaceholder')}</option>
+                    {flightStartDayOptions.map((day) => (
+                      <option key={day} value={day}>
+                        {day}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {errors.flightStart ? (
                   <span className="text-sm text-red-700">
                     {errors.flightStart}
@@ -296,15 +382,50 @@ export function RuleForm({
                 <span className="text-sm text-foreground">
                   {t('fields.flightEnd')}
                 </span>
-                <input
-                  type="datetime-local"
-                  step="1"
-                  value={values.flightEnd}
-                  onChange={(event) =>
-                    onFieldChange('flightEnd', event.target.value)
-                  }
-                  className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
-                />
+                <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={flightEndParts.month}
+                    onChange={(event) =>
+                      onFieldChange(
+                        'flightEnd',
+                        updateMonthDayValue(
+                          values.flightEnd,
+                          'month',
+                          event.target.value
+                        )
+                      )
+                    }
+                    className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                  >
+                    <option value="">{t('fields.monthPlaceholder')}</option>
+                    {monthOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={flightEndParts.day}
+                    onChange={(event) =>
+                      onFieldChange(
+                        'flightEnd',
+                        updateMonthDayValue(
+                          values.flightEnd,
+                          'day',
+                          event.target.value
+                        )
+                      )
+                    }
+                    className="rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+                  >
+                    <option value="">{t('fields.dayPlaceholder')}</option>
+                    {flightEndDayOptions.map((day) => (
+                      <option key={day} value={day}>
+                        {day}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {errors.flightEnd ? (
                   <span className="text-sm text-red-700">{errors.flightEnd}</span>
                 ) : null}
@@ -314,16 +435,6 @@ export function RuleForm({
             {errors.flightPeriod ? (
               <span className="text-sm text-red-700">{errors.flightPeriod}</span>
             ) : null}
-
-            {errors.flightPeriod ? null : errors.flightStart || errors.flightEnd ? null : (
-              <div className="rounded-md border border-border bg-background p-3 text-xs text-muted-foreground">
-                {generatedIntervals && generatedIntervals.length > 0
-                  ? t('fields.generatedIntervals', {
-                      count: generatedIntervals.length,
-                    })
-                  : t('fields.generatedIntervalsHelp')}
-              </div>
-            )}
           </fieldset>
 
           <fieldset className="grid gap-3">

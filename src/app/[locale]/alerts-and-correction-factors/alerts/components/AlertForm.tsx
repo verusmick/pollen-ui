@@ -1,8 +1,11 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { MESSAGE_SYSTEM_NOTIFICATION_MESSAGE_STATUSES } from '@/app/[locale]/rules-and-notifications/constants';
+import {
+  MESSAGE_SYSTEM_ALERT_TYPES,
+  MESSAGE_SYSTEM_NOTIFICATION_MESSAGE_STATUSES,
+} from '@/app/[locale]/rules-and-notifications/constants';
 import type {
   MessageSystemNotificationMessageStatus,
   NotificationMessageRecord,
@@ -19,8 +22,13 @@ interface AlertFormProps {
   onCancel: () => void;
 }
 
-function formatNumber(value: number | null | undefined): string {
-  return typeof value === 'number' && Number.isFinite(value) ? String(value) : '';
+function formatNumber(
+  value: number | null | undefined,
+  locale: string
+): string {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? new Intl.NumberFormat(locale, { maximumFractionDigits: 6 }).format(value)
+    : '';
 }
 
 function getNamedValue(value: unknown): string {
@@ -36,17 +44,31 @@ function getNamedValue(value: unknown): string {
     : '';
 }
 
-function getAlertDetail(value: unknown, key: string): string {
+function getAlertRangeParts(value: unknown): {
+  type: string;
+  minValue: number | null;
+  maxValue: number | null;
+} | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return '';
+    return null;
   }
 
   const record = value as Record<string, unknown>;
-  const candidate = record[key];
+  const type = typeof record.type === 'string' ? record.type : '';
+  const minValue = Number(record.min_value);
+  const maxValue = Number(record.max_value);
 
-  return typeof candidate === 'string' || typeof candidate === 'number'
-    ? String(candidate)
-    : '';
+  return {
+    type,
+    minValue: Number.isFinite(minValue) ? minValue : null,
+    maxValue: Number.isFinite(maxValue) ? maxValue : null,
+  };
+}
+
+function isKnownAlertType(
+  value: string
+): value is (typeof MESSAGE_SYSTEM_ALERT_TYPES)[number] {
+  return MESSAGE_SYSTEM_ALERT_TYPES.some((type) => type === value);
 }
 
 export function AlertForm({
@@ -59,15 +81,26 @@ export function AlertForm({
   onSubmit,
   onCancel,
 }: AlertFormProps) {
+  const locale = useLocale();
   const t = useTranslations('alertsAndCorrectionFactorsPage.alerts.form');
   const sharedT = useTranslations('messageSystemPage.shared');
+  const optionsT = useTranslations('messageSystemPage.notifications.options');
   const unavailable = sharedT('notAvailable');
   const notificationLabel =
     getNamedValue(record?.notification) || record?.notificationId || unavailable;
   const ruleLabel = getNamedValue(record?.rule) || record?.ruleId || unavailable;
-  const alertType = getAlertDetail(record?.alert, 'type') || unavailable;
-  const alertMin = getAlertDetail(record?.alert, 'min_value') || unavailable;
-  const alertMax = getAlertDetail(record?.alert, 'max_value') || unavailable;
+  const alertRange = getAlertRangeParts(record?.alert);
+  const alertType = alertRange?.type
+    ? isKnownAlertType(alertRange.type)
+      ? optionsT(`alertTypes.${alertRange.type}`)
+      : alertRange.type
+    : unavailable;
+  const triggerRange = alertRange
+    ? `${alertType} · ${formatNumber(alertRange.minValue, locale) || unavailable}-${
+        formatNumber(alertRange.maxValue, locale) || unavailable
+      } Pollen/m³`
+    : unavailable;
+  const valueLabel = formatNumber(record?.value, locale);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-6">
@@ -115,11 +148,9 @@ export function AlertForm({
             </div>
             <div>
               <dt className="text-xs font-medium uppercase text-muted-foreground">
-                {t('details.alertRange')}
+                {t('details.triggerRange')}
               </dt>
-              <dd className="mt-1 text-sm text-foreground">
-                {alertMin} - {alertMax}
-              </dd>
+              <dd className="mt-1 text-sm text-foreground">{triggerRange}</dd>
             </div>
             <div>
               <dt className="text-xs font-medium uppercase text-muted-foreground">
@@ -142,7 +173,7 @@ export function AlertForm({
                 {t('details.value')}
               </dt>
               <dd className="mt-1 text-sm text-foreground">
-                {formatNumber(record?.value) || unavailable}
+                {valueLabel ? `${valueLabel} Pollen/m³` : unavailable}
               </dd>
             </div>
             <div>

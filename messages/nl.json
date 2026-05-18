@@ -489,7 +489,7 @@
           "pollen": "Pollen",
           "locations": "Locaties",
           "notificationIds": "Meldingen",
-          "alerts": "Waarschuwingen",
+          "alerts": "Waarschuwingsdrempels",
           "enabledState": "Ingeschakeld",
           "actions": "Acties",
           "enabled": "Ingeschakeld",
@@ -521,15 +521,17 @@
           "flightPeriod": "Pollenvliegperiode",
           "flightStart": "Begin vliegperiode",
           "flightEnd": "Einde vliegperiode",
-          "generatedIntervals": "{count} evaluatie-intervallen worden buiten deze vliegperiode gegenereerd.",
-          "generatedIntervalsHelp": "Evaluatie-intervallen worden gegenereerd op basis van de geselecteerde vliegperiode.",
+          "generatedIntervals": "Een evaluatie-interval gebruikt deze vliegperiode.",
+          "generatedIntervalsHelp": "Selecteer maand en dag voor de vliegperiode.",
           "alerts": "Waarschuwingsdrempels",
           "alertType": "Type",
-          "alertMinValue": "Minimale waarde",
-          "alertMaxValue": "Maximale waarde",
+          "alertMinValue": "Minimale waarde (Pollen/m³)",
+          "alertMaxValue": "Maximale waarde (Pollen/m³)",
           "description": "Beschrijving",
           "enabled": "Ingeschakeld",
-          "locationPlaceholder": "Selecteer een locatie"
+          "locationPlaceholder": "Selecteer een locatie",
+          "monthPlaceholder": "Maand",
+          "dayPlaceholder": "Dag"
         },
         "validation": {
           "idRequired": "Regel-id is verplicht.",
@@ -539,8 +541,7 @@
           "notificationIdsRequired": "Selecteer minstens een melding.",
           "flightStartRequired": "Begin van de vliegperiode is verplicht.",
           "flightEndRequired": "Einde van de vliegperiode is verplicht.",
-          "flightPeriodInvalid": "Kies een geldige vliegperiode binnen een kalenderjaar.",
-          "generatedIntervalsRequired": "De vliegperiode moet minstens een evaluatie-interval in het jaar overlaten.",
+          "flightPeriodInvalid": "Kies een geldig begin en einde van de vliegperiode.",
           "alertsRequired": "Voeg minstens een waarschuwingsdrempel toe.",
           "alertTypeRequired": "Selecteer een geldig waarschuwingstype.",
           "alertMinRequired": "Minimale waarde moet numeriek zijn.",
@@ -597,7 +598,8 @@
           "rule": "Regel",
           "alert": "Waarschuwing",
           "actions": "Acties",
-          "editStatus": "Status bewerken"
+          "editStatus": "Status bewerken",
+          "triggerRange": "Activeringsbereik"
         },
         "states": {
           "loading": "Waarschuwingen laden...",
@@ -613,12 +615,12 @@
           "notification": "Melding",
           "rule": "Regel",
           "alertType": "Waarschuwingstype",
-          "alertRange": "Waarschuwingsbereik",
           "pollen": "Pollen",
           "location": "Locatie",
           "value": "Waarde",
           "creationDate": "Aangemaakt",
-          "description": "Beschrijving"
+          "description": "Beschrijving",
+          "triggerRange": "Activeringsbereik"
         },
         "fields": {
           "status": "Status"

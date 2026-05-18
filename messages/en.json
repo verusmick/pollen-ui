@@ -489,7 +489,7 @@
           "pollen": "Pollen",
           "locations": "Locations",
           "notificationIds": "Notifications",
-          "alerts": "Alerts",
+          "alerts": "Alert thresholds",
           "enabledState": "Enabled",
           "actions": "Actions",
           "enabled": "Enabled",
@@ -521,15 +521,17 @@
           "flightPeriod": "Pollen flight period",
           "flightStart": "Flight period start",
           "flightEnd": "Flight period end",
-          "generatedIntervals": "{count} evaluation intervals will be generated outside this flight period.",
-          "generatedIntervalsHelp": "Evaluation intervals are generated from the selected flight period.",
+          "generatedIntervals": "One evaluation interval will use this flight period.",
+          "generatedIntervalsHelp": "Select the month and day for the flight period.",
           "alerts": "Alert thresholds",
           "alertType": "Type",
-          "alertMinValue": "Min value",
-          "alertMaxValue": "Max value",
+          "alertMinValue": "Min value (Pollen/m³)",
+          "alertMaxValue": "Max value (Pollen/m³)",
           "description": "Description",
           "enabled": "Enabled",
-          "locationPlaceholder": "Select a location"
+          "locationPlaceholder": "Select a location",
+          "monthPlaceholder": "Month",
+          "dayPlaceholder": "Day"
         },
         "validation": {
           "idRequired": "Rule id is required.",
@@ -539,8 +541,7 @@
           "notificationIdsRequired": "Select at least one notification.",
           "flightStartRequired": "Flight period start is required.",
           "flightEndRequired": "Flight period end is required.",
-          "flightPeriodInvalid": "Choose a valid flight period within one calendar year.",
-          "generatedIntervalsRequired": "The flight period must leave at least one evaluation interval in the year.",
+          "flightPeriodInvalid": "Choose a valid flight period start and end.",
           "alertsRequired": "Add at least one alert threshold.",
           "alertTypeRequired": "Select a valid alert type.",
           "alertMinRequired": "Min value must be numeric.",
@@ -597,7 +598,8 @@
           "rule": "Rule",
           "alert": "Alert",
           "actions": "Actions",
-          "editStatus": "Edit status"
+          "editStatus": "Edit status",
+          "triggerRange": "Trigger range"
         },
         "states": {
           "loading": "Loading alerts...",
@@ -613,12 +615,12 @@
           "notification": "Notification",
           "rule": "Rule",
           "alertType": "Alert type",
-          "alertRange": "Alert range",
           "pollen": "Pollen",
           "location": "Location",
           "value": "Value",
           "creationDate": "Created",
-          "description": "Description"
+          "description": "Description",
+          "triggerRange": "Trigger range"
         },
         "fields": {
           "status": "Status"

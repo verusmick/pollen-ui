@@ -225,8 +225,6 @@ export function RuleFormContainer({
     if (values.flightStart.trim() && values.flightEnd.trim()) {
       if (!intervals) {
         nextErrors.flightPeriod = t('validation.flightPeriodInvalid');
-      } else if (intervals.length === 0) {
-        nextErrors.flightPeriod = t('validation.generatedIntervalsRequired');
       }
     }
 

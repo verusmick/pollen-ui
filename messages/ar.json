@@ -489,7 +489,7 @@
           "pollen": "حبوب اللقاح",
           "locations": "المواقع",
           "notificationIds": "الاشعارات",
-          "alerts": "التنبيهات",
+          "alerts": "عتبات التنبيه",
           "enabledState": "مفعلة",
           "actions": "الاجراءات",
           "enabled": "مفعلة",
@@ -521,15 +521,17 @@
           "flightPeriod": "فترة طيران حبوب اللقاح",
           "flightStart": "بداية فترة الطيران",
           "flightEnd": "نهاية فترة الطيران",
-          "generatedIntervals": "سيتم انشاء {count} فترات تقييم خارج فترة الطيران هذه.",
-          "generatedIntervalsHelp": "يتم انشاء فترات التقييم من فترة الطيران المحددة.",
+          "generatedIntervals": "ستستخدم فترة تقييم واحدة فترة الطيران هذه.",
+          "generatedIntervalsHelp": "اختر الشهر واليوم لفترة الطيران.",
           "alerts": "حدود التنبيه",
           "alertType": "النوع",
-          "alertMinValue": "القيمة الدنيا",
-          "alertMaxValue": "القيمة العليا",
+          "alertMinValue": "القيمة الدنيا (Pollen/m³)",
+          "alertMaxValue": "القيمة العليا (Pollen/m³)",
           "description": "الوصف",
           "enabled": "مفعلة",
-          "locationPlaceholder": "اختر موقعا"
+          "locationPlaceholder": "اختر موقعا",
+          "monthPlaceholder": "الشهر",
+          "dayPlaceholder": "اليوم"
         },
         "validation": {
           "idRequired": "معرف القاعدة مطلوب.",
@@ -539,8 +541,7 @@
           "notificationIdsRequired": "اختر اشعارا واحدا على الاقل.",
           "flightStartRequired": "بداية فترة الطيران مطلوبة.",
           "flightEndRequired": "نهاية فترة الطيران مطلوبة.",
-          "flightPeriodInvalid": "اختر فترة طيران صالحة ضمن سنة تقويمية واحدة.",
-          "generatedIntervalsRequired": "يجب ان تترك فترة الطيران فترة تقييم واحدة على الاقل في السنة.",
+          "flightPeriodInvalid": "اختر بداية ونهاية صالحتين لفترة الطيران.",
           "alertsRequired": "اضف حد تنبيه واحدا على الاقل.",
           "alertTypeRequired": "اختر نوع تنبيه صالحا.",
           "alertMinRequired": "يجب ان تكون القيمة الدنيا رقما.",
@@ -597,7 +598,8 @@
           "rule": "القاعدة",
           "alert": "التنبيه",
           "actions": "الاجراءات",
-          "editStatus": "تعديل الحالة"
+          "editStatus": "تعديل الحالة",
+          "triggerRange": "نطاق التفعيل"
         },
         "states": {
           "loading": "جار تحميل التنبيهات...",
@@ -613,12 +615,12 @@
           "notification": "الاشعار",
           "rule": "القاعدة",
           "alertType": "نوع التنبيه",
-          "alertRange": "نطاق التنبيه",
           "pollen": "حبوب اللقاح",
           "location": "الموقع",
           "value": "القيمة",
           "creationDate": "تاريخ الانشاء",
-          "description": "الوصف"
+          "description": "الوصف",
+          "triggerRange": "نطاق التفعيل"
         },
         "fields": {
           "status": "الحالة"

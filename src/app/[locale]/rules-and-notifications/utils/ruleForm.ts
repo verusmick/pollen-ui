@@ -88,61 +88,66 @@ function parseBackendDateTime(value: string): DateTimeParts | null {
   };
 }
 
-function parseDateTimeLocal(value: string): Date | null {
+function parseMonthDay(value: string): { month: number; day: number } | null {
+  const match = value.trim().match(/^(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const month = Number(match[1]);
+  const day = Number(match[2]);
+  const date = new Date(Date.UTC(2000, month - 1, day));
+
+  if (
+    !Number.isFinite(date.getTime()) ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return { month, day };
+}
+
+function formatMonthDay(month: number, day: number): string {
+  return `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function toMonthDayFromBackendDateTime(value: string): string {
   const parts = parseBackendDateTime(value);
+
+  return parts ? formatMonthDay(parts.month, parts.day) : '';
+}
+
+function toFixedYearComparable(value: string): number | null {
+  const parts = parseMonthDay(value);
 
   if (!parts) {
     return null;
   }
 
-  const date = new Date(
-    Date.UTC(
-      parts.year,
-      parts.month - 1,
-      parts.day,
-      parts.hour,
-      parts.minute,
-      parts.second
-    )
-  );
-
-  return Number.isFinite(date.getTime()) ? date : null;
+  return Date.UTC(2000, parts.month - 1, parts.day);
 }
 
-function formatBackendDateTime(date: Date): string {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const hour = String(date.getUTCHours()).padStart(2, '0');
-  const minute = String(date.getUTCMinutes()).padStart(2, '0');
-  const second = String(date.getUTCSeconds()).padStart(2, '0');
+function formatFlightPeriodStart(value: string): string {
+  const parts = parseMonthDay(value);
 
-  return `${year}-${month}-${day} ${hour}:${minute}:${second}+00`;
+  if (!parts) {
+    return '';
+  }
+
+  return `2000-${formatMonthDay(parts.month, parts.day)} 00:00:00+00`;
 }
 
-function formatDateTimeLocal(date: Date): string {
-  return formatBackendDateTime(date).slice(0, 19).replace(' ', 'T');
-}
+function formatFlightPeriodEnd(value: string): string {
+  const parts = parseMonthDay(value);
 
-function toDateTimeInputValue(value: string): string {
-  const date = parseDateTimeLocal(value);
-  return date ? formatDateTimeLocal(date) : value.trim();
-}
+  if (!parts) {
+    return '';
+  }
 
-function startOfYear(year: number): Date {
-  return new Date(Date.UTC(year, 0, 1, 0, 0, 0));
-}
-
-function endOfYear(year: number): Date {
-  return new Date(Date.UTC(year, 11, 31, 23, 59, 59));
-}
-
-function addSeconds(date: Date, seconds: number): Date {
-  return new Date(date.getTime() + seconds * 1000);
-}
-
-function isSameSecond(left: Date, right: Date): boolean {
-  return left.getTime() === right.getTime();
+  return `2000-${formatMonthDay(parts.month, parts.day)} 23:59:59+00`;
 }
 
 function mapRuleAlertRecordToFormValues(
@@ -159,111 +164,50 @@ export function generateRuleIntervalsFromFlightPeriod(
   flightStartValue: string,
   flightEndValue: string
 ): ApiRuleInterval[] | null {
-  const flightStart = parseDateTimeLocal(flightStartValue);
-  const flightEnd = parseDateTimeLocal(flightEndValue);
+  const flightStart = formatFlightPeriodStart(flightStartValue);
+  const flightEnd = formatFlightPeriodEnd(flightEndValue);
+  const comparableStart = toFixedYearComparable(flightStartValue);
+  const comparableEnd = toFixedYearComparable(flightEndValue);
 
-  if (!flightStart || !flightEnd) {
+  if (
+    !flightStart ||
+    !flightEnd ||
+    comparableStart === null ||
+    comparableEnd === null
+  ) {
     return null;
   }
 
-  if (flightStart.getUTCFullYear() !== flightEnd.getUTCFullYear()) {
+  if (comparableEnd < comparableStart) {
     return null;
   }
 
-  if (flightEnd.getTime() < flightStart.getTime()) {
-    return null;
-  }
-
-  const year = flightStart.getUTCFullYear();
-  const yearStart = startOfYear(year);
-  const yearEnd = endOfYear(year);
-  const intervals: ApiRuleInterval[] = [];
-
-  if (flightStart.getTime() > yearStart.getTime()) {
-    intervals.push({
-      start_date: formatBackendDateTime(yearStart),
-      end_date: formatBackendDateTime(addSeconds(flightStart, -1)),
-    });
-  }
-
-  if (flightEnd.getTime() < yearEnd.getTime()) {
-    intervals.push({
-      start_date: formatBackendDateTime(addSeconds(flightEnd, 1)),
-      end_date: formatBackendDateTime(yearEnd),
-    });
-  }
-
-  return intervals;
+  return [
+    {
+      start_date: flightStart,
+      end_date: flightEnd,
+    },
+  ];
 }
 
 function inferFlightPeriodFromIntervals(intervals: ApiRuleInterval[]): {
   flightStart: string;
   flightEnd: string;
 } | null {
-  if (intervals.length === 0 || intervals.length > 2) {
+  const interval = intervals[0];
+
+  if (!interval) {
     return null;
   }
 
-  const parsed = intervals
-    .map((interval) => ({
-      start: parseDateTimeLocal(interval.start_date),
-      end: parseDateTimeLocal(interval.end_date),
-    }))
-    .filter(
-      (interval): interval is { start: Date; end: Date } =>
-        Boolean(interval.start) && Boolean(interval.end)
-    );
+  const flightStart = toMonthDayFromBackendDateTime(interval.start_date);
+  const flightEnd = toMonthDayFromBackendDateTime(interval.end_date);
 
-  if (parsed.length !== intervals.length) {
+  if (!flightStart || !flightEnd) {
     return null;
   }
 
-  const year = parsed[0].start.getUTCFullYear();
-
-  if (
-    parsed.some(
-      (interval) =>
-        interval.start.getUTCFullYear() !== year ||
-        interval.end.getUTCFullYear() !== year
-    )
-  ) {
-    return null;
-  }
-
-  const yearStart = startOfYear(year);
-  const yearEnd = endOfYear(year);
-  const sorted = [...parsed].sort(
-    (left, right) => left.start.getTime() - right.start.getTime()
-  );
-  const first = sorted[0];
-  const second = sorted[1];
-
-  if (sorted.length === 2) {
-    if (!isSameSecond(first.start, yearStart) || !isSameSecond(second.end, yearEnd)) {
-      return null;
-    }
-
-    return {
-      flightStart: formatDateTimeLocal(addSeconds(first.end, 1)),
-      flightEnd: formatDateTimeLocal(addSeconds(second.start, -1)),
-    };
-  }
-
-  if (isSameSecond(first.start, yearStart)) {
-    return {
-      flightStart: formatDateTimeLocal(addSeconds(first.end, 1)),
-      flightEnd: formatDateTimeLocal(yearEnd),
-    };
-  }
-
-  if (isSameSecond(first.end, yearEnd)) {
-    return {
-      flightStart: formatDateTimeLocal(yearStart),
-      flightEnd: formatDateTimeLocal(addSeconds(first.start, -1)),
-    };
-  }
-
-  return null;
+  return { flightStart, flightEnd };
 }
 
 export function mapRuleRecordToFormValues(record: RuleRecord): RuleFormValues {
@@ -316,5 +260,5 @@ export function hasValidFlightPeriod(values: RuleFormValues): boolean {
     values.flightEnd
   );
 
-  return Boolean(intervals && intervals.length > 0);
+  return Boolean(intervals && intervals.length === 1);
 }

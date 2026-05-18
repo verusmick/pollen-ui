@@ -489,7 +489,7 @@
           "pollen": "Pollen",
           "locations": "Orte",
           "notificationIds": "Benachrichtigungen",
-          "alerts": "Warnungen",
+          "alerts": "Warnschwellen",
           "enabledState": "Aktiv",
           "actions": "Aktionen",
           "enabled": "Aktiv",
@@ -521,15 +521,17 @@
           "flightPeriod": "Pollenflugperiode",
           "flightStart": "Beginn der Flugperiode",
           "flightEnd": "Ende der Flugperiode",
-          "generatedIntervals": "{count} Auswertungsintervalle werden ausserhalb dieser Flugperiode erzeugt.",
-          "generatedIntervalsHelp": "Auswertungsintervalle werden aus der ausgewaehlten Flugperiode erzeugt.",
+          "generatedIntervals": "Ein Auswertungsintervall verwendet diese Flugperiode.",
+          "generatedIntervalsHelp": "Waehlen Sie Monat und Tag fuer die Flugperiode.",
           "alerts": "Warnschwellen",
           "alertType": "Typ",
-          "alertMinValue": "Minimalwert",
-          "alertMaxValue": "Maximalwert",
+          "alertMinValue": "Minimalwert (Pollen/m³)",
+          "alertMaxValue": "Maximalwert (Pollen/m³)",
           "description": "Beschreibung",
           "enabled": "Aktiv",
-          "locationPlaceholder": "Ort auswaehlen"
+          "locationPlaceholder": "Ort auswaehlen",
+          "monthPlaceholder": "Monat",
+          "dayPlaceholder": "Tag"
         },
         "validation": {
           "idRequired": "Regel-ID ist erforderlich.",
@@ -539,8 +541,7 @@
           "notificationIdsRequired": "Waehlen Sie mindestens eine Benachrichtigung aus.",
           "flightStartRequired": "Beginn der Flugperiode ist erforderlich.",
           "flightEndRequired": "Ende der Flugperiode ist erforderlich.",
-          "flightPeriodInvalid": "Waehlen Sie eine gueltige Flugperiode innerhalb eines Kalenderjahres.",
-          "generatedIntervalsRequired": "Die Flugperiode muss mindestens ein Auswertungsintervall im Jahr uebrig lassen.",
+          "flightPeriodInvalid": "Waehlen Sie einen gueltigen Beginn und ein gueltiges Ende der Flugperiode.",
           "alertsRequired": "Fuegen Sie mindestens eine Warnschwelle hinzu.",
           "alertTypeRequired": "Waehlen Sie einen gueltigen Warnungstyp aus.",
           "alertMinRequired": "Minimalwert muss numerisch sein.",
@@ -597,7 +598,8 @@
           "rule": "Regel",
           "alert": "Warnung",
           "actions": "Aktionen",
-          "editStatus": "Status bearbeiten"
+          "editStatus": "Status bearbeiten",
+          "triggerRange": "Ausloesebereich"
         },
         "states": {
           "loading": "Warnungen werden geladen...",
@@ -613,12 +615,12 @@
           "notification": "Benachrichtigung",
           "rule": "Regel",
           "alertType": "Warnungstyp",
-          "alertRange": "Warnungsbereich",
           "pollen": "Pollen",
           "location": "Ort",
           "value": "Wert",
           "creationDate": "Erstellt",
-          "description": "Beschreibung"
+          "description": "Beschreibung",
+          "triggerRange": "Ausloesebereich"
         },
         "fields": {
           "status": "Status"
