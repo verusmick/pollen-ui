@@ -11,6 +11,8 @@ import type {
   NotificationMessageRecord,
 } from '@/app/[locale]/rules-and-notifications/types';
 
+import { AlertMeasurementsChart } from './AlertMeasurementsChart';
+
 interface AlertFormProps {
   record?: NotificationMessageRecord;
   status: MessageSystemNotificationMessageStatus;
@@ -193,6 +195,8 @@ export function AlertForm({
               </dd>
             </div>
           </dl>
+
+          <AlertMeasurementsChart record={record} />
 
           <label className="grid gap-2">
             <span className="text-sm font-medium text-foreground">

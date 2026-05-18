@@ -639,6 +639,29 @@
           "update": "Actualizar estado",
           "saving": "Guardando..."
         },
+        "chart": {
+          "title": "Mediciones alrededor de la alerta",
+          "description": "Mediciones desde tres dias antes hasta tres dias despues de la alerta.",
+          "states": {
+            "loading": "Cargando mediciones...",
+            "updating": "Actualizando mediciones...",
+            "error": "No se pudieron cargar las mediciones.",
+            "empty": "No se encontraron mediciones para este rango de alerta."
+          },
+          "tooltip": {
+            "alertOccurred": "Ocurrio una alerta",
+            "date": "Fecha",
+            "pollen": "Polen",
+            "location": "Ubicacion",
+            "value": "Valor",
+            "alertType": "Tipo de alerta",
+            "triggerRange": "Rango de activación",
+            "status": "Estado"
+          },
+          "actions": {
+            "createCorrectionFactor": "Crear factor de correccion"
+          }
+        },
         "options": {
           "status": {
             "RESOLVED": "Resuelta",

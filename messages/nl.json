@@ -639,6 +639,29 @@
           "update": "Status bijwerken",
           "saving": "Opslaan..."
         },
+        "chart": {
+          "title": "Metingen rond waarschuwing",
+          "description": "Metingen van drie dagen voor tot drie dagen na de waarschuwing.",
+          "states": {
+            "loading": "Metingen laden...",
+            "updating": "Metingen bijwerken...",
+            "error": "Metingen konden niet worden geladen.",
+            "empty": "Er zijn geen metingen gevonden voor dit waarschuwingsbereik."
+          },
+          "tooltip": {
+            "alertOccurred": "Waarschuwing opgetreden",
+            "date": "Datum",
+            "pollen": "Pollen",
+            "location": "Locatie",
+            "value": "Waarde",
+            "alertType": "Waarschuwingstype",
+            "triggerRange": "Activeringsbereik",
+            "status": "Status"
+          },
+          "actions": {
+            "createCorrectionFactor": "Correctiefactor maken"
+          }
+        },
         "options": {
           "status": {
             "RESOLVED": "Opgelost",

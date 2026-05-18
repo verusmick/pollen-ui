@@ -639,6 +639,29 @@
           "update": "Update status",
           "saving": "Saving..."
         },
+        "chart": {
+          "title": "Measurements around alert",
+          "description": "Measurements from three days before to three days after the alert.",
+          "states": {
+            "loading": "Loading measurements...",
+            "updating": "Updating measurements...",
+            "error": "Failed to load measurements.",
+            "empty": "No measurements were found for this alert range."
+          },
+          "tooltip": {
+            "alertOccurred": "Alert occurred",
+            "date": "Date",
+            "pollen": "Pollen",
+            "location": "Location",
+            "value": "Value",
+            "alertType": "Alert type",
+            "triggerRange": "Trigger range",
+            "status": "Status"
+          },
+          "actions": {
+            "createCorrectionFactor": "Create correction factor"
+          }
+        },
         "options": {
           "status": {
             "RESOLVED": "Resolved",

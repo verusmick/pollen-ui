@@ -639,6 +639,29 @@
           "update": "Status aktualisieren",
           "saving": "Speichern..."
         },
+        "chart": {
+          "title": "Messungen rund um die Warnung",
+          "description": "Messungen von drei Tagen vor bis drei Tage nach der Warnung.",
+          "states": {
+            "loading": "Messungen werden geladen...",
+            "updating": "Messungen werden aktualisiert...",
+            "error": "Messungen konnten nicht geladen werden.",
+            "empty": "Fuer diesen Warnbereich wurden keine Messungen gefunden."
+          },
+          "tooltip": {
+            "alertOccurred": "Warnung ausgeloest",
+            "date": "Datum",
+            "pollen": "Pollen",
+            "location": "Ort",
+            "value": "Wert",
+            "alertType": "Warnungstyp",
+            "triggerRange": "Ausloesebereich",
+            "status": "Status"
+          },
+          "actions": {
+            "createCorrectionFactor": "Korrekturfaktor erstellen"
+          }
+        },
         "options": {
           "status": {
             "RESOLVED": "Geloest",

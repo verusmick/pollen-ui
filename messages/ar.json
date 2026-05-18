@@ -639,6 +639,29 @@
           "update": "تحديث الحالة",
           "saving": "جار الحفظ..."
         },
+        "chart": {
+          "title": "القياسات حول التنبيه",
+          "description": "القياسات من ثلاثة ايام قبل التنبيه الى ثلاثة ايام بعده.",
+          "states": {
+            "loading": "جار تحميل القياسات...",
+            "updating": "جار تحديث القياسات...",
+            "error": "تعذر تحميل القياسات.",
+            "empty": "لم يتم العثور على قياسات لنطاق هذا التنبيه."
+          },
+          "tooltip": {
+            "alertOccurred": "حدث تنبيه",
+            "date": "التاريخ",
+            "pollen": "Pollen",
+            "location": "الموقع",
+            "value": "القيمة",
+            "alertType": "نوع التنبيه",
+            "triggerRange": "نطاق التفعيل",
+            "status": "الحالة"
+          },
+          "actions": {
+            "createCorrectionFactor": "انشاء عامل تصحيح"
+          }
+        },
         "options": {
           "status": {
             "RESOLVED": "تم الحل",

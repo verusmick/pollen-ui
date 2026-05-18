@@ -639,6 +639,29 @@
           "update": "Mettre a jour le statut",
           "saving": "Enregistrement..."
         },
+        "chart": {
+          "title": "Mesures autour de l alerte",
+          "description": "Mesures des trois jours avant aux trois jours apres l alerte.",
+          "states": {
+            "loading": "Chargement des mesures...",
+            "updating": "Mise a jour des mesures...",
+            "error": "Impossible de charger les mesures.",
+            "empty": "Aucune mesure trouvee pour cette plage d alerte."
+          },
+          "tooltip": {
+            "alertOccurred": "Alerte declenchee",
+            "date": "Date",
+            "pollen": "Pollen",
+            "location": "Emplacement",
+            "value": "Valeur",
+            "alertType": "Type d alerte",
+            "triggerRange": "Plage d activation",
+            "status": "Statut"
+          },
+          "actions": {
+            "createCorrectionFactor": "Creer un facteur de correction"
+          }
+        },
         "options": {
           "status": {
             "RESOLVED": "Resolue",
