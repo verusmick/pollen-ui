@@ -27,11 +27,19 @@ import {
   toCorrectionFactorApiDateTimeFromUnixTimestamp,
   toCorrectionFactorUserFacingError,
 } from '../../utils';
+import { formatPollenScienceTimeRange } from '../../../utils/pollenScienceDateTime';
 import { CorrectionFactorForm } from './CorrectionFactorForm';
 
 interface CorrectionFactorFormContainerProps {
   mode?: CorrectionFactorFormMode;
   correctionFactorId?: string;
+}
+
+function formatPersistedPeakLabel(
+  startTimestamp: number,
+  endTimestamp: number
+): string {
+  return formatPollenScienceTimeRange(startTimestamp, endTimestamp);
 }
 
 export function CorrectionFactorFormContainer({
@@ -149,7 +157,10 @@ export function CorrectionFactorFormContainer({
         id: selectedPersistedPeak.id,
         from: selectedPersistedPeak.startTimestamp,
         to: selectedPersistedPeak.endTimestamp,
-        label: `${selectedPersistedPeak.startDate} - ${selectedPersistedPeak.endDate}`,
+        label: formatPersistedPeakLabel(
+          selectedPersistedPeak.startTimestamp,
+          selectedPersistedPeak.endTimestamp
+        ),
         value: selectedPersistedPeak.value,
       };
     }
@@ -203,7 +214,10 @@ export function CorrectionFactorFormContainer({
         from: selectedPersistedPeak.startTimestamp,
         to: selectedPersistedPeak.endTimestamp,
         peakTimestamp: selectedPersistedPeak.startTimestamp,
-        label: `${selectedPersistedPeak.startDate} - ${selectedPersistedPeak.endDate}`,
+        label: formatPersistedPeakLabel(
+          selectedPersistedPeak.startTimestamp,
+          selectedPersistedPeak.endTimestamp
+        ),
       },
       ...preview.reviewSlices,
     ];

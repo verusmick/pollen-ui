@@ -9,6 +9,7 @@ import type {
   CorrectionFactorValidationEventCoordinates,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
+import { formatPollenScienceDateTime } from '../../../utils/pollenScienceDateTime';
 
 interface CorrectionFactorEventCarouselProps {
   status: CorrectionFactorValidationEventsStatus;
@@ -24,13 +25,14 @@ const INITIAL_EVENT_BATCH_SIZE = 30;
 const EVENT_BATCH_SIZE = 30;
 
 function formatEventDatetime(timestamp: number): string {
-  return new Intl.DateTimeFormat(undefined, {
+  return formatPollenScienceDateTime(timestamp, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(timestamp * 1000));
+    hourCycle: 'h23',
+  });
 }
 
 interface ImageNaturalSize {

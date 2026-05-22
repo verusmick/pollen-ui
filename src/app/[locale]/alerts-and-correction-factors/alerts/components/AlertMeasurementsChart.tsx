@@ -15,6 +15,10 @@ import {
 
 import type { NotificationMessageRecord } from '@/app/[locale]/rules-and-notifications/types';
 
+import {
+  formatPollenScienceDateTime,
+  formatPollenScienceTimeRange,
+} from '../../utils/pollenScienceDateTime';
 import { useAlertMeasurements } from '../hooks';
 
 interface AlertMeasurementsChartProps {
@@ -23,6 +27,8 @@ interface AlertMeasurementsChartProps {
 
 interface AlertChartPoint {
   timestamp: number;
+  startTimestamp: number;
+  endTimestamp: number;
   measurementValue: number | null;
   alertValue: number | null;
   isAlert: boolean;
@@ -61,10 +67,26 @@ function formatNumber(
 }
 
 function formatDateTime(timestamp: number, locale: string): string {
-  return new Intl.DateTimeFormat(locale, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(timestamp * 1000));
+  return formatPollenScienceDateTime(
+    timestamp,
+    {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    },
+    locale
+  );
+}
+
+function formatMeasurementInterval(point: AlertChartPoint, locale: string): string {
+  return formatPollenScienceTimeRange(
+    point.startTimestamp,
+    point.endTimestamp,
+    locale
+  );
 }
 
 function buildCorrectionFactorHref(
@@ -203,6 +225,8 @@ export function AlertMeasurementsChart({ record }: AlertMeasurementsChartProps) 
   const chartPoints = useMemo<AlertChartPoint[]>(() => {
     const measurementPoints = points.map((point) => ({
       timestamp: point.timestamp + (point.endTimestamp - point.timestamp) / 2,
+      startTimestamp: point.timestamp,
+      endTimestamp: point.endTimestamp,
       measurementValue: point.value,
       alertValue: null,
       isAlert: false,
@@ -216,6 +240,8 @@ export function AlertMeasurementsChart({ record }: AlertMeasurementsChartProps) 
       ...measurementPoints,
       {
         timestamp: alertTimestamp,
+        startTimestamp: alertTimestamp,
+        endTimestamp: alertTimestamp,
         measurementValue: null,
         alertValue: record.value,
         isAlert: true,
@@ -316,7 +342,7 @@ export function AlertMeasurementsChart({ record }: AlertMeasurementsChartProps) 
               style={getMeasurementTooltipStyle(hoveredMeasurement)}
             >
               <div className="font-medium">
-                {formatDateTime(hoveredMeasurement.point.timestamp, locale)}
+                {formatMeasurementInterval(hoveredMeasurement.point, locale)}
               </div>
               <div className="text-muted-foreground">
                 {hoveredMeasurementValue

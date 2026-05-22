@@ -23,6 +23,7 @@ import type {
   CorrectionFactorPreviewStatus,
 } from '../../types';
 import { formatCorrectionFactorChartRange } from '../../utils';
+import { formatPollenScienceDateTime } from '../../../utils/pollenScienceDateTime';
 
 interface CorrectionFactorChartPreviewProps {
   basePollen: string;
@@ -64,13 +65,12 @@ function buildMeasurementAxisTicks(
   return ticks;
 }
 
-function formatCompactUtcTime(timestamp: number): string {
-  return new Intl.DateTimeFormat(undefined, {
+function formatCompactDisplayTime(timestamp: number): string {
+  return formatPollenScienceDateTime(timestamp, {
     hour: 'numeric',
     minute: '2-digit',
-    timeZone: 'UTC',
+    hourCycle: 'h23',
   })
-    .format(new Date(timestamp * 1000))
     .replace(':00', '')
     .replace(/\s/g, '');
 }
@@ -403,7 +403,7 @@ export function CorrectionFactorChartPreview({
                   ticks={xAxisTicks}
                   tickFormatter={(value) =>
                     resolution === 'measurement'
-                      ? formatCompactUtcTime(Number(value))
+                      ? formatCompactDisplayTime(Number(value))
                       : String(value)
                   }
                   tickLine={false}

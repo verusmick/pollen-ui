@@ -9,6 +9,10 @@ import type {
   CorrectionFactorPreviewSourcePoint,
   CorrectionFactorReviewSlice,
 } from '../types';
+import {
+  formatPollenScienceDateTime,
+  formatPollenScienceTimeRange,
+} from '../../utils/pollenScienceDateTime';
 import { toCorrectionFactorUnixTimestamp } from './correctionFactorDateTime';
 
 const SECONDS_IN_DAY = 24 * 60 * 60;
@@ -54,45 +58,38 @@ function normalizeMeasurementPoint(
   };
 }
 
-function formatUtcDate(
+function formatDisplayDate(
   timestamp: number,
   options: Intl.DateTimeFormatOptions
 ): string {
-  return new Intl.DateTimeFormat(undefined, {
-    ...options,
-    timeZone: 'UTC',
-  }).format(new Date(timestamp * 1000));
+  return formatPollenScienceDateTime(timestamp, options);
 }
 
 function formatPreviewSliceLabel(startTimestamp: number, endTimestamp: number): string {
-  return `${formatUtcDate(startTimestamp, {
+  return `${formatDisplayDate(startTimestamp, {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  })} - ${formatUtcDate(endTimestamp, {
+    hourCycle: 'h23',
+  })} - ${formatDisplayDate(endTimestamp, {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    hourCycle: 'h23',
   })}`;
 }
 
 function formatTooltipDateLabel(timestamp: number): string {
-  return formatUtcDate(timestamp, {
+  return formatDisplayDate(timestamp, {
     day: '2-digit',
     month: '2-digit',
   }).replace(',', '');
 }
 
 function formatTimeRangeLabel(startTimestamp: number, endTimestamp: number): string {
-  return `${formatUtcDate(startTimestamp, {
-    hour: '2-digit',
-    minute: '2-digit',
-  })} - ${formatUtcDate(endTimestamp, {
-    hour: '2-digit',
-    minute: '2-digit',
-  })}`;
+  return formatPollenScienceTimeRange(startTimestamp, endTimestamp);
 }
 
 function getRangeSpanInDays(range: CorrectionFactorChartRange): number {
@@ -240,24 +237,24 @@ function formatBucketLabel(
   to: number
 ): string {
   if (resolution === 'month') {
-    return formatUtcDate(from, {
+    return formatDisplayDate(from, {
       month: 'short',
       year: 'numeric',
     });
   }
 
   if (resolution === 'week') {
-    return `${formatUtcDate(from, {
+    return `${formatDisplayDate(from, {
       month: 'short',
       day: 'numeric',
-    })} - ${formatUtcDate(to, {
+    })} - ${formatDisplayDate(to, {
       month: 'short',
       day: 'numeric',
     })}`;
   }
 
   if (resolution === 'day') {
-    return formatUtcDate(from, {
+    return formatDisplayDate(from, {
       month: 'short',
       day: 'numeric',
     });
@@ -272,21 +269,22 @@ function formatAxisLabel(
   to: number
 ): string {
   if (resolution === 'month') {
-    return formatUtcDate(from, {
+    return formatDisplayDate(from, {
       month: 'short',
     });
   }
 
   if (resolution === 'week' || resolution === 'day') {
-    return formatUtcDate(from, {
+    return formatDisplayDate(from, {
       day: '2-digit',
       month: '2-digit',
     }).replace(',', '');
   }
 
-  return formatUtcDate(from, {
+  return formatDisplayDate(from, {
     hour: '2-digit',
     minute: '2-digit',
+    hourCycle: 'h23',
   });
 }
 
@@ -526,11 +524,11 @@ export function formatCorrectionFactorChartRange(
     return null;
   }
 
-  return `${formatUtcDate(range.from, {
+  return `${formatDisplayDate(range.from, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-  })} - ${formatUtcDate(range.to, {
+  })} - ${formatDisplayDate(range.to, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
