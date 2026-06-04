@@ -114,17 +114,12 @@ function withReviewedPollen(
   const reviewedPollenById = new Map(
     currentEvents.map((event) => [event.id, event.reviewedPollen])
   );
-  const eventIds = new Set(events.map((event) => event.id));
-  const restoredEvents = currentEvents.filter(
-    (event) => !eventIds.has(event.id)
-  );
 
   return [
     ...events.map((event) => ({
       ...event,
       reviewedPollen: reviewedPollenById.get(event.id) ?? UNKNOWN_POLLEN_CODE,
     })),
-    ...restoredEvents,
   ].sort((left, right) => left.datetime - right.datetime);
 }
 
@@ -736,6 +731,7 @@ export function useCorrectionFactorForm() {
       return syncRowsFromReviewedEvents(
         clearStoredMultipliers({
           ...current,
+          reviewStateSource: 'active',
           events: nextEvents,
         })
       );
@@ -780,6 +776,7 @@ export function useCorrectionFactorForm() {
       return syncRowsFromReviewedEvents(
         clearStoredMultipliers({
           ...current,
+          reviewStateSource: 'active',
           events: nextEvents,
         })
       );
@@ -858,6 +855,7 @@ export function useCorrectionFactorForm() {
         return {
           ...current,
           multiplierMode,
+          reviewStateSource: 'active',
           manualMultiplier: String(baseMultiplier),
         };
       }
@@ -865,6 +863,8 @@ export function useCorrectionFactorForm() {
       return {
         ...current,
         multiplierMode,
+        reviewStateSource:
+          multiplierMode === 'manual' ? 'active' : current.reviewStateSource,
       };
     });
     clearTopLevelError('manualMultiplier');

@@ -7,6 +7,7 @@ import type {
   CorrectionFactorFormErrors,
   CorrectionFactorMultiplierMode,
   CorrectionFactorFormValues,
+  CorrectionFactorReviewStateSource,
 } from '../../types';
 import { CorrectionFactorTotals } from './CorrectionFactorTotals';
 
@@ -29,6 +30,7 @@ interface CorrectionFactorResultSummaryProps {
   basePollen: string;
   correctionMultiplier: number;
   showStoredMultiplierView: boolean;
+  reviewStateSource: CorrectionFactorReviewStateSource;
   onMultiplierModeChange: (mode: CorrectionFactorMultiplierMode) => void;
   onManualMultiplierChange: (value: string) => void;
 }
@@ -140,6 +142,7 @@ export function CorrectionFactorResultSummary({
   basePollen,
   correctionMultiplier,
   showStoredMultiplierView,
+  reviewStateSource,
   onMultiplierModeChange,
   onManualMultiplierChange,
 }: CorrectionFactorResultSummaryProps) {
@@ -150,8 +153,12 @@ export function CorrectionFactorResultSummary({
       ?.reviewedEventsNumber ?? 0;
   const unknownCount = derived.unknownReviewedEvents;
   const basePollenLabel = basePollen
-    ? t('markedAsBasePollen', { basePollen })
-    : t('markedAsBasePollenFallback');
+    ? reviewStateSource === 'persisted'
+      ? t('previouslySelected')
+      : t('markedAsBasePollen', { basePollen })
+    : reviewStateSource === 'persisted'
+      ? t('previouslySelected')
+      : t('markedAsBasePollenFallback');
   const manualMultiplierError =
     errors.manualMultiplier ?? validationErrors.manualMultiplier;
   const isManualMode = values.multiplierMode === 'manual';

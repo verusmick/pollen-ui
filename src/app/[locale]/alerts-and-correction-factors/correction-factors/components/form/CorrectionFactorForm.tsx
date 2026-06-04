@@ -367,6 +367,7 @@ export function CorrectionFactorForm({
               basePollen={values.basePollen}
               correctionMultiplier={correctionMultiplier}
               showStoredMultiplierView={showStoredMultiplierView}
+              reviewStateSource={values.reviewStateSource}
               onMultiplierModeChange={onMultiplierModeChange}
               onManualMultiplierChange={onManualMultiplierChange}
             />
@@ -416,6 +417,7 @@ export function CorrectionFactorForm({
         basePollen={values.basePollen}
         selectedSliceLabel={selectedPreviewSliceLabel}
         correctionMultiplier={correctionMultiplier}
+        reviewStateSource={values.reviewStateSource}
         reviewSlices={previewReviewSlices}
         selectedSliceId={selectedPreviewSliceId}
         idleMessage={validationEventsIdleMessage}

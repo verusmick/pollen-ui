@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import type {
   CorrectionFactorFormDerivedState,
   CorrectionFactorMultiplierMode,
+  CorrectionFactorReviewStateSource,
 } from '../../types';
 
 interface CorrectionFactorDistributionTableProps {
@@ -14,6 +15,7 @@ interface CorrectionFactorDistributionTableProps {
   showStoredMultiplierView: boolean;
   storedMultiplier?: number | null;
   multiplierMode: CorrectionFactorMultiplierMode;
+  reviewStateSource?: CorrectionFactorReviewStateSource;
 }
 
 interface SummaryMetricProps {
@@ -39,6 +41,7 @@ export function CorrectionFactorDistributionTable({
   showStoredMultiplierView,
   storedMultiplier = null,
   multiplierMode,
+  reviewStateSource = 'active',
 }: CorrectionFactorDistributionTableProps) {
   const t = useTranslations('correctionFactorsPage.form.distribution');
   const baseRow = derived.rows.find(
@@ -49,8 +52,12 @@ export function CorrectionFactorDistributionTable({
     ? (storedMultiplier ?? 0)
     : (baseRow?.multiplier ?? 0);
   const basePollenLabel = basePollen
-    ? t('markedAsBasePollen', { basePollen })
-    : t('markedAsBasePollenFallback');
+    ? reviewStateSource === 'persisted'
+      ? t('previouslySelected')
+      : t('markedAsBasePollen', { basePollen })
+    : reviewStateSource === 'persisted'
+      ? t('previouslySelected')
+      : t('markedAsBasePollenFallback');
   const multiplierLabel =
     multiplierMode === 'manual' && !showStoredMultiplierView
       ? t('manualCorrectionMultiplier')

@@ -149,6 +149,7 @@ export type CorrectionFactorTimeOption =
   | '23:00';
 export type CorrectionFactorPercentageScale = 'ratio' | 'percentage';
 export type CorrectionFactorMultiplierMode = 'eventBased' | 'manual';
+export type CorrectionFactorReviewStateSource = 'active' | 'persisted';
 export type CorrectionFactorChartResolution =
   | 'month'
   | 'week'
@@ -219,6 +220,7 @@ export interface CorrectionFactorFormValues {
   selectedReviewSliceId: string | null;
   detectedEvents: number | null;
   multiplierMode: CorrectionFactorMultiplierMode;
+  reviewStateSource: CorrectionFactorReviewStateSource;
   manualMultiplier: string;
   events: CorrectionFactorReviewedValidationEvent[];
   peaks: CorrectionFactorPeak[];

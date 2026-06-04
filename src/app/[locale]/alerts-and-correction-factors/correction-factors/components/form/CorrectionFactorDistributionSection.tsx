@@ -129,6 +129,7 @@ export function CorrectionFactorDistributionSection({
         showStoredMultiplierView={showStoredMultiplierView}
         storedMultiplier={baseStoredMultiplier}
         multiplierMode={values.multiplierMode}
+        reviewStateSource={values.reviewStateSource}
       />
 
       {!showStoredMultiplierView ? (

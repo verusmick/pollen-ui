@@ -43,8 +43,7 @@ function getRestoredEventBasedMultiplier(
 ): number | null {
   if (
     values.multiplierMode !== 'eventBased' ||
-    (!row.isBasePollen && row.reviewedEvents.trim() !== '') ||
-    (row.reviewedEvents.trim() !== '' && values.events.length === 0)
+    values.reviewStateSource !== 'persisted'
   ) {
     return null;
   }

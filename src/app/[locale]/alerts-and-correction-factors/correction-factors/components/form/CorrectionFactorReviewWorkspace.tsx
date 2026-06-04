@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import type {
   CorrectionFactorFormDerivedState,
   CorrectionFactorReviewedValidationEvent,
+  CorrectionFactorReviewStateSource,
   CorrectionFactorReviewSlice,
   CorrectionFactorValidationEventsStatus,
 } from '../../types';
@@ -21,6 +22,7 @@ interface CorrectionFactorReviewWorkspaceProps {
   basePollen: string;
   selectedSliceLabel?: string | null;
   correctionMultiplier: number;
+  reviewStateSource: CorrectionFactorReviewStateSource;
   reviewSlices: CorrectionFactorReviewSlice[];
   selectedSliceId: string | null;
   idleMessage?: string | null;
@@ -40,6 +42,7 @@ export function CorrectionFactorReviewWorkspace({
   basePollen,
   selectedSliceLabel = null,
   correctionMultiplier,
+  reviewStateSource,
   reviewSlices,
   selectedSliceId,
   idleMessage = null,
@@ -56,8 +59,12 @@ export function CorrectionFactorReviewWorkspace({
       ?.reviewedEventsNumber ?? 0;
   const unknownCount = derived.unknownReviewedEvents;
   const basePollenLabel = basePollen
-    ? t('markedAsBasePollen', { basePollen })
-    : t('markedAsBasePollenFallback');
+    ? reviewStateSource === 'persisted'
+      ? t('previouslySelected')
+      : t('markedAsBasePollen', { basePollen })
+    : reviewStateSource === 'persisted'
+      ? t('previouslySelected')
+      : t('markedAsBasePollenFallback');
   const selectedSliceIndex = reviewSlices.findIndex(
     (slice) => slice.id === selectedSliceId
   );

@@ -305,6 +305,7 @@ export function mapCorrectionFactorRecordToFormValues(
     selectedReviewSliceId: selectedPeak?.id ?? null,
     detectedEvents: restoredDetectedEvents,
     multiplierMode: 'eventBased',
+    reviewStateSource: 'persisted',
     manualMultiplier:
       typeof baseStoredMultiplier === 'number' ? String(baseStoredMultiplier) : '',
     events: restoredEvents,

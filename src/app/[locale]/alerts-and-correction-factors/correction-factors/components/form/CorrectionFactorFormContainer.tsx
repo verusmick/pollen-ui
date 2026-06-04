@@ -382,13 +382,15 @@ export function CorrectionFactorFormContainer({
 
     if (validationEvents.status === 'ready') {
       form.replaceValidationEvents(validationEvents.events, {
-        syncRows: !isEditMode || hasRestoredSelectedPeakImages,
+        syncRows:
+          !isEditMode ||
+          form.values.reviewStateSource === 'active' ||
+          hasRestoredSelectedPeakImages,
       });
 
       const detectedEvents = Math.max(
         validationEvents.detectedEvents ?? 0,
-        validationEvents.events.length,
-        form.values.events.length
+        validationEvents.events.length
       );
 
       if (form.values.detectedEvents !== detectedEvents) {
@@ -404,7 +406,7 @@ export function CorrectionFactorFormContainer({
 
     if (validationEvents.status === 'empty') {
       form.replaceValidationEvents([], {
-        syncRows: !isEditMode,
+        syncRows: !isEditMode || form.values.reviewStateSource === 'active',
       });
 
       if (form.values.detectedEvents !== validationEvents.detectedEvents) {
@@ -419,7 +421,7 @@ export function CorrectionFactorFormContainer({
     }
 
     form.replaceValidationEvents([], {
-      syncRows: !isEditMode,
+      syncRows: !isEditMode || form.values.reviewStateSource === 'active',
     });
 
     if (form.values.detectedEvents !== null) {
@@ -427,6 +429,7 @@ export function CorrectionFactorFormContainer({
     }
   }, [
     form,
+    form.values.reviewStateSource,
     hasRestoredSelectedEvents,
     hasRestoredSelectedPeakImages,
     isManualOverrideMode,
@@ -468,6 +471,7 @@ export function CorrectionFactorFormContainer({
     });
   const showStoredMultiplierView =
     isEditMode &&
+    form.values.reviewStateSource === 'persisted' &&
     !form.hasReviewSessionChanges &&
     isStoredRecordOtherwiseUnchanged;
   const hasRuleEnabledChanged =

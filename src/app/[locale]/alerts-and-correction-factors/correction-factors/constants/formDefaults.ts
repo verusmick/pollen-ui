@@ -21,6 +21,7 @@ export const DEFAULT_CORRECTION_FACTOR_FORM_VALUES: CorrectionFactorFormValues =
     selectedReviewSliceId: null,
     detectedEvents: null,
     multiplierMode: 'eventBased',
+    reviewStateSource: 'active',
     manualMultiplier: '',
     events: [],
     peaks: [],
