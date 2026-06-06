@@ -597,7 +597,7 @@
           "pollen": "Pollen",
           "location": "Emplacement",
           "value": "Valeur",
-          "notification": "Notification",
+          "notification": "Destinataires des notifications",
           "rule": "Regle",
           "alert": "Alerte",
           "actions": "Actions",
@@ -615,7 +615,7 @@
         "editTitle": "Details de l'alerte",
         "editDescription": "Consultez les details de l'alerte et mettez a jour son statut.",
         "details": {
-          "notification": "Notification",
+          "notification": "Destinataires des notifications",
           "rule": "Regle",
           "alertType": "Type d'alerte",
           "pollen": "Pollen",

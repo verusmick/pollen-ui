@@ -58,4 +58,10 @@ Rules CRUD UI has been realigned to the new rule contract: list rows show pollen
 Rules and notification-message-backed Alerts received focused UI polish: Rules threshold summaries are stacked with `Pollen/m³` units, embedded threshold labels include value units, Rules flight periods collect month/day only and submit one fixed-year 2000 interval, Rules locations support multi-select, and Alerts list/detail displays trigger range plus value with `Pollen/m³`.
 
 ## Message System - Alerts detail chart
-Alerts detail now loads `/api/measurements` for the alert pollen/location from three days before through three days after `creation_date`, renders a simple route-local chart with visible measurement points and an alert marker, and exposes a fixed CTA to open the existing new Correction Factor page with alert context query params. Correction Factors files and behavior remain unchanged; prefill from query params is still future work.
+Alerts detail now loads `/api/measurements` for the alert pollen/location from three days before through three days after the alert/value occurrence date, renders a simple route-local chart with visible measurement points and an alert marker, and exposes a fixed CTA to open the existing new Correction Factor page with alert context query params. Correction Factors files and behavior remain unchanged; prefill from query params is still future work.
+
+## Message System - Alerts notification display and value date alignment
+Alerts notification-message mapping now supports `notification` as one object, an array, or missing/null; the Alerts list/detail display notification names instead of raw ids and the detail view includes recipients when present. Alerts Created display and alert chart occurrence-date usage now prefer `value_creation_date` with `creation_date` as a defensive fallback; status updates still send only `{ "status": ... }`.
+
+## Message System - Alerts recipients label
+Alerts list/detail copy now labels the notification field as notification recipients across supported locales.

@@ -95,12 +95,13 @@ export interface ApiNotificationMessageRecord {
   rule_id: MessageSystemApiId;
   alert_id: MessageSystemApiId;
   creation_date: string;
+  value_creation_date?: string | null;
   pollen: string;
   location: string;
   value: number;
   description: string;
   status: MessageSystemNotificationMessageStatus | string;
-  notification?: unknown;
+  notification?: ApiNotificationRecord | ApiNotificationRecord[] | null;
   rule?: unknown;
   alert?: unknown;
 }
@@ -131,6 +132,14 @@ export interface ApiMessageSystemDeleteResponse {
 export type MessageSystemId = string;
 
 export interface NotificationRecord {
+  id: MessageSystemId;
+  name: string;
+  recipients: string[];
+  frequency: string;
+  alertTypes: string[];
+}
+
+export interface NotificationMessageNotificationRecord {
   id: MessageSystemId;
   name: string;
   recipients: string[];
@@ -180,12 +189,14 @@ export interface NotificationMessageRecord {
   ruleId: MessageSystemId;
   alertId: MessageSystemId;
   creationDate: string;
+  valueCreationDate: string;
   pollen: string;
   location: string;
   value: number | null;
   description: string;
   status: string;
   notification?: unknown;
+  notifications: NotificationMessageNotificationRecord[];
   rule?: unknown;
   alert?: unknown;
   /** @deprecated Temporary compatibility for the old Notification Messages UI. */

@@ -415,8 +415,9 @@ Allowed actions:
 - view/read details if useful
 - change status
 - detail can show a simple measurements chart around the notification-message
-  `creation_date`, with an alert marker and a link to the existing new
-  Correction Factor page carrying alert context in query params
+  `value_creation_date` with `creation_date` as fallback, with an alert marker
+  and a link to the existing new Correction Factor page carrying alert context
+  in query params
 
 Not in scope:
 

@@ -12,6 +12,7 @@ import type {
 } from '@/app/[locale]/rules-and-notifications/types';
 
 import { AlertMeasurementsChart } from './AlertMeasurementsChart';
+import { getAlertOccurrenceDate } from '../utils/alertNotificationMessages';
 
 interface AlertFormProps {
   record?: NotificationMessageRecord;
@@ -73,6 +74,19 @@ function isKnownAlertType(
   return MESSAGE_SYSTEM_ALERT_TYPES.some((type) => type === value);
 }
 
+function getAlertTypeChipClass(type: string): string {
+  switch (type) {
+    case 'green':
+      return 'border-green-500/30 bg-green-500/10 text-green-800';
+    case 'yellow':
+      return 'border-yellow-500/30 bg-yellow-500/10 text-yellow-800';
+    case 'red':
+      return 'border-red-500/30 bg-red-500/10 text-red-800';
+    default:
+      return 'border-border bg-background text-foreground';
+  }
+}
+
 export function AlertForm({
   record,
   status,
@@ -88,8 +102,7 @@ export function AlertForm({
   const sharedT = useTranslations('messageSystemPage.shared');
   const optionsT = useTranslations('messageSystemPage.notifications.options');
   const unavailable = sharedT('notAvailable');
-  const notificationLabel =
-    getNamedValue(record?.notification) || record?.notificationId || unavailable;
+  const notifications = record?.notifications ?? [];
   const ruleLabel = getNamedValue(record?.rule) || record?.ruleId || unavailable;
   const alertRange = getAlertRangeParts(record?.alert);
   const alertType = alertRange?.type
@@ -98,7 +111,7 @@ export function AlertForm({
       : alertRange.type
     : unavailable;
   const triggerRange = alertRange
-    ? `${alertType} · ${formatNumber(alertRange.minValue, locale) || unavailable}-${
+    ? `${formatNumber(alertRange.minValue, locale) || unavailable} - ${
         formatNumber(alertRange.maxValue, locale) || unavailable
       } Pollen/m³`
     : unavailable;
@@ -132,8 +145,24 @@ export function AlertForm({
               <dt className="text-xs font-medium uppercase text-muted-foreground">
                 {t('details.notification')}
               </dt>
-              <dd className="mt-1 text-sm text-foreground">
-                {notificationLabel}
+              <dd className="mt-1 grid gap-2 text-sm text-foreground">
+                {notifications.length > 0 ? (
+                  notifications.map((notification, index) => (
+                    <span
+                      key={`${notification.id}-${notification.name}-${index}`}
+                      className="grid gap-0.5"
+                    >
+                      <span>{notification.name || unavailable}</span>
+                      {notification.recipients.length > 0 ? (
+                        <span className="text-xs text-muted-foreground">
+                          {notification.recipients.join(', ')}
+                        </span>
+                      ) : null}
+                    </span>
+                  ))
+                ) : (
+                  unavailable
+                )}
               </dd>
             </div>
             <div>
@@ -144,15 +173,23 @@ export function AlertForm({
             </div>
             <div>
               <dt className="text-xs font-medium uppercase text-muted-foreground">
-                {t('details.alertType')}
-              </dt>
-              <dd className="mt-1 text-sm text-foreground">{alertType}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase text-muted-foreground">
                 {t('details.triggerRange')}
               </dt>
-              <dd className="mt-1 text-sm text-foreground">{triggerRange}</dd>
+              <dd className="mt-1 text-sm text-foreground">
+                {alertRange ? (
+                  <span
+                    className={`inline-flex w-fit items-center rounded-md border px-2 py-1 text-xs ${getAlertTypeChipClass(
+                      alertRange.type
+                    )}`}
+                  >
+                    <span className="font-medium">{alertType}</span>
+                    <span className="mx-1 text-muted-foreground">·</span>
+                    <span>{triggerRange}</span>
+                  </span>
+                ) : (
+                  unavailable
+                )}
+              </dd>
             </div>
             <div>
               <dt className="text-xs font-medium uppercase text-muted-foreground">
@@ -183,7 +220,7 @@ export function AlertForm({
                 {t('details.creationDate')}
               </dt>
               <dd className="mt-1 text-sm text-foreground">
-                {record?.creationDate || unavailable}
+                {getAlertOccurrenceDate(record) || unavailable}
               </dd>
             </div>
             <div className="md:col-span-2">

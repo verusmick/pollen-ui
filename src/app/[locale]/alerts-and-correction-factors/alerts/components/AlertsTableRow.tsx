@@ -6,6 +6,11 @@ import { Link } from '@/features/i18n/routing';
 import { MESSAGE_SYSTEM_ALERT_TYPES } from '@/app/[locale]/rules-and-notifications/constants';
 import type { NotificationMessageRecord } from '@/app/[locale]/rules-and-notifications/types';
 
+import {
+  getAlertOccurrenceDate,
+  getNotificationDisplayNames,
+} from '../utils/alertNotificationMessages';
+
 interface AlertsTableRowProps {
   record: NotificationMessageRecord;
 }
@@ -75,8 +80,7 @@ export function AlertsTableRow({ record }: AlertsTableRowProps) {
   const sharedT = useTranslations('messageSystemPage.shared');
   const optionsT = useTranslations('messageSystemPage.notifications.options');
   const unavailable = sharedT('notAvailable');
-  const notificationLabel =
-    getNamedValue(record.notification) || record.notificationId || unavailable;
+  const notificationNames = getNotificationDisplayNames(record);
   const ruleLabel = getNamedValue(record.rule) || record.ruleId || unavailable;
   const alertRange = getAlertRangeParts(record.alert);
   const alertTypeLabel = alertRange
@@ -85,7 +89,7 @@ export function AlertsTableRow({ record }: AlertsTableRowProps) {
       : alertRange.type || unavailable
     : unavailable;
   const alertRangeLabel = alertRange
-    ? `${formatNumber(alertRange.minValue, locale) || unavailable}-${
+    ? `${formatNumber(alertRange.minValue, locale) || unavailable} - ${
         formatNumber(alertRange.maxValue, locale) || unavailable
       } Pollen/m³`
     : unavailable;
@@ -97,7 +101,7 @@ export function AlertsTableRow({ record }: AlertsTableRowProps) {
         {record.status || unavailable}
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
-        {record.creationDate || unavailable}
+        {getAlertOccurrenceDate(record) || unavailable}
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
         {record.pollen || unavailable}
@@ -109,7 +113,15 @@ export function AlertsTableRow({ record }: AlertsTableRowProps) {
         {valueLabel ? `${valueLabel} Pollen/m³` : unavailable}
       </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
-        {notificationLabel}
+        {notificationNames.length > 0 ? (
+          <div className="grid gap-1">
+            {notificationNames.map((name, index) => (
+              <span key={`${name}-${index}`}>{name}</span>
+            ))}
+          </div>
+        ) : (
+          unavailable
+        )}
       </td>
       <td className="px-4 py-3 text-sm text-foreground">{ruleLabel}</td>
       <td className="px-4 py-3 text-sm text-muted-foreground">

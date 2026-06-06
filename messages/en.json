@@ -597,7 +597,7 @@
           "pollen": "Pollen",
           "location": "Location",
           "value": "Value",
-          "notification": "Notification",
+          "notification": "Notification recipients",
           "rule": "Rule",
           "alert": "Alert",
           "actions": "Actions",
@@ -615,7 +615,7 @@
         "editTitle": "Alert details",
         "editDescription": "Review the alert details and update its status.",
         "details": {
-          "notification": "Notification",
+          "notification": "Notification recipients",
           "rule": "Rule",
           "alertType": "Alert type",
           "pollen": "Pollen",

@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import type { NotificationMessageRecord } from '@/app/[locale]/rules-and-notifications/types';
+import { getAlertOccurrenceDate } from '../utils/alertNotificationMessages';
 
 const ALERT_MEASUREMENT_WINDOW_SECONDS = 3 * 24 * 60 * 60;
 
@@ -138,11 +139,13 @@ async function getAlertMeasurements(params: {
 }
 
 function getAlertTimestamp(record?: NotificationMessageRecord): number | null {
-  if (!record?.creationDate) {
+  const occurrenceDate = getAlertOccurrenceDate(record);
+
+  if (!occurrenceDate) {
     return null;
   }
 
-  const timestamp = Date.parse(record.creationDate);
+  const timestamp = Date.parse(occurrenceDate);
 
   return Number.isFinite(timestamp) ? Math.floor(timestamp / 1000) : null;
 }

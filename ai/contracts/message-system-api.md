@@ -91,6 +91,10 @@ and allow status changes only.
 Notification messages should not have create UI in this frontend. They are
 created by backend trigger flow.
 
+For Alerts UI display, `value_creation_date` is the alert/value occurrence date.
+Use it for the displayed Created field. Fall back to `creation_date` only when
+`value_creation_date` is missing.
+
 ## Endpoints
 
 The upstream API uses `{{host}}/api/*`. In the frontend, these should be
@@ -275,8 +279,8 @@ Only `status` is editable through the frontend.
 ```
 
 Do not send editable payloads for notification message fields such as
-`notification_id`, `rule_id`, `alert_id`, `creation_date`, `pollen`,
-`location`, `value`, or `description`.
+`notification_id`, `rule_id`, `alert_id`, `creation_date`,
+`value_creation_date`, `pollen`, `location`, `value`, or `description`.
 
 ## Known Fields
 
@@ -320,14 +324,26 @@ Do not send editable payloads for notification message fields such as
 - `rule_id`: related rule id.
 - `alert_id`: related embedded/backend alert id.
 - `creation_date`: backend datetime string.
+- `value_creation_date`: value/measurement occurrence datetime string used by
+  the Alerts UI Created field, with `creation_date` as defensive fallback.
 - `pollen`: pollen name/code.
 - `location`: location string.
 - `value`: numeric measured or reported value.
 - `description`: free-text generated message description.
 - `status`: message status, editable by the frontend.
-- `notification`: related notification object.
+- `notification`: related notification object or array of notification objects.
+  Normalize defensively because older examples used one object and newer API
+  responses can include multiple notifications.
 - `rule`: related rule object.
 - `alert`: related alert object.
+
+Chart alignment:
+
+- If an Alerts chart needs the alert/value occurrence date for its measurements
+  window, marker, or alert context query params, prefer `value_creation_date`.
+- Fall back to `creation_date` only when `value_creation_date` is missing.
+- Do not otherwise change chart range, marker style, tooltip content, or
+  correction-factor CTA behavior as part of date alignment.
 
 ## Known Enum-Like Values
 

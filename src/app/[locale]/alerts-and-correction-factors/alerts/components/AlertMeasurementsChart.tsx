@@ -20,6 +20,7 @@ import {
   formatPollenScienceTimeRange,
 } from '../../utils/pollenScienceDateTime';
 import { useAlertMeasurements } from '../hooks';
+import { getAlertOccurrenceDate } from '../utils/alertNotificationMessages';
 
 interface AlertMeasurementsChartProps {
   record?: NotificationMessageRecord;
@@ -97,7 +98,7 @@ function buildCorrectionFactorHref(
     alertId: record.id,
     pollen: record.pollen,
     location: record.location,
-    date: record.creationDate,
+    date: getAlertOccurrenceDate(record),
   });
 
   if (record.value !== null) {

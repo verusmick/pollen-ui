@@ -9,6 +9,7 @@ import type {
   MessageSystemOption,
   MessageSystemApiId,
   NotificationMessageRecord,
+  NotificationMessageNotificationRecord,
   NotificationRecord,
   RuleRecord,
   RuleEmbeddedAlertRecord,
@@ -35,6 +36,25 @@ function toNumberArray(value: unknown): number[] {
           typeof item === 'number' && Number.isFinite(item)
       )
     : [];
+}
+
+function toNotificationMessageNotifications(
+  value: unknown
+): NotificationMessageNotificationRecord[] {
+  const candidates = Array.isArray(value) ? value : value ? [value] : [];
+
+  return candidates
+    .filter(
+      (item: unknown): item is Record<string, unknown> =>
+        Boolean(item) && typeof item === 'object' && !Array.isArray(item)
+    )
+    .map((item) => ({
+      id: toId(item.id as MessageSystemApiId | null | undefined),
+      name: typeof item.name === 'string' ? item.name : '',
+      recipients: toStringArray(item.recipients),
+      frequency: typeof item.frequency === 'string' ? item.frequency : '',
+      alertTypes: toStringArray(item.alert_types),
+    }));
 }
 
 function toRuleIntervals(value: unknown): ApiRuleInterval[] {
@@ -156,12 +176,14 @@ export function mapApiNotificationMessageRecord(
     ruleId: toId(record.rule_id),
     alertId: toId(record.alert_id),
     creationDate: record.creation_date ?? '',
+    valueCreationDate: record.value_creation_date ?? '',
     pollen: record.pollen ?? '',
     location: record.location ?? '',
     value: toNumberOrNull(record.value),
     description: record.description ?? '',
     status: record.status ?? '',
     notification: record.notification,
+    notifications: toNotificationMessageNotifications(record.notification),
     rule: record.rule,
     alert: record.alert,
     measureId: null,

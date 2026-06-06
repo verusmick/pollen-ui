@@ -597,7 +597,7 @@
           "pollen": "حبوب اللقاح",
           "location": "الموقع",
           "value": "القيمة",
-          "notification": "الاشعار",
+          "notification": "مستلمو الاشعار",
           "rule": "القاعدة",
           "alert": "التنبيه",
           "actions": "الاجراءات",
@@ -615,7 +615,7 @@
         "editTitle": "تفاصيل التنبيه",
         "editDescription": "راجع تفاصيل التنبيه وقم بتحديث حالته.",
         "details": {
-          "notification": "الاشعار",
+          "notification": "مستلمو الاشعار",
           "rule": "القاعدة",
           "alertType": "نوع التنبيه",
           "pollen": "حبوب اللقاح",

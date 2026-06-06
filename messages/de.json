@@ -597,7 +597,7 @@
           "pollen": "Pollen",
           "location": "Ort",
           "value": "Wert",
-          "notification": "Benachrichtigung",
+          "notification": "Benachrichtigungsempfaenger",
           "rule": "Regel",
           "alert": "Warnung",
           "actions": "Aktionen",
@@ -615,7 +615,7 @@
         "editTitle": "Warnungsdetails",
         "editDescription": "Pruefen Sie die Warnungsdetails und aktualisieren Sie den Status.",
         "details": {
-          "notification": "Benachrichtigung",
+          "notification": "Benachrichtigungsempfaenger",
           "rule": "Regel",
           "alertType": "Warnungstyp",
           "pollen": "Pollen",

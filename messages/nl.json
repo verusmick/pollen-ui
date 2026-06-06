@@ -597,7 +597,7 @@
           "pollen": "Pollen",
           "location": "Locatie",
           "value": "Waarde",
-          "notification": "Melding",
+          "notification": "Meldingsontvangers",
           "rule": "Regel",
           "alert": "Waarschuwing",
           "actions": "Acties",
@@ -615,7 +615,7 @@
         "editTitle": "Waarschuwingsdetails",
         "editDescription": "Bekijk de waarschuwingsdetails en werk de status bij.",
         "details": {
-          "notification": "Melding",
+          "notification": "Meldingsontvangers",
           "rule": "Regel",
           "alertType": "Waarschuwingstype",
           "pollen": "Pollen",
