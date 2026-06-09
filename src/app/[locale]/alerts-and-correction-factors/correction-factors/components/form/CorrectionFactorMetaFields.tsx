@@ -65,6 +65,11 @@ export function CorrectionFactorMetaFields({
   const hasSelectedLocationOption = locationOptions.some(
     (option) => option.id === values.location
   );
+  const selectedHiddenLocationOption =
+    locationOptions.find(
+      (option) => option.id === values.location && option.hidden
+    ) ?? null;
+  const visibleLocationOptions = locationOptions.filter((option) => !option.hidden);
   const hasSelectedPollenOption = pollenOptions.includes(values.basePollen);
 
   function handleStartDateChange(date: string) {
@@ -136,10 +141,14 @@ export function CorrectionFactorMetaFields({
                   ? t('loadError')
                   : t('allLocations')}
             </option>
-            {values.location && !hasSelectedLocationOption ? (
+            {selectedHiddenLocationOption ? (
+              <option value={selectedHiddenLocationOption.id}>
+                {selectedHiddenLocationOption.name}
+              </option>
+            ) : values.location && !hasSelectedLocationOption ? (
               <option value={values.location}>{values.location}</option>
             ) : null}
-            {locationOptions.map((option) => (
+            {visibleLocationOptions.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.name}
               </option>

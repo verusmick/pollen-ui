@@ -45,6 +45,7 @@ export function CorrectionFactorsFilters({
   disabled = false,
 }: CorrectionFactorsFiltersProps) {
   const t = useTranslations('correctionFactorsPage.list');
+  const visibleLocationOptions = locationOptions.filter((option) => !option.hidden);
 
   const locationPlaceholder = locationOptionsLoading
     ? t('filters.loading')
@@ -78,7 +79,7 @@ export function CorrectionFactorsFilters({
           <option value="">
             {locationOptionsError ? t('filters.allLocations') : locationPlaceholder}
           </option>
-          {locationOptions.map((option) => (
+          {visibleLocationOptions.map((option) => (
             <option key={option.id} value={option.id}>
               {option.name}
             </option>

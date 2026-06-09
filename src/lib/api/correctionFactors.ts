@@ -17,6 +17,7 @@ export interface CorrectionFactorLocationOption {
   id: string;
   name: string;
   validationName?: string | null;
+  hidden?: boolean;
 }
 
 interface CorrectionFactorValidationLocationOption {
@@ -24,6 +25,25 @@ interface CorrectionFactorValidationLocationOption {
   name: string;
   devices: string[];
 }
+
+const MUNICH_VALIDATION_LOCATION_NAME = 'Munich';
+// Correction Factors shows the Biedersteinerstrasse station for Munich while
+// keeping its /locations id for measurements and "Munich" for event images.
+const MUNICH_LOCATION_VALIDATION_ALIAS_IDS = new Map<string, string>([
+  ['DEMUNC', MUNICH_VALIDATION_LOCATION_NAME],
+  ['DEMUNC-man', MUNICH_VALIDATION_LOCATION_NAME],
+]);
+const MUNICH_LOCATION_VALIDATION_ALIAS_NAMES = new Map<string, string>([
+  ['munchen', MUNICH_VALIDATION_LOCATION_NAME],
+  ['munchen biedersteinerstrasse', MUNICH_VALIDATION_LOCATION_NAME],
+  ['munchen biedersteinerstrasse manuell', MUNICH_VALIDATION_LOCATION_NAME],
+]);
+const HIDDEN_CORRECTION_FACTOR_LOCATION_IDS = new Set(['DEMUNC']);
+const HIDDEN_CORRECTION_FACTOR_LOCATION_NAMES = new Set([
+  'munchen',
+  'munchen biedersteinerstrasse manuell',
+  'munich thalkirchner',
+]);
 
 function buildListQuery(params: CorrectionFactorListRequest): string {
   const query = new URLSearchParams();
@@ -260,6 +280,7 @@ function normalizeValidationLocationOptionsResponse(
 
 function normalizeLocationMatchKey(value: string): string {
   return value
+    .replace(/ß/g, 'ss')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[()]/g, ' ')
@@ -269,10 +290,61 @@ function normalizeLocationMatchKey(value: string): string {
     .replace(/\s+/g, ' ');
 }
 
+function resolveCorrectionFactorLocationValidationAlias(
+  location: CorrectionFactorLocationOption,
+  validationLocations: CorrectionFactorValidationLocationOption[]
+): string | null {
+  const alias =
+    MUNICH_LOCATION_VALIDATION_ALIAS_IDS.get(location.id) ??
+    MUNICH_LOCATION_VALIDATION_ALIAS_NAMES.get(
+      normalizeLocationMatchKey(location.name)
+    ) ??
+    null;
+
+  if (!alias) {
+    return null;
+  }
+
+  return validationLocations.some(
+    (validationLocation) => validationLocation.name === alias
+  )
+    ? alias
+    : null;
+}
+
+function shouldHideCorrectionFactorLocationOption(
+  location: CorrectionFactorLocationOption
+): boolean {
+  return (
+    HIDDEN_CORRECTION_FACTOR_LOCATION_IDS.has(location.id) ||
+    HIDDEN_CORRECTION_FACTOR_LOCATION_NAMES.has(
+      normalizeLocationMatchKey(location.name)
+    )
+  );
+}
+
+function applyCorrectionFactorLocationVisibility(
+  locations: CorrectionFactorLocationOption[]
+): CorrectionFactorLocationOption[] {
+  return locations.map((location) => ({
+    ...location,
+    hidden: shouldHideCorrectionFactorLocationOption(location) || undefined,
+  }));
+}
+
 function resolveValidationLocationName(
   location: CorrectionFactorLocationOption,
   validationLocations: CorrectionFactorValidationLocationOption[]
 ): string | null {
+  const explicitAlias = resolveCorrectionFactorLocationValidationAlias(
+    location,
+    validationLocations
+  );
+
+  if (explicitAlias) {
+    return explicitAlias;
+  }
+
   const candidates = [location.name, location.id].filter(Boolean);
 
   for (const candidate of candidates) {
@@ -320,6 +392,7 @@ function mergeLocationOptionsWithValidationLocations(
   return locations.map((location) => ({
     ...location,
     validationName: resolveValidationLocationName(location, validationLocations),
+    hidden: shouldHideCorrectionFactorLocationOption(location) || undefined,
   }));
 }
 
@@ -385,7 +458,9 @@ export async function getCorrectionFactorLocations(): Promise<
     throw locationsResult.reason;
   }
 
-  const locations = normalizeLocationOptionsResponse(locationsResult.value);
+  const locations = applyCorrectionFactorLocationVisibility(
+    normalizeLocationOptionsResponse(locationsResult.value)
+  );
 
   if (validationLocationsResult.status !== 'fulfilled') {
     return locations;
