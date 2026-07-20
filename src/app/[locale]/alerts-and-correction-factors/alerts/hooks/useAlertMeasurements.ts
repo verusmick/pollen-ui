@@ -192,7 +192,7 @@ export function useAlertMeasurements(
       });
     },
     enabled,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 3000,
   });
 
   return {

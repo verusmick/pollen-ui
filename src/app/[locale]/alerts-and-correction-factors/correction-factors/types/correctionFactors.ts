@@ -73,6 +73,7 @@ export interface CorrectionFactorMeasurementsRequest {
   to: number;
   locations: string;
   pollen: string;
+  applyRules?: boolean;
 }
 
 export interface CorrectionFactorValidationEventsRequest {

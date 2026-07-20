@@ -74,6 +74,10 @@ function buildMeasurementsQuery(
     pollen: params.pollen,
   });
 
+  if (params.applyRules !== undefined) {
+    query.set('applyRules', String(params.applyRules));
+  }
+
   return `?${query.toString()}`;
 }
 

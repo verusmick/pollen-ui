@@ -70,6 +70,7 @@ export function useCorrectionFactorPreview({
         to: rootRange.to,
         locations: values.location,
         pollen: values.basePollen,
+        applyRules: false,
       });
 
       return normalizeMeasurementsPreviewSource(response, {
