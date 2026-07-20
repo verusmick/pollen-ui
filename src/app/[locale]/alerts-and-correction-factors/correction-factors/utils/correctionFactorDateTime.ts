@@ -1,4 +1,12 @@
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
 import type { CorrectionFactorTimeOption } from '../types';
+import { POLLEN_SCIENCE_DISPLAY_TIME_ZONE } from '../../utils/pollenScienceDateTime';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const CORRECTION_FACTOR_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const CORRECTION_FACTOR_DATE_TIME_PATTERN =
@@ -54,6 +62,34 @@ function normalizeApiDateTimeOffset(value: string | undefined): string {
   }
 
   return `${sign}${offset.slice(0, 2)}:${offset.slice(2, 4)}`;
+}
+
+function toCorrectionFactorDisplayTimeZoneTimestamp(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number
+): number | null {
+  const displayDateTime = `${year}-${padNumber(month)}-${padNumber(
+    day
+  )}T${padNumber(hour)}:${padNumber(minute)}`;
+  const zonedDateTime = dayjs.tz(
+    displayDateTime,
+    POLLEN_SCIENCE_DISPLAY_TIME_ZONE
+  );
+
+  return zonedDateTime.isValid() &&
+    zonedDateTime.format('YYYY-MM-DDTHH:mm') === displayDateTime
+    ? zonedDateTime.unix()
+    : null;
+}
+
+function formatCorrectionFactorDisplayDateTime(timestamp: number): string {
+  return dayjs
+    .unix(timestamp)
+    .tz(POLLEN_SCIENCE_DISPLAY_TIME_ZONE)
+    .format('YYYY-MM-DDTHH:00');
 }
 
 export function isCorrectionFactorTimeOption(
@@ -119,17 +155,12 @@ export function combineCorrectionFactorDateTime(
   return `${date}T${time}`;
 }
 
+/** Converts an API timestamp instant to the wall time shown in the form. */
 export function normalizeCorrectionFactorDateTime(value: string): string {
   const normalizedValue = value.trim();
 
   if (!normalizedValue) {
     return '';
-  }
-
-  const splitValue = splitCorrectionFactorDateTime(normalizedValue);
-
-  if (splitValue.date && splitValue.time) {
-    return normalizedValue;
   }
 
   const dateMatch = CORRECTION_FACTOR_DATE_PATTERN.exec(normalizedValue);
@@ -144,42 +175,15 @@ export function normalizeCorrectionFactorDateTime(value: string): string {
     }
   }
 
-  const apiDateTimeMatch = CORRECTION_FACTOR_API_DATE_TIME_PATTERN.exec(normalizedValue);
+  const timestamp = toCorrectionFactorUnixTimestampFromApiDateTime(
+    normalizedValue
+  );
 
-  if (apiDateTimeMatch) {
-    const year = Number(apiDateTimeMatch[1]);
-    const month = Number(apiDateTimeMatch[2]);
-    const day = Number(apiDateTimeMatch[3]);
-    const hour = Number(apiDateTimeMatch[4]);
-    const minute = Number(apiDateTimeMatch[5]);
-    const second = apiDateTimeMatch[6] ? Number(apiDateTimeMatch[6]) : 0;
-    const time = `${apiDateTimeMatch[4]}:${apiDateTimeMatch[5]}`;
-
-    if (
-      isValidDateParts(year, month, day) &&
-      Number.isInteger(hour) &&
-      hour >= 0 &&
-      hour <= 23 &&
-      minute === 0 &&
-      second === 0 &&
-      isCorrectionFactorTimeOption(time)
-    ) {
-      return buildCorrectionFactorDateTimeValue(year, month, day, hour);
-    }
-  }
-
-  const parsedDate = new Date(normalizedValue);
-
-  if (Number.isNaN(parsedDate.getTime())) {
+  if (timestamp === null) {
     return '';
   }
 
-  const year = parsedDate.getUTCFullYear();
-  const month = parsedDate.getUTCMonth() + 1;
-  const day = parsedDate.getUTCDate();
-  const hour = parsedDate.getUTCHours();
-
-  return buildCorrectionFactorDateTimeValue(year, month, day, hour);
+  return formatCorrectionFactorDisplayDateTime(timestamp);
 }
 
 export function normalizeCorrectionFactorDateTimeInput(value: string): string {
@@ -237,6 +241,7 @@ export function compareCorrectionFactorDateTimes(
   return leftTimestamp - rightTimestamp;
 }
 
+/** Converts a form wall time in the display timezone to its Unix instant. */
 export function toCorrectionFactorUnixTimestamp(value: string): number | null {
   const match = CORRECTION_FACTOR_DATE_TIME_PATTERN.exec(value);
 
@@ -259,7 +264,13 @@ export function toCorrectionFactorUnixTimestamp(value: string): number | null {
     return null;
   }
 
-  return Math.floor(Date.UTC(year, month - 1, day, hour, minute, 0) / 1000);
+  return toCorrectionFactorDisplayTimeZoneTimestamp(
+    year,
+    month,
+    day,
+    hour,
+    minute
+  );
 }
 
 export function toCorrectionFactorUnixTimestampFromApiDateTime(
