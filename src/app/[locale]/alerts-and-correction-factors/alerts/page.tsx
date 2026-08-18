@@ -1,5 +1,9 @@
 import { AlertsListContainer } from './components';
 
 export default function AlertsPage() {
-  return <AlertsListContainer />;
+  return (
+    <div className="h-full w-full overflow-y-auto">
+      <AlertsListContainer />
+    </div>
+  );
 }

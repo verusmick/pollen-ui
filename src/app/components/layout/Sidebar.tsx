@@ -26,7 +26,7 @@ export function Sidebar({
     },
     {
       label: t('routes.rulesAndNotifications'),
-      href: '/rules-and-notifications/notifications',
+      href: '/rules-and-notifications/rules',
       match: '/rules-and-notifications',
     },
     {

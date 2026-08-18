@@ -123,6 +123,7 @@ async function getAlertMeasurements(params: {
     to: String(params.to),
     locations: params.location,
     pollen: params.pollen,
+    applyRules: 'false',
   });
   const response = await fetch(`/api/measurements?${query.toString()}`);
 

@@ -1,5 +1,9 @@
 import { RulesListContainer } from '../components';
 
 export default function RulesPage() {
-  return <RulesListContainer />;
+  return (
+    <div className="h-full w-full overflow-y-auto">
+      <RulesListContainer />
+    </div>
+  );
 }

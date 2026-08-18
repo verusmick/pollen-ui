@@ -5,12 +5,12 @@ import { useTranslations } from 'next-intl';
 
 const TABS = [
   {
-    key: 'notifications',
-    href: '/rules-and-notifications/notifications',
-  },
-  {
     key: 'rules',
     href: '/rules-and-notifications/rules',
+  },
+  {
+    key: 'notifications',
+    href: '/rules-and-notifications/notifications',
   },
 ] as const;
 
